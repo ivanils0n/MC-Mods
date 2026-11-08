@@ -1,0 +1,17 @@
+pluginManagement {
+	repositories {
+		maven {
+			name = 'Fabric'
+			url = 'https://maven.fabricmc.net/'
+		}
+		mavenCentral()
+		gradlePluginPortal()
+	}
+}
+
+rootProject.name = 'mc-mods'
+
+// Cada subpasta com build.gradle é um mod; para adicionar um mod novo basta criar a pasta.
+rootDir.eachDir { dir ->
+	if (new File(dir, 'build.gradle').exists()) include dir.name
+}

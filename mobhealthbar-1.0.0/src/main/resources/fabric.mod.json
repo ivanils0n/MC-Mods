@@ -1,0 +1,25 @@
+{
+	"schemaVersion": 1,
+	"id": "mobhealthbar",
+	"version": "${version}",
+	"name": "Mob Health Bar",
+	"description": "Mostra a vida de mobs e outros jogadores acima da cabeça.",
+	"authors": ["ivanils0n"],
+	"contact": {
+		"sources": "https://github.com/ivanils0n/MC-Mods"
+	},
+	"license": "MIT",
+	"icon": "assets/mobhealthbar/icon.png",
+	"environment": "client",
+	"mixins": [
+		{
+			"config": "mobhealthbar.mixins.json",
+			"environment": "client"
+		}
+	],
+	"depends": {
+		"fabricloader": ">=0.20.1",
+		"minecraft": ">=26.3 <27",
+		"java": ">=25"
+	}
+}
