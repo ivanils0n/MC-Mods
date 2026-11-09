@@ -28,10 +28,14 @@ public final class HealthBar {
 		if (!(entity instanceof LivingEntity living) || !living.isAlive()) return;
 		Player self = Minecraft.getInstance().player;
 		if (self == null || entity == self) return;
-		// Outros jogadores: só quando o nome está visível (respeita times/agachar).
-		if (!(entity instanceof Mob) && !(entity instanceof Player && state.nameTag != null)) return;
-		// Linha de visão evita mostrar a vida através das paredes (nametags atravessam blocos).
-		if (state.distanceToCameraSq > MAX_DISTANCE_SQ || entity.isInvisibleTo(self) || !self.hasLineOfSight(entity)) return;
+		if (entity instanceof Player) {
+			// Outros jogadores: a vida segue o nome (atravessa paredes e some junto com ele).
+			if (state.nameTag == null) return;
+		} else if (!(entity instanceof Mob) || state.distanceToCameraSq > MAX_DISTANCE_SQ
+				|| entity.isInvisibleTo(self) || !self.hasLineOfSight(entity)) {
+			// Mobs: só perto e com linha de visão.
+			return;
+		}
 
 		// scoreText é a linha desenhada logo abaixo do nome.
 		Component bar = bar(living);
