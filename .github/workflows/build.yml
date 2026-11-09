@@ -72,3 +72,12 @@ jobs:
               gh release upload tpaltar-pack "$name" --clobber || { sleep 10; gh release upload tpaltar-pack "$name" --clobber; }
             fi
           fi
+      - name: TEMP cliente carrega o pack
+        if: startsWith(matrix.mod, 'tpaltar-')
+        run: |
+          set +e
+          timeout 420 xvfb-run -a -s "-screen 0 1280x720x24" ./gradlew ":${{ matrix.mod }}:runClient" "-Pminecraft_version=${{ matrix.mc }}" "-Pminecraft_dependency=${{ matrix.dep }}" > client.log 2>&1
+          grep -E "Reloading ResourceManager|Created: .*atlas|OpenGL|Backend library" client.log | head -20
+          echo "==== problemas"
+          grep -iE "tpaltar|missing|unable to|failed to|couldn't|exception|error" client.log | grep -viE "realms|telemetry|narrator|sound|openal|gamemode|joystick|authlib|Session|YggdrasilService|profile" | head -60
+          echo "==== fim"; tail -5 client.log
