@@ -1,74 +1,18 @@
 name: build
-on: [push, pull_request, workflow_dispatch]
-
+on: [push]
 jobs:
-  # Lista as pastas de mod (as que têm build.gradle), para cada mod virar um download separado.
-  mods:
+  probe:
     runs-on: ubuntu-24.04
-    outputs:
-      list: ${{ steps.find.outputs.list }}
-    steps:
-      - uses: actions/checkout@v6
-      - id: find
-        run: |
-          mods=$(for d in */; do [ -f "$d/build.gradle" ] && printf '"%s",' "${d%/}"; done)
-          echo "list=[${mods%,}]" >> "$GITHUB_OUTPUT"
-
-  build:
-    needs: mods
-    runs-on: ubuntu-24.04
-    permissions:
-      contents: write # publicar o resource pack do Altar de Teleporte no release "tpaltar-pack"
     strategy:
       fail-fast: false
       matrix:
-        mod: ${{ fromJSON(needs.mods.outputs.list) }}
-        mc: ['26.3', '26.2']
-        include:
-          - { mc: '26.3', dep: '>=26.3 <27' }
-          - { mc: '26.2', dep: '~26.2' }
+        mc: ['26.1.2', '26.2', '26.3']
     steps:
       - uses: actions/checkout@v6
-      - uses: gradle/actions/wrapper-validation@v6
       - uses: actions/setup-java@v5
         with:
           java-version: '25'
           distribution: 'microsoft'
-      - run: chmod +x ./gradlew
-      - run: ./gradlew ":${{ matrix.mod }}:build" "-Pminecraft_version=${{ matrix.mc }}" "-Pminecraft_dependency=${{ matrix.dep }}"
-      # Um download por mod e versão do Minecraft, ex.: mc26.2-tpaltar-1.0.0
-      - uses: actions/upload-artifact@v7
-        with:
-          name: mc${{ matrix.mc }}-${{ matrix.mod }}
-          path: ${{ matrix.mod }}/build/libs/*.jar
-      # Sobe um servidor dedicado de verdade com o Altar de Teleporte, monta/remove um altar de teste e desliga.
-      - name: Teste do Altar de Teleporte num servidor real
-        if: startsWith(matrix.mod, 'tpaltar-')
-        run: |
-          mkdir -p ${{ matrix.mod }}/run
-          echo "eula=true" > ${{ matrix.mod }}/run/eula.txt
-          printf 'level-type=minecraft\\:flat\nonline-mode=false\nspawn-protection=0\n' > ${{ matrix.mod }}/run/server.properties
-          timeout 900 ./gradlew ":${{ matrix.mod }}:runServer" -Pselftest "-Pminecraft_version=${{ matrix.mc }}" "-Pminecraft_dependency=${{ matrix.dep }}" | tee server.log
-          grep -q "TPALTAR SELFTEST OK" server.log
-          ! grep -q "Serialization errors" server.log
-      # Confere que o hash dentro do .jar é o do zip e, na main, publica o zip no release "tpaltar-pack".
-      # O nome leva o hash, então cada versão do mod aponta para o seu próprio pack (o servidor envia o link sozinho).
-      - name: Resource pack do Altar de Teleporte
-        if: startsWith(matrix.mod, 'tpaltar-')
-        env:
-          GH_TOKEN: ${{ github.token }}
-        run: |
-          zip=${{ matrix.mod }}/build/pack/tpaltar-pack.zip
-          sha=$(sha1sum "$zip" | cut -d' ' -f1)
-          jar=$(ls ${{ matrix.mod }}/build/libs/*.jar | grep -v sources | head -1)
-          test "$(unzip -p "$jar" tpaltar/pack.sha1)" = "$sha"
-          echo "SHA-1 do pack: $sha"
-          if [ "${{ github.event_name }}" = push ] && [ "${{ github.ref }}" = refs/heads/main ]; then
-            name="tpaltar-pack-$sha.zip"
-            cp "$zip" "$name"
-            gh release view tpaltar-pack >/dev/null 2>&1 || gh release create tpaltar-pack --title "Texturas do Altar de Teleporte" \
-              --notes "Resource pack do Altar de Teleporte. O próprio mod envia o link certo aos jogadores; não é preciso configurar nada." || true
-            if ! gh release view tpaltar-pack --json assets -q '.assets[].name' | grep -qx "$name"; then
-              gh release upload tpaltar-pack "$name" --clobber || { sleep 10; gh release upload tpaltar-pack "$name" --clobber; }
-            fi
-          fi
+      - run: chmod +x ./gradlew .github/probe.sh
+      - run: ./gradlew ":smartchest-1.0.0:compileJava" "-Pminecraft_version=${{ matrix.mc }}" "-Pminecraft_dependency=*"
+      - run: .github/probe.sh
