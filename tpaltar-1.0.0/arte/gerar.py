@@ -551,8 +551,14 @@ def main():
     write_json(os.path.join(items, "smooth_stone.json"), select(
         [("tpaltar_obelisk", "tpaltar:item/obelisk"), ("tpaltar_ring", "tpaltar:item/shards")], "minecraft:block/smooth_stone"))
     write_json(os.path.join(items, "ender_pearl.json"), select([("tpaltar_eye", "tpaltar:item/eye_idle")], "minecraft:item/ender_pearl"))
-    write_json(os.path.join(items, "ender_eye.json"), select(
-        [("tpaltar_eye", "tpaltar:item/eye_active"), ("tpaltar_altar", "tpaltar:item/altar_item")], "minecraft:item/ender_eye"))
+    # O item do altar é um olho do fim com custom_data (inclusive os craftados em versões antigas, sem a marca):
+    # olho do fim comum não tem custom_data, então ele vira o obelisco em miniatura.
+    eye = select([("tpaltar_eye", "tpaltar:item/eye_active")], "minecraft:item/ender_eye")["model"]
+    write_json(os.path.join(items, "ender_eye.json"), {"model": {
+        "type": "minecraft:condition", "property": "minecraft:has_component", "component": "minecraft:custom_data",
+        "on_true": {"type": "minecraft:model", "model": "tpaltar:item/altar_item"},
+        "on_false": eye,
+    }})
 
     write_json(os.path.join(items, "glass_pane.json"), select([("tpaltar_blank", "tpaltar:item/blank")], "minecraft:item/glass_pane"))
 
