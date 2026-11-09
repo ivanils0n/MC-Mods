@@ -90,8 +90,8 @@ jobs:
           sleep 45; DISPLAY=:99 import -window root shot1.png
           sleep 7; DISPLAY=:99 import -window root shot2.png
           grep -E "\(tpaltar\)|joined the game|ERROR|Exception" client.log | grep -v ALSA | head -40
-      - uses: actions/upload-artifact@v7
-        if: startsWith(matrix.mod, 'tpaltar-') && matrix.mc == '26.2'
-        with:
-          name: print-jogo
-          path: shot*.png
+      - if: startsWith(matrix.mod, 'tpaltar-') && matrix.mc == '26.2'
+        run: |
+          git config user.name ci && git config user.email ci@users.noreply.github.com
+          git checkout -q --orphan prints-tmp && git rm -rqf --cached . && git add -f shot1.png shot2.png && git commit -qm prints
+          git push -qf origin HEAD:refs/heads/prints-tmp
