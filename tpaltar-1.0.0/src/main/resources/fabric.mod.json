@@ -10,6 +10,7 @@
 	},
 	"license": "MIT",
 	"environment": "*",
+	"mixins": ["tpaltar.mixins.json"],
 	"entrypoints": {
 		"main": ["io.github.ivanils0n.tpaltar.TpAltar"]
 	},

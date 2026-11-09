@@ -14,11 +14,11 @@ Vai na pasta `mods/` do servidor, junto com o Fabric API; os jogadores entram se
 
 - **Receita** (bancada): pedra lisa ×3 em cima; pedra lisa, ender pearl, pedra lisa no meio; obsidiana ×3 embaixo. Aparece no livro de receitas quando o jogador pega uma ender pearl.
 - **Colocar**: clique no chão com o altar; abre uma tela de bigorna para digitar o nome (até 24 letras, único por dimensão). Clique na ender pearl do resultado para confirmar ou feche a tela para desistir. Custa 5 níveis de experiência, cobrados só quando o altar é colocado (criativo não paga). Precisa de 3 blocos livres de altura.
-- **Abastecer**: clique no altar com ender pearls na mão. Guarda até 64; cada viagem **até** este altar gasta 4 (16 viagens).
+- **Abastecer**: abra o menu do altar e coloque ender pearls nos 4 espaços da última fileira (até 64); dá para tirar de volta do mesmo jeito. Cada viagem **até** este altar gasta 2 (32 viagens). O estoque é compartilhado por todos.
 - **Viajar**: clique no altar de mãos vazias → lista dos outros altares da mesma dimensão → clique no destino. Sem 4 pérolas no destino, a viagem é recusada. Saída e chegada soltam partículas roxas.
 - **Em uso**: a pérola flutuante gira para encarar o jogador mais próximo (até 16 blocos) e vira olho do fim enquanto alguém está escolhendo o destino; nesse tempo ninguém mais abre o menu daquele altar (abastecer continua liberado).
 - **Remover**: quebre a base de obsidiana. Com picareta de diamante ou netherite o altar e as pérolas guardadas voltam; com qualquer outra coisa ele se despedaça sem dropar nada.
-- Cada dimensão tem sua própria lista. Os dados ficam em `<mundo>/tpaltar.json`, fora do save do Minecraft. Sem o mod, o mundo abre normalmente: sobram só a obsidiana e a decoração.
+- Cada dimensão tem sua própria lista. Os dados ficam em `<mundo>/tpaltar.json`, fora do save do Minecraft. A decoração (coluna, tampo, olho) nunca é salva no mapa: sem o mod, sobra só uma obsidiana comum; com o mod, ela é recriada sozinha. Sobras de versões antigas são apagadas automaticamente.
 
 ## Item Despawn Timer
 

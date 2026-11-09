@@ -1,0 +1,11 @@
+{
+	"required": true,
+	"package": "io.github.ivanils0n.tpaltar.mixin",
+	"compatibilityLevel": "JAVA_21",
+	"mixins": [
+		"EntityMixin"
+	],
+	"injectors": {
+		"defaultRequire": 1
+	}
+}

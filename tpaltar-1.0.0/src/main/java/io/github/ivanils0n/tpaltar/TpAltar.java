@@ -8,6 +8,7 @@ import java.util.Map;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 import net.fabricmc.api.ModInitializer;
+import net.fabricmc.fabric.api.event.lifecycle.v1.ServerEntityEvents;
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerLifecycleEvents;
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerTickEvents;
 import net.fabricmc.fabric.api.event.player.PlayerBlockBreakEvents;
@@ -60,7 +61,7 @@ import org.slf4j.LoggerFactory;
 public final class TpAltar implements ModInitializer {
 	static final Logger LOG = LoggerFactory.getLogger("tpaltar");
 	static final int MAX_PEARLS = 64;
-	static final int COST = 4; // 64 pérolas = 16 viagens
+	static final int COST = 2; // 64 pérolas = 32 viagens
 	static final String ITEM_NAME = "Altar de Teleporte";
 	static final int NAME_MAX = 24;
 	static final int PLACE_LEVELS = 5; // níveis de XP para nomear e colocar um altar
@@ -73,6 +74,10 @@ public final class TpAltar implements ModInitializer {
 	private static final Map<String, UUID> USERS = new HashMap<>();
 	/** Item que o olho de cada altar está mostrando agora (true = olho do fim, em uso). Vazio após reiniciar. */
 	private static final Map<String, Boolean> SHOWN = new HashMap<>();
+	/** Tag única desta execução do servidor. As decorações nunca são salvas no mapa (mixin/EntityMixin), então uma
+	 * entidade "tpaltar" que chega do disco sem essa tag é sobra de versão antiga e é apagada. */
+	private static final String RUN_TAG = "tpaltar_run_" + Long.toHexString(new java.util.Random().nextLong());
+	private static final List<Entity> LEFTOVERS = new java.util.ArrayList<>();
 	private static MinecraftServer server;
 	private static AltarStore store;
 
@@ -90,6 +95,15 @@ public final class TpAltar implements ModInitializer {
 			LAST_USE.clear();
 			USERS.clear();
 			SHOWN.clear();
+			LEFTOVERS.clear();
+		});
+		ServerEntityEvents.ENTITY_LOAD.register((entity, level) -> {
+			if (entity.getTags().contains("tpaltar") && !entity.getTags().contains(RUN_TAG)) LEFTOVERS.add(entity);
+		});
+		ServerTickEvents.END_SERVER_TICK.register(s -> {
+			// Apaga fora do evento de carregamento, para não mexer na lista de entidades enquanto o jogo a percorre.
+			for (Entity e : LEFTOVERS) if (!e.isRemoved()) e.discard();
+			LEFTOVERS.clear();
 		});
 		UseBlockCallback.EVENT.register(TpAltar::onUseBlock);
 		UseEntityCallback.EVENT.register(TpAltar::onUseEntity);
@@ -162,7 +176,12 @@ public final class TpAltar implements ModInitializer {
 				sl.sendParticles(ParticleTypes.PORTAL, a.x + 0.5, a.y + 2.9, a.z + 0.5, 6, 0.25, 0.3, 0.25, 0.4);
 			}
 			Display.ItemDisplay eye = findEye(sl, a);
-			if (eye == null) continue;
+			if (eye == null) {
+				// Decoração não é salva no mapa: recria quando o lugar volta a ser carregado com jogadores por perto.
+				if (sl.isPositionEntityTicking(pos)) spawnVisuals(sl, pos);
+				SHOWN.remove(a.key());
+				continue;
+			}
 			boolean inUse = user(a) != null;
 			if (!Boolean.valueOf(inUse).equals(SHOWN.get(a.key())) && showEye(sl, a, eye, inUse)) SHOWN.put(a.key(), inUse);
 			lookAtNearest(sl, eye);
@@ -279,14 +298,18 @@ public final class TpAltar implements ModInitializer {
 	}
 
 	static void removeAltar(ServerLevel sl, Altar altar) {
+		ServerPlayer u = user(altar);
+		if (u != null) u.closeContainer(); // ninguém mexe no estoque de um altar que não existe mais
 		store.remove(altar);
 		USERS.remove(altar.key());
 		SHOWN.remove(altar.key());
 		command(sl, altar.pos(), "kill @e[tag=" + tag(altar.pos()) + ",distance=..5]");
 	}
 
-	private static void spawnVisuals(ServerLevel sl, BlockPos pos) {
-		String tags = "Tags:[\"tpaltar\",\"" + tag(pos) + "\"]";
+	/** Cria (ou recria, apagando a anterior) a decoração do altar. */
+	static void spawnVisuals(ServerLevel sl, BlockPos pos) {
+		command(sl, pos, "kill @e[tag=" + tag(pos) + ",distance=..5]");
+		String tags = "Tags:[\"tpaltar\",\"" + tag(pos) + "\",\"" + RUN_TAG + "\"]";
 		double x = pos.getX() + 0.5, y = pos.getY(), z = pos.getZ() + 0.5;
 		// Coluna de pedra lisa e tampo mais largo. São item_display (cubo centrado na entidade) porque o formato
 		// de block_state do block_display mudou entre a 26.2 e a 26.3; o de item é igual nas duas.
@@ -330,29 +353,21 @@ public final class TpAltar implements ModInitializer {
 		Integer last = LAST_USE.put(sp.getUUID(), now);
 		if (last != null && now - last < 5) return;
 
-		ItemStack pearls = sp.getMainHandItem().is(Items.ENDER_PEARL) ? sp.getMainHandItem()
-			: sp.getOffhandItem().is(Items.ENDER_PEARL) ? sp.getOffhandItem() : ItemStack.EMPTY;
-		if (pearls.isEmpty()) {
-			ServerPlayer busy = user(altar);
-			if (busy != null && busy != sp) {
-				say(sp, "O altar \"" + altar.name + "\" está sendo usado por " + busy.getName().getString() + ". Aguarde.", ChatFormatting.YELLOW);
-				return;
-			}
-			List<Altar> others = store.inDim(dim(sl));
-			others.remove(altar);
-			AltarMenu.open(sp, altar, others);
+		ServerPlayer busy = user(altar);
+		if (busy != null && busy != sp) {
+			say(sp, "O altar \"" + altar.name + "\" está sendo usado por " + busy.getName().getString() + ". Aguarde.", ChatFormatting.YELLOW);
 			return;
 		}
-		int add = Math.min(pearls.getCount(), MAX_PEARLS - altar.pearls);
-		if (add <= 0) {
-			say(sp, "O altar \"" + altar.name + "\" já está cheio (" + MAX_PEARLS + "/" + MAX_PEARLS + ").", ChatFormatting.YELLOW);
-			return;
-		}
-		altar.pearls += add;
+		List<Altar> others = store.inDim(dim(sl));
+		others.remove(altar);
+		AltarMenu.open(sp, altar, others);
+	}
+
+	/** Estoque mudou pelo menu do altar. Ignora se o altar já foi removido. */
+	static void setPearls(Altar a, int pearls) {
+		if (store == null || store.get(a.dim, a.pos()) != a) return;
+		a.pearls = Math.clamp(pearls, 0, MAX_PEARLS);
 		store.save();
-		if (!sp.isCreative()) pearls.shrink(add);
-		sl.playSound(null, altar.pos(), SoundEvents.END_PORTAL_FRAME_FILL, SoundSource.BLOCKS, 0.7f, 1.3f);
-		say(sp, "Altar \"" + altar.name + "\": " + altar.pearls + "/" + MAX_PEARLS + " pérolas (" + altar.pearls / COST + " viagens).", ChatFormatting.LIGHT_PURPLE);
 	}
 
 	static void teleport(ServerPlayer sp, Altar from, Altar to) {
@@ -381,6 +396,9 @@ public final class TpAltar implements ModInitializer {
 		}
 		dst.pearls -= COST;
 		store.save();
+		// Se alguém está com o menu do altar de destino aberto, atualiza o estoque mostrado.
+		ServerPlayer atDst = user(dst);
+		if (atDst != null && atDst.containerMenu instanceof AltarMenu menu) menu.loadPearls();
 		sl.playSound(null, sp.blockPosition(), SoundEvents.ENDERMAN_TELEPORT, SoundSource.PLAYERS, 1f, 1f);
 		portalBurst(sl, sp.position());
 		sp.stopRiding();

@@ -6,6 +6,7 @@ import net.minecraft.ChatFormatting;
 import net.minecraft.core.component.DataComponents;
 import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.world.Container;
 import net.minecraft.world.SimpleContainer;
 import net.minecraft.world.SimpleMenuProvider;
 import net.minecraft.world.entity.player.Inventory;
@@ -13,38 +14,72 @@ import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.inventory.ChestMenu;
 import net.minecraft.world.inventory.ContainerInput;
 import net.minecraft.world.inventory.MenuType;
+import net.minecraft.world.inventory.Slot;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.item.component.ItemLore;
 
-/** Baú virtual com os outros altares da dimensão. Nenhum item pode ser tirado ou colocado. */
+/**
+ * Baú virtual do altar: em cima os outros altares da dimensão (clique para viajar), na última fileira 4 espaços
+ * de ender pearls que são o estoque do próprio altar (4 × 16 = 64). Só esses 4 espaços aceitam itens.
+ */
 final class AltarMenu extends ChestMenu {
 	private static final MenuType<?>[] TYPES = {
 		MenuType.GENERIC_9x1, MenuType.GENERIC_9x2, MenuType.GENERIC_9x3,
 		MenuType.GENERIC_9x4, MenuType.GENERIC_9x5, MenuType.GENERIC_9x6
 	};
+	static final int MAX_TARGETS = 45; // 5 fileiras de destinos + 1 de estoque
+	private static final int PEARL_SLOTS = 4;
+	private static final int FIRST_PEARL = 2; // posição na fileira de estoque: [vidro vidro P P P P vidro vidro vidro]
 
 	private final Altar from;
 	private final List<Altar> targets;
+	private final SimpleContainer box;
+	private final int storeStart; // índice do primeiro espaço da fileira de estoque
+	private boolean loading;
 
 	private AltarMenu(int id, Inventory inv, SimpleContainer box, int rows, Altar from, List<Altar> targets) {
 		super(TYPES[rows - 1], id, inv, box, rows);
 		this.from = from;
 		this.targets = targets;
+		this.box = box;
+		this.storeStart = (rows - 1) * 9;
+		// Troca os espaços do baú: estoque só aceita ender pearl; o resto não deixa pegar nem colocar nada.
+		for (int i = 0; i < rows * 9; i++) {
+			Slot old = slots.get(i);
+			Slot slot = isPearlSlot(i)
+				? new Slot(box, old.getContainerSlot(), old.x, old.y) {
+					@Override
+					public boolean mayPlace(ItemStack stack) {
+						return stack.is(Items.ENDER_PEARL);
+					}
+				}
+				: new Slot(box, old.getContainerSlot(), old.x, old.y) {
+					@Override
+					public boolean mayPlace(ItemStack stack) {
+						return false;
+					}
+
+					@Override
+					public boolean mayPickup(Player player) {
+						return false;
+					}
+				};
+			slot.index = i;
+			slots.set(i, slot);
+		}
+		loadPearls();
+		box.addListener(this::pearlsMoved);
 	}
 
 	static void open(ServerPlayer player, Altar from, List<Altar> all) {
-		if (all.isEmpty()) {
-			TpAltar.say(player, "Não há outros altares nesta dimensão.", ChatFormatting.YELLOW);
-			return;
-		}
-		// shortcut: mostra só os 54 primeiros (um baú grande); paginar se algum servidor passar disso por dimensão.
-		List<Altar> targets = List.copyOf(all.subList(0, Math.min(all.size(), 54)));
-		int rows = (targets.size() + 8) / 9;
+		// shortcut: mostra só os 45 primeiros destinos; paginar se algum servidor passar disso por dimensão.
+		List<Altar> targets = List.copyOf(all.subList(0, Math.min(all.size(), MAX_TARGETS)));
+		int rows = (targets.size() + 8) / 9 + 1;
 		SimpleContainer box = new SimpleContainer(rows * 9);
 		for (int i = 0; i < targets.size(); i++) box.setItem(i, icon(targets.get(i)));
-		Component title = Component.literal(from.name + " · " + from.pearls + "/" + TpAltar.MAX_PEARLS + " pérolas");
-		player.openMenu(new SimpleMenuProvider((id, inv, p) -> new AltarMenu(id, inv, box, rows, from, targets), title));
+		for (int i = (rows - 1) * 9; i < rows * 9; i++) box.setItem(i, pane());
+		player.openMenu(new SimpleMenuProvider((id, inv, p) -> new AltarMenu(id, inv, box, rows, from, targets), Component.literal(from.name)));
 		if (player.containerMenu instanceof AltarMenu) TpAltar.lock(from, player); // trava até teleportar ou fechar
 	}
 
@@ -52,9 +87,37 @@ final class AltarMenu extends ChestMenu {
 		return from.key().equals(a.key());
 	}
 
+	private boolean isPearlSlot(int i) {
+		int col = i - storeStart;
+		return col >= FIRST_PEARL && col < FIRST_PEARL + PEARL_SLOTS;
+	}
+
+	/** Preenche os 4 espaços com o estoque atual do altar (ex.: depois que alguém viajou até ele). */
+	void loadPearls() {
+		loading = true;
+		int left = from.pearls;
+		for (int i = 0; i < PEARL_SLOTS; i++) {
+			int n = Math.min(left, 16);
+			box.setItem(storeStart + FIRST_PEARL + i, n > 0 ? new ItemStack(Items.ENDER_PEARL, n) : ItemStack.EMPTY);
+			left -= n;
+		}
+		loading = false;
+	}
+
+	/** Qualquer mudança no baú: o estoque do altar passa a ser o que está nos 4 espaços. */
+	private void pearlsMoved(Container c) {
+		if (loading) return;
+		int total = 0;
+		for (int i = 0; i < PEARL_SLOTS; i++) {
+			ItemStack s = box.getItem(storeStart + FIRST_PEARL + i);
+			if (s.is(Items.ENDER_PEARL)) total += s.getCount();
+		}
+		if (total != from.pearls) TpAltar.setPearls(from, total);
+	}
+
 	@Override
 	public void removed(Player player) {
-		super.removed(player);
+		super.removed(player); // devolve ao jogador o item que estava no cursor; o estoque fica no altar
 		TpAltar.unlock(from, player);
 	}
 
@@ -71,17 +134,43 @@ final class AltarMenu extends ChestMenu {
 		return s;
 	}
 
-	@Override
-	public void clicked(int slot, int button, ContainerInput type, Player player) {
-		// Nunca chama o super: bloqueia pegar, soltar, shift-clique e arrastar. Depois reenvia o estado real ao cliente.
-		sendAllDataToRemote();
-		if (player instanceof ServerPlayer sp && type == ContainerInput.PICKUP && slot >= 0 && slot < targets.size()) {
-			TpAltar.teleport(sp, from, targets.get(slot));
-		}
+	private static ItemStack pane() {
+		ItemStack s = new ItemStack(Items.PURPLE_STAINED_GLASS_PANE);
+		s.set(DataComponents.CUSTOM_NAME, TpAltar.plain("Ender pearls deste altar", ChatFormatting.LIGHT_PURPLE));
+		s.set(DataComponents.LORE, new ItemLore(List.of(
+			TpAltar.plain("Guarde até " + TpAltar.MAX_PEARLS + " nos espaços do meio.", ChatFormatting.GRAY),
+			TpAltar.plain("Cada viagem até aqui gasta " + TpAltar.COST + ".", ChatFormatting.GRAY))));
+		return s;
 	}
 
 	@Override
-	public ItemStack quickMoveStack(Player player, int slot) {
-		return ItemStack.EMPTY;
+	public void clicked(int slot, int button, ContainerInput type, Player player) {
+		if (slot >= 0 && slot < storeStart + 9 && !isPearlSlot(slot)) {
+			// Destinos e vidros: nunca passam pelo clique normal. Reenvia o estado real ao cliente.
+			sendAllDataToRemote();
+			if (player instanceof ServerPlayer sp && type == ContainerInput.PICKUP && slot < targets.size()) {
+				TpAltar.teleport(sp, from, targets.get(slot));
+			}
+			return;
+		}
+		super.clicked(slot, button, type, player); // estoque e inventário do jogador funcionam como um baú normal
+	}
+
+	@Override
+	public ItemStack quickMoveStack(Player player, int index) {
+		Slot slot = slots.get(index);
+		if (!slot.hasItem()) return ItemStack.EMPTY;
+		ItemStack stack = slot.getItem();
+		ItemStack before = stack.copy();
+		int boxEnd = storeStart + 9;
+		if (index < boxEnd) {
+			if (!isPearlSlot(index) || !moveItemStackTo(stack, boxEnd, slots.size(), true)) return ItemStack.EMPTY;
+		} else {
+			int first = storeStart + FIRST_PEARL;
+			if (!stack.is(Items.ENDER_PEARL) || !moveItemStackTo(stack, first, first + PEARL_SLOTS, false)) return ItemStack.EMPTY;
+		}
+		if (stack.isEmpty()) slot.set(ItemStack.EMPTY);
+		else slot.setChanged();
+		return before;
 	}
 }
