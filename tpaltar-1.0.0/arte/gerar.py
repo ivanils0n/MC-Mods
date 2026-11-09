@@ -462,25 +462,104 @@ def chest_bg(rows, hole):
     return img
 
 
-def anvil_bg(hole):
-    img = gui_panel(176, 166, 9)
-    em = icon(2)  # emblema do obelisco no lugar do martelo
-    img.alpha_composite(em, (14, 6))
-    for x in range(58, 171):  # campo de texto: buraco, o jogo desenha o campo e o texto
-        for y in range(19, 38):
+# Tela de nome: tema "Céu do End" (fundo estrelado, constelação, encaixes redondos verde-água).
+SKY = {"bg": "#0b0618", "bg2": "#0e081e", "bg3": "#120a26", "edge": "#3c3489", "inner": "#261d55",
+       "star": "#e0c8ff", "star2": "#5dcaa5", "line": "#534ab7", "teal": "#5dcaa5", "teal_dim": "#1d9e75",
+       "socket_in": "#0b1f1a", "field": "#140a28", "slot": "#140a28", "slot_edge": "#7f77dd",
+       "plate": "#afa9ec", "plate_edge": "#534ab7"}
+# shortcut: o campo escuro cobre o campo bege do jogo; se o nome digitado sumir no jogo, voltar para False (buraco)
+COVER_NAME_FIELD = True
+
+
+def put(img, x, y, c):
+    if 0 <= x < img.width and 0 <= y < img.height:
+        img.putpixel((x, y), hexc(c) if isinstance(c, str) else c)
+
+
+def sky_line(img, a, b, c):
+    n = max(abs(b[0] - a[0]), abs(b[1] - a[1]))
+    for k in range(n + 1):
+        put(img, round(a[0] + (b[0] - a[0]) * k / n), round(a[1] + (b[1] - a[1]) * k / n), c)
+
+
+def sky_star(img, x, y, c, big=False):
+    put(img, x, y, c)
+    if big:
+        for dx, dy in ((1, 0), (-1, 0), (0, 1), (0, -1)):
+            put(img, x + dx, y + dy, lerp(hexc(c), hexc(SKY["bg"]), 0.45))
+
+
+def sky_ring(img, cx, cy, r, c, fill=None):
+    for y in range(int(cy - r - 2), int(cy + r + 3)):
+        for x in range(int(cx - r - 2), int(cx + r + 3)):
+            d = math.hypot(x + 0.5 - cx, y + 0.5 - cy)
+            if fill and d < r - 0.5:
+                put(img, x, y, fill)
+            elif abs(d - r) < 0.6:
+                put(img, x, y, c)
+
+
+def anvil_bg():
+    rnd = random.Random(26)
+    w, h = 176, 166
+    img = Image.new("RGBA", (w, h))
+    pal = [hexc(SKY["bg"])] * 4 + [hexc(SKY["bg2"]), hexc(SKY["bg3"])]
+    for y in range(h):
+        for x in range(w):
+            img.putpixel((x, y), rnd.choice(pal))
+    for _ in range(46):  # estrelas soltas
+        sky_star(img, rnd.randrange(4, w - 4), rnd.randrange(4, 78), rnd.choice([SKY["star"]] * 3 + [SKY["star2"]]), rnd.random() < 0.2)
+    for x in range(w):
+        put(img, x, 0, SKY["edge"]); put(img, x, h - 1, SKY["edge"]); put(img, x, 2, SKY["inner"]); put(img, x, h - 3, SKY["inner"])
+    for y in range(h):
+        put(img, 0, y, SKY["edge"]); put(img, w - 1, y, SKY["edge"]); put(img, 2, y, SKY["inner"]); put(img, w - 3, y, SKY["inner"])
+    # constelação no lugar do martelo
+    pts = [(10, 34), (20, 16), (34, 22), (46, 8), (40, 38)]
+    for a, b in zip(pts, pts[1:4]):
+        sky_line(img, a, b, SKY["line"])
+    sky_line(img, pts[2], pts[4], SKY["line"])
+    for x, y in pts:
+        sky_star(img, x, y, SKY["star"], big=True)
+    # campo do nome: escuro (o jogo escreve o nome em branco) com borda verde-água arredondada
+    for y in range(19, 38):
+        for x in range(58, 171):
+            corner = (x in (58, 170)) and (y in (19, 37))
             border = x in (58, 170) or y in (19, 37)
-            img.putpixel((x, y), hexc(UI["socket"]) if border else HOLE)
-    gui_slot(img, 26, 46, hole)
-    gui_slot(img, 75, 46, hole)
-    gui_socket(img, 133, 46, hole)
-    for i in range(-3, 4):  # "+" e seta
-        img.putpixel((59 + i, 55), hexc(UI["slot_light"])); img.putpixel((59, 55 + i), hexc(UI["slot_light"]))
-    for x in range(100, 126):
-        img.putpixel((x, 55), hexc(UI["socket"])); img.putpixel((x, 56), hexc(UI["socket"]))
+            if corner:
+                continue
+            put(img, x, y, SKY["teal"] if border else (SKY["field"] if COVER_NAME_FIELD else (0, 0, 0, 0)))
+    # pérola: encaixe redondo
+    sky_ring(img, 35, 55, 9, SKY["teal"], fill=SKY["socket_in"])
+    # segundo espaço da bigorna (não usado): mini constelação
+    tri = [(80, 50), (89, 53), (84, 60)]
+    for a, b in zip(tri, tri[1:] + tri[:1]):
+        sky_line(img, a, b, SKY["line"])
+    for x, y in tri:
+        sky_star(img, x, y, "#afa9ec", big=True)
+    # seta tracejada até o resultado
+    for x in range(46, 127):
+        if (x // 3) % 2 == 0:
+            put(img, x, 55, SKY["teal"])
     for i in range(4):
-        img.putpixel((125 - i, 55 - i), hexc(UI["socket"])); img.putpixel((125 - i, 56 + i), hexc(UI["socket"]))
-    gui_plate(img, 6, 70)
-    gui_player_inv(img, 83, hole)
+        put(img, 127 - i, 55 - i, SKY["teal"]); put(img, 127 - i, 55 + i, SKY["teal"]); put(img, 128, 55, SKY["teal"])
+    # resultado: portal redondo
+    sky_ring(img, 142, 55, 13, SKY["teal_dim"])
+    sky_ring(img, 142, 55, 11, SKY["teal"], fill=SKY["socket_in"])
+    # placa clara atrás de "Inventário" e o inventário do jogador
+    for j in range(11):
+        for i in range(58):
+            edge = i in (0, 57) or j in (0, 10)
+            put(img, 6 + i, 70 + j, SKY["plate_edge" if edge else "plate"])
+    for r in range(4):
+        y0 = 83 + 18 * r + (4 if r == 3 else 0)
+        for c in range(9):
+            x0 = 7 + 18 * c
+            for j in range(18):
+                for i in range(18):
+                    edge = i in (0, 17) or j in (0, 17)
+                    if edge and (i in (0, 17)) and (j in (0, 17)):
+                        continue
+                    put(img, x0 + i, y0 + j, SKY["slot_edge"] if edge else SKY["slot"])
     return img
 
 
@@ -494,7 +573,7 @@ def gui_font(slot_holes):
         # ascent 13: o título fica em y=6 da tela e o topo do glifo em y + 7 - ascent = 0
         providers.append({"type": "bitmap", "file": f"tpaltar:gui/altar_{rows}.png", "ascent": 13,
                           "height": img.height, "chars": [chr(0xE000 + rows - 1)]})
-    img = anvil_bg(slot_holes)
+    img = anvil_bg()
     img.save(os.path.join(GUI, "nome.png"))
     providers.append({"type": "bitmap", "file": "tpaltar:gui/nome.png", "ascent": 13, "height": img.height, "chars": ["\ue006"]})
     write_json(os.path.join(RES, "tpaltar/font/gui.json"), {"providers": providers})
