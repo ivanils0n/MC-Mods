@@ -1,0 +1,24 @@
+{
+	"schemaVersion": 1,
+	"id": "itemtimer",
+	"version": "${version}",
+	"name": "Item Despawn Timer",
+	"description": "Mostra acima dos itens no chão quanto tempo falta para sumirem. Itens dropados juntos no mesmo lugar dividem um único cronômetro.",
+	"authors": ["ivanils0n"],
+	"contact": {
+		"sources": "https://github.com/ivanils0n/MC-Mods"
+	},
+	"license": "MIT",
+	"environment": "client",
+	"mixins": [
+		{
+			"config": "itemtimer.mixins.json",
+			"environment": "client"
+		}
+	],
+	"depends": {
+		"fabricloader": ">=0.19.0",
+		"minecraft": "${minecraft_dependency}",
+		"java": ">=25"
+	}
+}

@@ -1,0 +1,29 @@
+plugins {
+	id 'net.fabricmc.fabric-loom'
+}
+
+version = "${mod_version}+mc${minecraft_version}"
+group = 'io.github.ivanils0n'
+base.archivesName = mod_id
+
+dependencies {
+	minecraft "com.mojang:minecraft:${minecraft_version}"
+	implementation "net.fabricmc:fabric-loader:${loader_version}"
+}
+
+processResources {
+	def props = [version: project.version, minecraft_dependency: minecraft_dependency]
+	inputs.properties props
+	filesMatching("fabric.mod.json") {
+		expand props
+	}
+}
+
+java {
+	sourceCompatibility = JavaVersion.VERSION_25
+	targetCompatibility = JavaVersion.VERSION_25
+}
+
+tasks.withType(JavaCompile).configureEach {
+	it.options.release = 25
+}

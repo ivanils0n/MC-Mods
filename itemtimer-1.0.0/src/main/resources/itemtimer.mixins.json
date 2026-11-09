@@ -1,0 +1,12 @@
+{
+	"required": true,
+	"package": "io.github.ivanils0n.itemtimer.mixin",
+	"compatibilityLevel": "JAVA_21",
+	"client": [
+		"EntityRendererMixin",
+		"ItemEntityMixin"
+	],
+	"injectors": {
+		"defaultRequire": 1
+	}
+}
