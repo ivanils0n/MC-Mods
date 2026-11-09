@@ -93,9 +93,9 @@ jobs:
           timeout 600 ./gradlew ":${{ matrix.mod }}:runServer" -Pselftest=vitrine $P > vitrine.log 2>&1
           mkdir -p $d/saves && rm -rf $d/saves/vitrine && cp -r $d/world $d/saves/vitrine
           r=$d/resourcepacks/rival/assets/minecraft/items; mkdir -p $r
-          echo '{"pack":{"description":"rival","min_format":1,"max_format":999}}' > $d/resourcepacks/rival/pack.mcmeta
+          echo '{"pack":{"description":"rival","min_format":88,"max_format":99}}' > $d/resourcepacks/rival/pack.mcmeta
           for i in ender_eye ender_pearl smooth_stone; do echo '{"model":{"type":"minecraft:model","model":"minecraft:block/diamond_block"}}' > $r/$i.json; done
-          printf 'tutorialStep:none\nonboardAccessibility:false\npauseOnLostFocus:false\nrenderDistance:4\nguiScale:3\nresourcePacks:["vanilla","fabric","file/rival"]\n' > $d/options.txt
+          printf 'tutorialStep:none\nonboardAccessibility:false\npauseOnLostFocus:false\nrenderDistance:4\nguiScale:3\nresourcePacks:["vanilla","fabric","file/rival"]\nincompatibleResourcePacks:["file/rival"]\n' > $d/options.txt
           sudo apt-get install -y -qq xdotool > /dev/null
           timeout 600 ./gradlew ":${{ matrix.mod }}:runClient" -Pselftest=cliente $P > client.log 2>&1 &
           for i in $(seq 1 120); do grep -q "joined the game" client.log && break; sleep 5; done
