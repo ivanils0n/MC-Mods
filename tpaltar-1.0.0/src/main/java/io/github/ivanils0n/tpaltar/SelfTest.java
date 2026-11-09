@@ -91,6 +91,7 @@ final class SelfTest {
 	}
 
 	private static BlockPos ground(ServerLevel sl, int x, int z) {
+		sl.getChunk(x >> 4, z >> 4); // carrega o chunk; sem isso a altura vem do fundo do mundo
 		return new BlockPos(x, sl.getHeight(Heightmap.Types.MOTION_BLOCKING, x, z), z);
 	}
 

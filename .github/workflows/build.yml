@@ -82,7 +82,7 @@ jobs:
           timeout 600 ./gradlew ":${{ matrix.mod }}:runServer" -Pselftest=vitrine $P > vitrine.log 2>&1
           grep "(tpaltar)" vitrine.log
           mkdir -p $d/saves && rm -rf $d/saves/vitrine && cp -r $d/world $d/saves/vitrine
-          printf 'onboardAccessibility:false\npauseOnLostFocus:false\nrenderDistance:5\nguiScale:2\nfov:0.0\n' > $d/options.txt
+          printf 'tutorialStep:none\\nonboardAccessibility:false\npauseOnLostFocus:false\nrenderDistance:5\nguiScale:2\nfov:0.0\n' > $d/options.txt
           sudo apt-get install -y -qq xdotool x11-utils > /dev/null
           Xvfb :99 -screen 0 1280x720x24 & sleep 3
           DISPLAY=:99 timeout 700 ./gradlew ":${{ matrix.mod }}:runClient" -Pselftest=cliente $P > client.log 2>&1 &
