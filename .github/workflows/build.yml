@@ -7,7 +7,7 @@ jobs:
   mods:
     runs-on: ubuntu-24.04
     outputs:
-      list: ${{ steps.find.outputs.list }}
+      matrix: ${{ steps.find.outputs.matrix }}
     steps:
       - uses: actions/checkout@v6
       - id: find
@@ -23,7 +23,7 @@ jobs:
               list="$list{\"mod\":\"$d\",\"id\":\"$id\",\"mc\":\"$mc\",\"dep\":\"${dep[$mc]}\"},"
             done
           done
-          echo "list=[${list%,}]" | tee -a "$GITHUB_OUTPUT"
+          echo "matrix={\"include\":[${list%,}]}" | tee -a "$GITHUB_OUTPUT"
 
   build:
     needs: mods
@@ -32,8 +32,7 @@ jobs:
       contents: write # publicar os resource packs (releases "<mod_id>-pack")
     strategy:
       fail-fast: false
-      matrix:
-        include: ${{ fromJSON(needs.mods.outputs.list) }}
+      matrix: ${{ fromJSON(needs.mods.outputs.matrix) }}
     steps:
       - uses: actions/checkout@v6
       - uses: gradle/actions/wrapper-validation@v6
@@ -52,8 +51,8 @@ jobs:
       # Mods com autoteste (-Pselftest no build.gradle): sobe um servidor dedicado de verdade, o mod testa a si mesmo
       # e desliga. O log precisa ter "<MOD_ID> SELFTEST OK".
       - name: Autoteste num servidor real
-        if: hashFiles(format('{0}/src/main/java/**/SelfTest.java', matrix.mod)) != ''
         run: |
+          find ${{ matrix.mod }}/src/main/java -name SelfTest.java | grep -q . || { echo "Mod sem autoteste."; exit 0; }
           id=${{ matrix.id }}
           mkdir -p ${{ matrix.mod }}/run
           echo "eula=true" > ${{ matrix.mod }}/run/eula.txt
@@ -64,10 +63,10 @@ jobs:
       # Mods com resource pack (src/pack): confere que o hash dentro do .jar é o do zip e, na main, publica o zip no
       # release "<mod_id>-pack". O nome leva o hash, então cada versão do mod aponta para o seu próprio pack.
       - name: Resource pack
-        if: hashFiles(format('{0}/src/pack/pack.mcmeta', matrix.mod)) != ''
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
+          [ -f ${{ matrix.mod }}/src/pack/pack.mcmeta ] || { echo "Mod sem resource pack."; exit 0; }
           id=${{ matrix.id }}
           zip=${{ matrix.mod }}/build/pack/$id-pack.zip
           sha=$(sha1sum "$zip" | cut -d' ' -f1)
