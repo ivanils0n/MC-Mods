@@ -1,0 +1,643 @@
+{
+ "textures": {
+  "particle": "tpaltar:block/obelisk_stone",
+  "stone": "tpaltar:block/obelisk_stone",
+  "plinth": "tpaltar:block/plinth_side",
+  "plinth_top": "tpaltar:block/plinth_top",
+  "runes": "tpaltar:block/obelisk_runes",
+  "tip": "tpaltar:block/crystal"
+ },
+ "elements": [
+  {
+   "from": [
+    -8.32,
+    -16.0,
+    -8.32
+   ],
+   "to": [
+    24.32,
+    0.16,
+    24.32
+   ],
+   "faces": {
+    "north": {
+     "texture": "#plinth",
+     "uv": [
+      0,
+      0,
+      16,
+      16
+     ]
+    },
+    "south": {
+     "texture": "#plinth",
+     "uv": [
+      0,
+      0,
+      16,
+      16
+     ]
+    },
+    "east": {
+     "texture": "#plinth",
+     "uv": [
+      0,
+      0,
+      16,
+      16
+     ]
+    },
+    "west": {
+     "texture": "#plinth",
+     "uv": [
+      0,
+      0,
+      16,
+      16
+     ]
+    },
+    "up": {
+     "texture": "#plinth_top",
+     "uv": [
+      0,
+      0,
+      16,
+      16
+     ]
+    },
+    "down": {
+     "texture": "#plinth_top",
+     "uv": [
+      0,
+      0,
+      16,
+      16
+     ]
+    }
+   }
+  },
+  {
+   "from": [
+    -1.6,
+    0.0,
+    -1.6
+   ],
+   "to": [
+    17.6,
+    1.28,
+    17.6
+   ],
+   "faces": {
+    "north": {
+     "texture": "#stone",
+     "uv": [
+      0,
+      0,
+      9.6,
+      1.28
+     ]
+    },
+    "south": {
+     "texture": "#stone",
+     "uv": [
+      0,
+      0,
+      9.6,
+      1.28
+     ]
+    },
+    "east": {
+     "texture": "#stone",
+     "uv": [
+      0,
+      0,
+      9.6,
+      1.28
+     ]
+    },
+    "west": {
+     "texture": "#stone",
+     "uv": [
+      0,
+      0,
+      9.6,
+      1.28
+     ]
+    },
+    "up": {
+     "texture": "#stone",
+     "uv": [
+      0,
+      0,
+      9.6,
+      9.6
+     ]
+    },
+    "down": {
+     "texture": "#stone",
+     "uv": [
+      0,
+      0,
+      9.6,
+      9.6
+     ]
+    }
+   }
+  },
+  {
+   "from": [
+    1.6,
+    1.28,
+    1.6
+   ],
+   "to": [
+    14.4,
+    9.6,
+    14.4
+   ],
+   "faces": {
+    "north": {
+     "texture": "#stone",
+     "uv": [
+      0,
+      0,
+      6.4,
+      8.32
+     ]
+    },
+    "south": {
+     "texture": "#stone",
+     "uv": [
+      0,
+      0,
+      6.4,
+      8.32
+     ]
+    },
+    "east": {
+     "texture": "#stone",
+     "uv": [
+      0,
+      0,
+      6.4,
+      8.32
+     ]
+    },
+    "west": {
+     "texture": "#stone",
+     "uv": [
+      0,
+      0,
+      6.4,
+      8.32
+     ]
+    },
+    "up": {
+     "texture": "#stone",
+     "uv": [
+      0,
+      0,
+      6.4,
+      6.4
+     ]
+    },
+    "down": {
+     "texture": "#stone",
+     "uv": [
+      0,
+      0,
+      6.4,
+      6.4
+     ]
+    }
+   }
+  },
+  {
+   "from": [
+    1.408,
+    1.76,
+    1.408
+   ],
+   "to": [
+    14.592,
+    9.12,
+    14.592
+   ],
+   "faces": {
+    "north": {
+     "texture": "#runes",
+     "uv": [
+      0,
+      0,
+      16,
+      16
+     ]
+    },
+    "south": {
+     "texture": "#runes",
+     "uv": [
+      0,
+      0,
+      16,
+      16
+     ]
+    },
+    "east": {
+     "texture": "#runes",
+     "uv": [
+      0,
+      0,
+      16,
+      16
+     ]
+    },
+    "west": {
+     "texture": "#runes",
+     "uv": [
+      0,
+      0,
+      16,
+      16
+     ]
+    }
+   },
+   "light_emission": 15
+  },
+  {
+   "from": [
+    2.72,
+    9.6,
+    2.72
+   ],
+   "to": [
+    13.28,
+    17.6,
+    13.28
+   ],
+   "faces": {
+    "north": {
+     "texture": "#stone",
+     "uv": [
+      0,
+      0,
+      5.28,
+      8.0
+     ]
+    },
+    "south": {
+     "texture": "#stone",
+     "uv": [
+      0,
+      0,
+      5.28,
+      8.0
+     ]
+    },
+    "east": {
+     "texture": "#stone",
+     "uv": [
+      0,
+      0,
+      5.28,
+      8.0
+     ]
+    },
+    "west": {
+     "texture": "#stone",
+     "uv": [
+      0,
+      0,
+      5.28,
+      8.0
+     ]
+    },
+    "up": {
+     "texture": "#stone",
+     "uv": [
+      0,
+      0,
+      5.28,
+      5.28
+     ]
+    },
+    "down": {
+     "texture": "#stone",
+     "uv": [
+      0,
+      0,
+      5.28,
+      5.28
+     ]
+    }
+   }
+  },
+  {
+   "from": [
+    2.528,
+    10.08,
+    2.528
+   ],
+   "to": [
+    13.472,
+    17.12,
+    13.472
+   ],
+   "faces": {
+    "north": {
+     "texture": "#runes",
+     "uv": [
+      0,
+      0,
+      16,
+      16
+     ]
+    },
+    "south": {
+     "texture": "#runes",
+     "uv": [
+      0,
+      0,
+      16,
+      16
+     ]
+    },
+    "east": {
+     "texture": "#runes",
+     "uv": [
+      0,
+      0,
+      16,
+      16
+     ]
+    },
+    "west": {
+     "texture": "#runes",
+     "uv": [
+      0,
+      0,
+      16,
+      16
+     ]
+    }
+   },
+   "light_emission": 15
+  },
+  {
+   "from": [
+    3.84,
+    17.6,
+    3.84
+   ],
+   "to": [
+    12.16,
+    23.2,
+    12.16
+   ],
+   "faces": {
+    "north": {
+     "texture": "#stone",
+     "uv": [
+      0,
+      0,
+      4.16,
+      5.6
+     ]
+    },
+    "south": {
+     "texture": "#stone",
+     "uv": [
+      0,
+      0,
+      4.16,
+      5.6
+     ]
+    },
+    "east": {
+     "texture": "#stone",
+     "uv": [
+      0,
+      0,
+      4.16,
+      5.6
+     ]
+    },
+    "west": {
+     "texture": "#stone",
+     "uv": [
+      0,
+      0,
+      4.16,
+      5.6
+     ]
+    },
+    "up": {
+     "texture": "#stone",
+     "uv": [
+      0,
+      0,
+      4.16,
+      4.16
+     ]
+    },
+    "down": {
+     "texture": "#stone",
+     "uv": [
+      0,
+      0,
+      4.16,
+      4.16
+     ]
+    }
+   }
+  },
+  {
+   "from": [
+    3.648,
+    18.08,
+    3.648
+   ],
+   "to": [
+    12.352,
+    22.72,
+    12.352
+   ],
+   "faces": {
+    "north": {
+     "texture": "#runes",
+     "uv": [
+      0,
+      0,
+      16,
+      16
+     ]
+    },
+    "south": {
+     "texture": "#runes",
+     "uv": [
+      0,
+      0,
+      16,
+      16
+     ]
+    },
+    "east": {
+     "texture": "#runes",
+     "uv": [
+      0,
+      0,
+      16,
+      16
+     ]
+    },
+    "west": {
+     "texture": "#runes",
+     "uv": [
+      0,
+      0,
+      16,
+      16
+     ]
+    }
+   },
+   "light_emission": 15
+  },
+  {
+   "from": [
+    5.28,
+    23.2,
+    5.28
+   ],
+   "to": [
+    10.72,
+    24.8,
+    10.72
+   ],
+   "faces": {
+    "north": {
+     "texture": "#tip",
+     "uv": [
+      0,
+      0,
+      16,
+      16
+     ]
+    },
+    "south": {
+     "texture": "#tip",
+     "uv": [
+      0,
+      0,
+      16,
+      16
+     ]
+    },
+    "east": {
+     "texture": "#tip",
+     "uv": [
+      0,
+      0,
+      16,
+      16
+     ]
+    },
+    "west": {
+     "texture": "#tip",
+     "uv": [
+      0,
+      0,
+      16,
+      16
+     ]
+    },
+    "up": {
+     "texture": "#tip",
+     "uv": [
+      0,
+      0,
+      16,
+      16
+     ]
+    },
+    "down": {
+     "texture": "#tip",
+     "uv": [
+      0,
+      0,
+      16,
+      16
+     ]
+    }
+   },
+   "light_emission": 10
+  },
+  {
+   "from": [
+    6.72,
+    24.8,
+    6.72
+   ],
+   "to": [
+    9.28,
+    25.92,
+    9.28
+   ],
+   "faces": {
+    "north": {
+     "texture": "#tip",
+     "uv": [
+      0,
+      0,
+      16,
+      16
+     ]
+    },
+    "south": {
+     "texture": "#tip",
+     "uv": [
+      0,
+      0,
+      16,
+      16
+     ]
+    },
+    "east": {
+     "texture": "#tip",
+     "uv": [
+      0,
+      0,
+      16,
+      16
+     ]
+    },
+    "west": {
+     "texture": "#tip",
+     "uv": [
+      0,
+      0,
+      16,
+      16
+     ]
+    },
+    "up": {
+     "texture": "#tip",
+     "uv": [
+      0,
+      0,
+      16,
+      16
+     ]
+    },
+    "down": {
+     "texture": "#tip",
+     "uv": [
+      0,
+      0,
+      16,
+      16
+     ]
+    }
+   },
+   "light_emission": 13
+  }
+ ]
+}

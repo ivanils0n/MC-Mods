@@ -17,6 +17,8 @@ jobs:
   build:
     needs: mods
     runs-on: ubuntu-24.04
+    permissions:
+      contents: write # publicar o resource pack do Altar de Teleporte no release "tpaltar-pack"
     strategy:
       fail-fast: false
       matrix:
@@ -49,3 +51,24 @@ jobs:
           timeout 900 ./gradlew ":${{ matrix.mod }}:runServer" -Pselftest "-Pminecraft_version=${{ matrix.mc }}" "-Pminecraft_dependency=${{ matrix.dep }}" | tee server.log
           grep -q "TPALTAR SELFTEST OK" server.log
           ! grep -q "Serialization errors" server.log
+      # Confere que o hash dentro do .jar é o do zip e, na main, publica o zip no release "tpaltar-pack".
+      # O nome leva o hash, então cada versão do mod aponta para o seu próprio pack (o servidor envia o link sozinho).
+      - name: Resource pack do Altar de Teleporte
+        if: startsWith(matrix.mod, 'tpaltar-')
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          zip=${{ matrix.mod }}/build/pack/tpaltar-pack.zip
+          sha=$(sha1sum "$zip" | cut -d' ' -f1)
+          jar=$(ls ${{ matrix.mod }}/build/libs/*.jar | grep -v sources | head -1)
+          test "$(unzip -p "$jar" tpaltar/pack.sha1)" = "$sha"
+          echo "SHA-1 do pack: $sha"
+          if [ "${{ github.event_name }}" = push ] && [ "${{ github.ref }}" = refs/heads/main ]; then
+            name="tpaltar-pack-$sha.zip"
+            cp "$zip" "$name"
+            gh release view tpaltar-pack >/dev/null 2>&1 || gh release create tpaltar-pack --title "Texturas do Altar de Teleporte" \
+              --notes "Resource pack do Altar de Teleporte. O próprio mod envia o link certo aos jogadores; não é preciso configurar nada." || true
+            if ! gh release view tpaltar-pack --json assets -q '.assets[].name' | grep -qx "$name"; then
+              gh release upload tpaltar-pack "$name" --clobber || { sleep 10; gh release upload tpaltar-pack "$name" --clobber; }
+            fi
+          fi

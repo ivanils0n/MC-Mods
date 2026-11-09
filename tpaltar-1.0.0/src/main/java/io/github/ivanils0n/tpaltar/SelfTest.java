@@ -42,6 +42,8 @@ final class SelfTest {
 		ensure(eye != null, "olho não encontrado");
 		ensure(TpAltar.showEye(sl, altar, eye, true) && TpAltar.showEye(sl, altar, eye, false), "troca do olho falhou");
 		ensure(!eye.shouldBeSaved(), "decoração seria salva no mapa");
+		ensure(TpAltar.animateOnce(sl, altar), "animação falhou");
+		ensure(TpAltar.PACK_SHA1 != null, "hash do resource pack não está no .jar");
 		TpAltar.spawnVisuals(sl, pos); // recriar não pode duplicar
 		ensure(sl.getEntitiesOfClass(Display.class, area).size() == 3, "recriar duplicou: " + sl.getEntitiesOfClass(Display.class, area).size());
 		ensure(sl.getEntitiesOfClass(Interaction.class, area).size() == 1, "recriar duplicou a interação");

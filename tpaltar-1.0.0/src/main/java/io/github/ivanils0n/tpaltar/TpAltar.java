@@ -1,10 +1,14 @@
 package io.github.ivanils0n.tpaltar;
 
 import io.github.ivanils0n.tpaltar.AltarStore.Altar;
+import java.io.IOException;
+import java.io.InputStream;
+import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import java.util.Optional;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 import net.fabricmc.api.ModInitializer;
@@ -14,6 +18,7 @@ import net.fabricmc.fabric.api.event.lifecycle.v1.ServerTickEvents;
 import net.fabricmc.fabric.api.event.player.PlayerBlockBreakEvents;
 import net.fabricmc.fabric.api.event.player.UseBlockCallback;
 import net.fabricmc.fabric.api.event.player.UseEntityCallback;
+import net.fabricmc.fabric.api.networking.v1.ServerPlayConnectionEvents;
 import net.minecraft.ChatFormatting;
 import net.minecraft.commands.CommandSourceStack;
 import net.minecraft.core.BlockPos;
@@ -23,12 +28,14 @@ import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.MutableComponent;
+import net.minecraft.network.protocol.common.ClientboundResourcePackPushPacket;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
+import net.minecraft.util.Mth;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.Display;
@@ -39,6 +46,7 @@ import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.item.component.CustomData;
+import net.minecraft.world.item.component.CustomModelData;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
@@ -69,11 +77,38 @@ public final class TpAltar implements ModInitializer {
 	/** Onde o altar vai ficar enquanto o jogador digita o nome na tela da bigorna. */
 	record Pending(ResourceKey<Level> dim, BlockPos pos, InteractionHand hand) {}
 
+	private static final double EYE_Y = 3.0, RING_Y = 2.125; // altura das peças acima da base
+	private static final double ACTIVE_RANGE_SQR = 48 * 48; // sem jogador a essa distância o altar fica parado
+	private static final int ANIM_TICKS = 40; // cada passo de animação (giro dos cristais, flutuar do olho) dura 2 s
+	private static final float BOB = 0.06f;
+
+	// Resource pack: o zip é publicado pelo CI no release "tpaltar-pack" com o hash no nome, e o mesmo hash vai
+	// dentro do .jar (tpaltar/pack.sha1). Assim cada versão do mod aponta para o seu pack e o jogo só baixa de novo
+	// quando as texturas mudam.
+	private static final String PACK_URL = "https://github.com/ivanils0n/MC-Mods/releases/download/tpaltar-pack/tpaltar-pack-";
+	static final String PACK_SHA1 = readPackHash();
+	private static final UUID PACK_ID = UUID.nameUUIDFromBytes("tpaltar:pack".getBytes(StandardCharsets.UTF_8));
+
 	private static final Map<UUID, Integer> LAST_USE = new ConcurrentHashMap<>();
 	/** Quem está com o menu de destinos de cada altar aberto (chave do altar -> jogador). */
 	private static final Map<String, UUID> USERS = new HashMap<>();
-	/** Item que o olho de cada altar está mostrando agora (true = olho do fim, em uso). Vazio após reiniciar. */
-	private static final Map<String, Boolean> SHOWN = new HashMap<>();
+	/** Entidades de cada altar já encontradas, para não procurá-las no mundo a cada tick. */
+	private static final Map<String, Visuals> VIS = new HashMap<>();
+
+	private static final class Visuals {
+		final Display.ItemDisplay eye, ring;
+		Boolean shownInUse; // item que o olho está mostrando (true = em uso); null = ainda não ajustado
+		int step;
+
+		Visuals(Display.ItemDisplay eye, Display.ItemDisplay ring) {
+			this.eye = eye;
+			this.ring = ring;
+		}
+
+		boolean alive() {
+			return !eye.isRemoved() && !ring.isRemoved();
+		}
+	}
 	/** Tag única desta execução do servidor. As decorações nunca são salvas no mapa (mixin/EntityMixin), então uma
 	 * entidade "tpaltar" que chega do disco sem essa tag é sobra de versão antiga e é apagada. */
 	private static final String RUN_TAG = "tpaltar_run_" + Long.toHexString(new java.util.Random().nextLong());
@@ -89,12 +124,15 @@ public final class TpAltar implements ModInitializer {
 			LOG.info("{} altares carregados", store.size());
 			if (Boolean.getBoolean("tpaltar.selftest")) SelfTest.run(s);
 		});
+		ServerLifecycleEvents.SERVER_STOPPING.register(s -> {
+			if (store != null) store.saveIfDirty();
+		});
 		ServerLifecycleEvents.SERVER_STOPPED.register(s -> {
 			server = null;
 			store = null;
 			LAST_USE.clear();
 			USERS.clear();
-			SHOWN.clear();
+			VIS.clear();
 			LEFTOVERS.clear();
 		});
 		ServerEntityEvents.ENTITY_LOAD.register((entity, level) -> {
@@ -104,6 +142,14 @@ public final class TpAltar implements ModInitializer {
 			// Apaga fora do evento de carregamento, para não mexer na lista de entidades enquanto o jogo a percorre.
 			for (Entity e : LEFTOVERS) if (!e.isRemoved()) e.discard();
 			LEFTOVERS.clear();
+			// Mudanças de pérolas são gravadas no máximo uma vez por segundo (e ao desligar), não a cada clique.
+			if (store != null && s.getTickCount() % 20 == 0) store.saveIfDirty();
+		});
+		ServerPlayConnectionEvents.JOIN.register((handler, sender, s) -> {
+			// Só no servidor dedicado: em singleplayer as texturas já vêm do próprio .jar.
+			if (PACK_SHA1 == null || !s.isDedicatedServer()) return;
+			sender.sendPacket(new ClientboundResourcePackPushPacket(PACK_ID, PACK_URL + PACK_SHA1 + ".zip", PACK_SHA1, false,
+				Optional.of(Component.literal("Texturas do Altar de Teleporte"))));
 		});
 		UseBlockCallback.EVENT.register(TpAltar::onUseBlock);
 		UseEntityCallback.EVENT.register(TpAltar::onUseEntity);
@@ -163,49 +209,91 @@ public final class TpAltar implements ModInitializer {
 		long time = sl.getGameTime();
 		if (store == null || time % 2 != 0) return;
 		boolean everySecond = time % 20 == 0;
-		for (Altar a : store.inDim(dim(sl))) {
+		boolean animate = time % ANIM_TICKS == 0;
+		List<ServerPlayer> players = sl.players();
+		for (Altar a : store.inDimUnsorted(dim(sl))) {
 			BlockPos pos = a.pos();
 			if (!sl.isLoaded(pos)) continue;
-			if (everySecond) {
-				if (!sl.getBlockState(pos).is(Blocks.OBSIDIAN)) {
-					// Sumiu por outro meio (Wither, comando, editor de mundo): remove sem dropar nada.
-					LOG.info("Altar \"{}\" em {} não existe mais; removido", a.name, pos);
-					removeAltar(sl, a);
-					continue;
-				}
-				sl.sendParticles(ParticleTypes.PORTAL, a.x + 0.5, a.y + 2.9, a.z + 0.5, 6, 0.25, 0.3, 0.25, 0.4);
-			}
-			Display.ItemDisplay eye = findEye(sl, a);
-			if (eye == null) {
-				// Decoração não é salva no mapa: recria quando o lugar volta a ser carregado com jogadores por perto.
-				if (sl.isPositionEntityTicking(pos)) spawnVisuals(sl, pos);
-				SHOWN.remove(a.key());
+			if (everySecond && !sl.getBlockState(pos).is(Blocks.OBSIDIAN)) {
+				// Sumiu por outro meio (Wither, comando, editor de mundo): remove sem dropar nada.
+				LOG.info("Altar \"{}\" em {} não existe mais; removido", a.name, pos);
+				removeAltar(sl, a);
 				continue;
 			}
+			// Sem ninguém por perto não gira, não anima e não solta partículas: ninguém veria.
+			if (!anyPlayerNear(players, a)) continue;
+			Visuals v = visuals(sl, a, everySecond);
+			if (v == null) continue;
+			if (everySecond) sl.sendParticles(ParticleTypes.PORTAL, a.x + 0.5, a.y + EYE_Y, a.z + 0.5, 6, 0.25, 0.3, 0.25, 0.4);
 			boolean inUse = user(a) != null;
-			if (!Boolean.valueOf(inUse).equals(SHOWN.get(a.key())) && showEye(sl, a, eye, inUse)) SHOWN.put(a.key(), inUse);
-			lookAtNearest(sl, eye);
+			if (!Boolean.valueOf(inUse).equals(v.shownInUse) && showEye(sl, a, v.eye, inUse)) v.shownInUse = inUse;
+			lookAtNearest(sl, v.eye);
+			if (animate) animate(sl, a, v);
 		}
 	}
 
-	/** O olho fica 2,9 blocos acima da base; é o único item_display do altar nessa altura. */
+	private static boolean anyPlayerNear(List<ServerPlayer> players, Altar a) {
+		for (ServerPlayer p : players) if (p.distanceToSqr(a.x + 0.5, a.y + 1.5, a.z + 0.5) < ACTIVE_RANGE_SQR) return true;
+		return false;
+	}
+
+	/** Entidades do altar (do cache). Se sumiram, recria — no máximo uma vez por segundo e só com o lugar ativo. */
+	private static Visuals visuals(ServerLevel sl, Altar a, boolean mayRespawn) {
+		Visuals v = VIS.get(a.key());
+		if (v != null && v.alive()) return v;
+		Display.ItemDisplay eye = findEye(sl, a), ring = findDisplay(sl, a, RING_Y);
+		if (eye != null && ring != null) {
+			v = new Visuals(eye, ring);
+			VIS.put(a.key(), v);
+			return v;
+		}
+		VIS.remove(a.key());
+		// Decoração não é salva no mapa: recria quando o lugar volta a ser carregado com jogadores por perto.
+		if (mayRespawn && sl.isPositionEntityTicking(a.pos())) spawnVisuals(sl, a.pos());
+		return null;
+	}
+
 	static Display.ItemDisplay findEye(ServerLevel sl, Altar a) {
-		List<Display.ItemDisplay> found = sl.getEntitiesOfClass(Display.ItemDisplay.class, new AABB(a.x, a.y + 2.5, a.z, a.x + 1, a.y + 3.5, a.z + 1));
+		return findDisplay(sl, a, EYE_Y);
+	}
+
+	/** A peça do altar que está naquela altura (cada peça tem a sua). */
+	private static Display.ItemDisplay findDisplay(ServerLevel sl, Altar a, double dy) {
+		String tag = tag(a.pos());
+		List<Display.ItemDisplay> found = sl.getEntitiesOfClass(Display.ItemDisplay.class,
+			new AABB(a.x, a.y + dy - 0.25, a.z, a.x + 1, a.y + dy + 0.25, a.z + 1), e -> e.entityTags().contains(tag));
 		return found.isEmpty() ? null : found.get(0);
 	}
 
-	/** Pérola parada; vira olho do fim enquanto alguém escolhe o destino. Também passa olhos antigos para billboard fixo. */
+	/** Pérola parada; vira olho do fim enquanto alguém escolhe o destino (com o pack: olho 3D verde / roxo). */
 	static boolean showEye(ServerLevel sl, Altar a, Display.ItemDisplay eye, boolean inUse) {
-		String item = inUse ? "minecraft:ender_eye" : "minecraft:ender_pearl";
-		return command(sl, a.pos(), "data merge entity " + eye.getUUID() + " {item:{id:\"" + item + "\",count:1},billboard:\"fixed\",teleport_duration:2}");
+		return command(sl, a.pos(), "data merge entity " + eye.getUUID() + " {item:" + item(inUse ? "ender_eye" : "ender_pearl", "tpaltar_eye") + "}");
 	}
 
 	/** Gira o olho (só na horizontal) para encarar o jogador mais próximo em até 16 blocos. */
 	private static void lookAtNearest(ServerLevel sl, Display.ItemDisplay eye) {
 		Player p = sl.getNearestPlayer(eye.getX(), eye.getY(), eye.getZ(), 16, false);
 		if (p == null) return;
-		double dx = p.getX() - eye.getX(), dz = p.getZ() - eye.getZ();
-		eye.setYRot((float) Math.toDegrees(Math.atan2(dz, dx)) - 90f);
+		float yaw = (float) Math.toDegrees(Math.atan2(p.getZ() - eye.getZ(), p.getX() - eye.getX())) - 90f;
+		// Ignora mudanças pequenas: cada giro vira um pacote para os jogadores.
+		if (Math.abs(Mth.wrapDegrees(yaw - eye.getYRot())) > 2f) eye.setYRot(yaw);
+	}
+
+	/** Um passo de animação: cristais giram 90° e o olho sobe ou desce. O cliente interpola suavemente. */
+	private static boolean animate(ServerLevel sl, Altar a, Visuals v) {
+		v.step++;
+		double half = Math.toRadians(45 * (v.step % 8)); // meio ângulo do quatérnio (90° por passo)
+		String start = "{start_interpolation:0,interpolation_duration:" + ANIM_TICKS + ",";
+		boolean ok = command(sl, a.pos(), "data merge entity " + v.ring.getUUID() + " " + start
+			+ transform(0f, Math.sin(half), Math.cos(half), 0.8f, 0.25f) + "}");
+		return command(sl, a.pos(), "data merge entity " + v.eye.getUUID() + " " + start
+			+ transform(v.step % 2 == 0 ? BOB : -BOB, 0, 1, 0.7f, 0.7f) + "}") && ok;
+	}
+
+	/** Para o teste automático: roda um passo de animação no altar. */
+	static boolean animateOnce(ServerLevel sl, Altar a) {
+		Visuals v = visuals(sl, a, false);
+		return v != null && animate(sl, a, v);
 	}
 
 	/** Jogador que está com o menu de destinos deste altar aberto, ou null. Limpa travas de quem saiu ou fechou. */
@@ -302,7 +390,7 @@ public final class TpAltar implements ModInitializer {
 		if (u != null) u.closeContainer(); // ninguém mexe no estoque de um altar que não existe mais
 		store.remove(altar);
 		USERS.remove(altar.key());
-		SHOWN.remove(altar.key());
+		VIS.remove(altar.key());
 		killVisuals(sl, altar.pos());
 	}
 
@@ -316,20 +404,27 @@ public final class TpAltar implements ModInitializer {
 		killVisuals(sl, pos);
 		String tags = "Tags:[\"tpaltar\",\"" + tag(pos) + "\",\"" + RUN_TAG + "\"]";
 		double x = pos.getX() + 0.5, y = pos.getY(), z = pos.getZ() + 0.5;
-		// Coluna de pedra lisa e tampo mais largo. São item_display (cubo centrado na entidade) porque o formato
-		// de block_state do block_display mudou entre a 26.2 e a 26.3; o de item é igual nas duas.
-		summon(sl, pos, "item_display", x, y + 1.5, z, tags + ",item:{id:\"minecraft:smooth_stone\",count:1}," + scale(0.5f, 1f));
-		summon(sl, pos, "item_display", x, y + 2.125, z, tags + ",item:{id:\"minecraft:smooth_stone\",count:1}," + scale(0.8f, 0.25f));
-		// Pérola flutuando (vira olho do fim em uso), sempre iluminada; o giro é feito no onWorldTick.
-		summon(sl, pos, "item_display", x, y + 2.9, z, tags + ",item:{id:\"minecraft:ender_pearl\",count:1},"
-			+ "teleport_duration:2,brightness:{sky:15,block:15}," + scale(0.7f, 0.7f));
+		// Sem resource pack: coluna e tampo de pedra lisa e pérola flutuando. Com o pack (custom_model_data), as mesmas
+		// entidades viram obelisco rúnico, anel de cristais e olho 3D; os modelos compensam estas escalas
+		// (arte/gerar.py). São item_display porque o formato do block_display mudou entre a 26.2 e a 26.3.
+		summon(sl, pos, "item_display", x, y + 1.5, z, tags + ",item:" + item("smooth_stone", "tpaltar_obelisk") + ","
+			+ transform(0f, 0, 1, 0.5f, 1f));
+		summon(sl, pos, "item_display", x, y + RING_Y, z, tags + ",item:" + item("smooth_stone", "tpaltar_ring") + ","
+			+ transform(0f, 0, 1, 0.8f, 0.25f));
+		summon(sl, pos, "item_display", x, y + EYE_Y, z, tags + ",item:" + item("ender_pearl", "tpaltar_eye") + ","
+			+ "teleport_duration:2,brightness:{sky:15,block:15}," + transform(0f, 0, 1, 0.7f, 0.7f));
 		// Área clicável que cobre a coluna e o olho.
 		summon(sl, pos, "interaction", x, y + 1, z, tags + ",width:0.9f,height:2.3f,response:1b");
 	}
 
-	private static String scale(float side, float height) {
-		return String.format(Locale.ROOT, "transformation:{left_rotation:[0f,0f,0f,1f],right_rotation:[0f,0f,0f,1f],"
-			+ "translation:[0f,0f,0f],scale:[%sf,%sf,%sf]}", side, height, side);
+	private static String item(String id, String model) {
+		return "{id:\"minecraft:" + id + "\",count:1,components:{\"minecraft:custom_model_data\":{strings:[\"" + model + "\"]}}}";
+	}
+
+	/** Deslocamento vertical, giro em Y (quatérnio 0,qy,0,qw) e escala. */
+	private static String transform(float ty, double qy, double qw, float side, float height) {
+		return String.format(Locale.ROOT, "transformation:{left_rotation:[0f,%.5ff,0f,%.5ff],right_rotation:[0f,0f,0f,1f],"
+			+ "translation:[0f,%sf,0f],scale:[%sf,%sf,%sf]}", qy, qw, ty, side, height, side);
 	}
 
 	private static void summon(ServerLevel sl, BlockPos pos, String type, double x, double y, double z, String nbt) {
@@ -372,7 +467,7 @@ public final class TpAltar implements ModInitializer {
 	static void setPearls(Altar a, int pearls) {
 		if (store == null || store.get(a.dim, a.pos()) != a) return;
 		a.pearls = Math.clamp(pearls, 0, MAX_PEARLS);
-		store.save();
+		store.markDirty();
 	}
 
 	static void teleport(ServerPlayer sp, Altar from, Altar to) {
@@ -400,7 +495,7 @@ public final class TpAltar implements ModInitializer {
 			return;
 		}
 		dst.pearls -= COST;
-		store.save();
+		store.markDirty();
 		// Se alguém está com o menu do altar de destino aberto, atualiza o estoque mostrado.
 		ServerPlayer atDst = user(dst);
 		if (atDst != null && atDst.containerMenu instanceof AltarMenu menu) menu.loadPearls();
@@ -458,7 +553,18 @@ public final class TpAltar implements ModInitializer {
 		s.set(DataComponents.CUSTOM_NAME, plain(ITEM_NAME, ChatFormatting.LIGHT_PURPLE));
 		s.set(DataComponents.ITEM_MODEL, Items.ENDER_EYE.components().get(DataComponents.ITEM_MODEL));
 		s.set(DataComponents.ENCHANTMENT_GLINT_OVERRIDE, true);
+		s.set(DataComponents.CUSTOM_MODEL_DATA, new CustomModelData(List.of(), List.of(), List.of("tpaltar_altar"), List.of()));
 		return s;
+	}
+
+	private static String readPackHash() {
+		try (InputStream in = TpAltar.class.getResourceAsStream("/tpaltar/pack.sha1")) {
+			if (in == null) return null;
+			String sha = new String(in.readAllBytes(), StandardCharsets.UTF_8).trim();
+			return sha.matches("[0-9a-f]{40}") ? sha : null;
+		} catch (IOException e) {
+			return null;
+		}
 	}
 
 	static MutableComponent plain(String text, ChatFormatting color) {
