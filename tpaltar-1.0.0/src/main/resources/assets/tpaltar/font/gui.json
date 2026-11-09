@@ -1,0 +1,77 @@
+{
+ "providers": [
+  {
+   "type": "space",
+   "advances": {
+    "\uf000": -8,
+    "\uf001": -177,
+    "\uf002": 8,
+    "\uf003": -60,
+    "\uf004": 60
+   }
+  },
+  {
+   "type": "bitmap",
+   "file": "tpaltar:gui/altar_1.png",
+   "ascent": 13,
+   "height": 132,
+   "chars": [
+    "\ue000"
+   ]
+  },
+  {
+   "type": "bitmap",
+   "file": "tpaltar:gui/altar_2.png",
+   "ascent": 13,
+   "height": 150,
+   "chars": [
+    "\ue001"
+   ]
+  },
+  {
+   "type": "bitmap",
+   "file": "tpaltar:gui/altar_3.png",
+   "ascent": 13,
+   "height": 168,
+   "chars": [
+    "\ue002"
+   ]
+  },
+  {
+   "type": "bitmap",
+   "file": "tpaltar:gui/altar_4.png",
+   "ascent": 13,
+   "height": 186,
+   "chars": [
+    "\ue003"
+   ]
+  },
+  {
+   "type": "bitmap",
+   "file": "tpaltar:gui/altar_5.png",
+   "ascent": 13,
+   "height": 204,
+   "chars": [
+    "\ue004"
+   ]
+  },
+  {
+   "type": "bitmap",
+   "file": "tpaltar:gui/altar_6.png",
+   "ascent": 13,
+   "height": 222,
+   "chars": [
+    "\ue005"
+   ]
+  },
+  {
+   "type": "bitmap",
+   "file": "tpaltar:gui/nome.png",
+   "ascent": 13,
+   "height": 166,
+   "chars": [
+    "\ue006"
+   ]
+  }
+ ]
+}

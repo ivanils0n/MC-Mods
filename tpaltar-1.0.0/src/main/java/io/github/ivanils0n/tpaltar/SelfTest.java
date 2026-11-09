@@ -2,6 +2,7 @@ package io.github.ivanils0n.tpaltar;
 
 import io.github.ivanils0n.tpaltar.AltarStore.Altar;
 import net.minecraft.core.BlockPos;
+import net.minecraft.network.chat.Component;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.entity.Display;
@@ -28,6 +29,8 @@ final class SelfTest {
 	private static void check(MinecraftServer server) {
 		ensure(server.getRecipeManager().getRecipes().stream().anyMatch(r -> r.id().toString().contains("tpaltar:altar")), "receita não carregou");
 		ensure(TpAltar.isAltarItem(TpAltar.altarItem()), "item do altar não é reconhecido");
+		Component title = TpAltar.themedTitle("\uF000\uE000\uF001\uF002", "Teste");
+		ensure(title.getString().endsWith("Teste") && title.getSiblings().size() == 2, "título com fundo: " + title);
 
 		ServerLevel sl = server.overworld();
 		BlockPos pos = new BlockPos(0, 200, 0);

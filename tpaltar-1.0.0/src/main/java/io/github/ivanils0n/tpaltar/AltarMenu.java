@@ -16,6 +16,7 @@ import net.minecraft.world.inventory.MenuType;
 import net.minecraft.world.inventory.Slot;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
+import net.minecraft.world.item.component.CustomModelData;
 import net.minecraft.world.item.component.ItemLore;
 
 /**
@@ -93,8 +94,13 @@ final class AltarMenu extends ChestMenu {
 		Box box = new Box(rows * 9);
 		for (int i = 0; i < targets.size(); i++) box.setItem(i, icon(targets.get(i)));
 		for (int i = (rows - 1) * 9; i < rows * 9; i++) box.setItem(i, pane());
-		player.openMenu(new SimpleMenuProvider((id, inv, p) -> new AltarMenu(id, inv, box, rows, from, targets), Component.literal(from.name)));
+		player.openMenu(new SimpleMenuProvider((id, inv, p) -> new AltarMenu(id, inv, box, rows, from, targets), title(player, rows, from.name)));
 		if (player.containerMenu instanceof AltarMenu) TpAltar.lock(from, player); // trava até teleportar ou fechar
+	}
+
+	/** Fundo de baú com o mesmo número de fileiras (caracteres \uE000 a \uE005 da fonte tpaltar:gui). */
+	private static Component title(ServerPlayer player, int rows, String name) {
+		return TpAltar.guiTitle(player, "\uF000" + (char) (0xE000 + rows - 1) + "\uF001\uF002", name);
 	}
 
 	boolean isFor(Altar a) {
@@ -150,6 +156,8 @@ final class AltarMenu extends ChestMenu {
 
 	private static ItemStack pane() {
 		ItemStack s = new ItemStack(Items.GLASS_PANE);
+		// Com o pack o vidro fica invisível e aparecem as runas do fundo; sem o pack continua vidro.
+		s.set(DataComponents.CUSTOM_MODEL_DATA, new CustomModelData(List.of(), List.of(), List.of("tpaltar_blank"), List.of()));
 		s.set(DataComponents.CUSTOM_NAME, TpAltar.plain("Ender pearls deste altar", ChatFormatting.LIGHT_PURPLE));
 		s.set(DataComponents.LORE, new ItemLore(List.of(
 			TpAltar.plain("Guarde até " + TpAltar.MAX_PEARLS + " nos espaços do meio.", ChatFormatting.GRAY),

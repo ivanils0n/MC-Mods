@@ -9,8 +9,13 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Optional;
+import java.util.Set;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
+import com.google.gson.JsonArray;
+import com.google.gson.JsonObject;
+import com.google.gson.JsonPrimitive;
+import com.mojang.serialization.JsonOps;
 import net.fabricmc.api.ModInitializer;
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerEntityEvents;
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerLifecycleEvents;
@@ -27,8 +32,10 @@ import net.minecraft.core.component.DataComponents;
 import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.ComponentSerialization;
 import net.minecraft.network.chat.MutableComponent;
 import net.minecraft.network.protocol.common.ClientboundResourcePackPushPacket;
+import net.minecraft.network.protocol.common.ServerboundResourcePackPacket;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ServerLevel;
@@ -89,6 +96,8 @@ public final class TpAltar implements ModInitializer {
 	static final String PACK_SHA1 = readPackHash();
 	private static final UUID PACK_ID = UUID.nameUUIDFromBytes("tpaltar:pack".getBytes(StandardCharsets.UTF_8));
 
+	/** Jogadores do servidor dedicado que carregaram o pack (só eles recebem os fundos de tela, que dependem dele). */
+	private static final Set<UUID> PACK_OK = ConcurrentHashMap.newKeySet();
 	private static final Map<UUID, Integer> LAST_USE = new ConcurrentHashMap<>();
 	/** Quem está com o menu de destinos de cada altar aberto (chave do altar -> jogador). */
 	private static final Map<String, UUID> USERS = new HashMap<>();
@@ -153,6 +162,7 @@ public final class TpAltar implements ModInitializer {
 			sender.sendPacket(new ClientboundResourcePackPushPacket(PACK_ID, PACK_URL + PACK_SHA1 + ".zip", PACK_SHA1, false,
 				Optional.of(Component.literal("Texturas do Altar de Teleporte"))));
 		});
+		ServerPlayConnectionEvents.DISCONNECT.register((handler, s) -> PACK_OK.remove(handler.player.getUUID()));
 		UseBlockCallback.EVENT.register(TpAltar::onUseBlock);
 		UseEntityCallback.EVENT.register(TpAltar::onUseEntity);
 		PlayerBlockBreakEvents.BEFORE.register(TpAltar::onBreak);
@@ -570,6 +580,42 @@ public final class TpAltar implements ModInitializer {
 		} catch (IOException e) {
 			return null;
 		}
+	}
+
+	/** Chamado pelo mixin quando o jogador responde ao pedido do resource pack. */
+	public static void packStatus(ServerPlayer p, UUID id, ServerboundResourcePackPacket.Action action) {
+		if (!PACK_ID.equals(id)) return;
+		if (action == ServerboundResourcePackPacket.Action.SUCCESSFULLY_LOADED) PACK_OK.add(p.getUUID());
+		else if (action != ServerboundResourcePackPacket.Action.ACCEPTED && action != ServerboundResourcePackPacket.Action.DOWNLOADED) PACK_OK.remove(p.getUUID());
+	}
+
+	/** Singleplayer: as texturas vêm do .jar do dono do mundo. Servidor: só de quem carregou o pack. */
+	static boolean hasPack(ServerPlayer p) {
+		return server.isDedicatedServer() ? PACK_OK.contains(p.getUUID()) : server.isSingleplayerOwner(p.nameAndId());
+	}
+
+	/**
+	 * Título de tela com o fundo "Pedra rúnica": o fundo é um caractere da fonte tpaltar:gui (arte/gerar.py), cercado
+	 * de espaços negativos que o levam ao canto da tela e voltam para onde o texto começa. Sem o pack, título comum
+	 * (senão apareceriam quadradinhos de caractere desconhecido).
+	 */
+	static Component guiTitle(ServerPlayer p, String background, String text) {
+		return hasPack(p) ? themedTitle(background, text) : Component.literal(text);
+	}
+
+	static Component themedTitle(String background, String text) {
+		JsonObject bg = new JsonObject();
+		bg.addProperty("text", background);
+		bg.addProperty("font", "tpaltar:gui");
+		bg.addProperty("color", "white"); // o título vanilla é cinza escuro e escureceria o desenho
+		JsonObject name = new JsonObject();
+		name.addProperty("text", text);
+		name.addProperty("color", "#E0C8FF");
+		JsonArray parts = new JsonArray();
+		parts.add(new JsonPrimitive("")); // raiz sem estilo: o nome não herda a fonte do fundo
+		parts.add(bg);
+		parts.add(name);
+		return ComponentSerialization.CODEC.parse(JsonOps.INSTANCE, parts).result().orElse(Component.literal(text));
 	}
 
 	static MutableComponent plain(String text, ChatFormatting color) {

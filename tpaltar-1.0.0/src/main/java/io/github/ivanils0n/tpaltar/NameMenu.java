@@ -37,7 +37,8 @@ final class NameMenu extends AnvilMenu {
 	}
 
 	static void open(ServerPlayer player, TpAltar.Pending pending, String title) {
-		player.openMenu(new SimpleMenuProvider((id, inv, p) -> new NameMenu(id, inv, pending), Component.literal(title)));
+		player.openMenu(new SimpleMenuProvider((id, inv, p) -> new NameMenu(id, inv, pending),
+			TpAltar.guiTitle(player, "\uF003\uE006\uF001\uF004", title))); // fundo de bigorna (título começa em x=60)
 	}
 
 	@Override
