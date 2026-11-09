@@ -18,57 +18,74 @@ jobs:
     needs: mods
     runs-on: ubuntu-24.04
     permissions:
-      contents: write # publicar o resource pack do Altar de Teleporte no release "tpaltar-pack"
+      contents: write # publicar os resource packs (releases "<mod>-pack")
     strategy:
       fail-fast: false
       matrix:
         mod: ${{ fromJSON(needs.mods.outputs.list) }}
-        mc: ['26.3', '26.2']
+        mc: ['26.3', '26.2', '26.1.2']
         include:
           - { mc: '26.3', dep: '>=26.3 <27' }
           - { mc: '26.2', dep: '~26.2' }
+          - { mc: '26.1.2', dep: '>=26.1 <26.2' }
     steps:
       - uses: actions/checkout@v6
-      - uses: gradle/actions/wrapper-validation@v6
-      - uses: actions/setup-java@v5
+      # Cada mod diz em quais versões compila (ci_minecraft_versions no gradle.properties; sem a linha: 26.3 e 26.2).
+      - id: want
+        run: |
+          props=${{ matrix.mod }}/gradle.properties
+          v=$(sed -n 's/^ci_minecraft_versions=//p' "$props"); v=${v:-26.3,26.2}
+          case ",$v," in *",${{ matrix.mc }},"*) echo "ok=true" >> "$GITHUB_OUTPUT";; *) echo "${{ matrix.mod }} não é compilado para ${{ matrix.mc }}";; esac
+          echo "id=$(sed -n 's/^mod_id=//p' "$props")" >> "$GITHUB_OUTPUT"
+      - if: steps.want.outputs.ok == 'true'
+        uses: gradle/actions/wrapper-validation@v6
+      - if: steps.want.outputs.ok == 'true'
+        uses: actions/setup-java@v5
         with:
           java-version: '25'
           distribution: 'microsoft'
-      - run: chmod +x ./gradlew
-      - run: ./gradlew ":${{ matrix.mod }}:build" "-Pminecraft_version=${{ matrix.mc }}" "-Pminecraft_dependency=${{ matrix.dep }}"
+      - if: steps.want.outputs.ok == 'true'
+        run: chmod +x ./gradlew
+      # --configure-on-demand: só configura o mod pedido (os outros podem não ter a versão do Minecraft da matriz).
+      - if: steps.want.outputs.ok == 'true'
+        run: ./gradlew --configure-on-demand ":${{ matrix.mod }}:build" "-Pminecraft_version=${{ matrix.mc }}" "-Pminecraft_dependency=${{ matrix.dep }}"
       # Um download por mod e versão do Minecraft, ex.: mc26.2-tpaltar-1.0.0
-      - uses: actions/upload-artifact@v7
+      - if: steps.want.outputs.ok == 'true'
+        uses: actions/upload-artifact@v7
         with:
           name: mc${{ matrix.mc }}-${{ matrix.mod }}
           path: ${{ matrix.mod }}/build/libs/*.jar
-      # Sobe um servidor dedicado de verdade com o Altar de Teleporte, monta/remove um altar de teste e desliga.
-      - name: Teste do Altar de Teleporte num servidor real
-        if: startsWith(matrix.mod, 'tpaltar-')
+      # Mods com autoteste (-Pselftest no build.gradle): sobe um servidor dedicado de verdade, o mod testa a si mesmo
+      # e desliga. O log precisa ter "<MOD_ID> SELFTEST OK".
+      - name: Autoteste num servidor real
+        if: steps.want.outputs.ok == 'true' && hashFiles(format('{0}/src/main/java/**/SelfTest.java', matrix.mod)) != ''
         run: |
+          id=${{ steps.want.outputs.id }}
           mkdir -p ${{ matrix.mod }}/run
           echo "eula=true" > ${{ matrix.mod }}/run/eula.txt
           printf 'level-type=minecraft\\:flat\nonline-mode=false\nspawn-protection=0\n' > ${{ matrix.mod }}/run/server.properties
-          timeout 900 ./gradlew ":${{ matrix.mod }}:runServer" -Pselftest "-Pminecraft_version=${{ matrix.mc }}" "-Pminecraft_dependency=${{ matrix.dep }}" | tee server.log
-          grep -q "TPALTAR SELFTEST OK" server.log
+          timeout 900 ./gradlew --configure-on-demand ":${{ matrix.mod }}:runServer" -Pselftest "-Pminecraft_version=${{ matrix.mc }}" "-Pminecraft_dependency=${{ matrix.dep }}" | tee server.log
+          grep -q "${id^^} SELFTEST OK" server.log
           ! grep -q "Serialization errors" server.log
-      # Confere que o hash dentro do .jar é o do zip e, na main, publica o zip no release "tpaltar-pack".
-      # O nome leva o hash, então cada versão do mod aponta para o seu próprio pack (o servidor envia o link sozinho).
-      - name: Resource pack do Altar de Teleporte
-        if: startsWith(matrix.mod, 'tpaltar-')
+      # Mods com resource pack (src/pack): confere que o hash dentro do .jar é o do zip e, na main, publica o zip no
+      # release "<mod_id>-pack". O nome leva o hash, então cada versão do mod aponta para o seu próprio pack.
+      - name: Resource pack
+        if: steps.want.outputs.ok == 'true' && hashFiles(format('{0}/src/pack/pack.mcmeta', matrix.mod)) != ''
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
-          zip=${{ matrix.mod }}/build/pack/tpaltar-pack.zip
+          id=${{ steps.want.outputs.id }}
+          zip=${{ matrix.mod }}/build/pack/$id-pack.zip
           sha=$(sha1sum "$zip" | cut -d' ' -f1)
           jar=$(ls ${{ matrix.mod }}/build/libs/*.jar | grep -v sources | head -1)
-          test "$(unzip -p "$jar" tpaltar/pack.sha1)" = "$sha"
+          test "$(unzip -p "$jar" $id/pack.sha1)" = "$sha"
           echo "SHA-1 do pack: $sha"
           if [ "${{ github.event_name }}" = push ] && [ "${{ github.ref }}" = refs/heads/main ]; then
-            name="tpaltar-pack-$sha.zip"
+            name="$id-pack-$sha.zip"
             cp "$zip" "$name"
-            gh release view tpaltar-pack >/dev/null 2>&1 || gh release create tpaltar-pack --title "Texturas do Altar de Teleporte" \
-              --notes "Resource pack do Altar de Teleporte. O próprio mod envia o link certo aos jogadores; não é preciso configurar nada." || true
-            if ! gh release view tpaltar-pack --json assets -q '.assets[].name' | grep -qx "$name"; then
-              gh release upload tpaltar-pack "$name" --clobber || { sleep 10; gh release upload tpaltar-pack "$name" --clobber; }
+            gh release view $id-pack >/dev/null 2>&1 || gh release create $id-pack --title "Texturas: $id" \
+              --notes "Resource pack do mod $id. O próprio mod envia o link certo aos jogadores; não é preciso configurar nada." || true
+            if ! gh release view $id-pack --json assets -q '.assets[].name' | grep -qx "$name"; then
+              gh release upload $id-pack "$name" --clobber || { sleep 10; gh release upload $id-pack "$name" --clobber; }
             fi
           fi

@@ -7,6 +7,7 @@ Mods Fabric para Minecraft. Cada pasta `<mod>-<versão>/` é um mod independente
 | Mob Health Bar | `mobhealthbar-1.2.1/` | 26.2 e 26.3+ (Fabric, só cliente) |
 | Item Despawn Timer | `itemtimer-1.0.0/` | 26.2 e 26.3+ (Fabric, só cliente) |
 | Altar de Teleporte | `tpaltar-1.0.0/` | 26.2 e 26.3+ (Fabric, servidor ou singleplayer, requer Fabric API) |
+| Baú Inteligente | `smartchest-1.0.0/` | 26.1.x, 26.2 e 26.3+ (Fabric, servidor ou singleplayer, requer Fabric API) |
 
 ## Altar de Teleporte
 
@@ -22,6 +23,23 @@ Vai na pasta `mods/` do servidor, junto com o Fabric API; os jogadores entram se
 - **Desempenho**: altares sem jogador a 48 blocos ficam parados (sem giro, animação ou partículas); as animações são interpoladas pelo cliente (1 atualização a cada 2 s por altar) e as mudanças de pérolas são gravadas no máximo 1 vez por segundo.
 - Cada dimensão tem sua própria lista. Os dados ficam em `<mundo>/tpaltar.json`, fora do save do Minecraft. A decoração (coluna, tampo, olho) nunca é salva no mapa: sem o mod, sobra só uma obsidiana comum; com o mod, ela é recriada sozinha. Sobras de versões antigas são apagadas automaticamente.
 
+## Baú Inteligente
+
+Vai na pasta `mods/` do servidor, junto com o Fabric API; os jogadores entram sem instalar nada. Em singleplayer, coloque o mesmo .jar na pasta `mods/` do jogo.
+
+- **Receitas** (bancada): **Baú Inteligente** = 8 obsidianas em volta de um baú. **Vinculador** = 8 ender pearls em volta de uma vara de blaze. Aparecem no livro de receitas ao pegar obsidiana / vara de blaze.
+- **Colocar**: clique no chão com o Baú Inteligente. Ele fica virado para você e nunca se junta com baús vizinhos.
+- **Vincular**: clique no Baú Inteligente com o Vinculador (ele passa a "apontar" para esse baú) e depois clique nos baús e barris que quer ligar; clicar de novo num baú ligado o desliga. Baú duplo entra inteiro com um clique. Limites: mesma dimensão, até 32 blocos de distância e até 64 baús. Segurando o Vinculador você vê partículas nos baús ligados.
+- **Usar**: clique no Baú Inteligente. A tela junta os itens de todos os baús ligados (itens iguais somados; o número no espaço vai até 99 e o total exato aparece ao passar o mouse).
+  - Clique: pega um pack · botão direito: metade · Shift+clique: direto para o inventário.
+  - Guardar: solte um item em qualquer espaço da grade, Shift+clique num item do seu inventário ou use o botão **Guardar inventário** (tudo menos a hotbar). Primeiro completa pilhas iguais, depois usa espaços vazios. Se os baús ligados estiverem cheios, nada é guardado e o item fica com você.
+  - Barra de baixo: ◀ página ▶ · **pesquisar** (abre uma caixa de texto; o resultado mostra ao vivo o que foi achado; botão direito limpa) · **ordenar** (quantidade, nome, mod/id) · **guardar inventário** · **baús ligados** (fecha a tela e marca os baús com partículas).
+- **Pesquisa no idioma do jogo**: acha pelo nome no idioma de cada jogador, pelo nome em inglês e pelo id do item, sem diferenciar acentos ("pa" acha "Pá"). Em singleplayer usa o idioma do próprio jogo. No servidor dedicado, o arquivo de idioma do jogador é baixado uma vez da Mojang (conferido pelo SHA-1) e guardado em `<mundo>/smartchest-lang/`; sem internet, a pesquisa usa inglês e id.
+- **Quebrar**: como a obsidiana, só volta com picareta de diamante ou netherite. Os vínculos são apagados: ao colocar de novo, é preciso vincular os baús outra vez. Nenhum item se perde (eles sempre ficam nos baús normais).
+- **Visual (Obsidiana do End)**: o baú e o Vinculador ("Chave do End") têm textura própria, e a tela ganha fundo escuro com botões. Vem dentro do .jar (singleplayer) e, no servidor dedicado, o próprio mod envia o resource pack ao jogador. Quem recusar vê obsidiana, vara de blaze e a tela de baú comum (com flechas, livro, comparador, funil e laço como botões). As texturas são geradas por `arte/gerar.py`.
+- **Desempenho**: os baús só são lidos enquanto alguém está com a tela aberta (1 vez por segundo) e nunca carregam chunks; baús ligados longe demais para estarem carregados aparecem como "longe demais agora".
+- Os dados ficam em `<mundo>/smartchest.json`, fora do save do Minecraft. Sem o mod, sobra só uma obsidiana comum e os itens continuam nos baús.
+
 ## Item Despawn Timer
 
 Mostra acima dos itens no chão quanto falta para sumirem (5 min). Itens dropados juntos no mesmo lugar (ex.: ao morrer) mostram um só cronômetro, com o tempo do primeiro a sumir. Amarelo no último minuto, vermelho nos últimos 10 s.
@@ -31,7 +49,7 @@ Mostra acima dos itens no chão quanto falta para sumirem (5 min). Itens dropado
 
 ## Compilar
 
-O GitHub Actions compila a cada push. Os `.jar` ficam em **Actions → último build → Artifacts**, um download por mod e versão do Minecraft (ex.: `mc26.2-tpaltar-1.0.0`). As versões ficam na matriz do `build.yml`.
+O GitHub Actions compila a cada push. Os `.jar` ficam em **Actions → último build → Artifacts**, um download por mod e versão do Minecraft (ex.: `mc26.2-tpaltar-1.0.0`; o de `mc26.1.2` serve para 26.1, 26.1.1 e 26.1.2). As versões ficam na matriz do `build.yml`; cada mod escolhe as suas com `ci_minecraft_versions` no `gradle.properties` (sem a linha: 26.3 e 26.2).
 
 Localmente (Java 25): `./gradlew build` → `<pasta>/build/libs/`.
 
