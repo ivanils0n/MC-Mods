@@ -11,6 +11,6 @@ public abstract class EntityMixin {
 	// A decoração do altar nunca vai para o save: sem o mod, o mundo abre só com a obsidiana; com o mod, é recriada.
 	@Inject(method = "shouldBeSaved", at = @At("HEAD"), cancellable = true)
 	private void tpaltar$neverSave(CallbackInfoReturnable<Boolean> cir) {
-		if (((Entity) (Object) this).getTags().contains("tpaltar")) cir.setReturnValue(false);
+		if (((Entity) (Object) this).entityTags().contains("tpaltar")) cir.setReturnValue(false);
 	}
 }

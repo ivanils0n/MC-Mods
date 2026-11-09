@@ -6,7 +6,6 @@ import net.minecraft.ChatFormatting;
 import net.minecraft.core.component.DataComponents;
 import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerPlayer;
-import net.minecraft.world.Container;
 import net.minecraft.world.SimpleContainer;
 import net.minecraft.world.SimpleMenuProvider;
 import net.minecraft.world.entity.player.Inventory;
@@ -34,11 +33,26 @@ final class AltarMenu extends ChestMenu {
 
 	private final Altar from;
 	private final List<Altar> targets;
-	private final SimpleContainer box;
+	private final Box box;
 	private final int storeStart; // índice do primeiro espaço da fileira de estoque
 	private boolean loading;
 
-	private AltarMenu(int id, Inventory inv, SimpleContainer box, int rows, Altar from, List<Altar> targets) {
+	/** Baú que avisa o menu a cada mudança (o SimpleContainer da 26.x não tem ouvintes). */
+	private static final class Box extends SimpleContainer {
+		Runnable onChange;
+
+		Box(int size) {
+			super(size);
+		}
+
+		@Override
+		public void setChanged() {
+			super.setChanged();
+			if (onChange != null) onChange.run();
+		}
+	}
+
+	private AltarMenu(int id, Inventory inv, Box box, int rows, Altar from, List<Altar> targets) {
 		super(TYPES[rows - 1], id, inv, box, rows);
 		this.from = from;
 		this.targets = targets;
@@ -69,14 +83,14 @@ final class AltarMenu extends ChestMenu {
 			slots.set(i, slot);
 		}
 		loadPearls();
-		box.addListener(this::pearlsMoved);
+		box.onChange = this::pearlsMoved;
 	}
 
 	static void open(ServerPlayer player, Altar from, List<Altar> all) {
 		// shortcut: mostra só os 45 primeiros destinos; paginar se algum servidor passar disso por dimensão.
 		List<Altar> targets = List.copyOf(all.subList(0, Math.min(all.size(), MAX_TARGETS)));
 		int rows = (targets.size() + 8) / 9 + 1;
-		SimpleContainer box = new SimpleContainer(rows * 9);
+		Box box = new Box(rows * 9);
 		for (int i = 0; i < targets.size(); i++) box.setItem(i, icon(targets.get(i)));
 		for (int i = (rows - 1) * 9; i < rows * 9; i++) box.setItem(i, pane());
 		player.openMenu(new SimpleMenuProvider((id, inv, p) -> new AltarMenu(id, inv, box, rows, from, targets), Component.literal(from.name)));
@@ -105,7 +119,7 @@ final class AltarMenu extends ChestMenu {
 	}
 
 	/** Qualquer mudança no baú: o estoque do altar passa a ser o que está nos 4 espaços. */
-	private void pearlsMoved(Container c) {
+	private void pearlsMoved() {
 		if (loading) return;
 		int total = 0;
 		for (int i = 0; i < PEARL_SLOTS; i++) {
@@ -135,7 +149,7 @@ final class AltarMenu extends ChestMenu {
 	}
 
 	private static ItemStack pane() {
-		ItemStack s = new ItemStack(Items.PURPLE_STAINED_GLASS_PANE);
+		ItemStack s = new ItemStack(Items.GLASS_PANE);
 		s.set(DataComponents.CUSTOM_NAME, TpAltar.plain("Ender pearls deste altar", ChatFormatting.LIGHT_PURPLE));
 		s.set(DataComponents.LORE, new ItemLore(List.of(
 			TpAltar.plain("Guarde até " + TpAltar.MAX_PEARLS + " nos espaços do meio.", ChatFormatting.GRAY),

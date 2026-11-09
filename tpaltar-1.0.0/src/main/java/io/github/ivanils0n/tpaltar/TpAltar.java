@@ -98,7 +98,7 @@ public final class TpAltar implements ModInitializer {
 			LEFTOVERS.clear();
 		});
 		ServerEntityEvents.ENTITY_LOAD.register((entity, level) -> {
-			if (entity.getTags().contains("tpaltar") && !entity.getTags().contains(RUN_TAG)) LEFTOVERS.add(entity);
+			if (entity.entityTags().contains("tpaltar") && !entity.entityTags().contains(RUN_TAG)) LEFTOVERS.add(entity);
 		});
 		ServerTickEvents.END_SERVER_TICK.register(s -> {
 			// Apaga fora do evento de carregamento, para não mexer na lista de entidades enquanto o jogo a percorre.
