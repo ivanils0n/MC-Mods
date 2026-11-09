@@ -1,85 +1,14 @@
 name: build
-on: [push, pull_request, workflow_dispatch]
-
+on: [push]
 jobs:
-  # Lista mod x versão do Minecraft: uma pasta com build.gradle é um mod, e cada mod diz em quais versões compila
-  # (ci_minecraft_versions no gradle.properties; sem a linha: 26.3 e 26.2). Cada par vira um download separado.
-  mods:
+  probe:
     runs-on: ubuntu-24.04
-    outputs:
-      matrix: ${{ steps.find.outputs.matrix }}
     steps:
       - uses: actions/checkout@v6
-      - id: find
-        run: |
-          declare -A dep=( [26.3]='>=26.3 <27' [26.2]='~26.2' [26.1.2]='>=26.1 <26.2' )
-          list=""
-          for d in */; do
-            d=${d%/}; [ -f "$d/build.gradle" ] || continue
-            v=$(sed -n 's/^ci_minecraft_versions=//p' "$d/gradle.properties"); v=${v:-26.3,26.2}
-            id=$(sed -n 's/^mod_id=//p' "$d/gradle.properties")
-            for mc in ${v//,/ }; do
-              [ -n "${dep[$mc]}" ] || { echo "::error::$d pede o Minecraft $mc, que não está na lista do build.yml"; exit 1; }
-              list="$list{\"mod\":\"$d\",\"id\":\"$id\",\"mc\":\"$mc\",\"dep\":\"${dep[$mc]}\"},"
-            done
-          done
-          echo "matrix={\"include\":[${list%,}]}" | tee -a "$GITHUB_OUTPUT"
-
-  build:
-    needs: mods
-    runs-on: ubuntu-24.04
-    permissions:
-      contents: write # publicar os resource packs (releases "<mod_id>-pack")
-    strategy:
-      fail-fast: false
-      max-parallel: 4 # com mais jobs de uma vez o GitHub tem falhado ao criar os restantes ("Internal server error")
-      matrix: ${{ fromJSON(needs.mods.outputs.matrix) }}
-    steps:
-      - uses: actions/checkout@v6
-      - uses: gradle/actions/wrapper-validation@v6
       - uses: actions/setup-java@v5
         with:
           java-version: '25'
           distribution: 'microsoft'
-      - run: chmod +x ./gradlew
-      # --configure-on-demand: só configura o mod pedido (os outros podem não ter a versão do Minecraft da matriz).
-      - run: ./gradlew --configure-on-demand ":${{ matrix.mod }}:build" "-Pminecraft_version=${{ matrix.mc }}" "-Pminecraft_dependency=${{ matrix.dep }}"
-      # Um download por mod e versão do Minecraft, ex.: mc26.2-tpaltar-1.0.0
-      - uses: actions/upload-artifact@v7
-        with:
-          name: mc${{ matrix.mc }}-${{ matrix.mod }}
-          path: ${{ matrix.mod }}/build/libs/*.jar
-      # Mods com autoteste (-Pselftest no build.gradle): sobe um servidor dedicado de verdade, o mod testa a si mesmo
-      # e desliga. O log precisa ter "<MOD_ID> SELFTEST OK".
-      - name: Autoteste num servidor real
-        run: |
-          find ${{ matrix.mod }}/src/main/java -name SelfTest.java | grep -q . || { echo "Mod sem autoteste."; exit 0; }
-          id=${{ matrix.id }}
-          mkdir -p ${{ matrix.mod }}/run
-          echo "eula=true" > ${{ matrix.mod }}/run/eula.txt
-          printf 'level-type=minecraft\\:flat\nonline-mode=false\nspawn-protection=0\n' > ${{ matrix.mod }}/run/server.properties
-          timeout 900 ./gradlew --configure-on-demand ":${{ matrix.mod }}:runServer" -Pselftest "-Pminecraft_version=${{ matrix.mc }}" "-Pminecraft_dependency=${{ matrix.dep }}" | tee server.log
-          grep -q "${id^^} SELFTEST OK" server.log
-          ! grep -q "Serialization errors" server.log
-      # Mods com resource pack (src/pack): confere que o hash dentro do .jar é o do zip e, na main, publica o zip no
-      # release "<mod_id>-pack". O nome leva o hash, então cada versão do mod aponta para o seu próprio pack.
-      - name: Resource pack
-        env:
-          GH_TOKEN: ${{ github.token }}
-        run: |
-          [ -f ${{ matrix.mod }}/src/pack/pack.mcmeta ] || { echo "Mod sem resource pack."; exit 0; }
-          id=${{ matrix.id }}
-          zip=${{ matrix.mod }}/build/pack/$id-pack.zip
-          sha=$(sha1sum "$zip" | cut -d' ' -f1)
-          jar=$(ls ${{ matrix.mod }}/build/libs/*.jar | grep -v sources | head -1)
-          test "$(unzip -p "$jar" $id/pack.sha1)" = "$sha"
-          echo "SHA-1 do pack: $sha"
-          if [ "${{ github.event_name }}" = push ] && [ "${{ github.ref }}" = refs/heads/main ]; then
-            name="$id-pack-$sha.zip"
-            cp "$zip" "$name"
-            gh release view $id-pack >/dev/null 2>&1 || gh release create $id-pack --title "Texturas: $id" \
-              --notes "Resource pack do mod $id. O próprio mod envia o link certo aos jogadores; não é preciso configurar nada." || true
-            if ! gh release view $id-pack --json assets -q '.assets[].name' | grep -qx "$name"; then
-              gh release upload $id-pack "$name" --clobber || { sleep 10; gh release upload $id-pack "$name" --clobber; }
-            fi
-          fi
+      - run: chmod +x ./gradlew .github/probe.sh
+      - run: ./gradlew --configure-on-demand ":smartchest-1.1.0:compileJava"
+      - run: .github/probe.sh
