@@ -5,6 +5,9 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.entity.state.EntityRenderState;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.MutableComponent;
+import net.minecraft.network.chat.contents.objects.AtlasSprite;
+import net.minecraft.data.AtlasIds;
+import net.minecraft.resources.Identifier;
 import net.minecraft.util.Mth;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityAttachment;
@@ -15,6 +18,9 @@ import net.minecraft.world.entity.player.Player;
 public final class HealthBar {
 	private static final int SEGMENTS = 10;
 	private static final double MAX_DISTANCE_SQ = 32 * 32;
+	private static final AtlasSprite FULL = heart("full");
+	private static final AtlasSprite HALF = heart("half");
+	private static final AtlasSprite EMPTY = heart("container");
 
 	private HealthBar() {}
 
@@ -38,13 +44,19 @@ public final class HealthBar {
 	static Component bar(LivingEntity living) {
 		float max = Math.max(living.getMaxHealth(), 1);
 		float health = Mth.clamp(living.getHealth(), 0, max);
-		float ratio = health / max;
-		int filled = Mth.ceil(ratio * SEGMENTS);
-		ChatFormatting color = ratio > 0.5f ? ChatFormatting.GREEN : ratio > 0.25f ? ChatFormatting.YELLOW : ChatFormatting.RED;
+		// 10 corações = 100% (cada meio coração vale 5%), igual à barra de vida do jogador.
+		int halves = Mth.ceil(health / max * SEGMENTS * 2);
 
-		MutableComponent text = Component.literal("■".repeat(filled)).withStyle(color);
-		text.append(Component.literal("■".repeat(SEGMENTS - filled)).withStyle(ChatFormatting.DARK_GRAY));
+		MutableComponent text = Component.empty();
+		for (int i = 0; i < SEGMENTS; i++) {
+			int left = halves - i * 2;
+			text.append(Component.object(left >= 2 ? FULL : left == 1 ? HALF : EMPTY));
+		}
 		text.append(Component.literal(" " + Mth.ceil(health) + "/" + Mth.ceil(max)).withStyle(ChatFormatting.WHITE));
 		return text;
+	}
+
+	private static AtlasSprite heart(String name) {
+		return new AtlasSprite(AtlasIds.GUI, Identifier.withDefaultNamespace("hud/heart/" + name));
 	}
 }
