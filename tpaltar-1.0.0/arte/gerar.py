@@ -349,8 +349,19 @@ def altar_item_model():
     for x, z in ((2.2, 7.5), (12.8, 7.5), (7.5, 2.2), (7.5, 12.8)):  # cristais em volta
         els.append(el([x - 0.6, 7, z - 0.6], [x + 0.6, 10.5, z + 0.6], cr, light=12))
     t = "tpaltar:block/"
+    # Poses próprias: o obelisco é alto e fino, então fica maior no inventário e menor na mão para caber inteiro.
+    display = {
+        "gui": {"rotation": [30, 225, 0], "translation": [0, -0.5, 0], "scale": [0.78, 0.78, 0.78]},
+        "ground": {"rotation": [0, 0, 0], "translation": [0, 3, 0], "scale": [0.3, 0.3, 0.3]},
+        "fixed": {"rotation": [0, 0, 0], "translation": [0, 0, 0], "scale": [0.6, 0.6, 0.6]},
+        "thirdperson_righthand": {"rotation": [75, 45, 0], "translation": [0, 2.5, 0], "scale": [0.375, 0.375, 0.375]},
+        "thirdperson_lefthand": {"rotation": [75, 45, 0], "translation": [0, 2.5, 0], "scale": [0.375, 0.375, 0.375]},
+        "firstperson_righthand": {"rotation": [0, 45, 0], "translation": [0, 0.5, 0], "scale": [0.28, 0.28, 0.28]},
+        "firstperson_lefthand": {"rotation": [0, 225, 0], "translation": [0, 0.5, 0], "scale": [0.28, 0.28, 0.28]},
+    }
     return {
         "parent": "minecraft:block/block",
+        "display": display,
         "textures": {
             "particle": t + "obelisk_stone", "stone": t + "obelisk_stone", "plinth": t + "plinth_side",
             "plinth_top": t + "plinth_top", "runes": t + "obelisk_runes", "tip": t + "crystal",
