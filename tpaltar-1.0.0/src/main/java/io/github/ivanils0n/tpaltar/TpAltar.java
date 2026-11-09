@@ -36,6 +36,7 @@ import net.minecraft.network.chat.ComponentSerialization;
 import net.minecraft.network.chat.MutableComponent;
 import net.minecraft.network.protocol.common.ClientboundResourcePackPushPacket;
 import net.minecraft.network.protocol.common.ServerboundResourcePackPacket;
+import net.minecraft.resources.Identifier;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ServerLevel;
@@ -154,6 +155,11 @@ public final class TpAltar implements ModInitializer {
 			LEFTOVERS.clear();
 			// Mudanças de pérolas são gravadas no máximo uma vez por segundo (e ao desligar), não a cada clique.
 			if (store != null && s.getTickCount() % 20 == 0) store.saveIfDirty();
+			if (ownModels() && s.getTickCount() % 20 == 0) {
+				for (ServerPlayer p : s.getPlayerList().getPlayers()) {
+					for (int i = 0; i < p.getInventory().getContainerSize(); i++) upgrade(p.getInventory().getItem(i));
+				}
+			}
 		});
 		ServerPlayConnectionEvents.JOIN.register((handler, sender, s) -> {
 			// Só no servidor dedicado: em singleplayer as texturas já vêm do próprio .jar.
@@ -281,7 +287,8 @@ public final class TpAltar implements ModInitializer {
 
 	/** Pérola parada; vira olho do fim enquanto alguém escolhe o destino (com o pack: olho 3D verde / roxo). */
 	static boolean showEye(ServerLevel sl, Altar a, Display.ItemDisplay eye, boolean inUse) {
-		return command(sl, a.pos(), "data merge entity " + eye.getUUID() + " {item:" + item(inUse ? "ender_eye" : "ender_pearl", "tpaltar_eye") + "}");
+		return command(sl, a.pos(), "data merge entity " + eye.getUUID() + " {item:"
+			+ (inUse ? item("ender_eye", "tpaltar_eye", "eye_active") : item("ender_pearl", "tpaltar_eye", "eye_idle")) + "}");
 	}
 
 	/** Gira o olho (só na horizontal) para encarar o jogador mais próximo em até 16 blocos. */
@@ -421,18 +428,20 @@ public final class TpAltar implements ModInitializer {
 		// Sem resource pack: coluna e tampo de pedra lisa e pérola flutuando. Com o pack (custom_model_data), as mesmas
 		// entidades viram obelisco rúnico, anel de cristais e olho 3D; os modelos compensam estas escalas
 		// (arte/gerar.py). São item_display porque o formato do block_display mudou entre a 26.2 e a 26.3.
-		summon(sl, pos, "item_display", x, y + 1.5, z, tags + ",item:" + item("smooth_stone", "tpaltar_obelisk") + ","
+		summon(sl, pos, "item_display", x, y + 1.5, z, tags + ",item:" + item("smooth_stone", "tpaltar_obelisk", "obelisk") + ","
 			+ transform(0f, 0, 1, 0.5f, 1f));
-		summon(sl, pos, "item_display", x, y + RING_Y, z, tags + ",item:" + item("smooth_stone", "tpaltar_ring") + ","
+		summon(sl, pos, "item_display", x, y + RING_Y, z, tags + ",item:" + item("smooth_stone", "tpaltar_ring", "shards") + ","
 			+ transform(0f, 0, 1, 0.8f, 0.25f));
-		summon(sl, pos, "item_display", x, y + EYE_Y, z, tags + ",item:" + item("ender_pearl", "tpaltar_eye") + ","
+		summon(sl, pos, "item_display", x, y + EYE_Y, z, tags + ",item:" + item("ender_pearl", "tpaltar_eye", "eye_idle") + ","
 			+ "teleport_duration:2,brightness:{sky:15,block:15}," + transform(0f, 0, 1, 0.7f, 0.7f));
 		// Área clicável que cobre a coluna e o olho.
 		summon(sl, pos, "interaction", x, y + 1, z, tags + ",width:0.9f,height:2.3f,response:1b");
 	}
 
-	private static String item(String id, String model) {
-		return "{id:\"minecraft:" + id + "\",count:1,components:{\"minecraft:custom_model_data\":{strings:[\"" + model + "\"]}}}";
+	/** Peça com a marca do pack (cmd) e, no singleplayer, com o modelo próprio do mod (ver ownModels). */
+	private static String item(String id, String cmd, String own) {
+		String model = ownModels() ? ",\"minecraft:item_model\":\"tpaltar:" + own + "\"" : "";
+		return "{id:\"minecraft:" + id + "\",count:1,components:{\"minecraft:custom_model_data\":{strings:[\"" + cmd + "\"]}" + model + "}}";
 	}
 
 	/** Deslocamento vertical, giro em Y (quatérnio 0,qy,0,qw) e escala. */
@@ -565,9 +574,27 @@ public final class TpAltar implements ModInitializer {
 		tag.putBoolean("tpaltar", true);
 		s.set(DataComponents.CUSTOM_DATA, CustomData.of(tag));
 		s.set(DataComponents.CUSTOM_NAME, plain(ITEM_NAME, ChatFormatting.LIGHT_PURPLE));
-		s.set(DataComponents.ITEM_MODEL, Items.ENDER_EYE.components().get(DataComponents.ITEM_MODEL));
+		s.set(DataComponents.ITEM_MODEL, ownModels() ? model("altar") : Items.ENDER_EYE.components().get(DataComponents.ITEM_MODEL));
 		s.set(DataComponents.ENCHANTMENT_GLINT_OVERRIDE, true);
 		return s;
+	}
+
+	static Identifier model(String name) {
+		return Identifier.fromNamespaceAndPath("tpaltar", name);
+	}
+
+	/**
+	 * Singleplayer: os resource packs do jogador ficam acima das texturas do .jar e podem trocar o olho do fim, a
+	 * pérola ou a pedra lisa; então as peças do altar usam modelos do próprio mod (tpaltar:*), que nenhum pack troca.
+	 * Servidor dedicado: o pack enviado pelo servidor já fica acima dos do jogador, e quem o recusa vê as peças vanilla.
+	 */
+	static boolean ownModels() {
+		return server != null && !server.isDedicatedServer();
+	}
+
+	/** Altar craftado (a receita dá o modelo de olho do fim) ou de versão antiga: ganha o modelo próprio no singleplayer. */
+	static void upgrade(ItemStack stack) {
+		if (isAltarItem(stack) && !model("altar").equals(stack.get(DataComponents.ITEM_MODEL))) stack.set(DataComponents.ITEM_MODEL, model("altar"));
 	}
 
 	private static String readPackHash() {

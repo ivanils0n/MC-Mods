@@ -29,6 +29,7 @@ final class SelfTest {
 	private static void check(MinecraftServer server) {
 		ensure(server.getRecipeManager().getRecipes().stream().anyMatch(r -> r.id().toString().contains("tpaltar:altar")), "receita não carregou");
 		ensure(TpAltar.isAltarItem(TpAltar.altarItem()), "item do altar não é reconhecido");
+		ensure(!TpAltar.ownModels(), "servidor dedicado deveria usar os itens vanilla (o pack do servidor já fica por cima)");
 		Component title = TpAltar.themedTitle("\uF000\uE000\uF001\uF002", "Teste");
 		ensure(title.getString().endsWith("Teste") && title.getSiblings().size() == 2, "título com fundo: " + title);
 
