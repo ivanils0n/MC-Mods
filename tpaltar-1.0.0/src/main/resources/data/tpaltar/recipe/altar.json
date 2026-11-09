@@ -1,0 +1,24 @@
+{
+	"type": "minecraft:crafting_shaped",
+	"category": "misc",
+	"pattern": [
+		"SSS",
+		"SES",
+		"OOO"
+	],
+	"key": {
+		"S": "minecraft:smooth_stone",
+		"E": "minecraft:ender_pearl",
+		"O": "minecraft:obsidian"
+	},
+	"result": {
+		"id": "minecraft:obsidian",
+		"count": 1,
+		"components": {
+			"minecraft:custom_data": {"tpaltar": true},
+			"minecraft:custom_name": {"text": "Altar de Teleporte", "color": "light_purple", "italic": false},
+			"minecraft:item_model": "minecraft:ender_eye",
+			"minecraft:enchantment_glint_override": true
+		}
+	}
+}

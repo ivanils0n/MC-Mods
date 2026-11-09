@@ -23,3 +23,11 @@ jobs:
         with:
           name: mods-mc${{ matrix.mc }}
           path: '*/build/libs/*.jar'
+      # Sobe um servidor dedicado de verdade com o Altar de Teleporte, monta/remove um altar de teste e desliga.
+      - name: Teste do Altar de Teleporte num servidor real
+        run: |
+          mkdir -p tpaltar-1.0.0/run
+          echo "eula=true" > tpaltar-1.0.0/run/eula.txt
+          printf 'level-type=minecraft\\:flat\nonline-mode=false\nspawn-protection=0\n' > tpaltar-1.0.0/run/server.properties
+          timeout 900 ./gradlew :tpaltar-1.0.0:runServer -Pselftest "-Pminecraft_version=${{ matrix.mc }}" "-Pminecraft_dependency=${{ matrix.dep }}" | tee server.log
+          grep -q "TPALTAR SELFTEST OK" server.log
