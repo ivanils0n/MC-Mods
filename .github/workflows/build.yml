@@ -4,6 +4,12 @@ on: [push, pull_request, workflow_dispatch]
 jobs:
   build:
     runs-on: ubuntu-24.04
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - { mc: '26.3', dep: '>=26.3 <27' }
+          - { mc: '26.2', dep: '~26.2' }
     steps:
       - uses: actions/checkout@v6
       - uses: gradle/actions/wrapper-validation@v6
@@ -12,8 +18,14 @@ jobs:
           java-version: '25'
           distribution: 'microsoft'
       - run: chmod +x ./gradlew
-      - run: ./gradlew build
+      - run: ./gradlew build "-Pminecraft_version=${{ matrix.mc }}" "-Pminecraft_dependency=${{ matrix.dep }}"
+      - name: tmp-check
+        run: |
+          set +e; J=~/.gradle/caches/fabric-loom/${{ matrix.mc }}/minecraft-merged.jar
+          javap -cp $J net.minecraft.client.renderer.entity.EntityRenderer | grep -E "createRenderState\(T, float\)"
+          javap -c -p -cp $J net.minecraft.client.renderer.entity.EntityRenderer | grep -c "EntityRenderState.scoreText"
+          unzip -p */build/libs/*.jar fabric.mod.json | grep -E '"version"|"minecraft"'
       - uses: actions/upload-artifact@v7
         with:
-          name: mods
+          name: mods-mc${{ matrix.mc }}
           path: '*/build/libs/*.jar'

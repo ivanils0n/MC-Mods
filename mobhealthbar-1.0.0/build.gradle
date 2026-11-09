@@ -12,10 +12,10 @@ dependencies {
 }
 
 processResources {
-	def version = project.version
-	inputs.property "version", version
+	def props = [version: project.version, minecraft_dependency: minecraft_dependency]
+	inputs.properties props
 	filesMatching("fabric.mod.json") {
-		expand "version": version
+		expand props
 	}
 }
 
