@@ -15,7 +15,7 @@
     "when": "tpaltar_altar",
     "model": {
      "type": "minecraft:model",
-     "model": "tpaltar:item/altar_icon"
+     "model": "tpaltar:item/altar_item"
     }
    }
   ],

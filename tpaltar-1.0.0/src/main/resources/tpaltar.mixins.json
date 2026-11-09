@@ -3,7 +3,8 @@
 	"package": "io.github.ivanils0n.tpaltar.mixin",
 	"compatibilityLevel": "JAVA_21",
 	"mixins": [
-		"EntityMixin"
+		"EntityMixin",
+		"ResourcePackResponseMixin"
 	],
 	"injectors": {
 		"defaultRequire": 1

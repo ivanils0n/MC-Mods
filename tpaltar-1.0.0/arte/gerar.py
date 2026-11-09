@@ -323,6 +323,183 @@ def eye_model(shell, iris_tex, pupil_tex, node_tex):
     }
 
 
+def altar_item_model():
+    """Item do altar: o obelisco em miniatura (inventário, mão e chão usam as poses de bloco do block/block)."""
+    p, st, ru, cr = "#plinth", "#stone", "#runes", "#tip"
+    all6 = ("north", "south", "east", "west", "up", "down")
+
+    def el(a, b, tex, top=None, light=None, sides_only=False):
+        faces = {f: tex for f in all6 if not (sides_only and f in ("up", "down"))}
+        if top:
+            faces["up"] = top
+        e = cube(a, b, faces)
+        if light:
+            e["light_emission"] = light
+        return e
+
+    els = [
+        el([2, 0, 2], [14, 4, 14], p, top="#plinth_top"),
+        el([4, 4, 4], [12, 5, 12], st),
+        el([5, 5, 5], [11, 8.5, 11], st), el([4.9, 5.3, 4.9], [11.1, 8.2, 11.1], ru, light=15, sides_only=True),
+        el([5.5, 8.5, 5.5], [10.5, 11, 10.5], st), el([5.4, 8.8, 5.4], [10.6, 10.7, 10.6], ru, light=15, sides_only=True),
+        el([6, 11, 6], [10, 12.5, 10], st),
+        el([7, 12.5, 7], [9, 13.5, 9], cr, light=13),
+        el([6.5, 14.2, 6.5], [9.5, 17.2, 9.5], "#iris", top="#shell", light=15),
+    ]
+    for x, z in ((2.2, 7.5), (12.8, 7.5), (7.5, 2.2), (7.5, 12.8)):  # cristais em volta
+        els.append(el([x - 0.6, 7, z - 0.6], [x + 0.6, 10.5, z + 0.6], cr, light=12))
+    t = "tpaltar:block/"
+    # Poses próprias: o obelisco é alto e fino, então fica maior no inventário e menor na mão para caber inteiro.
+    display = {
+        "gui": {"rotation": [30, 225, 0], "translation": [0, -0.5, 0], "scale": [0.78, 0.78, 0.78]},
+        "ground": {"rotation": [0, 0, 0], "translation": [0, 3, 0], "scale": [0.3, 0.3, 0.3]},
+        "fixed": {"rotation": [0, 0, 0], "translation": [0, 0, 0], "scale": [0.6, 0.6, 0.6]},
+        "thirdperson_righthand": {"rotation": [75, 45, 0], "translation": [0, 2.5, 0], "scale": [0.375, 0.375, 0.375]},
+        "thirdperson_lefthand": {"rotation": [75, 45, 0], "translation": [0, 2.5, 0], "scale": [0.375, 0.375, 0.375]},
+        "firstperson_righthand": {"rotation": [0, 45, 0], "translation": [0, 0.5, 0], "scale": [0.28, 0.28, 0.28]},
+        "firstperson_lefthand": {"rotation": [0, 225, 0], "translation": [0, 0.5, 0], "scale": [0.28, 0.28, 0.28]},
+    }
+    return {
+        "parent": "minecraft:block/block",
+        "display": display,
+        "textures": {
+            "particle": t + "obelisk_stone", "stone": t + "obelisk_stone", "plinth": t + "plinth_side",
+            "plinth_top": t + "plinth_top", "runes": t + "obelisk_runes", "tip": t + "crystal",
+            "iris": t + "eye_iris_idle", "shell": t + "eye_shell",
+        },
+        "elements": els,
+    }
+
+
+# ---------- telas (tema "Pedra rúnica") ----------
+# Fundos desenhados como um caractere de fonte no título da tela (font tpaltar:gui). As posições seguem as telas
+# vanilla: baú 176 x (114 + 18*fileiras), bigorna 176 x 166. Ver TpAltar.guiTitle().
+
+GUI = os.path.join(RES, "tpaltar/textures/gui")
+UI = {
+    "bg": "#241c30", "bg2": "#2b2238", "bg3": "#1f1829", "edge": "#120c22", "hi": "#6b5a8c", "lo": "#3a2e52",
+    "inner": "#4e3f6e", "slot": "#16101f", "slot_dark": "#0d0914", "slot_light": "#7a5fa8",
+    "socket": "#c77dff", "socket_in": "#1b1030", "rune": "#5e4a86", "plate": "#b9add0", "plate_edge": "#7a6f94",
+}
+HOLE = (0, 0, 0, 0)
+
+
+def gui_panel(w, h, seed):
+    rnd = random.Random(seed)
+    img = Image.new("RGBA", (w, h))
+    pal = [hexc(UI["bg"])] * 3 + [hexc(UI["bg2"]), hexc(UI["bg3"])]
+    for y in range(h):
+        for x in range(w):
+            img.putpixel((x, y), rnd.choice(pal))
+    for x in range(w):
+        img.putpixel((x, 0), hexc(UI["edge"])); img.putpixel((x, h - 1), hexc(UI["edge"]))
+        img.putpixel((x, 1), hexc(UI["hi"])); img.putpixel((x, h - 2), hexc(UI["lo"]))
+    for y in range(h):
+        img.putpixel((0, y), hexc(UI["edge"])); img.putpixel((w - 1, y), hexc(UI["edge"]))
+        img.putpixel((1, y), hexc(UI["hi"])); img.putpixel((w - 2, y), hexc(UI["lo"]))
+    for x in range(4, w - 4):  # filete interno
+        img.putpixel((x, 3), hexc(UI["inner"])); img.putpixel((x, h - 4), hexc(UI["inner"]))
+    for y in range(4, h - 4):
+        img.putpixel((3, y), hexc(UI["inner"])); img.putpixel((w - 4, y), hexc(UI["inner"]))
+    return img
+
+
+def gui_slot(img, x, y, hole):
+    for i in range(18):
+        img.putpixel((x + i, y), hexc(UI["slot_dark"])); img.putpixel((x, y + i), hexc(UI["slot_dark"]))
+        img.putpixel((x + i, y + 17), hexc(UI["slot_light"])); img.putpixel((x + 17, y + i), hexc(UI["slot_light"]))
+    for j in range(1, 17):
+        for i in range(1, 17):
+            img.putpixel((x + i, y + j), HOLE if hole else hexc(UI["slot"]))
+
+
+def gui_socket(img, x, y, hole):
+    for i in range(18):
+        for px, py in ((x + i, y), (x + i, y + 17), (x, y + i), (x + 17, y + i)):
+            img.putpixel((px, py), hexc(UI["socket"]))
+    for j in range(1, 17):
+        for i in range(1, 17):
+            edge = i in (1, 16) or j in (1, 16)
+            img.putpixel((x + i, y + j), HOLE if hole and not edge else hexc(UI["edge"] if edge else UI["socket_in"]))
+
+
+def gui_rune(img, x, y, glyph):
+    for dy, row in enumerate(GLYPHS[glyph % len(GLYPHS)]):
+        for dx, ch in enumerate(row):
+            if ch == "#":
+                img.putpixel((x + 6 + dx, y + 7 + dy), hexc(UI["rune"]))
+
+
+def gui_plate(img, x, y, w=58, h=11):
+    for j in range(h):
+        for i in range(w):
+            edge = i in (0, w - 1) or j in (0, h - 1)
+            img.putpixel((x + i, y + j), hexc(UI["plate_edge" if edge else "plate"]))
+
+
+def gui_player_inv(img, top, hole):
+    for r in range(3):
+        for c in range(9):
+            gui_slot(img, 7 + 18 * c, top + 18 * r, hole)
+    for c in range(9):
+        gui_slot(img, 7 + 18 * c, top + 58, hole)
+
+
+def chest_bg(rows, hole):
+    h = 114 + 18 * rows
+    img = gui_panel(176, h, rows)
+    for r in range(rows - 1):  # destinos
+        for c in range(9):
+            gui_slot(img, 7 + 18 * c, 17 + 18 * r, hole)
+    y = 17 + 18 * (rows - 1)  # estoque de pérolas: 4 encaixes no meio, runas nos lados (os vidros ficam invisíveis)
+    for c in range(9):
+        if 2 <= c <= 5:
+            gui_socket(img, 7 + 18 * c, y, hole)
+        else:
+            gui_rune(img, 7 + 18 * c, y, c)
+    gui_plate(img, 6, h - 96)  # placa clara atrás do texto "Inventário" (o jogo o escreve em cinza escuro)
+    gui_player_inv(img, 18 * rows + 30, hole)
+    return img
+
+
+def anvil_bg(hole):
+    img = gui_panel(176, 166, 9)
+    em = icon(2)  # emblema do obelisco no lugar do martelo
+    img.alpha_composite(em, (14, 6))
+    for x in range(58, 171):  # campo de texto: buraco, o jogo desenha o campo e o texto
+        for y in range(19, 38):
+            border = x in (58, 170) or y in (19, 37)
+            img.putpixel((x, y), hexc(UI["socket"]) if border else HOLE)
+    gui_slot(img, 26, 46, hole)
+    gui_slot(img, 75, 46, hole)
+    gui_socket(img, 133, 46, hole)
+    for i in range(-3, 4):  # "+" e seta
+        img.putpixel((59 + i, 55), hexc(UI["slot_light"])); img.putpixel((59, 55 + i), hexc(UI["slot_light"]))
+    for x in range(100, 126):
+        img.putpixel((x, 55), hexc(UI["socket"])); img.putpixel((x, 56), hexc(UI["socket"]))
+    for i in range(4):
+        img.putpixel((125 - i, 55 - i), hexc(UI["socket"])); img.putpixel((125 - i, 56 + i), hexc(UI["socket"]))
+    gui_plate(img, 6, 70)
+    gui_player_inv(img, 83, hole)
+    return img
+
+
+def gui_font(slot_holes):
+    os.makedirs(GUI, exist_ok=True)
+    providers = [{"type": "space", "advances": {
+        "\uf000": -8, "\uf001": -177, "\uf002": 8, "\uf003": -60, "\uf004": 60}}]
+    for rows in range(1, 7):
+        img = chest_bg(rows, slot_holes)
+        img.save(os.path.join(GUI, f"altar_{rows}.png"))
+        # ascent 13: o título fica em y=6 da tela e o topo do glifo em y + 7 - ascent = 0
+        providers.append({"type": "bitmap", "file": f"tpaltar:gui/altar_{rows}.png", "ascent": 13,
+                          "height": img.height, "chars": [chr(0xE000 + rows - 1)]})
+    img = anvil_bg(slot_holes)
+    img.save(os.path.join(GUI, "nome.png"))
+    providers.append({"type": "bitmap", "file": "tpaltar:gui/nome.png", "ascent": 13, "height": img.height, "chars": ["\ue006"]})
+    write_json(os.path.join(RES, "tpaltar/font/gui.json"), {"providers": providers})
+
+
 def write_json(path, data):
     os.makedirs(os.path.dirname(path), exist_ok=True)
     with open(path, "w") as f:
@@ -353,8 +530,6 @@ def main():
     save(iris("#5a1490", "#ff9cff", "#22053a", speed=2), "eye_iris_active", frametime=2)
     save(pupil("#e050ff", "#ffe0ff", "#1a0020", [2, 2, 1, 1, 2, 2], flicker="#ffffff"), "eye_pupil_active", frametime=2)
     save(node("#9b30ff", "#ffe0ff"), "eye_node_active", frametime=2)
-    os.makedirs(os.path.join(RES, "tpaltar/textures/item"), exist_ok=True)
-    icon().save(os.path.join(RES, "tpaltar/textures/item/altar.png"))
     os.makedirs(os.path.join(ROOT, "src/pack"), exist_ok=True)
     icon(8).save(os.path.join(ROOT, "src/pack/pack.png"))
 
@@ -366,7 +541,10 @@ def main():
         "parent": "tpaltar:item/eye_idle",
         "textures": {"iris": t + "eye_iris_active", "pupil": t + "eye_pupil_active", "node": t + "eye_node_active"},
     })
-    write_json(os.path.join(MOD, "altar_icon.json"), {"parent": "minecraft:item/generated", "textures": {"layer0": "tpaltar:item/altar"}})
+    write_json(os.path.join(MOD, "altar_item.json"), altar_item_model())
+    write_json(os.path.join(MOD, "blank.json"), {"textures": {"particle": t + "obelisk_stone"}, "elements": []})
+    # shortcut: se o jogo desenhar o título por cima dos itens, os espaços precisam ser buracos (slot_holes=True)
+    gui_font(slot_holes=False)
 
     # Só as peças marcadas com custom_model_data mudam; sem a marca (ou sem o pack) fica o visual vanilla.
     items = os.path.join(RES, "minecraft/items")
@@ -374,7 +552,9 @@ def main():
         [("tpaltar_obelisk", "tpaltar:item/obelisk"), ("tpaltar_ring", "tpaltar:item/shards")], "minecraft:block/smooth_stone"))
     write_json(os.path.join(items, "ender_pearl.json"), select([("tpaltar_eye", "tpaltar:item/eye_idle")], "minecraft:item/ender_pearl"))
     write_json(os.path.join(items, "ender_eye.json"), select(
-        [("tpaltar_eye", "tpaltar:item/eye_active"), ("tpaltar_altar", "tpaltar:item/altar_icon")], "minecraft:item/ender_eye"))
+        [("tpaltar_eye", "tpaltar:item/eye_active"), ("tpaltar_altar", "tpaltar:item/altar_item")], "minecraft:item/ender_eye"))
+
+    write_json(os.path.join(items, "glass_pane.json"), select([("tpaltar_blank", "tpaltar:item/blank")], "minecraft:item/glass_pane"))
 
     write_json(os.path.join(ROOT, "src/pack/pack.mcmeta"), {"pack": {
         "description": "Texturas do Altar de Teleporte",
