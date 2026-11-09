@@ -60,6 +60,7 @@ public final class TpAltar implements ModInitializer {
 	static final int COST = 4; // 64 pérolas = 16 viagens
 	static final String ITEM_NAME = "Altar de Teleporte";
 	static final int NAME_MAX = 24;
+	static final int PLACE_LEVELS = 5; // níveis de XP para nomear e colocar um altar
 
 	/** Onde o altar vai ficar enquanto o jogador digita o nome na tela da bigorna. */
 	record Pending(ResourceKey<Level> dim, BlockPos pos, InteractionHand hand) {}
@@ -160,6 +161,7 @@ public final class TpAltar implements ModInitializer {
 			say(sp, "O altar precisa de 3 blocos livres de altura.", ChatFormatting.RED);
 			return;
 		}
+		if (!hasLevels(sp)) return;
 		NameMenu.open(sp, new Pending(sl.dimension(), pos.immutable(), hand), "Nome do altar");
 	}
 
@@ -187,13 +189,23 @@ public final class TpAltar implements ModInitializer {
 			say(sp, "O local ficou ocupado. Colocação cancelada.", ChatFormatting.RED);
 			return null;
 		}
+		if (!hasLevels(sp)) return null;
 		if (placeAltar(sl, p.pos(), name) == null) {
 			say(sp, "Não foi possível colocar o altar aqui.", ChatFormatting.RED);
 			return null;
 		}
-		if (!sp.isCreative()) stack.shrink(1);
+		if (!sp.isCreative()) {
+			stack.shrink(1);
+			sp.giveExperienceLevels(-PLACE_LEVELS);
+		}
 		say(sp, "Altar \"" + name + "\" criado! Clique nele com ender pearls para abastecer: cada viagem até aqui gasta " + COST + ".", ChatFormatting.GREEN);
 		return null;
+	}
+
+	private static boolean hasLevels(ServerPlayer sp) {
+		if (sp.isCreative() || sp.experienceLevel >= PLACE_LEVELS) return true;
+		say(sp, "Colocar um altar custa " + PLACE_LEVELS + " níveis de experiência (você tem " + sp.experienceLevel + ").", ChatFormatting.RED);
+		return false;
 	}
 
 	private static boolean hasRoom(ServerLevel sl, BlockPos pos) {
