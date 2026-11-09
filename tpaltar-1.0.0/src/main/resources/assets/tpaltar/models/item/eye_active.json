@@ -1,0 +1,8 @@
+{
+ "parent": "tpaltar:item/eye_idle",
+ "textures": {
+  "iris": "tpaltar:block/eye_iris_active",
+  "pupil": "tpaltar:block/eye_pupil_active",
+  "node": "tpaltar:block/eye_node_active"
+ }
+}

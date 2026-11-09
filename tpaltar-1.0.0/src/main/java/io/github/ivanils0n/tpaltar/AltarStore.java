@@ -49,6 +49,7 @@ final class AltarStore {
 
 	private final Path file;
 	private final Map<String, Altar> byKey = new LinkedHashMap<>();
+	private boolean dirty;
 
 	private AltarStore(Path file) {
 		this.file = file;
@@ -62,10 +63,16 @@ final class AltarStore {
 		return byKey.get(key(dim, pos.getX(), pos.getY(), pos.getZ()));
 	}
 
-	/** Altares da dimensão, em ordem alfabética. */
-	List<Altar> inDim(String dim) {
+	/** Altares da dimensão, sem ordenar (para o tick). */
+	List<Altar> inDimUnsorted(String dim) {
 		List<Altar> out = new ArrayList<>();
 		for (Altar a : byKey.values()) if (a.dim.equals(dim)) out.add(a);
+		return out;
+	}
+
+	/** Altares da dimensão, em ordem alfabética. */
+	List<Altar> inDim(String dim) {
+		List<Altar> out = inDimUnsorted(dim);
 		out.sort(Comparator.comparing(a -> a.name.toLowerCase()));
 		return out;
 	}
@@ -113,8 +120,18 @@ final class AltarStore {
 		return store;
 	}
 
+	/** Marca para gravar no próximo saveIfDirty (o mod chama a cada segundo e ao desligar). */
+	void markDirty() {
+		dirty = true;
+	}
+
+	void saveIfDirty() {
+		if (dirty) save();
+	}
+
 	/** Grava num .tmp e troca de uma vez, para nunca deixar o arquivo pela metade se o servidor cair. */
 	void save() {
+		dirty = false;
 		Path tmp = file.resolveSibling(file.getFileName() + ".tmp");
 		try {
 			Files.writeString(tmp, GSON.toJson(byKey.values()), StandardCharsets.UTF_8);
