@@ -12,7 +12,6 @@ import net.fabricmc.fabric.api.event.lifecycle.v1.ServerTickEvents;
 import net.fabricmc.fabric.api.event.player.PlayerBlockBreakEvents;
 import net.fabricmc.fabric.api.event.player.UseBlockCallback;
 import net.fabricmc.fabric.api.event.player.UseEntityCallback;
-import net.fabricmc.fabric.api.message.v1.ServerMessageEvents;
 import net.minecraft.ChatFormatting;
 import net.minecraft.commands.CommandSourceStack;
 import net.minecraft.core.BlockPos;
@@ -20,10 +19,8 @@ import net.minecraft.core.Direction;
 import net.minecraft.core.component.DataComponents;
 import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.nbt.CompoundTag;
-import net.minecraft.network.chat.ChatType;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.MutableComponent;
-import net.minecraft.network.chat.PlayerChatMessage;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ServerLevel;
@@ -62,12 +59,11 @@ public final class TpAltar implements ModInitializer {
 	static final int MAX_PEARLS = 64;
 	static final int COST = 4; // 64 pérolas = 16 viagens
 	static final String ITEM_NAME = "Altar de Teleporte";
-	private static final int NAME_MAX = 24;
-	private static final int NAME_TIMEOUT = 60 * 20; // 60 s para digitar o nome
+	static final int NAME_MAX = 24;
 
-	private record Pending(ResourceKey<Level> dim, BlockPos pos, InteractionHand hand, int expires) {}
+	/** Onde o altar vai ficar enquanto o jogador digita o nome na tela da bigorna. */
+	record Pending(ResourceKey<Level> dim, BlockPos pos, InteractionHand hand) {}
 
-	private static final Map<UUID, Pending> PENDING = new ConcurrentHashMap<>();
 	private static final Map<UUID, Integer> LAST_USE = new ConcurrentHashMap<>();
 	private static MinecraftServer server;
 	private static AltarStore store;
@@ -83,13 +79,11 @@ public final class TpAltar implements ModInitializer {
 		ServerLifecycleEvents.SERVER_STOPPED.register(s -> {
 			server = null;
 			store = null;
-			PENDING.clear();
 			LAST_USE.clear();
 		});
 		UseBlockCallback.EVENT.register(TpAltar::onUseBlock);
 		UseEntityCallback.EVENT.register(TpAltar::onUseEntity);
 		PlayerBlockBreakEvents.BEFORE.register(TpAltar::onBreak);
-		ServerMessageEvents.ALLOW_CHAT_MESSAGE.register(TpAltar::onChat);
 		ServerTickEvents.END_LEVEL_TICK.register(TpAltar::onWorldTick);
 	}
 
@@ -141,20 +135,6 @@ public final class TpAltar implements ModInitializer {
 		return false; // a quebra vanilla soltaria uma obsidiana comum
 	}
 
-	private static boolean onChat(PlayerChatMessage message, ServerPlayer sender, ChatType.Bound params) {
-		MinecraftServer s = server;
-		if (s == null) return true;
-		Pending pending = PENDING.remove(sender.getUUID());
-		if (pending == null) return true;
-		if (s.getTickCount() > pending.expires()) {
-			say(sender, "Tempo para nomear o altar esgotado. Clique de novo no chão para tentar outra vez.", ChatFormatting.YELLOW);
-			return true; // a mensagem segue para o chat normalmente
-		}
-		String text = message.signedContent().trim();
-		s.execute(() -> finishPlacement(sender, pending, text));
-		return false; // o nome não aparece no chat
-	}
-
 	private static void onWorldTick(ServerLevel sl) {
 		if (store == null || sl.getGameTime() % 20 != 0) return;
 		for (Altar a : store.inDim(dim(sl))) {
@@ -180,50 +160,40 @@ public final class TpAltar implements ModInitializer {
 			say(sp, "O altar precisa de 3 blocos livres de altura.", ChatFormatting.RED);
 			return;
 		}
-		PENDING.put(sp.getUUID(), new Pending(sl.dimension(), pos.immutable(), hand, server.getTickCount() + NAME_TIMEOUT));
-		say(sp, "Digite no chat o nome deste altar (até " + NAME_MAX + " letras) ou \"cancelar\".", ChatFormatting.LIGHT_PURPLE);
+		NameMenu.open(sp, new Pending(sl.dimension(), pos.immutable(), hand), "Nome do altar");
 	}
 
-	private static void finishPlacement(ServerPlayer sp, Pending p, String text) {
-		ServerLevel sl = server.getLevel(p.dim());
-		if (sp.isRemoved() || sl == null || sp.level() != sl) return;
-		if (text.equalsIgnoreCase("cancelar")) {
-			say(sp, "Colocação cancelada.", ChatFormatting.YELLOW);
-			return;
-		}
-		String name = text.replace("§", "");
-		if (name.isEmpty() || name.length() > NAME_MAX) {
-			retryName(sp, p, "Nome inválido: use de 1 a " + NAME_MAX + " letras. Digite outro nome:");
-			return;
-		}
-		if (store.nameTaken(dim(sl), name)) {
-			retryName(sp, p, "Já existe um altar \"" + name + "\" nesta dimensão. Digite outro nome:");
-			return;
-		}
+	/**
+	 * Chamado quando o jogador confirma o nome na bigorna. Devolve um aviso para reabrir a tela (nome inválido)
+	 * ou null quando terminou (colocou o altar ou desistiu com mensagem no chat).
+	 */
+	static String finishPlacement(ServerPlayer sp, Pending p, String text) {
+		ServerLevel sl = server == null ? null : server.getLevel(p.dim());
+		if (store == null || sp.isRemoved() || sl == null || sp.level() != sl) return null;
+		String name = text.trim();
+		if (name.isEmpty()) return "Digite um nome";
+		if (name.length() > NAME_MAX) return "Máximo de " + NAME_MAX + " letras";
+		if (store.nameTaken(dim(sl), name)) return "\"" + name + "\" já existe";
 		ItemStack stack = sp.getItemInHand(p.hand());
 		if (!isAltarItem(stack)) {
-			say(sp, "Segure o altar na mão ao digitar o nome. Colocação cancelada.", ChatFormatting.RED);
-			return;
+			say(sp, "O altar não está mais na sua mão. Colocação cancelada.", ChatFormatting.RED);
+			return null;
 		}
 		if (sp.distanceToSqr(Vec3.atCenterOf(p.pos())) > 8 * 8) {
 			say(sp, "Você se afastou demais do local. Colocação cancelada.", ChatFormatting.RED);
-			return;
+			return null;
 		}
 		if (!hasRoom(sl, p.pos()) || !sl.isUnobstructed(Blocks.OBSIDIAN.defaultBlockState(), p.pos(), CollisionContext.empty())) {
 			say(sp, "O local ficou ocupado. Colocação cancelada.", ChatFormatting.RED);
-			return;
+			return null;
 		}
 		if (placeAltar(sl, p.pos(), name) == null) {
 			say(sp, "Não foi possível colocar o altar aqui.", ChatFormatting.RED);
-			return;
+			return null;
 		}
 		if (!sp.isCreative()) stack.shrink(1);
 		say(sp, "Altar \"" + name + "\" criado! Clique nele com ender pearls para abastecer: cada viagem até aqui gasta " + COST + ".", ChatFormatting.GREEN);
-	}
-
-	private static void retryName(ServerPlayer sp, Pending p, String msg) {
-		PENDING.put(sp.getUUID(), p);
-		say(sp, msg, ChatFormatting.RED);
+		return null;
 	}
 
 	private static boolean hasRoom(ServerLevel sl, BlockPos pos) {
