@@ -38,9 +38,11 @@ final class SelfTest {
 		}
 		if (mode.equals("cliente")) {
 			ServerLevel sl = server.overworld();
-			FORCED_IN_USE.add(AltarStore.key(TpAltar.dim(sl), 2, ground(sl, 2, 6).getY() - 1, 6)); // o chão agora é o altar
-			int y = ground(sl, 0, 0).getY();
-			ServerPlayConnectionEvents.JOIN.register((h, sender, s) -> h.player.teleportTo(sl, 0.5, y, 0.5, Set.<Relative>of(), 0f, -8f, false));
+			// Na hora em que o jogador entra o terreno já está carregado (antes disso a altura vem errada).
+			ServerPlayConnectionEvents.JOIN.register((h, sender, s) -> {
+				FORCED_IN_USE.add(AltarStore.key(TpAltar.dim(sl), 2, ground(sl, 2, 6).getY() - 1, 6)); // o chão ali é o altar
+				h.player.teleportTo(sl, 0.5, ground(sl, 0, 0).getY(), 0.5, Set.<Relative>of(), 0f, -8f, false);
+			});
 			return;
 		}
 		try {
