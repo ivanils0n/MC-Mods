@@ -49,7 +49,7 @@ final class AltarMenu extends ChestMenu {
 
 	private static ItemStack icon(Altar a) {
 		boolean charged = a.pearls >= TpAltar.COST;
-		ItemStack s = new ItemStack(charged ? Items.ENDER_EYE : Items.GRAY_DYE);
+		ItemStack s = new ItemStack(charged ? Items.ENDER_EYE : Items.ENDER_PEARL);
 		s.set(DataComponents.CUSTOM_NAME, TpAltar.plain(a.name, charged ? ChatFormatting.LIGHT_PURPLE : ChatFormatting.GRAY));
 		s.set(DataComponents.LORE, new ItemLore(List.of(
 			TpAltar.plain(a.x + ", " + a.y + ", " + a.z, ChatFormatting.GRAY),

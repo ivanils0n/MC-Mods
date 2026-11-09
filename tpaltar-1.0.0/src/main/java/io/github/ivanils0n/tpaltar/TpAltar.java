@@ -90,7 +90,7 @@ public final class TpAltar implements ModInitializer {
 		UseEntityCallback.EVENT.register(TpAltar::onUseEntity);
 		PlayerBlockBreakEvents.BEFORE.register(TpAltar::onBreak);
 		ServerMessageEvents.ALLOW_CHAT_MESSAGE.register(TpAltar::onChat);
-		ServerTickEvents.END_WORLD_TICK.register(TpAltar::onWorldTick);
+		ServerTickEvents.END_LEVEL_TICK.register(TpAltar::onWorldTick);
 	}
 
 	// ---------- eventos ----------
