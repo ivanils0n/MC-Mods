@@ -26,7 +26,6 @@ jobs:
           echo "list=[${list%,}]" | tee -a "$GITHUB_OUTPUT"
 
   build:
-    name: ${{ matrix.mod }} mc${{ matrix.mc }}
     needs: mods
     runs-on: ubuntu-24.04
     permissions:
