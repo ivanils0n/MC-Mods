@@ -1,21 +1,48 @@
 package io.github.ivanils0n.tpaltar;
 
 import io.github.ivanils0n.tpaltar.AltarStore.Altar;
+import java.util.HashSet;
+import java.util.Set;
+import net.fabricmc.fabric.api.networking.v1.ServerPlayConnectionEvents;
 import net.minecraft.core.BlockPos;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.entity.Display;
 import net.minecraft.world.entity.Interaction;
+import net.minecraft.world.entity.Relative;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
+import net.minecraft.world.level.levelgen.Heightmap;
 import net.minecraft.world.level.storage.LevelResource;
 import net.minecraft.world.phys.AABB;
 
-/** Roda só com -Dtpaltar.selftest=true (CI): monta e desmonta um altar num servidor de verdade e desliga. */
+/**
+ * Só no CI, com -Dtpaltar.selftest=...:
+ * true: monta e desmonta um altar num servidor de verdade e desliga.
+ * vitrine: cria um mundo com dois altares para fotografar e desliga.
+ * cliente: no singleplayer desse mundo, põe o jogador de frente para os altares e deixa um deles "em uso".
+ */
 final class SelfTest {
+	static final Set<String> FORCED_IN_USE = new HashSet<>();
+
 	private SelfTest() {}
 
-	static void run(MinecraftServer server) {
+	static void run(MinecraftServer server, String mode) {
+		if (mode.equals("vitrine")) {
+			ServerLevel sl = server.overworld();
+			TpAltar.setPearls(TpAltar.placeAltar(sl, ground(sl, -2, 6), "Base"), 64);
+			TpAltar.setPearls(TpAltar.placeAltar(sl, ground(sl, 2, 6), "Mina"), 64);
+			TpAltar.LOG.info("TPALTAR VITRINE OK");
+			server.halt(false);
+			return;
+		}
+		if (mode.equals("cliente")) {
+			ServerLevel sl = server.overworld();
+			FORCED_IN_USE.add(AltarStore.key(TpAltar.dim(sl), 2, ground(sl, 2, 6).getY(), 6));
+			int y = ground(sl, 0, 0).getY();
+			ServerPlayConnectionEvents.JOIN.register((h, sender, s) -> h.player.teleportTo(sl, 0.5, y, 0.5, Set.<Relative>of(), 0f, -8f, false));
+			return;
+		}
 		try {
 			check(server);
 			TpAltar.LOG.info("TPALTAR SELFTEST OK");
@@ -59,6 +86,10 @@ final class SelfTest {
 		ensure(sl.getEntitiesOfClass(Display.class, area).isEmpty() && sl.getEntitiesOfClass(Interaction.class, area).isEmpty(), "entidades não foram removidas");
 		sl.setBlock(pos, Blocks.AIR.defaultBlockState(), Block.UPDATE_ALL);
 		sl.setBlock(pos.east().below(), Blocks.AIR.defaultBlockState(), Block.UPDATE_ALL);
+	}
+
+	private static BlockPos ground(ServerLevel sl, int x, int z) {
+		return new BlockPos(x, sl.getHeight(Heightmap.Types.MOTION_BLOCKING, x, z), z);
 	}
 
 	private static void ensure(boolean ok, String what) {

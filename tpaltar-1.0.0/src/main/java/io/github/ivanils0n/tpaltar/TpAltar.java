@@ -122,7 +122,8 @@ public final class TpAltar implements ModInitializer {
 			server = s;
 			store = AltarStore.load(s.getWorldPath(LevelResource.ROOT).resolve("tpaltar.json"));
 			LOG.info("{} altares carregados", store.size());
-			if (Boolean.getBoolean("tpaltar.selftest")) SelfTest.run(s);
+			String test = System.getProperty("tpaltar.selftest");
+			if (test != null) SelfTest.run(s, test);
 		});
 		ServerLifecycleEvents.SERVER_STOPPING.register(s -> {
 			if (store != null) store.saveIfDirty();
@@ -225,7 +226,7 @@ public final class TpAltar implements ModInitializer {
 			Visuals v = visuals(sl, a, everySecond);
 			if (v == null) continue;
 			if (everySecond) sl.sendParticles(ParticleTypes.PORTAL, a.x + 0.5, a.y + EYE_Y, a.z + 0.5, 6, 0.25, 0.3, 0.25, 0.4);
-			boolean inUse = user(a) != null;
+			boolean inUse = user(a) != null || SelfTest.FORCED_IN_USE.contains(a.key());
 			if (!Boolean.valueOf(inUse).equals(v.shownInUse) && showEye(sl, a, v.eye, inUse)) v.shownInUse = inUse;
 			lookAtNearest(sl, v.eye);
 			if (animate) animate(sl, a, v);
