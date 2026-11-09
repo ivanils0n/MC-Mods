@@ -72,3 +72,15 @@ jobs:
               gh release upload tpaltar-pack "$name" --clobber || { sleep 10; gh release upload tpaltar-pack "$name" --clobber; }
             fi
           fi
+      - if: always() && startsWith(matrix.mod, 'tpaltar-')
+        run: |
+          set +e
+          CJ=$(find ~/.gradle/caches/fabric-loom -name 'minecraft-client.jar' | head -1); MJ=$(find ~/.gradle/caches/fabric-loom -name 'minecraft-merged.jar' | head -1)
+          echo "== glass_pane"; unzip -p "$CJ" assets/minecraft/items/glass_pane.json
+          echo "== packet"; javap -cp "$MJ" net.minecraft.network.protocol.common.ServerboundResourcePackPacket | grep -E 'public'
+          javap -cp "$MJ" 'net.minecraft.network.protocol.common.ServerboundResourcePackPacket$Action' | grep -E 'static final'
+          javap -cp "$MJ" net.minecraft.server.network.ServerCommonPacketListenerImpl | grep -iE 'resourcepack'
+          javap -cp "$MJ" net.minecraft.network.chat.ComponentSerialization | grep -E 'CODEC'
+          echo "== labels"; javap -p -c -cp "$MJ" net.minecraft.client.gui.screens.inventory.AnvilScreen | grep -B2 -A2 'titleLabelX' | head -20
+          javap -p -cp "$MJ" net.minecraft.client.gui.screens.inventory.AbstractContainerScreen | grep -iE 'render|label' | head -30
+          javap -p -c -cp "$MJ" net.minecraft.client.gui.screens.inventory.AbstractContainerScreen | grep -E 'invoke.*(renderLabels|renderSlots|renderSlot|renderBg|renderContents|renderCarriedItem|nextStratum)' | head -20
