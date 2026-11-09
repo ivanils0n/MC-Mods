@@ -1,0 +1,62 @@
+plugins {
+	id 'net.fabricmc.fabric-loom'
+}
+
+version = "${mod_version}+mc${minecraft_version}"
+group = 'io.github.ivanils0n'
+base.archivesName = mod_id
+
+// Versão do Fabric API escolhida pela versão do Minecraft (ex.: fabric_api_26_2 no gradle.properties).
+def fabricApi = project.property("fabric_api_" + minecraft_version.replace('.', '_'))
+
+dependencies {
+	minecraft "com.mojang:minecraft:${minecraft_version}"
+	implementation "net.fabricmc:fabric-loader:${loader_version}"
+	implementation "net.fabricmc.fabric-api:fabric-api:${fabricApi}"
+}
+
+// -Pselftest: o runServer sobe um servidor real, monta um Baú Inteligente de teste, vincula baús, pega e guarda itens e desliga (usado no CI).
+if (project.hasProperty('selftest')) {
+	loom.runs.server.vmArg('-Dsmartchest.selftest=true')
+}
+
+// Resource pack do servidor: as mesmas texturas de src/main/resources/assets num zip reproduzível (mesmos bytes a
+// cada build), cujo SHA-1 vai dentro do .jar em smartchest/pack.sha1. O CI publica o zip como smartchest-pack-<sha1>.zip.
+def packZip = tasks.register('resourcePackZip', Zip) {
+	archiveFileName = 'smartchest-pack.zip'
+	destinationDirectory = layout.buildDirectory.dir('pack')
+	preserveFileTimestamps = false
+	reproducibleFileOrder = true
+	from('src/main/resources') { include 'assets/**' }
+	from('src/pack')
+}
+def packHashDir = layout.buildDirectory.dir('generated/packhash')
+def packHash = tasks.register('resourcePackHash') {
+	def zip = packZip.flatMap { it.archiveFile }
+	inputs.file zip
+	outputs.dir packHashDir
+	doLast {
+		def sha = java.security.MessageDigest.getInstance('SHA-1').digest(zip.get().asFile.bytes).encodeHex().toString()
+		def out = packHashDir.get().file('smartchest/pack.sha1').asFile
+		out.parentFile.mkdirs()
+		out.text = sha
+	}
+}
+sourceSets.main.resources.srcDir(packHash)
+
+processResources {
+	def props = [version: project.version, minecraft_dependency: minecraft_dependency]
+	inputs.properties props
+	filesMatching("fabric.mod.json") {
+		expand props
+	}
+}
+
+java {
+	sourceCompatibility = JavaVersion.VERSION_25
+	targetCompatibility = JavaVersion.VERSION_25
+}
+
+tasks.withType(JavaCompile).configureEach {
+	it.options.release = 25
+}

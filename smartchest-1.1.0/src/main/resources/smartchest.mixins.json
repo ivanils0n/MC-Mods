@@ -1,0 +1,12 @@
+{
+	"required": true,
+	"package": "io.github.ivanils0n.smartchest.mixin",
+	"compatibilityLevel": "JAVA_21",
+	"mixins": [
+		"EntityMixin",
+		"ResourcePackResponseMixin"
+	],
+	"injectors": {
+		"defaultRequire": 1
+	}
+}

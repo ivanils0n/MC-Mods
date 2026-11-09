@@ -7,7 +7,8 @@ Mods Fabric para Minecraft. Cada pasta `<mod>-<versão>/` é um mod independente
 | Mob Health Bar | `mobhealthbar-1.2.1/` | 26.2 e 26.3+ (Fabric, só cliente) |
 | Item Despawn Timer | `itemtimer-1.0.0/` | 26.2 e 26.3+ (Fabric, só cliente) |
 | Altar de Teleporte | `tpaltar-1.0.0/` | 26.2 e 26.3+ (Fabric, servidor ou singleplayer, requer Fabric API) |
-| Baú Inteligente | `smartchest-1.0.0/` | 26.1.x, 26.2 e 26.3+ (Fabric, servidor ou singleplayer, requer Fabric API) |
+| Baú Inteligente | `smartchest-1.0.0/` | 26.1.x e 26.3+ (Fabric, servidor ou singleplayer, requer Fabric API) |
+| Baú Inteligente | `smartchest-1.1.0/` | 26.2 (Fabric, servidor ou singleplayer, requer Fabric API) |
 
 ## Altar de Teleporte
 
@@ -29,7 +30,9 @@ Vai na pasta `mods/` do servidor, junto com o Fabric API; os jogadores entram se
 
 - **Receitas** (bancada): **Baú Inteligente** = 8 obsidianas em volta de um baú. **Vinculador** = 8 ender pearls em volta de uma vara de blaze. Aparecem no livro de receitas ao pegar obsidiana / vara de blaze.
 - **Colocar**: clique no chão com o Baú Inteligente. Ele fica virado para você e nunca se junta com baús vizinhos.
-- **Vincular**: clique no Baú Inteligente com o Vinculador (ele passa a "apontar" para esse baú) e depois clique nos baús e barris que quer ligar; clicar de novo num baú ligado o desliga. Baú duplo entra inteiro com um clique. Limites: mesma dimensão, até 32 blocos de distância e até 64 baús. Segurando o Vinculador você vê partículas nos baús ligados.
+- **Vincular**: clique no Baú Inteligente com o Vinculador (ele passa a "apontar" para esse baú) e depois clique nos baús e barris que quer ligar; clicar de novo num baú ligado o desliga. Baú duplo entra inteiro com um clique. Limites: mesma dimensão, até 64 baús e distância:
+  - **1.0.0** (26.1.x e 26.3): até 32 blocos do Baú Inteligente.
+  - **1.1.0** (26.2): sem limite de blocos; o baú precisa estar dentro da distância de visão (a menor entre a do servidor e a do jogador, em chunks) contada a partir do Baú Inteligente, senão aparece "Baú muito longe". Se a distância de visão diminuir depois, os baús que ficarem fora continuam ligados, mas não aparecem: ao abrir o Baú Inteligente aparece quantos estão fora, e eles voltam quando a área estiver carregada de novo. Desligar sempre funciona. Segurando o Vinculador você vê partículas nos baús ligados.
 - **Usar**: clique no Baú Inteligente. A tela junta os itens de todos os baús ligados (itens iguais somados; o número no espaço vai até 99 e o total exato aparece ao passar o mouse).
   - Clique: pega um pack · botão direito: metade · Shift+clique: direto para o inventário.
   - Guardar: solte um item em qualquer espaço da grade, Shift+clique num item do seu inventário ou use o botão **Guardar inventário** (tudo menos a hotbar). Primeiro completa pilhas iguais, depois usa espaços vazios. Se os baús ligados estiverem cheios, nada é guardado e o item fica com você.
