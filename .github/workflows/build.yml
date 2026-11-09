@@ -83,13 +83,16 @@ jobs:
           grep "(tpaltar)" vitrine.log
           mkdir -p $d/saves && rm -rf $d/saves/vitrine && cp -r $d/world $d/saves/vitrine
           printf 'onboardAccessibility:false\npauseOnLostFocus:false\nrenderDistance:5\nguiScale:2\nfov:0.0\n' > $d/options.txt
-          sudo apt-get install -y -qq xdotool > /dev/null
+          sudo apt-get install -y -qq xdotool x11-utils > /dev/null
           Xvfb :99 -screen 0 1280x720x24 & sleep 3
           DISPLAY=:99 timeout 700 ./gradlew ":${{ matrix.mod }}:runClient" -Pselftest=cliente $P > client.log 2>&1 &
           for i in $(seq 1 120); do grep -q "joined the game" client.log && break; sleep 5; done
           sleep 45
           export DISPLAY=:99
-          w=$(xdotool search --name "Minecraft" | head -1); echo "janela: $w"; xdotool windowfocus --sync $w
+          xwininfo -root -tree | grep -vE '^\s*$' | head -20
+          ps aux | grep -E 'KnotClient|DISPLAY' | grep -v grep | cut -c1-200 | head -3
+          for p in $(pgrep -f KnotClient); do tr '\0' '\n' < /proc/$p/environ | grep DISPLAY; done
+          w=$(xdotool search --classname "." | tail -1); echo "janela: $w"; xdotool windowfocus --sync $w
           xdotool key F1; sleep 2; xdotool key F2; sleep 6; xdotool key F2; sleep 3
           ls -la $d/screenshots
           i=1; for f in $(ls $d/screenshots/*.png | sort); do cp "$f" shot$i.png; i=$((i+1)); done
