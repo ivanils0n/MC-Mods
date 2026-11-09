@@ -89,6 +89,9 @@ public final class SmartChest implements ModInitializer {
 
 	/** Ordenação escolhida por jogador (0 quantidade, 1 nome, 2 id/mod); vale até o servidor reiniciar. */
 	static final Map<UUID, Integer> SORT = new ConcurrentHashMap<>();
+	/** Aba e filtro pelo item de cada jogador; zeram ao abrir o baú de novo (valem na volta da pesquisa). */
+	static final Map<UUID, Integer> CATEGORY = new ConcurrentHashMap<>();
+	static final Map<UUID, ItemStack> FILTER = new ConcurrentHashMap<>();
 	/** Visual de cada baú já encontrado, para não procurar no mundo a cada segundo. */
 	private static final Map<String, Entity> VIS = new HashMap<>();
 	/** Tag desta execução: o visual nunca é salvo (mixin/EntityMixin); um "smartchest" sem ela é sobra antiga. */
@@ -103,6 +106,7 @@ public final class SmartChest implements ModInitializer {
 			server = s;
 			store = ChestStore.load(s.getWorldPath(LevelResource.ROOT).resolve("smartchest.json"));
 			Lang.init(s, s.getWorldPath(LevelResource.ROOT));
+			Categories.build(s);
 			LOG.info("{} baús inteligentes carregados", store.size());
 			if (Boolean.getBoolean("smartchest.selftest")) SelfTest.run(s);
 		});
@@ -113,6 +117,9 @@ public final class SmartChest implements ModInitializer {
 			server = null;
 			store = null;
 			SORT.clear();
+			CATEGORY.clear();
+			FILTER.clear();
+			Categories.clear();
 			VIS.clear();
 			LEFTOVERS.clear();
 			PACK_OK.clear();
@@ -159,6 +166,8 @@ public final class SmartChest implements ModInitializer {
 		if (chest != null) {
 			if (sp.isSecondaryUseActive() && !held.isEmpty()) return InteractionResult.PASS; // agachado: coloca blocos encostados
 			if (hand == InteractionHand.MAIN_HAND) {
+				CATEGORY.remove(sp.getUUID());
+				FILTER.remove(sp.getUUID());
 				StorageMenu.open(sp, chest, "", 0);
 				if (sp.containerMenu instanceof StorageMenu menu && menu.unloaded() > 0) {
 					say(sp, count(menu.unloaded(), "baú ligado está", "baús ligados estão") + " fora da distância de visão e não aparece"

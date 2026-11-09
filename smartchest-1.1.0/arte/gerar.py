@@ -20,7 +20,10 @@ RES = os.path.join(ROOT, "src/main/resources/assets")
 SC = os.path.join(RES, "smartchest")
 
 # Modelos do mod; SmartChest.java usa os mesmos nomes no componente item_model ("smartchest:<nome>").
-MODELS = ["chest", "linker", "btn_prev", "btn_next", "btn_search", "btn_sort", "btn_info", "btn_deposit", "btn_links"]
+# Abas (mesma ordem de Categories.KEYS no Java): cada uma tem o ícone normal e o "_on" (aba ativa, com moldura).
+TABS = ["todos", "construcao", "natureza", "funcionais", "redstone", "ferramentas", "comida", "ingredientes"]
+MODELS = ["chest", "linker", "btn_prev", "btn_next", "btn_search", "btn_sort", "btn_info", "btn_deposit", "btn_links",
+          "tab_filter"] + [f"tab_{k}{on}" for k in TABS for on in ("", "_on")]
 
 
 def hx(c, a=255):
@@ -169,6 +172,64 @@ def buttons():
             "btn_deposit": deposit, "btn_info": info, "btn_links": links}
 
 
+# ------------------------------------------------------------------ abas
+def tab_icons():
+    I = lambda rows, pal: grid(rows, pal)
+    icons = {
+        "todos": I(["................", "................", "..############..", "..#hhhhhhhhhh#..", "..#h########h#..",
+                    "..#h#......#h#..", "..############..", "..#hhhhggghhh#..", "..#hhhhgeghhh#..", "..#hhhhggghhh#..",
+                    "..#hhhhhhhhhh#..", "..#hhhhhhhhhh#..", "..############..", "................", "................", "................"],
+                   {"#": "#0b0812", "h": "#4b2f7a", "g": "#2fa37a", "e": "#0a2a20"}),
+        "construcao": I(["................", "................", "..############..", "..#rrr#rrrrr#...", "..#rrr#rrrrr#...",
+                         "..############..", "..#rrrrr#rrr#...", "..#rrrrr#rrr#...", "..############..", "..#rrr#rrrrr#...",
+                         "..#rrr#rrrrr#...", "..############..", "................", "................", "................", "................"],
+                        {"#": "#d9ccc0", "r": "#a0503a"}),
+        "natureza": I(["................", "................", "..gggggggggggg..", "..gGgggGggggGg..", "..gggGgggGgggg..",
+                       "..dgdddgdddgdd..", "..dddddddddddd..", "..ddDdddddDddd..", "..dddddDdddddd..", "..dDdddddddDdd..",
+                       "..dddddddddddd..", "..ddddDddddddd..", "................", "................", "................", "................"],
+                      {"g": "#5da83a", "G": "#86d05a", "d": "#7a5634", "D": "#5c3f24"}),
+        "funcionais": I(["................", "................", "..############..", "..#wwwwwwwwww#..", "..#w#w#ww#w#w#..",
+                         "..############..", "..#pppppppppp#..", "..#p#pppppp#p#..", "..#p#pppppp#p#..", "..#pppppppppp#..",
+                         "..#p#pppppp#p#..", "..############..", "................", "................", "................", "................"],
+                        {"#": "#3d2a17", "w": "#b8915a", "p": "#8a6634"}),
+        "comida": I(["................", "................", ".......b........", "......b.ll......", "....rrbrrl......",
+                     "...rrrrrrrr.....", "..rRrrrrrrrr....", "..rRrrrrrrrr....", "..rrrrrrrrrr....", "..rrrrrrrrrr....",
+                     "...rrrrrrrr.....", "....rr..rr......", "................", "................", "................", "................"],
+                    {"b": "#5c3f24", "l": "#5da83a", "r": "#d8262a", "R": "#ff8a7a"}),
+    }
+    red = Image.new("RGBA", (16, 16), (0, 0, 0, 0))
+    px(red, [(6, 6), (7, 6), (8, 7), (9, 8), (7, 9), (6, 8), (8, 9), (10, 7), (5, 7), (9, 10), (4, 9)], "#e52b1a")
+    px(red, [(7, 7), (8, 8)], "#ff7a6a")
+    icons["redstone"] = red
+    pick = Image.new("RGBA", (16, 16), (0, 0, 0, 0))
+    for i in range(10):
+        pick.putpixel((2 + i, 13 - i), hx("#7a5530"))
+    for t in range(-5, 6):
+        x, y = 10 + t + (t * t) // 9, 5 + t - (t * t) // 9
+        for a, b, col in ((x, y, "#4ee6d8"), (x + 1, y, "#1fb5a8")):
+            if 0 <= a < 16 and 0 <= b < 16:
+                pick.putpixel((a, b), hx(col))
+    outline(pick, "#0d1f1d")
+    icons["ferramentas"] = pick
+    ingot = Image.new("RGBA", (16, 16), (0, 0, 0, 0))
+    rect(ingot, 3, 7, 12, 10, "#d8d8d8"); rect(ingot, 4, 6, 13, 6, "#ffffff"); rect(ingot, 3, 10, 12, 10, "#9a9a9a")
+    icons["ingredientes"] = ingot
+    out = {}
+    for k in TABS:
+        out["tab_" + k] = icons[k]
+        on = Image.new("RGBA", (16, 16), (0, 0, 0, 0))  # aba ativa: fundo claro e moldura na própria textura
+        rect(on, 0, 0, 15, 15, "#5a3f94")
+        rect(on, 0, 0, 15, 0, "#c9b8ff"); rect(on, 0, 0, 0, 15, "#c9b8ff")
+        rect(on, 0, 15, 15, 15, "#2e2348"); rect(on, 15, 0, 15, 15, "#2e2348")
+        on.alpha_composite(icons[k].resize((12, 12), Image.NEAREST), (2, 2))
+        out["tab_" + k + "_on"] = on
+    out["tab_filter"] = grid(["................", "................", "..##..##..##....", "..#..........#..", "..............#.",
+                              "..#.............", "..#......h...#..", "........hhh.....", ".......hhhhh..#.", "..#.....hhh.....",
+                              "..#......h......", "..............#.", "..#..........#..", "....##..##..##..", "................", "................"],
+                             {"#": "#9d8cc9", "h": "#5fd4b8"})
+    return out
+
+
 # ------------------------------------------------------------------ fundo da tela (176x222, baú duplo)
 T = dict(panel=["#1a1526", "#1d1729", "#18131f"], hi="#3d2e60", lo="#09070e", edge="#050308",
          well="#110d19", slot="#0e0b15", s_sh="#060409", s_hl="#2b2141",
@@ -236,9 +297,17 @@ def gui(icons):
     end = text(img, 16, 5, "Baú Inteligente", T["title"])
     assert end <= 98, end  # o título fixo não pode encostar no texto do filtro
 
-    # itens: 9x5 (slots em 7 + 18c, 17 + 18r, iguais aos do baú duplo vanilla)
-    well(6, 16, 169, 107)
-    for r in range(5):
+    # 1ª fileira: abas (encaixe do filtro pelo item + 8 categorias) em forma de pasta; depois 4 fileiras de itens
+    # (slots em 7 + 18c, 17 + 18r, iguais aos do baú duplo vanilla)
+    for c in range(9):
+        x = 7 + c * 18
+        d.rectangle([x, 17, x + 17, 34], fill=hx(T["btn"] if c else T["slot"]))
+        d.line([x + 1, 17, x + 16, 17], fill=hx(T["btn_hi"] if c else T["group_line"]))
+        d.line([x, 18, x, 34], fill=hx(T["btn_hi"] if c else T["group_line"]))
+        d.line([x + 17, 18, x + 17, 34], fill=hx(T["btn_lo"] if c else T["group_line"]))
+    d.line([6, 35, 169, 35], fill=hx(T["group_line"]))
+    well(6, 35, 169, 107)
+    for r in range(1, 5):
         for c in range(9):
             slot(7 + c * 18, 17 + r * 18)
     # controles em 3 grupos: [◀ página ▶] [pesquisar ordenar] [guardar vínculos]
@@ -344,6 +413,7 @@ def main():
     save_png(f, "block/chest_front"); save_png(s, "block/chest_side"); save_png(t, "block/chest_top")
     save_png(linker(), "item/linker")
     icons = buttons()
+    icons.update(tab_icons())
     for name, im in icons.items():
         save_png(im, "item/" + name)
     save_png(gui(icons), "gui/storage")

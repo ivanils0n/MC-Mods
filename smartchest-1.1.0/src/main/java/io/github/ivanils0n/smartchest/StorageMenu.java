@@ -38,12 +38,13 @@ import net.minecraft.world.item.component.ItemLore;
 import net.minecraft.world.phys.Vec3;
 
 /**
- * Tela do Baú Inteligente (baú duplo vanilla): 5 fileiras com os itens de todos os baús ligados, somados por tipo, e
- * a última fileira com os botões [◀ página ▶] [pesquisar ordenar] [guardar vínculos]. Os espaços de cima são só
- * vitrine (nunca guardam item): cada clique é tratado aqui e mexe direto nos baús ligados.
+ * Tela do Baú Inteligente (baú duplo vanilla): 1ª fileira com as abas [filtro pelo item][8 categorias], 4 fileiras
+ * com os itens de todos os baús ligados, somados por tipo, e a última com os botões [◀ página ▶] [pesquisar
+ * ordenar] [guardar vínculos]. Os espaços de cima são só vitrine (nunca guardam item): cada clique é tratado aqui e
+ * mexe direto nos baús ligados.
  */
 final class StorageMenu extends ChestMenu {
-	static final int GRID = 45;
+	static final int FILTER = 0, FIRST_TAB = 1, GRID_START = 9, GRID = 36; // itens nos espaços 9..44
 	static final int PREV = 45, INFO = 46, NEXT = 47, SEARCH = 49, SORT = 50, DEPOSIT = 52, LINKS = 53;
 	private static final String[] SORTS = {"Quantidade", "Nome", "Mod / id"};
 	private static final NumberFormat NUM = NumberFormat.getIntegerInstance(Locale.forLanguageTag("pt-BR"));
@@ -100,6 +101,15 @@ final class StorageMenu extends ChestMenu {
 		return SmartChest.SORT.getOrDefault(player.getUUID(), 0);
 	}
 
+	private int category() {
+		return SmartChest.CATEGORY.getOrDefault(player.getUUID(), Categories.ALL);
+	}
+
+	/** Item escolhido no encaixe de filtro (só o tipo conta), ou null. */
+	private ItemStack filter() {
+		return SmartChest.FILTER.get(player.getUUID());
+	}
+
 	private Linked linked() {
 		return Storage.linked(player.level(), chest, SmartChest.store);
 	}
@@ -120,7 +130,14 @@ final class StorageMenu extends ChestMenu {
 		List<Entry> all = Storage.scan(linked.containers);
 		String q = Lang.normalize(query.trim());
 		List<Entry> list = new ArrayList<>();
-		for (Entry e : all) if (q.isEmpty() || haystack(e).contains(q)) list.add(e);
+		int cat = category();
+		ItemStack filter = filter();
+		for (Entry e : all) {
+			if (!q.isEmpty() && !haystack(e).contains(q)) continue;
+			if (cat != Categories.ALL && Categories.of(e.proto) != cat) continue;
+			if (filter != null && !e.proto.is(filter.getItem())) continue;
+			list.add(e);
+		}
 		Comparator<Entry> byName = Comparator.comparing(e -> Lang.normalize(name(e)));
 		list.sort(switch (sortMode()) {
 			case 1 -> byName;
@@ -132,13 +149,21 @@ final class StorageMenu extends ChestMenu {
 		page = Math.clamp(page, 0, pages - 1);
 		for (int i = 0; i < GRID; i++) {
 			int idx = page * GRID + i;
-			box.setItem(i, idx < list.size() ? display(list.get(idx)) : ItemStack.EMPTY);
+			box.setItem(GRID_START + i, idx < list.size() ? display(list.get(idx)) : ItemStack.EMPTY);
+		}
+		box.setItem(FILTER, filter == null
+			? tab("tab_filter", Items.ITEM_FRAME, false, "Filtrar pelo item", "Clique aqui com um item na mão:", "mostra só itens desse tipo.")
+			: filterShown(filter));
+		for (int i = 0; i < Categories.KEYS.length; i++) {
+			box.setItem(FIRST_TAB + i, tab("tab_" + Categories.KEYS[i], Categories.VANILLA[i], i == cat, Categories.NAMES[i],
+				i == cat ? "Aba atual" : "Clique: ver só esta categoria"));
 		}
 		long items = 0;
 		for (Entry e : all) items += e.total;
 		int links = chest.links.size();
 		List<String> info = new ArrayList<>();
-		info.add(SmartChest.count(all.size(), "tipo de item", "tipos de item") + (q.isEmpty() ? "" : " (" + list.size() + " na pesquisa)"));
+		boolean filtering = !q.isEmpty() || cat != Categories.ALL || filter != null;
+		info.add(SmartChest.count(all.size(), "tipo de item", "tipos de item") + (filtering ? " (" + list.size() + " mostrados)" : ""));
 		info.add("Itens: " + NUM.format(items));
 		info.add(SmartChest.count(links, "baú ligado", "baús ligados") + (linked.unloaded > 0 ? " (" + linked.unloaded + " fora da distância de visão)" : ""));
 		if (linked.totalSlots > 0) {
@@ -201,6 +226,37 @@ final class StorageMenu extends ChestMenu {
 		return s;
 	}
 
+	/**
+	 * Aba: papel com o modelo da aba (com o pack, ícone do mod e moldura na ativa; sem o pack, o visual do item vanilla
+	 * e brilho na ativa). Papel por baixo para não aparecer dano de ferramenta e afins no texto.
+	 */
+	private ItemStack tab(String model, Item look, boolean active, String name, String... lines) {
+		ItemStack s = new ItemStack(Items.PAPER);
+		if (SmartChest.hasPack(player)) s.set(DataComponents.ITEM_MODEL, SmartChest.model(active ? model + "_on" : model));
+		else {
+			s.set(DataComponents.ITEM_MODEL, BuiltInRegistries.ITEM.getKey(look));
+			if (active) s.set(DataComponents.ENCHANTMENT_GLINT_OVERRIDE, true);
+		}
+		s.set(DataComponents.CUSTOM_NAME, SmartChest.plain(name, active ? ChatFormatting.AQUA : ChatFormatting.LIGHT_PURPLE));
+		List<Component> lore = new ArrayList<>();
+		for (String l : lines) lore.add(SmartChest.plain(l, ChatFormatting.GRAY));
+		s.set(DataComponents.LORE, new ItemLore(lore));
+		return s;
+	}
+
+	/** O encaixe com o filtro escolhido: o próprio item, brilhando. */
+	private ItemStack filterShown(ItemStack filter) {
+		ItemStack s = filter.copyWithCount(1);
+		s.set(DataComponents.CUSTOM_NAME, SmartChest.plain("Filtro: " + Lang.resolve(filter.getHoverName(), tr), ChatFormatting.AQUA));
+		s.set(DataComponents.ENCHANTMENT_GLINT_OVERRIDE, true);
+		s.set(DataComponents.LORE, new ItemLore(List.of(
+			SmartChest.plain("Mostra só itens desse tipo.", ChatFormatting.GRAY),
+			Component.empty(),
+			SmartChest.plain("Clique com outro item: trocar", ChatFormatting.DARK_GRAY),
+			SmartChest.plain("Clique sem item: tirar o filtro", ChatFormatting.DARK_GRAY))));
+		return s;
+	}
+
 	/** Botão: com o pack, ícone do mod; sem o pack, o item vanilla (flecha, livro...) para continuar dando para entender. */
 	private ItemStack button(Item item, String model, String name, String... lines) {
 		ItemStack s = new ItemStack(item);
@@ -219,7 +275,9 @@ final class StorageMenu extends ChestMenu {
 		if (!(p instanceof ServerPlayer sp)) return;
 		if (slot >= 0 && slot < 54) {
 			if (input == ContainerInput.PICKUP || input == ContainerInput.QUICK_MOVE) {
-				if (slot < GRID) clickItem(sp, slot, button, input);
+				if (slot == FILTER) clickFilter();
+				else if (slot < GRID_START) clickTab(slot - FIRST_TAB);
+				else if (slot < GRID_START + GRID) clickItem(sp, slot - GRID_START, button, input);
 				else clickButton(sp, slot, button);
 			}
 			sendAllDataToRemote(); // o cliente "previu" o clique: manda o estado real
@@ -231,6 +289,21 @@ final class StorageMenu extends ChestMenu {
 			return;
 		}
 		super.clicked(slot, button, input, p); // o resto do inventário do jogador funciona normalmente
+	}
+
+	/** Com um item na mão: filtra por ele (o item continua na mão). Sem item: tira o filtro. */
+	private void clickFilter() {
+		ItemStack carried = getCarried();
+		if (carried.isEmpty()) SmartChest.FILTER.remove(player.getUUID());
+		else SmartChest.FILTER.put(player.getUUID(), carried.copyWithCount(1));
+		page = 0;
+		refresh();
+	}
+
+	private void clickTab(int cat) {
+		SmartChest.CATEGORY.put(player.getUUID(), cat);
+		page = 0;
+		refresh();
 	}
 
 	private void clickItem(ServerPlayer sp, int slot, int button, ContainerInput input) {

@@ -101,7 +101,7 @@ final class SelfTest {
 		ensure(menu.view().size() == 2, "tipos na tela: " + menu.view().size());
 		ensure(menu.view().get(0).proto.is(Items.COBBLESTONE) && menu.view().get(1).total == 15 && menu.view().get(1).chests == 2,
 			"ordem/total por quantidade");
-		ensure(menu.getSlot(1).getItem().is(Items.DIAMOND) && menu.getSlot(1).getItem().getCount() == 15, "vitrine do diamante");
+		ensure(menu.getSlot(StorageMenu.GRID_START + 1).getItem().is(Items.DIAMOND) && menu.getSlot(StorageMenu.GRID_START + 1).getItem().getCount() == 15, "vitrine do diamante");
 		ensure(menu.unloaded() == 0, "baús carregados contados como fora: " + menu.unloaded());
 		ensure(SmartChest.viewDistance(fp) >= 2, "distância de visão do jogador: " + SmartChest.viewDistance(fp));
 		// Baú ligado numa área que não está carregada: não aparece, é contado como fora da distância de visão e
@@ -113,14 +113,14 @@ final class SelfTest {
 		ensure(far.unloaded() == 1 && far.view().size() == 2 && sc.isLinked(unloadedPos), "baú fora da distância de visão");
 		sc.unlink(unloadedPos);
 
-		menu.clicked(1, 0, ContainerInput.PICKUP, fp); // pega o pacote de diamantes
+		menu.clicked(StorageMenu.GRID_START + 1, 0, ContainerInput.PICKUP, fp); // pega o pacote de diamantes
 		ensure(menu.getCarried().is(Items.DIAMOND) && menu.getCarried().getCount() == 15, "pegar: " + menu.getCarried());
 		ensure(count(List.of(chest, barrel), Items.DIAMOND) == 0, "diamantes ficaram nos baús");
-		menu.clicked(5, 0, ContainerInput.PICKUP, fp); // solta na grade = guarda
+		menu.clicked(StorageMenu.GRID_START + 5, 0, ContainerInput.PICKUP, fp); // solta na grade = guarda
 		ensure(menu.getCarried().isEmpty() && count(List.of(chest, barrel), Items.DIAMOND) == 15, "guardar o que estava na mão");
 
 		int diamondSlot = -1;
-		for (int i = 0; i < StorageMenu.GRID; i++) if (menu.getSlot(i).getItem().is(Items.DIAMOND)) diamondSlot = i;
+		for (int i = StorageMenu.GRID_START; i < StorageMenu.GRID_START + StorageMenu.GRID; i++) if (menu.getSlot(i).getItem().is(Items.DIAMOND)) diamondSlot = i;
 		menu.clicked(diamondSlot, 0, ContainerInput.QUICK_MOVE, fp); // Shift+clique: para o inventário
 		ensure(count(fp.getInventory(), Items.DIAMOND) == 15 && count(List.of(chest, barrel), Items.DIAMOND) == 0, "Shift+clique para o inventário");
 		int invSlot = -1;
@@ -129,6 +129,25 @@ final class SelfTest {
 		ensure(count(fp.getInventory(), Items.DIAMOND) == 0 && count(List.of(chest, barrel), Items.DIAMOND) == 15, "Shift+clique para guardar");
 
 		ensure(StorageMenu.detached(fp, sc, "DIAM").view().size() == 1, "pesquisa pelo nome");
+
+		// Abas (categorias do criativo) e filtro pelo item.
+		ensure(Categories.of(new ItemStack(Items.DIAMOND_PICKAXE)) == 5 && Categories.of(new ItemStack(Items.APPLE)) == 6
+			&& Categories.of(new ItemStack(Items.DIAMOND)) == 7 && Categories.of(new ItemStack(Items.REDSTONE_TORCH)) == 4,
+			"categorias: " + Categories.of(new ItemStack(Items.DIAMOND_PICKAXE)) + " " + Categories.of(new ItemStack(Items.APPLE)) + " "
+				+ Categories.of(new ItemStack(Items.DIAMOND)) + " " + Categories.of(new ItemStack(Items.REDSTONE_TORCH)));
+		menu.clicked(StorageMenu.FIRST_TAB + 5, 0, ContainerInput.PICKUP, fp); // aba Ferramentas e combate
+		ensure(menu.view().isEmpty(), "aba de ferramentas mostrou " + menu.view().size());
+		menu.clicked(StorageMenu.FIRST_TAB + 7, 0, ContainerInput.PICKUP, fp); // aba Ingredientes e outros
+		ensure(menu.view().size() == 1 && menu.view().get(0).proto.is(Items.DIAMOND), "aba de ingredientes");
+		menu.clicked(StorageMenu.FIRST_TAB, 0, ContainerInput.PICKUP, fp); // Todos
+		ensure(menu.view().size() == 2, "aba Todos");
+		menu.setCarried(new ItemStack(Items.COBBLESTONE, 3));
+		menu.clicked(StorageMenu.FILTER, 0, ContainerInput.PICKUP, fp); // filtro pelo item na mão
+		ensure(menu.view().size() == 1 && menu.view().get(0).proto.is(Items.COBBLESTONE) && menu.getCarried().getCount() == 3,
+			"filtro pelo item");
+		menu.setCarried(ItemStack.EMPTY);
+		menu.clicked(StorageMenu.FILTER, 0, ContainerInput.PICKUP, fp); // sem item: tira o filtro
+		ensure(menu.view().size() == 2, "tirar o filtro");
 		ensure(StorageMenu.detached(fp, sc, "cobble").view().size() == 1, "pesquisa pelo id");
 		ensure(StorageMenu.detached(fp, sc, "xyz").view().isEmpty(), "pesquisa sem resultado");
 
@@ -138,7 +157,7 @@ final class SelfTest {
 		ensure(Storage.insert(List.of(chest, barrel), dirt) == 0 && dirt.getCount() == 5, "guardou em baú cheio");
 		menu.refresh();
 		menu.setCarried(new ItemStack(Items.DIRT, 5));
-		menu.clicked(0, 0, ContainerInput.PICKUP, fp);
+		menu.clicked(StorageMenu.GRID_START, 0, ContainerInput.PICKUP, fp);
 		ensure(menu.getCarried().is(Items.DIRT) && menu.getCarried().getCount() == 5, "item sumiu ao guardar em baú cheio");
 		menu.setCarried(ItemStack.EMPTY);
 		chest.setItem(3, ItemStack.EMPTY);
