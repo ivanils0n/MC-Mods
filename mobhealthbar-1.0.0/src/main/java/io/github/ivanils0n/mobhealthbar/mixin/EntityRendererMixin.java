@@ -12,7 +12,7 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 @Mixin(EntityRenderer.class)
 public abstract class EntityRendererMixin {
 	// createRenderState roda depois de todos os extractRenderState das subclasses, então nada sobrescreve o nosso texto.
-	@Inject(method = "createRenderState", at = @At("RETURN"))
+	@Inject(method = "createRenderState(Lnet/minecraft/world/entity/Entity;F)Lnet/minecraft/client/renderer/entity/state/EntityRenderState;", at = @At("RETURN"))
 	private void mobhealthbar$addHealth(Entity entity, float partialTick, CallbackInfoReturnable<EntityRenderState> cir) {
 		HealthBar.apply(entity, cir.getReturnValue(), partialTick);
 	}

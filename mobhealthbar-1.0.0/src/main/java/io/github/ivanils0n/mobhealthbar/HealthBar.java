@@ -2,7 +2,6 @@ package io.github.ivanils0n.mobhealthbar;
 
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.renderer.entity.state.AvatarRenderState;
 import net.minecraft.client.renderer.entity.state.EntityRenderState;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.MutableComponent;
@@ -21,21 +20,16 @@ public final class HealthBar {
 
 	public static void apply(Entity entity, EntityRenderState state, float partialTick) {
 		if (!(entity instanceof LivingEntity living) || !living.isAlive()) return;
+		Player self = Minecraft.getInstance().player;
+		if (self == null || entity == self) return;
+		// Outros jogadores: só quando o nome está visível (respeita times/agachar).
+		if (!(entity instanceof Mob) && !(entity instanceof Player && state.nameTag != null)) return;
+		// Linha de visão evita mostrar a vida através das paredes (nametags atravessam blocos).
+		if (state.distanceToCameraSq > MAX_DISTANCE_SQ || entity.isInvisibleTo(self) || !self.hasLineOfSight(entity)) return;
 
-		// Jogadores: linha extra abaixo do nome (só quando o nome já está visível).
-		if (state instanceof AvatarRenderState avatar) {
-			if (entity instanceof Player && avatar.nameTag != null) avatar.scoreText = bar(living);
-			return;
-		}
-
-		if (!(entity instanceof Mob)) return;
-		Player player = Minecraft.getInstance().player;
-		// Linha de visão evita mostrar mobs através das paredes (nametags atravessam blocos).
-		if (player == null || state.distanceToCameraSq > MAX_DISTANCE_SQ
-				|| entity.isInvisibleTo(player) || !player.hasLineOfSight(entity)) return;
-
+		// scoreText é a linha desenhada logo abaixo do nome.
 		Component bar = bar(living);
-		state.nameTag = state.nameTag == null ? bar : state.nameTag.copy().append(" ").append(bar);
+		state.scoreText = state.scoreText == null ? bar : state.scoreText.copy().append(" ").append(bar);
 		if (state.nameTagAttachment == null) {
 			state.nameTagAttachment = entity.getAttachments().getNullable(EntityAttachment.NAME_TAG, 0, entity.getYRot(partialTick));
 		}
