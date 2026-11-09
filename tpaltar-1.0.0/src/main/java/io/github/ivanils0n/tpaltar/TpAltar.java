@@ -53,7 +53,6 @@ import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.item.component.CustomData;
-import net.minecraft.world.item.component.CustomModelData;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
@@ -568,7 +567,6 @@ public final class TpAltar implements ModInitializer {
 		s.set(DataComponents.CUSTOM_NAME, plain(ITEM_NAME, ChatFormatting.LIGHT_PURPLE));
 		s.set(DataComponents.ITEM_MODEL, Items.ENDER_EYE.components().get(DataComponents.ITEM_MODEL));
 		s.set(DataComponents.ENCHANTMENT_GLINT_OVERRIDE, true);
-		s.set(DataComponents.CUSTOM_MODEL_DATA, new CustomModelData(List.of(), List.of(), List.of("tpaltar_altar"), List.of()));
 		return s;
 	}
 
