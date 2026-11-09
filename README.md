@@ -4,7 +4,7 @@ Mods Fabric para Minecraft. Cada pasta `<mod>-<versão>/` é um mod independente
 
 | Mod | Pasta | Minecraft |
 |-----|-------|-----------|
-| Mob Health Bar | `mobhealthbar-1.1.1/` | 26.2 e 26.3+ (Fabric, só cliente) |
+| Mob Health Bar | `mobhealthbar-1.2.0/` | 26.2 e 26.3+ (Fabric, só cliente) |
 
 ## Compilar
 
