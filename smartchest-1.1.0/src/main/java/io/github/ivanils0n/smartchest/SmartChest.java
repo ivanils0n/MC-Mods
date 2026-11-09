@@ -37,6 +37,7 @@ import net.minecraft.network.chat.ComponentSerialization;
 import net.minecraft.network.chat.MutableComponent;
 import net.minecraft.network.protocol.common.ClientboundResourcePackPushPacket;
 import net.minecraft.network.protocol.common.ServerboundResourcePackPacket;
+import net.minecraft.resources.Identifier;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
@@ -50,7 +51,6 @@ import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.item.component.CustomData;
-import net.minecraft.world.item.component.CustomModelData;
 import net.minecraft.world.item.component.ItemLore;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
@@ -211,6 +211,7 @@ public final class SmartChest implements ModInitializer {
 		// Quem segura um Vinculador ligado vê partículas nos baús ligados (só ele vê).
 		for (ServerPlayer p : players) {
 			ItemStack held = p.getMainHandItem();
+			upgrade(held);
 			if (!isLinker(held)) continue;
 			Chest c = target(held);
 			if (c == null || !c.dim.equals(dim) || p.distanceToSqr(Vec3.atCenterOf(c.pos())) > ACTIVE_RANGE_SQR) continue;
@@ -273,6 +274,7 @@ public final class SmartChest implements ModInitializer {
 		tag.putString("dim", c.dim);
 		tag.putIntArray("pos", new int[] {c.x, c.y, c.z});
 		linker.set(DataComponents.CUSTOM_DATA, CustomData.of(tag));
+		upgrade(linker);
 		linker.set(DataComponents.LORE, new ItemLore(List.of(
 			plain("Ligado ao Baú Inteligente em " + c.x + ", " + c.y + ", " + c.z, ChatFormatting.GRAY),
 			plain("Clique em baús ou barris para ligar ou desligar.", ChatFormatting.DARK_GRAY))));
@@ -381,7 +383,7 @@ public final class SmartChest implements ModInitializer {
 			default -> 0;
 		}) / 2;
 		String nbt = "Tags:[\"smartchest\",\"" + tag(pos) + "\",\"" + RUN_TAG + "\"],item:{id:\"minecraft:obsidian\",count:1,components:"
-			+ "{\"minecraft:custom_model_data\":{strings:[\"" + CHEST_TAG + "\"]}}},"
+			+ "{\"minecraft:item_model\":\"smartchest:chest\"}},"
 			+ String.format(Locale.ROOT, "transformation:{left_rotation:[0f,%.5ff,0f,%.5ff],right_rotation:[0f,0f,0f,1f],"
 				+ "translation:[0f,-0.5f,0f],scale:[1.002f,1.002f,1.002f]}", Math.sin(half), Math.cos(half));
 		command(sl, pos, String.format(Locale.ROOT, "summon minecraft:item_display %.4f %.4f %.4f {%s}",
@@ -439,7 +441,7 @@ public final class SmartChest implements ModInitializer {
 		s.set(DataComponents.CUSTOM_DATA, CustomData.of(tag));
 		s.set(DataComponents.CUSTOM_NAME, plain(NAME, ChatFormatting.LIGHT_PURPLE));
 		s.set(DataComponents.ENCHANTMENT_GLINT_OVERRIDE, true);
-		s.set(DataComponents.CUSTOM_MODEL_DATA, model(CHEST_TAG));
+		s.set(DataComponents.ITEM_MODEL, model("chest"));
 		return s;
 	}
 
@@ -452,12 +454,25 @@ public final class SmartChest implements ModInitializer {
 		s.set(DataComponents.CUSTOM_NAME, plain("Vinculador", ChatFormatting.AQUA));
 		s.set(DataComponents.MAX_STACK_SIZE, 1);
 		s.set(DataComponents.ENCHANTMENT_GLINT_OVERRIDE, true);
-		s.set(DataComponents.CUSTOM_MODEL_DATA, model(LINKER_TAG));
+		s.set(DataComponents.ITEM_MODEL, model("linker"));
 		return s;
 	}
 
-	static CustomModelData model(String name) {
-		return new CustomModelData(List.of(), List.of(), List.of(name), List.of());
+	/**
+	 * Modelo próprio (assets/smartchest/items/<nome>.json). Nenhum outro resource pack mexe nesse caminho, então a
+	 * textura do mod sempre vale para os itens do mod, e os itens vanilla continuam com o pack que o jogador usa.
+	 */
+	static Identifier model(String name) {
+		return Identifier.fromNamespaceAndPath("smartchest", name);
+	}
+
+	/** Itens feitos na 1.0.0 (sem item_model): ganham o modelo quando o jogador os segura ou usa. */
+	static void upgrade(ItemStack stack) {
+		if (stack.has(DataComponents.ITEM_MODEL) && stack.get(DataComponents.ITEM_MODEL).getNamespace().equals("smartchest")) return;
+		if (isChestItem(stack)) stack.set(DataComponents.ITEM_MODEL, model("chest"));
+		else if (isLinker(stack)) stack.set(DataComponents.ITEM_MODEL, model("linker"));
+		else return;
+		stack.remove(DataComponents.CUSTOM_MODEL_DATA);
 	}
 
 	// ---------- resource pack e título da tela ----------
@@ -485,24 +500,26 @@ public final class SmartChest implements ModInitializer {
 	}
 
 	/**
-	 * Título da tela. Com o pack: o fundo inteiro é um caractere da fonte smartchest:gui (arte/gerar.py) e o texto
-	 * do título é a pesquisa, levado para dentro da caixa de busca (o nome "Baú Inteligente" já está desenhado no
-	 * fundo). Sem o pack, título comum (senão apareceriam quadradinhos de caractere desconhecido).
+	 * Título da tela. Com o pack: o fundo inteiro é um caractere da fonte smartchest:gui (arte/gerar.py), com o nome
+	 * "Baú Inteligente" já desenhado; o texto do título só aparece com uma pesquisa ativa ("filtro: ..."). Sem o
+	 * pack, título comum (senão apareceriam quadradinhos de caractere desconhecido).
 	 */
 	static Component title(ServerPlayer p, String query) {
 		if (!hasPack(p)) return Component.literal(query.isEmpty() ? NAME : NAME + ": " + query);
-		return themedTitle(query);
+		// Espaço para uns 11 caracteres depois de x=100: mostra o fim do que foi digitado.
+		String shown = query.length() > 6 ? ".." + query.substring(query.length() - 5) : query;
+		return themedTitle("\uF000\uE000\uF001\uF002", query.isEmpty() ? "" : "filtro: " + shown);
 	}
 
-	static Component themedTitle(String query) {
+	/** Fundo da fonte smartchest:gui + texto. {@code background} é a sequência de caracteres do fundo. */
+	static Component themedTitle(String background, String label) {
 		JsonObject bg = new JsonObject();
-		bg.addProperty("text", "\uF000\uE000\uF001\uF002");
+		bg.addProperty("text", background);
 		bg.addProperty("font", "smartchest:gui");
 		bg.addProperty("color", "white"); // o título vanilla é cinza escuro e escureceria o desenho
 		JsonObject text = new JsonObject();
-		// A caixa tem ~60 px (uns 9 caracteres): mostra o fim do que foi digitado.
-		text.addProperty("text", query.isEmpty() ? "Pesquisar..." : query.length() > 9 ? ".." + query.substring(query.length() - 7) : query);
-		text.addProperty("color", query.isEmpty() ? "#9D8CC9" : "#E3D8FF");
+		text.addProperty("text", label);
+		text.addProperty("color", "#E3D8FF");
 		JsonArray parts = new JsonArray();
 		parts.add(new JsonPrimitive("")); // raiz sem estilo: o texto não herda a fonte do fundo
 		parts.add(bg);

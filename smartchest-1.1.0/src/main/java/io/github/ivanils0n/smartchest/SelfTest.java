@@ -42,8 +42,16 @@ final class SelfTest {
 		ensure(SmartChest.isChestItem(SmartChest.chestItem()) && !SmartChest.isChestItem(new ItemStack(Items.OBSIDIAN)), "item do baú");
 		ensure(SmartChest.isLinker(SmartChest.linkerItem()) && !SmartChest.isLinker(new ItemStack(Items.BLAZE_ROD)), "item do vinculador");
 		ensure(SmartChest.PACK_SHA1 != null, "hash do resource pack não está no .jar");
-		Component title = SmartChest.themedTitle("diam");
+		Component title = SmartChest.themedTitle("\uF000\uE000\uF001\uF002", "filtro: diam");
 		ensure(title.getString().endsWith("diam") && title.getSiblings().size() == 2, "título com fundo: " + title);
+		ensure(SmartChest.model("chest").toString().equals("smartchest:chest") && SmartChest.chestItem().has(net.minecraft.core.component.DataComponents.ITEM_MODEL), "modelo do baú");
+		ItemStack old = SmartChest.linkerItem();
+		old.remove(net.minecraft.core.component.DataComponents.ITEM_MODEL);
+		SmartChest.upgrade(old);
+		ensure(SmartChest.model("linker").equals(old.get(net.minecraft.core.component.DataComponents.ITEM_MODEL)), "vinculador antigo não ganhou o modelo");
+		ItemStack rod = new ItemStack(Items.BLAZE_ROD);
+		SmartChest.upgrade(rod);
+		ensure(!SmartChest.model("linker").equals(rod.get(net.minecraft.core.component.DataComponents.ITEM_MODEL)), "vara de blaze comum mudou de modelo");
 
 		// Idioma: tradução própria, formato com argumentos, acentos e o download real do português.
 		ensure(Lang.resolve(Component.translatable("item.minecraft.diamond"), k -> k.equals("item.minecraft.diamond") ? "Diamante" : null).equals("Diamante"), "tradução");

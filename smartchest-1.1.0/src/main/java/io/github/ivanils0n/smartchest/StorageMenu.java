@@ -144,21 +144,21 @@ final class StorageMenu extends ChestMenu {
 		if (linked.totalSlots > 0) {
 			info.add("Espaço usado: " + linked.usedSlots + "/" + linked.totalSlots + " (" + linked.usedSlots * 100 / linked.totalSlots + "%)");
 		}
-		ItemStack book = button(Items.BOOK, "smartchest_info", "Página " + (page + 1) + " de " + pages, info.toArray(String[]::new));
+		ItemStack book = button(Items.BOOK, "btn_info", "Página " + (page + 1) + " de " + pages, info.toArray(String[]::new));
 		book.set(DataComponents.MAX_STACK_SIZE, 99);
 		book.setCount(Math.min(page + 1, 99));
 		box.setItem(INFO, book);
-		box.setItem(PREV, button(Items.ARROW, "smartchest_prev", "Página anterior", page > 0 ? "Clique: voltar" : "Esta é a primeira página"));
-		box.setItem(NEXT, button(Items.ARROW, "smartchest_next", "Próxima página", page < pages - 1 ? "Clique: avançar" : "Esta é a última página"));
-		box.setItem(SEARCH, button(Items.WRITABLE_BOOK, "smartchest_search", query.isEmpty() ? "Pesquisar" : "Pesquisa: " + query,
+		box.setItem(PREV, button(Items.ARROW, "btn_prev", "Página anterior", page > 0 ? "Clique: voltar" : "Esta é a primeira página"));
+		box.setItem(NEXT, button(Items.ARROW, "btn_next", "Próxima página", page < pages - 1 ? "Clique: avançar" : "Esta é a última página"));
+		box.setItem(SEARCH, button(Items.WRITABLE_BOOK, "btn_search", query.isEmpty() ? "Pesquisar" : "Pesquisa: " + query,
 			"Clique: digitar o nome do item", "Botão direito: limpar a pesquisa"));
 		String[] sortLines = new String[SORTS.length + 1];
 		for (int i = 0; i < SORTS.length; i++) sortLines[i] = (i == sortMode() ? "▶ " : "   ") + SORTS[i];
 		sortLines[SORTS.length] = "Clique: trocar";
-		box.setItem(SORT, button(Items.COMPARATOR, "smartchest_sort", "Ordenar: " + SORTS[sortMode()], sortLines));
-		box.setItem(DEPOSIT, button(Items.HOPPER, "smartchest_deposit", "Guardar inventário",
+		box.setItem(SORT, button(Items.COMPARATOR, "btn_sort", "Ordenar: " + SORTS[sortMode()], sortLines));
+		box.setItem(DEPOSIT, button(Items.HOPPER, "btn_deposit", "Guardar inventário",
 			"Guarda tudo do inventário nos baús ligados,", "menos a hotbar.", "Shift+clique num item guarda só ele."));
-		box.setItem(LINKS, button(Items.LEAD, "smartchest_links", SmartChest.count(links, "baú ligado", "baús ligados"),
+		box.setItem(LINKS, button(Items.LEAD, "btn_links", SmartChest.count(links, "baú ligado", "baús ligados"),
 			"Ligue ou desligue baús com o Vinculador.", "Clique: mostrar no mundo"));
 	}
 
@@ -201,10 +201,11 @@ final class StorageMenu extends ChestMenu {
 		return s;
 	}
 
-	private static ItemStack button(Item item, String model, String name, String... lines) {
+	/** Botão: com o pack, ícone do mod; sem o pack, o item vanilla (flecha, livro...) para continuar dando para entender. */
+	private ItemStack button(Item item, String model, String name, String... lines) {
 		ItemStack s = new ItemStack(item);
 		s.set(DataComponents.CUSTOM_NAME, SmartChest.plain(name, ChatFormatting.LIGHT_PURPLE));
-		s.set(DataComponents.CUSTOM_MODEL_DATA, SmartChest.model(model));
+		if (SmartChest.hasPack(player)) s.set(DataComponents.ITEM_MODEL, SmartChest.model(model));
 		List<Component> lore = new ArrayList<>();
 		for (String l : lines) lore.add(SmartChest.plain(l, ChatFormatting.GRAY));
 		s.set(DataComponents.LORE, new ItemLore(lore));

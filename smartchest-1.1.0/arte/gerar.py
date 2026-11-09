@@ -1,11 +1,12 @@
 """Gera texturas, modelos, fonte da tela e definições de item do Baú Inteligente.
 
-Rode da pasta smartchest-1.0.0:  python3 arte/gerar.py
+Rode da pasta smartchest-1.1.0:  python3 arte/gerar.py
 Saída: src/main/resources/assets/... (vai no .jar e no zip do resource pack) e src/pack/pack.png.
 
 Visual escolhido: baú "Obsidiana do End" (opção A) e vinculador "Chave do End" (opção 4).
-Nada aqui registra bloco ou item novo: as definições em assets/minecraft/items trocam o modelo de itens vanilla só
-quando o item tem custom_model_data "smartchest_*" (o mod põe isso); sem o pack, o jogador vê o item vanilla.
+Nada aqui registra bloco ou item novo. Os itens do mod apontam (componente item_model) para definições próprias em
+assets/smartchest/items, que nenhum outro resource pack substitui; os itens vanilla não são tocados, então os packs
+do jogador continuam valendo para eles.
 """
 import json
 import math
@@ -18,28 +19,8 @@ ROOT = os.path.join(os.path.dirname(__file__), "..")
 RES = os.path.join(ROOT, "src/main/resources/assets")
 SC = os.path.join(RES, "smartchest")
 
-# Definições vanilla (26.1, 26.2 e 26.3 são iguais) usadas quando o item não é do mod.
-VANILLA = {
-    "obsidian": "minecraft:block/obsidian",
-    "blaze_rod": "minecraft:item/blaze_rod",
-    "arrow": "minecraft:item/arrow",
-    "writable_book": "minecraft:item/writable_book",
-    "comparator": "minecraft:item/comparator",
-    "hopper": "minecraft:item/hopper",
-    "lead": "minecraft:item/lead",
-    "book": "minecraft:item/book",
-}
-# Item vanilla de base -> custom_model_data do mod -> modelo do mod (SmartChest.java usa os mesmos nomes).
-ITEMS = {
-    "obsidian": {"smartchest_chest": "chest"},
-    "blaze_rod": {"smartchest_linker": "linker"},
-    "arrow": {"smartchest_prev": "btn_prev", "smartchest_next": "btn_next"},
-    "writable_book": {"smartchest_search": "btn_search"},
-    "comparator": {"smartchest_sort": "btn_sort"},
-    "book": {"smartchest_info": "btn_info"},
-    "hopper": {"smartchest_deposit": "btn_deposit"},
-    "lead": {"smartchest_links": "btn_links"},
-}
+# Modelos do mod; SmartChest.java usa os mesmos nomes no componente item_model ("smartchest:<nome>").
+MODELS = ["chest", "linker", "btn_prev", "btn_next", "btn_search", "btn_sort", "btn_info", "btn_deposit", "btn_links"]
 
 
 def hx(c, a=255):
@@ -249,14 +230,11 @@ def gui(icons):
     for p in [(0, 0), (175, 0), (0, 221), (175, 221)]:
         img.putpixel(p, (0, 0, 0, 0))
 
-    # cabeçalho: olho + "Baú Inteligente" (fixo) | caixa de busca (o texto é o título da tela, a partir de x=109)
+    # cabeçalho: olho + "Baú Inteligente" (fixo); o texto do título da tela (o filtro da pesquisa) vai em x=100
     rect(img, 8, 6, 13, 9, "#2fa37a"); rect(img, 9, 5, 12, 10, "#2fa37a")
     px(img, [(9, 6)], "#a6f5d0"); rect(img, 11, 6, 11, 9, "#0a2a20")
     end = text(img, 16, 5, "Baú Inteligente", T["title"])
-    assert end <= 98, end  # o título fixo não pode invadir a caixa de busca
-    well(99, 3, 169, 14)
-    lens = icons["btn_search"].resize((8, 8), Image.NEAREST)
-    img.alpha_composite(lens, (100, 5))
+    assert end <= 98, end  # o título fixo não pode encostar no texto do filtro
 
     # itens: 9x5 (slots em 7 + 18c, 17 + 18r, iguais aos do baú duplo vanilla)
     well(6, 16, 169, 107)
@@ -283,6 +261,42 @@ def gui(icons):
 
 
 # ------------------------------------------------------------------ escrita
+def search_gui(icons, front):
+    """Tela da pesquisa (a bigorna do jogo, 176x166) no mesmo tema; o campo de texto fica vazado para o jogo desenhá-lo."""
+    img = Image.new("RGBA", (176, 166), (0, 0, 0, 0))
+    noise(img, T["panel"], 9, (0, 0, 176, 166))
+    d = ImageDraw.Draw(img)
+
+    def slot(x, y, fill=T["slot"]):
+        d.rectangle([x, y, x + 17, y + 17], fill=hx(fill))
+        d.line([x, y, x + 16, y], fill=hx(T["s_sh"])); d.line([x, y, x, y + 16], fill=hx(T["s_sh"]))
+        d.line([x + 1, y + 17, x + 17, y + 17], fill=hx(T["s_hl"])); d.line([x + 17, y + 1, x + 17, y + 17], fill=hx(T["s_hl"]))
+
+    d.rectangle([0, 0, 175, 165], outline=hx(T["edge"]))
+    d.line([1, 1, 174, 1], fill=hx(T["hi"])); d.line([1, 1, 1, 164], fill=hx(T["hi"]))
+    d.line([1, 164, 174, 164], fill=hx(T["lo"])); d.line([174, 1, 174, 164], fill=hx(T["lo"]))
+    for p in [(0, 0), (175, 0), (0, 165), (175, 165)]:
+        img.putpixel(p, (0, 0, 0, 0))
+    img.alpha_composite(front.resize((32, 32), Image.NEAREST), (14, 8))  # olho do baú no lugar do martelo
+    for x in range(58, 171):  # campo de texto: vazado, o jogo desenha o campo e o texto digitado
+        for y in range(19, 38):
+            img.putpixel((x, y), hx(T["group_line"]) if x in (58, 170) or y in (19, 37) else (0, 0, 0, 0))
+    slot(26, 46); slot(75, 46); slot(133, 46, T["btn"])
+    for i in range(-3, 4):  # "+" e seta
+        img.putpixel((59 + i, 55), hx(T["btn_hi"])); img.putpixel((59, 55 + i), hx(T["btn_hi"]))
+    for x in range(100, 126):
+        img.putpixel((x, 55), hx(T["btn_hi"])); img.putpixel((x, 56), hx(T["btn_hi"]))
+    for i in range(4):
+        img.putpixel((125 - i, 55 - i), hx(T["btn_hi"])); img.putpixel((125 - i, 56 + i), hx(T["btn_hi"]))
+    d.rectangle([5, 70, 75, 81], fill=hx(T["plate"]), outline=hx(T["plate_lo"]))  # atrás de "Inventário" (y=72)
+    for r in range(3):
+        for c in range(9):
+            slot(7 + c * 18, 83 + r * 18)
+    for c in range(9):
+        slot(7 + c * 18, 141)
+    return img
+
+
 def save_png(img, rel):
     path = os.path.join(SC, "textures", rel + ".png")
     os.makedirs(os.path.dirname(path), exist_ok=True)
@@ -333,6 +347,7 @@ def main():
     for name, im in icons.items():
         save_png(im, "item/" + name)
     save_png(gui(icons), "gui/storage")
+    save_png(search_gui(icons, f), "gui/search")
 
     models = os.path.join(SC, "models/item")
     save_json(cube_model(), os.path.join(models, "chest.json"))
@@ -340,18 +355,17 @@ def main():
     for name in icons:
         save_json({"parent": "minecraft:item/generated", "textures": {"layer0": "smartchest:item/" + name}}, os.path.join(models, name + ".json"))
 
-    for base, cases in ITEMS.items():
-        save_json({"model": {
-            "type": "minecraft:select", "property": "minecraft:custom_model_data", "index": 0,
-            "cases": [{"when": cmd, "model": {"type": "minecraft:model", "model": "smartchest:item/" + m}} for cmd, m in cases.items()],
-            "fallback": {"type": "minecraft:model", "model": VANILLA[base]},
-        }}, os.path.join(RES, "minecraft/items", base + ".json"))
+    for m in MODELS:
+        save_json({"model": {"type": "minecraft:model", "model": "smartchest:item/" + m}}, os.path.join(SC, "items", m + ".json"))
 
     # Fonte da tela: U+E000 é o fundo inteiro; U+F000 volta ao canto da tela, U+F001 desfaz a largura do fundo e
-    # U+F002 leva o texto do título (a pesquisa) para dentro da caixa de busca (x=109). Ver SmartChest.title().
+    # U+F002 leva o texto do título (o filtro da pesquisa) para x=100. U+E001 é a tela da pesquisa (bigorna, título em
+    # x=60): U+F003 volta ao canto e U+F004 volta ao x=60. Ver SmartChest.title() e SearchMenu.open().
     save_json({"providers": [
-        {"type": "space", "advances": {chr(0xF000): -8, chr(0xF001): -177, chr(0xF002): 109}},
+        {"type": "space", "advances": {chr(0xF000): -8, chr(0xF001): -177, chr(0xF002): 100,
+                                           chr(0xF003): -60, chr(0xF004): 60}},
         {"type": "bitmap", "file": "smartchest:gui/storage.png", "ascent": 13, "height": 222, "chars": [chr(0xE000)]},
+        {"type": "bitmap", "file": "smartchest:gui/search.png", "ascent": 13, "height": 166, "chars": [chr(0xE001)]},
     ]}, os.path.join(SC, "font/gui.json"))
 
     pack = os.path.join(ROOT, "src/pack")

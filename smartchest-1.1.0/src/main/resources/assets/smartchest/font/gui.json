@@ -5,7 +5,9 @@
    "advances": {
     "\uf000": -8,
     "\uf001": -177,
-    "\uf002": 109
+    "\uf002": 100,
+    "\uf003": -60,
+    "\uf004": 60
    }
   },
   {
@@ -15,6 +17,15 @@
    "height": 222,
    "chars": [
     "\ue000"
+   ]
+  },
+  {
+   "type": "bitmap",
+   "file": "smartchest:gui/search.png",
+   "ascent": 13,
+   "height": 166,
+   "chars": [
+    "\ue001"
    ]
   }
  ]

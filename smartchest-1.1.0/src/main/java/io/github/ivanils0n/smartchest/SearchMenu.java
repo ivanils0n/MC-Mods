@@ -40,14 +40,16 @@ final class SearchMenu extends AnvilMenu {
 		this.typed = query;
 		ItemStack shown = new ItemStack(Items.WRITABLE_BOOK);
 		shown.set(DataComponents.CUSTOM_NAME, Component.literal(query)); // o campo de texto começa com a pesquisa atual
-		shown.set(DataComponents.CUSTOM_MODEL_DATA, SmartChest.model("smartchest_search"));
+		if (SmartChest.hasPack(player)) shown.set(DataComponents.ITEM_MODEL, SmartChest.model("btn_search"));
 		getSlot(0).set(shown);
 		preview();
 	}
 
 	static void open(ServerPlayer player, Chest chest, String query) {
-		player.openMenu(new SimpleMenuProvider((id, inv, p) -> new SearchMenu(id, inv, player, chest, query),
-			Component.literal("Pesquisar no Baú Inteligente")));
+		// Com o pack, a bigorna ganha o fundo do Baú Inteligente (o título dela começa em x=60).
+		Component title = SmartChest.hasPack(player) ? SmartChest.themedTitle("\uF003\uE001\uF001\uF004", "Pesquisar")
+			: Component.literal("Pesquisar no Baú Inteligente");
+		player.openMenu(new SimpleMenuProvider((id, inv, p) -> new SearchMenu(id, inv, player, chest, query), title));
 	}
 
 	@Override
