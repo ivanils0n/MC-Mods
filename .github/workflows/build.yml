@@ -32,6 +32,7 @@ jobs:
       contents: write # publicar os resource packs (releases "<mod_id>-pack")
     strategy:
       fail-fast: false
+      max-parallel: 4 # com mais jobs de uma vez o GitHub tem falhado ao criar os restantes ("Internal server error")
       matrix: ${{ fromJSON(needs.mods.outputs.matrix) }}
     steps:
       - uses: actions/checkout@v6
