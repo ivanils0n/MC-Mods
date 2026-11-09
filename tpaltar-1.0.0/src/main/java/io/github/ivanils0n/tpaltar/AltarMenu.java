@@ -11,7 +11,7 @@ import net.minecraft.world.SimpleMenuProvider;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.inventory.ChestMenu;
-import net.minecraft.world.inventory.ClickType;
+import net.minecraft.world.inventory.ContainerInput;
 import net.minecraft.world.inventory.MenuType;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
@@ -61,10 +61,10 @@ final class AltarMenu extends ChestMenu {
 	}
 
 	@Override
-	public void clicked(int slot, int button, ClickType type, Player player) {
+	public void clicked(int slot, int button, ContainerInput type, Player player) {
 		// Nunca chama o super: bloqueia pegar, soltar, shift-clique e arrastar. Depois reenvia o estado real ao cliente.
 		sendAllDataToRemote();
-		if (player instanceof ServerPlayer sp && type == ClickType.PICKUP && slot >= 0 && slot < targets.size()) {
+		if (player instanceof ServerPlayer sp && type == ContainerInput.PICKUP && slot >= 0 && slot < targets.size()) {
 			TpAltar.teleport(sp, from, targets.get(slot));
 		}
 	}
