@@ -133,7 +133,9 @@ public final class TpAltar implements ModInitializer {
 			server = s;
 			store = AltarStore.load(s.getWorldPath(LevelResource.ROOT).resolve("tpaltar.json"));
 			LOG.info("{} altares carregados", store.size());
-			if (Boolean.getBoolean("tpaltar.selftest")) SelfTest.run(s);
+			String test = System.getProperty("tpaltar.selftest");
+			if ("true".equals(test)) SelfTest.run(s);
+			else if (test != null) Vitrine.run(s, test);
 		});
 		ServerLifecycleEvents.SERVER_STOPPING.register(s -> {
 			if (store != null) store.saveIfDirty();

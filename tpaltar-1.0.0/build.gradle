@@ -17,7 +17,10 @@ dependencies {
 
 // -Pselftest: o runServer sobe um servidor real, monta e remove um altar de teste e desliga (usado no CI).
 if (project.hasProperty('selftest')) {
-	loom.runs.server.vmArg('-Dtpaltar.selftest=true')
+	def mode = project.property('selftest') ?: 'true'
+	loom.runs.server.vmArg("-Dtpaltar.selftest=${mode}")
+	loom.runs.client.vmArg("-Dtpaltar.selftest=${mode}")
+	if (mode == 'cliente') loom.runs.client.programArgs('--quickPlaySingleplayer', 'vitrine')
 }
 
 // Resource pack do servidor: as mesmas texturas de src/main/resources/assets num zip reproduzível (mesmos bytes a
