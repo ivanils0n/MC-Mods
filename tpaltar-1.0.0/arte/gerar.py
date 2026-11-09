@@ -560,6 +560,11 @@ def main():
         "on_false": eye,
     }})
 
+    # Modelos próprios (item_model tpaltar:*), usados no singleplayer: nenhum outro resource pack os substitui.
+    for name in ("obelisk", "shards", "eye_idle", "eye_active", "blank"):
+        write_json(os.path.join(RES, "tpaltar/items", name + ".json"), {"model": {"type": "minecraft:model", "model": "tpaltar:item/" + name}})
+    write_json(os.path.join(RES, "tpaltar/items/altar.json"), {"model": {"type": "minecraft:model", "model": "tpaltar:item/altar_item"}})
+
     write_json(os.path.join(items, "glass_pane.json"), select([("tpaltar_blank", "tpaltar:item/blank")], "minecraft:item/glass_pane"))
 
     write_json(os.path.join(ROOT, "src/pack/pack.mcmeta"), {"pack": {
