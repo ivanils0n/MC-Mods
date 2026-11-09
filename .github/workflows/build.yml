@@ -83,12 +83,11 @@ jobs:
           grep "(tpaltar)" vitrine.log
           mkdir -p $d/saves && rm -rf $d/saves/vitrine && cp -r $d/world $d/saves/vitrine
           printf 'onboardAccessibility:false\npauseOnLostFocus:false\nrenderDistance:5\nguiScale:2\nfov:0.0\n' > $d/options.txt
-          which import xwd
           Xvfb :99 -screen 0 1280x720x24 & sleep 3
           DISPLAY=:99 timeout 700 ./gradlew ":${{ matrix.mod }}:runClient" -Pselftest=cliente $P > client.log 2>&1 &
           for i in $(seq 1 120); do grep -q "joined the game" client.log && break; sleep 5; done
-          sleep 45; DISPLAY=:99 import -window root shot1.png
-          sleep 7; DISPLAY=:99 import -window root shot2.png
+          sleep 45; ffmpeg -loglevel error -f x11grab -video_size 1280x720 -i :99 -frames:v 1 shot1.png
+          sleep 7; ffmpeg -loglevel error -f x11grab -video_size 1280x720 -i :99 -frames:v 1 shot2.png
           grep -E "\(tpaltar\)|joined the game|ERROR|Exception" client.log | grep -v ALSA | head -40
       - uses: actions/upload-artifact@v7
         if: startsWith(matrix.mod, 'tpaltar-') && matrix.mc == '26.2'

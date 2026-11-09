@@ -97,7 +97,9 @@ public final class TpAltar implements ModInitializer {
 
 	private static final class Visuals {
 		final Display.ItemDisplay eye, ring;
-		Boolean shownInUse; // item que o olho está mostrando (true = em uso); null = ainda não ajustado
+		// Item que o olho está mostrando (true = em uso). Toda decoração encontrada foi criada nesta execução (as antigas
+		// são apagadas ao carregar) e nasce como pérola; trocar para o mesmo item faria o comando "falhar" a cada tick.
+		boolean shownInUse;
 		int step;
 
 		Visuals(Display.ItemDisplay eye, Display.ItemDisplay ring) {
@@ -227,7 +229,10 @@ public final class TpAltar implements ModInitializer {
 			if (v == null) continue;
 			if (everySecond) sl.sendParticles(ParticleTypes.PORTAL, a.x + 0.5, a.y + EYE_Y, a.z + 0.5, 6, 0.25, 0.3, 0.25, 0.4);
 			boolean inUse = user(a) != null || SelfTest.FORCED_IN_USE.contains(a.key());
-			if (!Boolean.valueOf(inUse).equals(v.shownInUse) && showEye(sl, a, v.eye, inUse)) v.shownInUse = inUse;
+			if (inUse != v.shownInUse) {
+				showEye(sl, a, v.eye, inUse);
+				v.shownInUse = inUse; // mesmo se falhar: não repete o comando a cada tick
+			}
 			lookAtNearest(sl, v.eye);
 			if (animate) animate(sl, a, v);
 		}
