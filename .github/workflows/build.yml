@@ -19,12 +19,6 @@ jobs:
           distribution: 'microsoft'
       - run: chmod +x ./gradlew
       - run: ./gradlew build "-Pminecraft_version=${{ matrix.mc }}" "-Pminecraft_dependency=${{ matrix.dep }}"
-      - name: tmp-probe
-        run: |
-          set +e; J=~/.gradle/caches/fabric-loom/${{ matrix.mc }}/minecraft-merged.jar
-          mkdir x && cd x && unzip -q $J 'net/minecraft/client/*'
-          echo "## scoreText writers"; for f in $(grep -rla "scoreText" net); do javap -c -p $f | awk '/^  [a-z].*\(/{m=$0} /putfield.*scoreText/{print FILENAME": "m}' FILENAME=$f; done | sort -u
-          echo "## extractNameTags callers"; for f in $(grep -rla "extractNameTags" net); do javap -c -p $f | awk '/^  [a-z].*\(/{m=$0} /invoke.*extractNameTags/{print FILENAME": "m}' FILENAME=$f; done | sort -u
       - uses: actions/upload-artifact@v7
         with:
           name: mods-mc${{ matrix.mc }}
