@@ -83,12 +83,16 @@ jobs:
           grep "(tpaltar)" vitrine.log
           mkdir -p $d/saves && rm -rf $d/saves/vitrine && cp -r $d/world $d/saves/vitrine
           printf 'onboardAccessibility:false\npauseOnLostFocus:false\nrenderDistance:5\nguiScale:2\nfov:0.0\n' > $d/options.txt
-          sudo apt-get install -y -qq imagemagick > /dev/null
+          sudo apt-get install -y -qq xdotool > /dev/null
           Xvfb :99 -screen 0 1280x720x24 & sleep 3
           DISPLAY=:99 timeout 700 ./gradlew ":${{ matrix.mod }}:runClient" -Pselftest=cliente $P > client.log 2>&1 &
           for i in $(seq 1 120); do grep -q "joined the game" client.log && break; sleep 5; done
-          sleep 45; DISPLAY=:99 import -window root shot1.png
-          sleep 7; DISPLAY=:99 import -window root shot2.png
+          sleep 45
+          export DISPLAY=:99
+          w=$(xdotool search --name "Minecraft" | head -1); echo "janela: $w"; xdotool windowfocus --sync $w
+          xdotool key F1; sleep 2; xdotool key F2; sleep 6; xdotool key F2; sleep 3
+          ls -la $d/screenshots
+          i=1; for f in $(ls $d/screenshots/*.png | sort); do cp "$f" shot$i.png; i=$((i+1)); done
           grep -E "\(tpaltar\)|joined the game|ERROR|Exception" client.log | grep -v ALSA | head -40
       - if: startsWith(matrix.mod, 'tpaltar-') && matrix.mc == '26.2'
         run: |
