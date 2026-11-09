@@ -248,21 +248,20 @@ public final class TpAltar implements ModInitializer {
 	private static void spawnVisuals(ServerLevel sl, BlockPos pos) {
 		String tags = "Tags:[\"tpaltar\",\"" + tag(pos) + "\"]";
 		double x = pos.getX() + 0.5, y = pos.getY(), z = pos.getZ() + 0.5;
-		// Coluna de pedra lisa e tampo mais largo.
-		summon(sl, pos, "block_display", x, y + 1, z, tags + ",block_state:{Name:\"minecraft:smooth_stone\"},"
-			+ transform(-0.25f, -0.25f, 0.5f, 1f));
-		summon(sl, pos, "block_display", x, y + 2, z, tags + ",block_state:{Name:\"minecraft:smooth_stone\"},"
-			+ transform(-0.4f, -0.4f, 0.8f, 0.25f));
+		// Coluna de pedra lisa e tampo mais largo. São item_display (cubo centrado na entidade) porque o formato
+		// de block_state do block_display mudou entre a 26.2 e a 26.3; o de item é igual nas duas.
+		summon(sl, pos, "item_display", x, y + 1.5, z, tags + ",item:{id:\"minecraft:smooth_stone\",count:1}," + scale(0.5f, 1f));
+		summon(sl, pos, "item_display", x, y + 2.125, z, tags + ",item:{id:\"minecraft:smooth_stone\",count:1}," + scale(0.8f, 0.25f));
 		// Olho do fim flutuando, virando para quem olha e sempre iluminado.
 		summon(sl, pos, "item_display", x, y + 2.9, z, tags + ",item:{id:\"minecraft:ender_eye\",count:1},"
-			+ "billboard:\"vertical\",brightness:{sky:15,block:15}," + transform(0f, 0f, 0.7f, 0.7f));
+			+ "billboard:\"vertical\",brightness:{sky:15,block:15}," + scale(0.7f, 0.7f));
 		// Área clicável que cobre a coluna e o olho.
 		summon(sl, pos, "interaction", x, y + 1, z, tags + ",width:0.9f,height:2.3f,response:1b");
 	}
 
-	private static String transform(float tx, float tz, float side, float height) {
+	private static String scale(float side, float height) {
 		return String.format(Locale.ROOT, "transformation:{left_rotation:[0f,0f,0f,1f],right_rotation:[0f,0f,0f,1f],"
-			+ "translation:[%sf,0f,%sf],scale:[%sf,%sf,%sf]}", tx, tz, side, height, side);
+			+ "translation:[0f,0f,0f],scale:[%sf,%sf,%sf]}", side, height, side);
 	}
 
 	private static void summon(ServerLevel sl, BlockPos pos, String type, double x, double y, double z, String nbt) {
