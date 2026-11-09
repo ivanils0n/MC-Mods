@@ -303,12 +303,17 @@ public final class TpAltar implements ModInitializer {
 		store.remove(altar);
 		USERS.remove(altar.key());
 		SHOWN.remove(altar.key());
-		command(sl, altar.pos(), "kill @e[tag=" + tag(altar.pos()) + ",distance=..5]");
+		killVisuals(sl, altar.pos());
+	}
+
+	private static void killVisuals(ServerLevel sl, BlockPos pos) {
+		String tag = tag(pos);
+		for (Entity e : sl.getEntitiesOfClass(Entity.class, new AABB(pos).inflate(1, 4, 1), e -> e.entityTags().contains(tag))) e.discard();
 	}
 
 	/** Cria (ou recria, apagando a anterior) a decoração do altar. */
 	static void spawnVisuals(ServerLevel sl, BlockPos pos) {
-		command(sl, pos, "kill @e[tag=" + tag(pos) + ",distance=..5]");
+		killVisuals(sl, pos);
 		String tags = "Tags:[\"tpaltar\",\"" + tag(pos) + "\",\"" + RUN_TAG + "\"]";
 		double x = pos.getX() + 0.5, y = pos.getY(), z = pos.getZ() + 0.5;
 		// Coluna de pedra lisa e tampo mais largo. São item_display (cubo centrado na entidade) porque o formato
