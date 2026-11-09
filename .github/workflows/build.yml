@@ -19,6 +19,13 @@ jobs:
           distribution: 'microsoft'
       - run: chmod +x ./gradlew
       - run: ./gradlew build "-Pminecraft_version=${{ matrix.mc }}" "-Pminecraft_dependency=${{ matrix.dep }}"
+      - name: tmp-probe
+        run: |
+          set +e; J=~/.gradle/caches/fabric-loom/${{ matrix.mc }}/minecraft-merged.jar
+          unzip -l $J | grep -E "network/chat/contents/objects/|network/chat/Component.class|AtlasIds|resources/Identifier.class|resources/ResourceLocation.class" | awk '{print $4}'
+          javap -cp $J net.minecraft.network.chat.Component | grep -iE "object"
+          for c in $(unzip -l $J | grep -oE "net/minecraft/network/chat/contents/objects/AtlasSprite[^ ]*\.class|net/minecraft/data/AtlasIds\.class"); do javap -cp $J ${c%.class} | grep -vE "^\s*$" | head -20; done
+          unzip -l $J | grep -E "textures/gui/sprites/hud/heart/(full|half|container)\.png" | awk '{print $4}'
       - uses: actions/upload-artifact@v7
         with:
           name: mods-mc${{ matrix.mc }}
