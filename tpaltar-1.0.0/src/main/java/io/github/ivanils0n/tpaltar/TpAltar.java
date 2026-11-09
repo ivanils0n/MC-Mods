@@ -133,7 +133,9 @@ public final class TpAltar implements ModInitializer {
 			server = s;
 			store = AltarStore.load(s.getWorldPath(LevelResource.ROOT).resolve("tpaltar.json"));
 			LOG.info("{} altares carregados", store.size());
-			if (Boolean.getBoolean("tpaltar.selftest")) SelfTest.run(s);
+			String test = System.getProperty("tpaltar.selftest");
+			if ("true".equals(test)) SelfTest.run(s);
+			else if (test != null) Vitrine.run(s, test);
 		});
 		ServerLifecycleEvents.SERVER_STOPPING.register(s -> {
 			if (store != null) store.saveIfDirty();
@@ -590,6 +592,13 @@ public final class TpAltar implements ModInitializer {
 	}
 
 	/** Singleplayer: as texturas vêm do .jar do dono do mundo. Servidor: só de quem carregou o pack. */
+	static void openForTest(ServerPlayer p, ServerLevel sl, BlockPos pos) {
+		Altar a = store.get(dim(sl), pos);
+		List<Altar> others = store.inDim(dim(sl));
+		others.remove(a);
+		AltarMenu.open(p, a, others);
+	}
+
 	static boolean hasPack(ServerPlayer p) {
 		return server.isDedicatedServer() ? PACK_OK.contains(p.getUUID()) : server.isSingleplayerOwner(p.nameAndId());
 	}

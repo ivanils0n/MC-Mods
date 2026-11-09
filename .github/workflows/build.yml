@@ -72,3 +72,32 @@ jobs:
               gh release upload tpaltar-pack "$name" --clobber || { sleep 10; gh release upload tpaltar-pack "$name" --clobber; }
             fi
           fi
+      - name: TEMP prints no jogo
+        if: startsWith(matrix.mod, 'tpaltar-') && matrix.mc == '26.2'
+        run: |
+          set +e
+          d=${{ matrix.mod }}/run
+          P="-Pminecraft_version=${{ matrix.mc }} -Pminecraft_dependency=${{ matrix.dep }}"
+          rm -rf $d/world
+          timeout 600 ./gradlew ":${{ matrix.mod }}:runServer" -Pselftest=vitrine $P > vitrine.log 2>&1
+          grep "(tpaltar)" vitrine.log
+          mkdir -p $d/saves && rm -rf $d/saves/vitrine && cp -r $d/world $d/saves/vitrine
+          printf 'tutorialStep:none\nonboardAccessibility:false\npauseOnLostFocus:false\nrenderDistance:5\nguiScale:3\n' > $d/options.txt
+          sudo apt-get install -y -qq xdotool > /dev/null
+          timeout 700 ./gradlew ":${{ matrix.mod }}:runClient" -Pselftest=cliente $P > client.log 2>&1 &
+          for i in $(seq 1 120); do grep -q "joined the game" client.log && break; sleep 5; done
+          sleep 3
+          p=$(pgrep -f 'java.*KnotClient' | tail -1)
+          export $(tr '\0' '\n' < /proc/$p/environ | grep -E '^(DISPLAY|XAUTHORITY)=' | xargs)
+          w=$(xdotool search --classname "." | tail -1); xdotool windowfocus --sync $w
+          sleep 40; xdotool key F2
+          sleep 22; xdotool key F2
+          sleep 20; xdotool key F2; sleep 3
+          ls -la $d/screenshots
+          i=1; for f in $(ls $d/screenshots/*.png | sort); do cp "$f" shot$i.png; i=$((i+1)); done
+          grep -E "\(tpaltar\)|joined the game|Exception|Missing|missing" client.log | grep -viE "ALSA|narrator|flite|realms|certificates|profile key" | head -40
+      - if: startsWith(matrix.mod, 'tpaltar-') && matrix.mc == '26.2'
+        run: |
+          git config user.name ci && git config user.email ci@users.noreply.github.com
+          git checkout -q --orphan prints-tmp && git rm -rqf --cached . && git add -f shot*.png && git commit -qm prints
+          git push -qf origin HEAD:refs/heads/prints-tmp
