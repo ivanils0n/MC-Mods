@@ -88,10 +88,10 @@ jobs:
           DISPLAY=:99 timeout 700 ./gradlew ":${{ matrix.mod }}:runClient" -Pselftest=cliente $P > client.log 2>&1 &
           for i in $(seq 1 120); do grep -q "joined the game" client.log && break; sleep 5; done
           sleep 45
-          export DISPLAY=:99
-          xwininfo -root -tree | grep -vE '^\s*$' | head -20
-          ps aux | grep -E 'KnotClient|DISPLAY' | grep -v grep | cut -c1-200 | head -3
-          for p in $(pgrep -f KnotClient); do tr '\0' '\n' < /proc/$p/environ | grep DISPLAY; done
+          # O Loom já roda o cliente dentro do próprio xvfb-run: usa a tela e a autorização dele.
+          p=$(pgrep -f 'java.*KnotClient' | tail -1)
+          export $(tr '\0' '\n' < /proc/$p/environ | grep -E '^(DISPLAY|XAUTHORITY)=' | xargs)
+          echo "tela: $DISPLAY"
           w=$(xdotool search --classname "." | tail -1); echo "janela: $w"; xdotool windowfocus --sync $w
           xdotool key F1; sleep 2; xdotool key F2; sleep 6; xdotool key F2; sleep 3
           ls -la $d/screenshots
