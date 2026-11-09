@@ -38,6 +38,9 @@ final class SelfTest {
 		AABB area = new AABB(pos).inflate(1, 4, 1);
 		ensure(sl.getEntitiesOfClass(Display.class, area).size() == 3, "entidades de exibição: " + sl.getEntitiesOfClass(Display.class, area).size());
 		ensure(sl.getEntitiesOfClass(Interaction.class, area).size() == 1, "entidade de interação não apareceu");
+		Display.ItemDisplay eye = TpAltar.findEye(sl, altar);
+		ensure(eye != null, "olho não encontrado");
+		ensure(TpAltar.showEye(sl, altar, eye, true) && TpAltar.showEye(sl, altar, eye, false), "troca do olho falhou");
 
 		ensure(TpAltar.safeSpot(sl, pos) == null, "achou lugar seguro no ar");
 		sl.setBlock(pos.east().below(), Blocks.STONE.defaultBlockState(), Block.UPDATE_ALL);

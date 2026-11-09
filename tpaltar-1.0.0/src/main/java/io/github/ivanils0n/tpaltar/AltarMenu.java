@@ -45,6 +45,17 @@ final class AltarMenu extends ChestMenu {
 		for (int i = 0; i < targets.size(); i++) box.setItem(i, icon(targets.get(i)));
 		Component title = Component.literal(from.name + " · " + from.pearls + "/" + TpAltar.MAX_PEARLS + " pérolas");
 		player.openMenu(new SimpleMenuProvider((id, inv, p) -> new AltarMenu(id, inv, box, rows, from, targets), title));
+		if (player.containerMenu instanceof AltarMenu) TpAltar.lock(from, player); // trava até teleportar ou fechar
+	}
+
+	boolean isFor(Altar a) {
+		return from.key().equals(a.key());
+	}
+
+	@Override
+	public void removed(Player player) {
+		super.removed(player);
+		TpAltar.unlock(from, player);
 	}
 
 	private static ItemStack icon(Altar a) {

@@ -1,6 +1,7 @@
 package io.github.ivanils0n.tpaltar;
 
 import io.github.ivanils0n.tpaltar.AltarStore.Altar;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
@@ -29,6 +30,7 @@ import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
+import net.minecraft.world.entity.Display;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EquipmentSlot;
 import net.minecraft.world.entity.Interaction;
@@ -42,6 +44,7 @@ import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.storage.LevelResource;
+import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.EntityHitResult;
 import net.minecraft.world.phys.Vec3;
@@ -66,6 +69,10 @@ public final class TpAltar implements ModInitializer {
 	record Pending(ResourceKey<Level> dim, BlockPos pos, InteractionHand hand) {}
 
 	private static final Map<UUID, Integer> LAST_USE = new ConcurrentHashMap<>();
+	/** Quem está com o menu de destinos de cada altar aberto (chave do altar -> jogador). */
+	private static final Map<String, UUID> USERS = new HashMap<>();
+	/** Item que o olho de cada altar está mostrando agora (true = olho do fim, em uso). Vazio após reiniciar. */
+	private static final Map<String, Boolean> SHOWN = new HashMap<>();
 	private static MinecraftServer server;
 	private static AltarStore store;
 
@@ -81,6 +88,8 @@ public final class TpAltar implements ModInitializer {
 			server = null;
 			store = null;
 			LAST_USE.clear();
+			USERS.clear();
+			SHOWN.clear();
 		});
 		UseBlockCallback.EVENT.register(TpAltar::onUseBlock);
 		UseEntityCallback.EVENT.register(TpAltar::onUseEntity);
@@ -137,18 +146,65 @@ public final class TpAltar implements ModInitializer {
 	}
 
 	private static void onWorldTick(ServerLevel sl) {
-		if (store == null || sl.getGameTime() % 20 != 0) return;
+		long time = sl.getGameTime();
+		if (store == null || time % 2 != 0) return;
+		boolean everySecond = time % 20 == 0;
 		for (Altar a : store.inDim(dim(sl))) {
 			BlockPos pos = a.pos();
 			if (!sl.isLoaded(pos)) continue;
-			if (!sl.getBlockState(pos).is(Blocks.OBSIDIAN)) {
-				// Sumiu por outro meio (Wither, comando, editor de mundo): remove sem dropar nada.
-				LOG.info("Altar \"{}\" em {} não existe mais; removido", a.name, pos);
-				removeAltar(sl, a);
-				continue;
+			if (everySecond) {
+				if (!sl.getBlockState(pos).is(Blocks.OBSIDIAN)) {
+					// Sumiu por outro meio (Wither, comando, editor de mundo): remove sem dropar nada.
+					LOG.info("Altar \"{}\" em {} não existe mais; removido", a.name, pos);
+					removeAltar(sl, a);
+					continue;
+				}
+				sl.sendParticles(ParticleTypes.PORTAL, a.x + 0.5, a.y + 2.9, a.z + 0.5, 6, 0.25, 0.3, 0.25, 0.4);
 			}
-			sl.sendParticles(ParticleTypes.PORTAL, a.x + 0.5, a.y + 2.9, a.z + 0.5, 6, 0.25, 0.3, 0.25, 0.4);
+			Display.ItemDisplay eye = findEye(sl, a);
+			if (eye == null) continue;
+			boolean inUse = user(a) != null;
+			if (!Boolean.valueOf(inUse).equals(SHOWN.get(a.key())) && showEye(sl, a, eye, inUse)) SHOWN.put(a.key(), inUse);
+			lookAtNearest(sl, eye);
 		}
+	}
+
+	/** O olho fica 2,9 blocos acima da base; é o único item_display do altar nessa altura. */
+	static Display.ItemDisplay findEye(ServerLevel sl, Altar a) {
+		List<Display.ItemDisplay> found = sl.getEntitiesOfClass(Display.ItemDisplay.class, new AABB(a.x, a.y + 2.5, a.z, a.x + 1, a.y + 3.5, a.z + 1));
+		return found.isEmpty() ? null : found.get(0);
+	}
+
+	/** Pérola parada; vira olho do fim enquanto alguém escolhe o destino. Também passa olhos antigos para billboard fixo. */
+	static boolean showEye(ServerLevel sl, Altar a, Display.ItemDisplay eye, boolean inUse) {
+		String item = inUse ? "minecraft:ender_eye" : "minecraft:ender_pearl";
+		return command(sl, a.pos(), "data merge entity " + eye.getUUID() + " {item:{id:\"" + item + "\",count:1},billboard:\"fixed\",teleport_duration:2}");
+	}
+
+	/** Gira o olho (só na horizontal) para encarar o jogador mais próximo em até 16 blocos. */
+	private static void lookAtNearest(ServerLevel sl, Display.ItemDisplay eye) {
+		Player p = sl.getNearestPlayer(eye.getX(), eye.getY(), eye.getZ(), 16, false);
+		if (p == null) return;
+		double dx = p.getX() - eye.getX(), dz = p.getZ() - eye.getZ();
+		eye.setYRot((float) Math.toDegrees(Math.atan2(dz, dx)) - 90f);
+	}
+
+	/** Jogador que está com o menu de destinos deste altar aberto, ou null. Limpa travas de quem saiu ou fechou. */
+	static ServerPlayer user(Altar a) {
+		UUID id = USERS.get(a.key());
+		if (id == null) return null;
+		ServerPlayer p = server.getPlayerList().getPlayer(id);
+		if (p != null && p.containerMenu instanceof AltarMenu menu && menu.isFor(a)) return p;
+		USERS.remove(a.key());
+		return null;
+	}
+
+	static void lock(Altar a, ServerPlayer p) {
+		USERS.put(a.key(), p.getUUID());
+	}
+
+	static void unlock(Altar a, Player p) {
+		USERS.remove(a.key(), p.getUUID());
 	}
 
 	// ---------- colocar ----------
@@ -224,6 +280,8 @@ public final class TpAltar implements ModInitializer {
 
 	static void removeAltar(ServerLevel sl, Altar altar) {
 		store.remove(altar);
+		USERS.remove(altar.key());
+		SHOWN.remove(altar.key());
 		command(sl, altar.pos(), "kill @e[tag=" + tag(altar.pos()) + ",distance=..5]");
 	}
 
@@ -234,9 +292,9 @@ public final class TpAltar implements ModInitializer {
 		// de block_state do block_display mudou entre a 26.2 e a 26.3; o de item é igual nas duas.
 		summon(sl, pos, "item_display", x, y + 1.5, z, tags + ",item:{id:\"minecraft:smooth_stone\",count:1}," + scale(0.5f, 1f));
 		summon(sl, pos, "item_display", x, y + 2.125, z, tags + ",item:{id:\"minecraft:smooth_stone\",count:1}," + scale(0.8f, 0.25f));
-		// Olho do fim flutuando, virando para quem olha e sempre iluminado.
-		summon(sl, pos, "item_display", x, y + 2.9, z, tags + ",item:{id:\"minecraft:ender_eye\",count:1},"
-			+ "billboard:\"vertical\",brightness:{sky:15,block:15}," + scale(0.7f, 0.7f));
+		// Pérola flutuando (vira olho do fim em uso), sempre iluminada; o giro é feito no onWorldTick.
+		summon(sl, pos, "item_display", x, y + 2.9, z, tags + ",item:{id:\"minecraft:ender_pearl\",count:1},"
+			+ "teleport_duration:2,brightness:{sky:15,block:15}," + scale(0.7f, 0.7f));
 		// Área clicável que cobre a coluna e o olho.
 		summon(sl, pos, "interaction", x, y + 1, z, tags + ",width:0.9f,height:2.3f,response:1b");
 	}
@@ -250,9 +308,14 @@ public final class TpAltar implements ModInitializer {
 		command(sl, pos, String.format(Locale.ROOT, "summon minecraft:%s %.4f %.4f %.4f {%s}", type, x, y, z, nbt));
 	}
 
-	private static void command(ServerLevel sl, BlockPos pos, String cmd) {
-		CommandSourceStack source = server.createCommandSourceStack().withLevel(sl).withPosition(Vec3.atCenterOf(pos)).withSuppressedOutput();
+	/** Roda um comando como o próprio servidor (funciona com cheats desligados). Avisa no log se falhar. */
+	private static boolean command(ServerLevel sl, BlockPos pos, String cmd) {
+		boolean[] ok = {false};
+		CommandSourceStack source = server.createCommandSourceStack().withLevel(sl).withPosition(Vec3.atCenterOf(pos))
+			.withSuppressedOutput().withCallback((success, result) -> ok[0] = success);
 		server.getCommands().performPrefixedCommand(source, cmd);
+		if (!ok[0]) LOG.warn("Comando do altar falhou: {}", cmd);
+		return ok[0];
 	}
 
 	private static String tag(BlockPos pos) {
@@ -270,6 +333,11 @@ public final class TpAltar implements ModInitializer {
 		ItemStack pearls = sp.getMainHandItem().is(Items.ENDER_PEARL) ? sp.getMainHandItem()
 			: sp.getOffhandItem().is(Items.ENDER_PEARL) ? sp.getOffhandItem() : ItemStack.EMPTY;
 		if (pearls.isEmpty()) {
+			ServerPlayer busy = user(altar);
+			if (busy != null && busy != sp) {
+				say(sp, "O altar \"" + altar.name + "\" está sendo usado por " + busy.getName().getString() + ". Aguarde.", ChatFormatting.YELLOW);
+				return;
+			}
 			List<Altar> others = store.inDim(dim(sl));
 			others.remove(altar);
 			AltarMenu.open(sp, altar, others);
@@ -314,11 +382,18 @@ public final class TpAltar implements ModInitializer {
 		dst.pearls -= COST;
 		store.save();
 		sl.playSound(null, sp.blockPosition(), SoundEvents.ENDERMAN_TELEPORT, SoundSource.PLAYERS, 1f, 1f);
+		portalBurst(sl, sp.position());
 		sp.stopRiding();
 		sp.teleportTo(spot.x, spot.y, spot.z);
 		sp.resetFallDistance();
 		sl.playSound(null, dst.pos(), SoundEvents.ENDERMAN_TELEPORT, SoundSource.PLAYERS, 1f, 1f);
+		portalBurst(sl, spot);
 		say(sp, "Bem-vindo a \"" + dst.name + "\". Restam " + dst.pearls / COST + " viagens para cá.", ChatFormatting.LIGHT_PURPLE);
+	}
+
+	/** Nuvem de partículas roxas na altura do corpo do jogador. */
+	private static void portalBurst(ServerLevel sl, Vec3 feet) {
+		sl.sendParticles(ParticleTypes.PORTAL, feet.x, feet.y + 1, feet.z, 60, 0.4, 0.8, 0.4, 0.6);
 	}
 
 	/** Um bloco ao lado do altar com chão firme e 2 de altura livres, sem líquido. */
