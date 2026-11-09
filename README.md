@@ -6,11 +6,11 @@ Mods Fabric para Minecraft. Cada pasta `<mod>-<versão>/` é um mod independente
 |-----|-------|-----------|
 | Mob Health Bar | `mobhealthbar-1.2.1/` | 26.2 e 26.3+ (Fabric, só cliente) |
 | Item Despawn Timer | `itemtimer-1.0.0/` | 26.2 e 26.3+ (Fabric, só cliente) |
-| Altar de Teleporte | `tpaltar-1.0.0/` | 26.2 e 26.3+ (Fabric, só servidor, requer Fabric API) |
+| Altar de Teleporte | `tpaltar-1.0.0/` | 26.2 e 26.3+ (Fabric, servidor ou singleplayer, requer Fabric API) |
 
 ## Altar de Teleporte
 
-Vai só no servidor (`mods/`, junto com o Fabric API); os jogadores entram sem instalar nada.
+Vai na pasta `mods/` do servidor, junto com o Fabric API; os jogadores entram sem instalar nada. Em singleplayer, coloque o mesmo .jar na pasta `mods/` do jogo.
 
 - **Receita** (bancada): pedra lisa ×3 em cima; pedra lisa, ender pearl, pedra lisa no meio; obsidiana ×3 embaixo. Aparece no livro de receitas quando o jogador pega uma ender pearl.
 - **Colocar**: clique no chão com o altar; o servidor pede o nome no chat (até 24 letras, único por dimensão, `cancelar` desiste). Precisa de 3 blocos livres de altura.
@@ -28,7 +28,7 @@ Mostra acima dos itens no chão quanto falta para sumirem (5 min). Itens dropado
 
 ## Compilar
 
-O GitHub Actions compila a cada push. Os `.jar` ficam em **Actions → último build → Artifacts** (um `mods-mc<versão>` por versão do Minecraft, definidas na matriz do `build.yml`).
+O GitHub Actions compila a cada push. Os `.jar` ficam em **Actions → último build → Artifacts**, um download por mod e versão do Minecraft (ex.: `mc26.2-tpaltar-1.0.0`). As versões ficam na matriz do `build.yml`.
 
 Localmente (Java 25): `./gradlew build` → `<pasta>/build/libs/`.
 

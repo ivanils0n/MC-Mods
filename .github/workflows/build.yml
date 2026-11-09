@@ -2,11 +2,26 @@ name: build
 on: [push, pull_request, workflow_dispatch]
 
 jobs:
+  # Lista as pastas de mod (as que têm build.gradle), para cada mod virar um download separado.
+  mods:
+    runs-on: ubuntu-24.04
+    outputs:
+      list: ${{ steps.find.outputs.list }}
+    steps:
+      - uses: actions/checkout@v6
+      - id: find
+        run: |
+          mods=$(for d in */; do [ -f "$d/build.gradle" ] && printf '"%s",' "${d%/}"; done)
+          echo "list=[${mods%,}]" >> "$GITHUB_OUTPUT"
+
   build:
+    needs: mods
     runs-on: ubuntu-24.04
     strategy:
       fail-fast: false
       matrix:
+        mod: ${{ fromJSON(needs.mods.outputs.list) }}
+        mc: ['26.3', '26.2']
         include:
           - { mc: '26.3', dep: '>=26.3 <27' }
           - { mc: '26.2', dep: '~26.2' }
@@ -18,17 +33,19 @@ jobs:
           java-version: '25'
           distribution: 'microsoft'
       - run: chmod +x ./gradlew
-      - run: ./gradlew build "-Pminecraft_version=${{ matrix.mc }}" "-Pminecraft_dependency=${{ matrix.dep }}"
+      - run: ./gradlew ":${{ matrix.mod }}:build" "-Pminecraft_version=${{ matrix.mc }}" "-Pminecraft_dependency=${{ matrix.dep }}"
+      # Um download por mod e versão do Minecraft, ex.: mc26.2-tpaltar-1.0.0
       - uses: actions/upload-artifact@v7
         with:
-          name: mods-mc${{ matrix.mc }}
-          path: '*/build/libs/*.jar'
+          name: mc${{ matrix.mc }}-${{ matrix.mod }}
+          path: ${{ matrix.mod }}/build/libs/*.jar
       # Sobe um servidor dedicado de verdade com o Altar de Teleporte, monta/remove um altar de teste e desliga.
       - name: Teste do Altar de Teleporte num servidor real
+        if: startsWith(matrix.mod, 'tpaltar-')
         run: |
-          mkdir -p tpaltar-1.0.0/run
-          echo "eula=true" > tpaltar-1.0.0/run/eula.txt
-          printf 'level-type=minecraft\\:flat\nonline-mode=false\nspawn-protection=0\n' > tpaltar-1.0.0/run/server.properties
-          timeout 900 ./gradlew :tpaltar-1.0.0:runServer -Pselftest "-Pminecraft_version=${{ matrix.mc }}" "-Pminecraft_dependency=${{ matrix.dep }}" | tee server.log
+          mkdir -p ${{ matrix.mod }}/run
+          echo "eula=true" > ${{ matrix.mod }}/run/eula.txt
+          printf 'level-type=minecraft\\:flat\nonline-mode=false\nspawn-protection=0\n' > ${{ matrix.mod }}/run/server.properties
+          timeout 900 ./gradlew ":${{ matrix.mod }}:runServer" -Pselftest "-Pminecraft_version=${{ matrix.mc }}" "-Pminecraft_dependency=${{ matrix.dep }}" | tee server.log
           grep -q "TPALTAR SELFTEST OK" server.log
           ! grep -q "Serialization errors" server.log
