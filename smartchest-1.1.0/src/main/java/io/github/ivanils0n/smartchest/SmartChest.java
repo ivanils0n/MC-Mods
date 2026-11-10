@@ -22,6 +22,7 @@ import net.fabricmc.api.ModInitializer;
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerEntityEvents;
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerLifecycleEvents;
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerTickEvents;
+import net.fabricmc.fabric.api.event.player.AttackBlockCallback;
 import net.fabricmc.fabric.api.event.player.PlayerBlockBreakEvents;
 import net.fabricmc.fabric.api.event.player.UseBlockCallback;
 import net.fabricmc.fabric.api.event.player.UseItemCallback;
@@ -151,6 +152,17 @@ public final class SmartChest implements ModInitializer {
 			FILTER.remove(id);
 		});
 		UseBlockCallback.EVENT.register(SmartChest::onUseBlock);
+		// Botão esquerdo com o Vinculador num baú: escolher o tipo (categoria, qualquer item ou só retirar) em vez de quebrar.
+		AttackBlockCallback.EVENT.register((player, level, hand, pos, dir) -> {
+			if (store == null || !(level instanceof ServerLevel sl) || !(player instanceof ServerPlayer sp) || sp.isSpectator()
+				|| hand != InteractionHand.MAIN_HAND || !isLinker(sp.getMainHandItem()) || !Storage.isLinkable(sl.getBlockEntity(pos))) {
+				return InteractionResult.PASS;
+			}
+			Component err = linkProblem(sp, sl, sp.getMainHandItem(), pos);
+			if (err != null) say(sp, err);
+			else LinkMenu.open(sp, target(sp.getMainHandItem()), pos);
+			return InteractionResult.SUCCESS;
+		});
 		// O cliente não sabe que a obsidiana é um baú: junto com o clique ele também manda "usar o item da mão" (comer,
 		// levantar o escudo, jogar a pérola). Com a tela do baú aberta isso é recusado e o inventário é reenviado.
 		UseItemCallback.EVENT.register((player, level, hand) -> {
@@ -330,8 +342,8 @@ public final class SmartChest implements ModInitializer {
 		return store.get(dim.get(), new BlockPos(p[0], p[1], p[2]));
 	}
 
-	/** Liga ou desliga o baú clicado (e a outra metade, se for duplo). Devolve a mensagem para o jogador. */
-	static Component toggleLink(ServerPlayer sp, ServerLevel sl, ItemStack linker, BlockPos pos) {
+	/** O que impede o Vinculador de mexer nesse baú (mensagem), ou null. */
+	static Component linkProblem(ServerPlayer sp, ServerLevel sl, ItemStack linker, BlockPos pos) {
 		if (!sl.mayInteract(sp, pos)) return plain("Você não pode mexer nesse baú.", ChatFormatting.RED);
 		CustomData data = linker.get(DataComponents.CUSTOM_DATA);
 		boolean bound = data != null && data.copyTag().contains("pos");
@@ -341,29 +353,45 @@ public final class SmartChest implements ModInitializer {
 				: "Primeiro clique num Baú Central com o Vinculador.", ChatFormatting.RED);
 		}
 		String err = linkProblem(c, sl, pos);
-		if (err != null) return plain(err, ChatFormatting.RED);
+		return err == null ? null : plain(err, ChatFormatting.RED);
+	}
+
+	/** Botão direito: liga (para qualquer item) ou desliga o baú clicado (e a outra metade, se for duplo). */
+	static Component toggleLink(ServerPlayer sp, ServerLevel sl, ItemStack linker, BlockPos pos) {
+		Component err = linkProblem(sp, sl, linker, pos);
+		if (err != null) return err;
+		Chest c = target(linker);
+		if (!c.isLinked(pos)) return linkWith(sp, sl, linker, pos, ChestStore.ANY);
+		for (BlockPos p : Storage.group(sl, pos)) c.unlink(p);
+		store.markDirty();
+		for (BlockPos p : Storage.group(sl, pos)) particles(sl, sp, p, ParticleTypes.WAX_ON, 10);
+		sl.playSound(null, pos, SoundEvents.CHAIN_PLACE, SoundSource.PLAYERS, 1f, 0.6f);
+		return plain("Baú desligado (" + count(c.links.size(), "ligado", "ligados") + ").", ChatFormatting.YELLOW);
+	}
+
+	/** Liga o baú com o modo (ChestStore.ANY, categoria 1-7 ou ChestStore.INPUT), ou só troca o modo se já está ligado. */
+	static Component linkWith(ServerPlayer sp, ServerLevel sl, ItemStack linker, BlockPos pos, int mode) {
+		Component err = linkProblem(sp, sl, linker, pos);
+		if (err != null) return err;
+		Chest c = target(linker);
 		List<BlockPos> group = Storage.group(sl, pos);
-		if (c.isLinked(pos)) {
-			for (BlockPos p : group) c.unlink(p);
-			store.markDirty();
-			for (BlockPos p : group) particles(sl, sp, p, ParticleTypes.WAX_ON, 10);
-			sl.playSound(null, pos, SoundEvents.CHAIN_PLACE, SoundSource.PLAYERS, 1f, 0.6f);
-			return plain("Baú desligado (" + count(c.links.size(), "ligado", "ligados") + ").", ChatFormatting.YELLOW);
-		}
+		int adding = 0;
 		for (BlockPos p : group) {
+			if (c.isLinked(p)) continue;
+			adding++;
 			String far = rangeProblem(c, p, viewDistance(sp)); // desligar sempre pode; ligar só dentro da distância de visão
 			if (far != null) return plain(far, ChatFormatting.RED);
 		}
-		int adding = 0;
-		for (BlockPos p : group) if (!c.isLinked(p)) adding++;
 		if (c.links.size() + adding > MAX_LINKS) {
 			return plain("Limite de " + MAX_LINKS + " baús por Baú Central atingido.", ChatFormatting.RED);
 		}
-		for (BlockPos p : group) c.link(p);
+		for (BlockPos p : group) c.link(p, mode);
 		store.markDirty();
 		for (BlockPos p : group) particles(sl, sp, p, ParticleTypes.HAPPY_VILLAGER, 12);
 		sl.playSound(null, pos, SoundEvents.CHAIN_PLACE, SoundSource.PLAYERS, 1f, 1.4f);
-		return plain((group.size() > 1 ? "Baú duplo ligado" : "Baú ligado") + " (" + count(c.links.size(), "ligado", "ligados") + ").", ChatFormatting.GREEN);
+		String kind = mode == ChestStore.ANY ? "qualquer item" : mode == ChestStore.INPUT ? "só retirar" : "só " + Categories.NAMES[mode];
+		return plain((group.size() > 1 ? "Baú duplo" : "Baú") + (adding > 0 ? " ligado" : " agora") + ": " + kind
+			+ " (" + count(c.links.size(), "ligado", "ligados") + ").", ChatFormatting.GREEN);
 	}
 
 	/** Motivo para não ligar este bloco ao baú, ou null se pode. */

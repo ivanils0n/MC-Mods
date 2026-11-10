@@ -55,8 +55,19 @@ final class Storage {
 	/** Baús ligados que existem e estão carregados (não carrega chunks). Remove vínculos de blocos que sumiram. */
 	static final class Linked {
 		final List<Container> containers = new ArrayList<>();
+		/** Modo de cada baú (mesma ordem de {@code containers}): ver ChestStore.Chest.links. */
+		final List<Integer> modes = new ArrayList<>();
 		int unloaded;
 		int usedSlots, totalSlots;
+
+		/** Onde o item pode ser guardado: primeiro os baús da categoria dele, depois os de qualquer item. */
+		List<Container> targets(ItemStack st) {
+			int cat = Categories.of(st);
+			List<Container> out = new ArrayList<>();
+			for (int i = 0; i < containers.size(); i++) if (modes.get(i) == cat) out.add(containers.get(i));
+			for (int i = 0; i < containers.size(); i++) if (modes.get(i) == ChestStore.ANY) out.add(containers.get(i));
+			return out;
+		}
 	}
 
 	static boolean isLinkable(BlockEntity be) {
@@ -89,6 +100,7 @@ final class Storage {
 			}
 			Container c = (Container) be;
 			out.containers.add(c);
+			out.modes.add(chest.mode(p));
 			out.totalSlots += c.getContainerSize();
 		}
 		if (pruned && store != null) store.markDirty();
@@ -170,13 +182,25 @@ final class Storage {
 	}
 
 	/**
-	 * Organiza os baús por categoria (ordem das abas): junta os itens iguais em pilhas cheias e começa cada categoria num
-	 * baú novo quando há baús para isso; senão, as categorias ficam em sequência. Devolve se cada categoria ficou em baús
-	 * próprios. O que não couber (só com pilhas acima do normal, feitas por comando) vai para {@code leftover}.
+	 * Organiza os baús por categoria (ordem das abas), juntando os itens iguais em pilhas cheias. Baús "só retirar"
+	 * não são tocados. Cada categoria vai primeiro para os baús marcados com ela; o resto vai para os baús de qualquer
+	 * item, cada categoria começando num baú novo quando há baús para isso (senão, em sequência). Devolve se cada
+	 * categoria ficou em baús próprios. Se ainda sobrar (baús marcados guardando outra coisa antes), vai para qualquer
+	 * espaço livre; o que nem assim couber (só pilhas acima do normal, feitas por comando) vai para {@code leftover}.
 	 */
-	static boolean organize(List<Container> containers, List<ItemStack> leftover) {
+	static boolean organize(Linked linked, List<ItemStack> leftover) {
+		List<Container> all = new ArrayList<>(), general = new ArrayList<>();
+		Map<Integer, List<Container>> marked = new LinkedHashMap<>();
+		for (int i = 0; i < linked.containers.size(); i++) {
+			int mode = linked.modes.get(i);
+			if (mode == ChestStore.INPUT) continue;
+			Container c = linked.containers.get(i);
+			all.add(c);
+			if (mode == ChestStore.ANY) general.add(c);
+			else marked.computeIfAbsent(mode, k -> new ArrayList<>()).add(c);
+		}
 		Map<Key, long[]> totals = new LinkedHashMap<>();
-		for (Container c : containers) {
+		for (Container c : all) {
 			for (int i = 0; i < c.getContainerSize(); i++) {
 				ItemStack s = c.getItem(i);
 				if (s.isEmpty()) continue;
@@ -187,15 +211,34 @@ final class Storage {
 		List<Key> keys = new ArrayList<>(totals.keySet());
 		keys.sort(Comparator.comparingInt((Key k) -> Categories.of(k.stack()))
 			.thenComparing(k -> BuiltInRegistries.ITEM.getKey(k.stack().getItem()).toString()));
-		List<ItemStack> stacks = new ArrayList<>();
+		Map<Integer, List<ItemStack>> byCat = new LinkedHashMap<>();
 		for (Key k : keys) {
 			int max = maxStack(k.stack());
-			for (long n = totals.get(k)[0]; n > 0; n -= max) stacks.add(k.stack().copyWithCount((int) Math.min(max, n)));
+			List<ItemStack> list = byCat.computeIfAbsent(Categories.of(k.stack()), x -> new ArrayList<>());
+			for (long n = totals.get(k)[0]; n > 0; n -= max) list.add(k.stack().copyWithCount((int) Math.min(max, n)));
 		}
-		boolean each = place(containers, stacks, true, null);
-		place(containers, stacks, each, leftover);
-		for (Container c : containers) c.setChanged();
+		List<ItemStack> rest = new ArrayList<>(), over = new ArrayList<>();
+		byCat.forEach((cat, list) -> fill(marked.getOrDefault(cat, List.of()), list, rest));
+		boolean each = place(general, rest, true, null);
+		place(general, rest, each, over);
+		fill(all, over, leftover);
+		for (Container c : all) c.setChanged();
 		return each;
+	}
+
+	/** Põe as pilhas nos primeiros espaços vazios; o que não couber vai para {@code over}. */
+	private static void fill(List<Container> containers, List<ItemStack> stacks, List<ItemStack> over) {
+		int ci = 0, slot = 0;
+		for (ItemStack st : stacks) {
+			while (ci < containers.size() && (slot >= containers.get(ci).getContainerSize() || !containers.get(ci).getItem(slot).isEmpty())) {
+				if (++slot >= containers.get(ci).getContainerSize()) {
+					ci++;
+					slot = 0;
+				}
+			}
+			if (ci >= containers.size()) over.add(st);
+			else containers.get(ci).setItem(slot++, st);
+		}
 	}
 
 	/** Põe as pilhas em ordem nos baús ({@code out == null}: só confere se cabem). */

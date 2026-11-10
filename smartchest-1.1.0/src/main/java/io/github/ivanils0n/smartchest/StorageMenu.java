@@ -237,6 +237,10 @@ final class StorageMenu extends ChestMenu {
 	 * afins no texto.
 	 */
 	private ItemStack tab(String model, Item look, boolean active, String name, String... lines) {
+		return tab(player, model, look, active, name, lines);
+	}
+
+	static ItemStack tab(ServerPlayer player, String model, Item look, boolean active, String name, String... lines) {
 		ItemStack s = new ItemStack(Items.PAPER);
 		s.set(DataComponents.ITEM_MODEL, model != null && SmartChest.hasPack(player) ? SmartChest.model(model) : BuiltInRegistries.ITEM.getKey(look));
 		if (active) s.set(DataComponents.ENCHANTMENT_GLINT_OVERRIDE, true);
@@ -342,7 +346,7 @@ final class StorageMenu extends ChestMenu {
 			}
 			ItemStack got = Storage.take(linked.containers, e.proto, n);
 			sp.getInventory().add(got);
-			if (!got.isEmpty()) Storage.insert(linked.containers, got); // não coube (raro): volta para os baús
+			if (!got.isEmpty()) Storage.insert(linked.targets(got), got); // não coube (raro): volta para os baús
 			if (!got.isEmpty()) setCarried(got); // nem lá: fica na mão, nunca some
 		} else {
 			int pack = (int) Math.min(max, e.total);
@@ -407,7 +411,7 @@ final class StorageMenu extends ChestMenu {
 		boolean back = !taken.isEmpty() && ItemStack.isSameItemSameComponents(carried, taken);
 		ItemStack proto = carried.copyWithCount(1);
 		ItemStack part = one ? carried.split(1) : carried;
-		int moved = Storage.insert(linked.containers, part);
+		int moved = Storage.insert(linked.targets(part), part);
 		if (one && !part.isEmpty()) carried.grow(part.getCount()); // não coube: volta para a mão
 		setCarried(carried.isEmpty() ? ItemStack.EMPTY : carried);
 		if (carried.isEmpty()) taken = ItemStack.EMPTY;
@@ -422,7 +426,7 @@ final class StorageMenu extends ChestMenu {
 		if (st.isEmpty()) return;
 		Linked linked = linked();
 		if (noChests(sp, linked)) return;
-		int moved = Storage.insert(linked.containers, st);
+		int moved = Storage.insert(linked.targets(st), st);
 		if (st.isEmpty()) slot.set(ItemStack.EMPTY);
 		else slot.setChanged();
 		feedback(sp, moved, !st.isEmpty());
@@ -439,7 +443,7 @@ final class StorageMenu extends ChestMenu {
 		for (int i = 9; i < 36; i++) {
 			ItemStack st = inv.getItem(i);
 			if (st.isEmpty()) continue;
-			moved += Storage.insert(linked.containers, st);
+			moved += Storage.insert(linked.targets(st), st);
 			if (st.isEmpty()) inv.setItem(i, ItemStack.EMPTY);
 			else left = true;
 		}
@@ -457,7 +461,7 @@ final class StorageMenu extends ChestMenu {
 		Linked linked = linked();
 		if (noChests(sp, linked)) return;
 		List<ItemStack> rest = new ArrayList<>();
-		boolean each = Storage.organize(linked.containers, rest);
+		boolean each = Storage.organize(linked, rest);
 		for (ItemStack st : rest) sp.getInventory().placeItemBackInInventory(st); // nunca deve acontecer: nada some
 		refresh();
 		SmartChest.say(sp, each ? "Baús organizados: cada categoria em baús próprios."

@@ -248,15 +248,28 @@ final class SelfTest {
 		// Organizar: uma categoria por baú (Construção no baú, Minérios no barril), juntando as pilhas.
 		chest.setItem(10, new ItemStack(Items.DIAMOND, 3));
 		List<ItemStack> rest = new java.util.ArrayList<>();
-		ensure(Storage.organize(List.of(chest, barrel), rest) && rest.isEmpty() && count(chest, Items.COBBLESTONE) == 64
+		ensure(Storage.organize(linkedOf(List.of(chest, barrel), 0, 0), rest) && rest.isEmpty() && count(chest, Items.COBBLESTONE) == 64
 			&& count(chest, Items.DIAMOND) == 0 && barrel.getItem(0).is(Items.DIAMOND) && barrel.getItem(0).getCount() == 18,
 			"organizar: " + chest.getItem(0) + " " + barrel.getItem(0));
 		// Mais categorias que baús: em sequência, nada some.
 		barrel.setItem(5, new ItemStack(Items.APPLE, 7));
-		ensure(!Storage.organize(List.of(chest, barrel), rest) && rest.isEmpty() && chest.getItem(0).is(Items.COBBLESTONE)
+		ensure(!Storage.organize(linkedOf(List.of(chest, barrel), 0, 0), rest) && rest.isEmpty() && chest.getItem(0).is(Items.COBBLESTONE)
 			&& chest.getItem(1).getCount() == 18 && chest.getItem(2).getCount() == 7 && count(barrel, Items.APPLE) == 0,
 			"organizar em sequência: " + chest.getItem(1) + " " + chest.getItem(2));
 		chest.setItem(2, ItemStack.EMPTY);
+		// Modos: baú só de Minérios e barril só retirar. Organizar não toca no barril e só põe minérios no baú (o
+		// pedregulho, sem outro lugar, fica num espaço livre); guardar pedregulho não acha baú.
+		barrel.setItem(4, new ItemStack(Items.APPLE, 2));
+		Storage.Linked modes = linkedOf(List.of(chest, barrel), Categories.ORES, ChestStore.INPUT);
+		Storage.organize(modes, rest);
+		ensure(rest.isEmpty() && chest.getItem(0).is(Items.DIAMOND) && count(chest, Items.COBBLESTONE) == 64
+			&& barrel.getItem(4).is(Items.APPLE) && count(barrel, Items.DIAMOND) == 0, "organizar com modos: " + chest.getItem(0));
+		ensure(modes.targets(new ItemStack(Items.DIAMOND)).equals(List.of(chest)) && modes.targets(new ItemStack(Items.COBBLESTONE)).isEmpty(),
+			"guardar com modos");
+		barrel.setItem(4, ItemStack.EMPTY);
+		sc.link(barrelPos, ChestStore.INPUT);
+		ensure(sc.mode(barrelPos) == ChestStore.INPUT && sc.mode(chestPos) == ChestStore.ANY && sc.links.size() == 2, "modo do vínculo");
+		sc.link(barrelPos, ChestStore.ANY);
 
 		// Baús cheios: não guarda nada e o item fica com o jogador.
 		for (Container c : List.of(chest, barrel)) for (int i = 0; i < c.getContainerSize(); i++) c.setItem(i, new ItemStack(Items.STONE, 64));
@@ -287,6 +300,13 @@ final class SelfTest {
 			sl.setBlock(p, Blocks.AIR.defaultBlockState(), Block.UPDATE_ALL);
 		}
 		sl.setBlock(base, Blocks.AIR.defaultBlockState(), Block.UPDATE_ALL);
+	}
+
+	private static Storage.Linked linkedOf(List<Container> cs, int... modes) {
+		Storage.Linked l = new Storage.Linked();
+		l.containers.addAll(cs);
+		for (int m : modes) l.modes.add(m);
+		return l;
 	}
 
 	private static int count(Container c, net.minecraft.world.item.Item item) {

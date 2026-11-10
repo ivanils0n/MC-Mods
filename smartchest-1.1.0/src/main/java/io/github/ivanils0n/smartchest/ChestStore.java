@@ -21,10 +21,13 @@ import net.minecraft.core.Direction;
  * Minecraft: se o arquivo der problema, o mapa não é afetado.
  */
 final class ChestStore {
+	static final int ANY = 0, INPUT = 8;
+
 	static final class Chest {
 		String dim;
 		int x, y, z;
 		String facing = "north";
+		/** x, y, z e o modo do baú ligado: 0 = qualquer item, 1-7 = só essa categoria (Categories), 8 = só retirar. */
 		List<int[]> links = new ArrayList<>();
 
 		Chest() {}
@@ -56,7 +59,23 @@ final class ChestStore {
 		}
 
 		void link(BlockPos p) {
-			if (!isLinked(p)) links.add(new int[] {p.getX(), p.getY(), p.getZ()});
+			link(p, ANY);
+		}
+
+		/** Liga com o modo, ou só troca o modo se já está ligado. */
+		void link(BlockPos p, int mode) {
+			for (int[] l : links) {
+				if (l[0] == p.getX() && l[1] == p.getY() && l[2] == p.getZ()) {
+					l[3] = mode;
+					return;
+				}
+			}
+			links.add(new int[] {p.getX(), p.getY(), p.getZ(), mode});
+		}
+
+		int mode(BlockPos p) {
+			for (int[] l : links) if (l[0] == p.getX() && l[1] == p.getY() && l[2] == p.getZ()) return l[3];
+			return ANY;
 		}
 
 		boolean unlink(BlockPos p) {
@@ -126,7 +145,13 @@ final class ChestStore {
 				for (Chest c : list) {
 					if (c == null || c.dim == null) continue;
 					List<int[]> ok = new ArrayList<>();
-					if (c.links != null) for (int[] l : c.links) if (l != null && l.length == 3) ok.add(l);
+					if (c.links != null) {
+						for (int[] l : c.links) {
+							if (l == null || l.length < 3) continue;
+							int mode = l.length > 3 && l[3] >= ANY && l[3] <= INPUT ? l[3] : ANY; // arquivo antigo: sem modo
+							ok.add(new int[] {l[0], l[1], l[2], mode});
+						}
+					}
 					c.links = ok;
 					c.facing = c.facing().getName();
 					store.byKey.put(c.key(), c);

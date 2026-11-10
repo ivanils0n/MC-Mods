@@ -378,7 +378,7 @@ final class SearchMenu extends AnvilMenu {
 				taken.shrink(fit);
 			}
 			if (!taken.isEmpty()) inv.add(taken);
-			if (!taken.isEmpty()) Storage.insert(linked.containers, taken); // não coube (raro): volta para o baú
+			if (!taken.isEmpty()) Storage.insert(linked.targets(taken), taken); // não coube (raro): volta para o baú
 			if (!taken.isEmpty()) sp.drop(taken, false); // nem no baú: cai aos pés do jogador, nunca some
 			if (count > 0) got.add(new Picked(p.proto, count));
 		}
