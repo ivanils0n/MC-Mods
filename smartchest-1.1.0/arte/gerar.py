@@ -478,7 +478,8 @@ KEY = [  # Vinculador em 3D (chave em pé, como um desenho de 1 px de espessura 
 
 
 def key_model():
-    """As rotações são as do item/handheld com -45 graus a mais em z: lá o desenho é na diagonal, aqui a chave é reta."""
+    """As rotações são as do item/handheld com -45 graus a mais em z: lá o desenho é na diagonal, aqui a chave é reta.
+    Na mão ela gira mais meia-volta: o personagem segura pelo aro, com os dentes para fora."""
     faces = lambda t: {k: {"texture": "#" + t} for k in ("north", "south", "east", "west", "up", "down")}
     return {
         "gui_light": "front",
@@ -489,10 +490,10 @@ def key_model():
             "gui": {"rotation": [0, 25, -45]},
             "ground": {"translation": [0, 2, 0], "scale": [0.5, 0.5, 0.5]},
             "fixed": {"rotation": [0, 180, -45]},
-            "thirdperson_righthand": {"rotation": [0, -90, 10], "translation": [0, 4, 0.5], "scale": [0.85, 0.85, 0.85]},
-            "thirdperson_lefthand": {"rotation": [0, 90, -10], "translation": [0, 4, 0.5], "scale": [0.85, 0.85, 0.85]},
-            "firstperson_righthand": {"rotation": [0, -90, -20], "translation": [1.13, 3.2, 1.13], "scale": [0.68, 0.68, 0.68]},
-            "firstperson_lefthand": {"rotation": [0, 90, 20], "translation": [1.13, 3.2, 1.13], "scale": [0.68, 0.68, 0.68]},
+            "thirdperson_righthand": {"rotation": [0, -90, -170], "translation": [0, 4, 0.5], "scale": [0.85, 0.85, 0.85]},
+            "thirdperson_lefthand": {"rotation": [0, 90, 170], "translation": [0, 4, 0.5], "scale": [0.85, 0.85, 0.85]},
+            "firstperson_righthand": {"rotation": [0, -90, 160], "translation": [1.13, 3.2, 1.13], "scale": [0.68, 0.68, 0.68]},
+            "firstperson_lefthand": {"rotation": [0, 90, -160], "translation": [1.13, 3.2, 1.13], "scale": [0.68, 0.68, 0.68]},
         },
     }
 
