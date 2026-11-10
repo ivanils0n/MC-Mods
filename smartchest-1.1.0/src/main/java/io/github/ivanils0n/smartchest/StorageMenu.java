@@ -38,7 +38,7 @@ import net.minecraft.world.item.component.ItemLore;
 import net.minecraft.world.phys.Vec3;
 
 /**
- * Tela do Baú Inteligente (baú duplo vanilla): 1ª fileira com as abas [filtro pelo item][8 categorias], 4 fileiras
+ * Tela do Baú Central (baú duplo vanilla): 1ª fileira com as abas [filtro pelo item][8 categorias], 4 fileiras
  * com os itens de todos os baús ligados, somados por tipo, e a última com os botões [◀ página ▶] [pesquisar
  * ordenar] [guardar vínculos]. Os espaços de cima são só vitrine (nunca guardam item): cada clique é tratado aqui e
  * mexe direto nos baús ligados.
@@ -129,7 +129,7 @@ final class StorageMenu extends ChestMenu {
 	void refresh() {
 		Linked linked = linked();
 		unloaded = linked.unloaded;
-		List<Entry> all = Storage.scan(linked.containers);
+		List<Entry> all = Storage.scan(linked);
 		String q = Lang.normalize(query.trim());
 		List<Entry> list = new ArrayList<>();
 		int cat = category();
@@ -194,7 +194,11 @@ final class StorageMenu extends ChestMenu {
 
 	/** Nome do item no idioma do jogador. */
 	String name(Entry e) {
-		return names.computeIfAbsent(new Key(e.proto), k -> Lang.resolve(e.proto.getHoverName(), tr));
+		return name(e.proto);
+	}
+
+	String name(ItemStack proto) {
+		return names.computeIfAbsent(new Key(proto), k -> Lang.resolve(proto.getHoverName(), tr));
 	}
 
 	private static String id(Entry e) {
@@ -219,6 +223,7 @@ final class StorageMenu extends ChestMenu {
 		if (old != null) lore.addAll(old.lines().subList(0, Math.min(old.lines().size(), 200)));
 		lore.add(SmartChest.plain("Total: " + NUM.format(e.total), ChatFormatting.GRAY));
 		lore.add(SmartChest.plain("Em " + SmartChest.count(e.chests, "baú", "baús"), ChatFormatting.GRAY));
+		lore.add(SmartChest.plain("Categoria: " + Categories.NAMES[Categories.of(e.proto)], ChatFormatting.DARK_GRAY));
 		s.set(DataComponents.LORE, new ItemLore(lore));
 		return s;
 	}
@@ -351,7 +356,7 @@ final class StorageMenu extends ChestMenu {
 	private void left(ServerPlayer sp, ItemStack proto) {
 		long n = 0;
 		for (Entry x : view) if (ItemStack.isSameItemSameComponents(x.proto, proto)) n = x.total;
-		sp.sendSystemMessage(SmartChest.plain(Lang.resolve(proto.getHoverName(), tr) + ": " + NUM.format(n) + " no baú", ChatFormatting.GRAY), true);
+		sp.sendSystemMessage(SmartChest.plain(name(proto) + ": " + NUM.format(n) + " no baú", ChatFormatting.GRAY), true);
 	}
 
 	private void clickButton(ServerPlayer sp, int slot, int button) {

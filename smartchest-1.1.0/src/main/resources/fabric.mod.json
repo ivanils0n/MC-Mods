@@ -2,7 +2,7 @@
 	"schemaVersion": 1,
 	"id": "smartchest",
 	"version": "${version}",
-	"name": "Baú Inteligente",
+	"name": "Baú Central",
 	"description": "Um baú que reúne os itens dos baús e barris vinculados a ele, com pesquisa no idioma do jogo. Só no servidor: os jogadores não precisam instalar nada.",
 	"authors": ["ivanils0n"],
 	"contact": {

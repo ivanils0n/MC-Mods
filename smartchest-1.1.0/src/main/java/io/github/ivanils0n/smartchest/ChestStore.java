@@ -17,7 +17,7 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 
 /**
- * Baús Inteligentes do mundo e os baús ligados a cada um, salvos em <mundo>/smartchest.json, fora do save do
+ * Baús Centrais do mundo e os baús ligados a cada um, salvos em <mundo>/smartchest.json, fora do save do
  * Minecraft: se o arquivo der problema, o mapa não é afetado.
  */
 final class ChestStore {
@@ -112,7 +112,7 @@ final class ChestStore {
 		save();
 	}
 
-	/** Um baú vinculado foi quebrado: some de todos os Baús Inteligentes da dimensão. */
+	/** Um baú vinculado foi quebrado: some de todos os Baús Centrais da dimensão. */
 	void unlinkEverywhere(String dim, BlockPos pos) {
 		for (Chest c : byKey.values()) if (c.dim.equals(dim) && c.unlink(pos)) dirty = true;
 	}

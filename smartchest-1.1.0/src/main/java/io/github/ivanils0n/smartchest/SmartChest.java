@@ -10,6 +10,7 @@ import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
@@ -23,6 +24,7 @@ import net.fabricmc.fabric.api.event.lifecycle.v1.ServerLifecycleEvents;
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerTickEvents;
 import net.fabricmc.fabric.api.event.player.PlayerBlockBreakEvents;
 import net.fabricmc.fabric.api.event.player.UseBlockCallback;
+import net.fabricmc.fabric.api.event.player.UseItemCallback;
 import net.fabricmc.fabric.api.networking.v1.ServerPlayConnectionEvents;
 import net.minecraft.ChatFormatting;
 import net.minecraft.commands.CommandSourceStack;
@@ -66,16 +68,16 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * Baú Inteligente, 100% no servidor: o baú é um bloco de obsidiana de verdade com um item_display por cima (com o
+ * Baú Central, 100% no servidor: o baú é um bloco de obsidiana de verdade com um item_display por cima (com o
  * resource pack ele vira o baú "Obsidiana do End"); o Vinculador é uma vara de blaze marcada. Nenhum bloco ou item
  * novo é registrado, então o cliente vanilla entra sem mod e o mundo continua abrindo se o mod for removido.
  *
- * Os itens nunca ficam no Baú Inteligente: a tela mostra a soma dos baús e barris ligados e pegar/guardar mexe neles.
+ * Os itens nunca ficam no Baú Central: a tela mostra a soma dos baús e barris ligados e pegar/guardar mexe neles.
  */
 public final class SmartChest implements ModInitializer {
 	static final Logger LOG = LoggerFactory.getLogger("smartchest");
-	static final String NAME = "Baú Inteligente";
-	static final int MAX_LINKS = 64; // baús ligados por Baú Inteligente (cada metade de baú duplo conta 1)
+	static final String NAME = "Baú Central";
+	static final int MAX_LINKS = 512; // baús ligados por Baú Central (cada metade de baú duplo conta 1)
 	static final double USE_RANGE_SQR = 8 * 8; // a tela fecha se o jogador se afastar mais que isso
 	private static final double ACTIVE_RANGE_SQR = 48 * 48; // sem jogador a essa distância o visual não é conferido
 	static final String CHEST_TAG = "smartchest_chest", LINKER_TAG = "smartchest_linker";
@@ -97,6 +99,8 @@ public final class SmartChest implements ModInitializer {
 	/** Tag desta execução: o visual nunca é salvo (mixin/EntityMixin); um "smartchest" sem ela é sobra antiga. */
 	private static final String RUN_TAG = "smartchest_run_" + Long.toHexString(new java.util.Random().nextLong());
 	private static final List<Entity> LEFTOVERS = new ArrayList<>();
+	/** Baús com a tampa aberta agora (alguém está com a tela ou a pesquisa deles aberta). */
+	private static Set<Chest> open = new HashSet<>();
 	static MinecraftServer server;
 	static ChestStore store;
 
@@ -107,7 +111,7 @@ public final class SmartChest implements ModInitializer {
 			store = ChestStore.load(s.getWorldPath(LevelResource.ROOT).resolve("smartchest.json"));
 			Lang.init(s, s.getWorldPath(LevelResource.ROOT));
 			Categories.build(s);
-			LOG.info("{} baús inteligentes carregados", store.size());
+			LOG.info("{} baús centrais carregados", store.size());
 			if (Boolean.getBoolean("smartchest.selftest")) SelfTest.run(s);
 		});
 		ServerLifecycleEvents.SERVER_STOPPING.register(s -> {
@@ -121,6 +125,7 @@ public final class SmartChest implements ModInitializer {
 			FILTER.clear();
 			Categories.clear();
 			VIS.clear();
+			open.clear();
 			LEFTOVERS.clear();
 			PACK_OK.clear();
 			Lang.clear();
@@ -132,14 +137,27 @@ public final class SmartChest implements ModInitializer {
 			for (Entity e : LEFTOVERS) if (!e.isRemoved()) e.discard();
 			LEFTOVERS.clear();
 			if (store != null && s.getTickCount() % 20 == 0) store.saveIfDirty();
+			if (store != null) updateLids(s);
 		});
 		ServerPlayConnectionEvents.JOIN.register((handler, sender, s) -> {
 			if (PACK_SHA1 == null || !s.isDedicatedServer()) return; // singleplayer: as texturas vêm do .jar
 			sender.sendPacket(new ClientboundResourcePackPushPacket(PACK_ID, PACK_URL + PACK_SHA1 + ".zip", PACK_SHA1, false,
-				Optional.of(Component.literal("Texturas do Baú Inteligente"))));
+				Optional.of(Component.literal("Texturas do Baú Central"))));
 		});
-		ServerPlayConnectionEvents.DISCONNECT.register((handler, s) -> PACK_OK.remove(handler.player.getUUID()));
+		ServerPlayConnectionEvents.DISCONNECT.register((handler, s) -> {
+			UUID id = handler.player.getUUID();
+			PACK_OK.remove(id);
+			CATEGORY.remove(id);
+			FILTER.remove(id);
+		});
 		UseBlockCallback.EVENT.register(SmartChest::onUseBlock);
+		// O cliente não sabe que a obsidiana é um baú: junto com o clique ele também manda "usar o item da mão" (comer,
+		// levantar o escudo, jogar a pérola). Com a tela do baú aberta isso é recusado e o inventário é reenviado.
+		UseItemCallback.EVENT.register((player, level, hand) -> {
+			if (!(player instanceof ServerPlayer sp) || !(sp.containerMenu instanceof StorageMenu)) return InteractionResult.PASS;
+			sp.containerMenu.sendAllDataToRemote();
+			return InteractionResult.FAIL;
+		});
 		PlayerBlockBreakEvents.BEFORE.register(SmartChest::onBreak);
 		PlayerBlockBreakEvents.AFTER.register((level, player, pos, state, be) -> {
 			// Baú ligado quebrado por um jogador: sai da lista na hora (outros meios são limpos ao abrir a tela).
@@ -164,7 +182,11 @@ public final class SmartChest implements ModInitializer {
 			return InteractionResult.SUCCESS;
 		}
 		if (chest != null) {
-			if (sp.isSecondaryUseActive() && !held.isEmpty()) return InteractionResult.PASS; // agachado: coloca blocos encostados
+			if (sp.isSecondaryUseActive() && !held.isEmpty()) { // agachado: coloca blocos encostados
+				if (!isChestItem(held)) return InteractionResult.PASS;
+				place(sp, sl, hit, hand, held); // outro Baú Central: pelo caminho vanilla viraria obsidiana comum
+				return InteractionResult.SUCCESS;
+			}
 			if (hand == InteractionHand.MAIN_HAND) {
 				CATEGORY.remove(sp.getUUID());
 				FILTER.remove(sp.getUUID());
@@ -195,9 +217,9 @@ public final class SmartChest implements ModInitializer {
 		if (survival) player.getMainHandItem().hurtAndBreak(1, player, EquipmentSlot.MAINHAND);
 		if (drop) Block.popResource(sl, pos, chestItem());
 		if (drop || !survival) {
-			say(player, "Baú Inteligente removido. Os vínculos foram apagados: ao colocá-lo de novo, vincule os baús outra vez.", ChatFormatting.YELLOW);
+			say(player, "Baú Central removido. Os vínculos foram apagados: ao colocá-lo de novo, vincule os baús outra vez.", ChatFormatting.YELLOW);
 		} else {
-			say(player, "O Baú Inteligente se perdeu: como a obsidiana, ele só volta quebrado com picareta de diamante ou netherite.", ChatFormatting.RED);
+			say(player, "O Baú Central se perdeu: como a obsidiana, ele só volta quebrado com picareta de diamante ou netherite.", ChatFormatting.RED);
 		}
 		return false; // a quebra vanilla soltaria uma obsidiana comum
 	}
@@ -211,7 +233,7 @@ public final class SmartChest implements ModInitializer {
 			if (!sl.isLoaded(pos)) continue;
 			if (!sl.getBlockState(pos).is(Blocks.OBSIDIAN)) {
 				// Sumiu por outro meio (comando, editor de mundo): remove sem dropar nada.
-				LOG.info("Baú Inteligente em {} não existe mais; removido", pos);
+				LOG.info("Baú Central em {} não existe mais; removido", pos);
 				removeChest(sl, c);
 				continue;
 			}
@@ -225,7 +247,9 @@ public final class SmartChest implements ModInitializer {
 			Chest c = target(held);
 			if (c == null || !c.dim.equals(dim) || p.distanceToSqr(Vec3.atCenterOf(c.pos())) > ACTIVE_RANGE_SQR) continue;
 			particles(sl, p, c.pos(), ParticleTypes.PORTAL, 6);
-			for (BlockPos l : c.linkPositions()) particles(sl, p, l, ParticleTypes.END_ROD, 2);
+			for (BlockPos l : c.linkPositions()) {
+				if (p.distanceToSqr(Vec3.atCenterOf(l)) < ACTIVE_RANGE_SQR) particles(sl, p, l, ParticleTypes.END_ROD, 2);
+			}
 		}
 	}
 
@@ -246,11 +270,11 @@ public final class SmartChest implements ModInitializer {
 		if (!sp.mayUseItemAt(pos, hit.getDirection(), stack) || !sl.mayInteract(sp, pos)) return;
 		if (!sl.getBlockState(pos).canBeReplaced() || !sl.isUnobstructed(Blocks.OBSIDIAN.defaultBlockState(), pos, CollisionContext.empty())) return;
 		if (placeChest(sl, pos, sp.getDirection().getOpposite()) == null) {
-			say(sp, "Não foi possível colocar o Baú Inteligente aqui.", ChatFormatting.RED);
+			say(sp, "Não foi possível colocar o Baú Central aqui.", ChatFormatting.RED);
 			return;
 		}
 		if (!sp.isCreative()) stack.shrink(1);
-		say(sp, "Baú Inteligente colocado! Clique nele com um Vinculador e depois nos baús ou barris que quer ligar.", ChatFormatting.LIGHT_PURPLE);
+		say(sp, "Baú Central colocado! Clique nele com um Vinculador e depois nos baús ou barris que quer ligar.", ChatFormatting.LIGHT_PURPLE);
 	}
 
 	/** Coloca a obsidiana e o visual e registra o baú (sem vínculos). Devolve null se o bloco não puder ser colocado. */
@@ -285,7 +309,7 @@ public final class SmartChest implements ModInitializer {
 		linker.set(DataComponents.CUSTOM_DATA, CustomData.of(tag));
 		upgrade(linker);
 		linker.set(DataComponents.LORE, new ItemLore(List.of(
-			plain("Ligado ao Baú Inteligente em " + c.x + ", " + c.y + ", " + c.z, ChatFormatting.GRAY),
+			plain("Ligado ao Baú Central em " + c.x + ", " + c.y + ", " + c.z, ChatFormatting.GRAY),
 			plain("Clique em baús ou barris para ligar ou desligar.", ChatFormatting.DARK_GRAY))));
 		sl.playSound(null, c.pos(), SoundEvents.LODESTONE_COMPASS_LOCK, SoundSource.PLAYERS, 1f, 1f);
 		particles(sl, sp, c.pos(), ParticleTypes.PORTAL, 30);
@@ -294,7 +318,7 @@ public final class SmartChest implements ModInitializer {
 			+ count(viewDistance(sp), "chunk", "chunks") + " daqui (sua distância de visão).", ChatFormatting.AQUA);
 	}
 
-	/** Baú Inteligente que o Vinculador está mapeando, ou null. */
+	/** Baú Central que o Vinculador está mapeando, ou null. */
 	static Chest target(ItemStack linker) {
 		CustomData data = linker.get(DataComponents.CUSTOM_DATA);
 		if (data == null || store == null) return null;
@@ -313,8 +337,8 @@ public final class SmartChest implements ModInitializer {
 		boolean bound = data != null && data.copyTag().contains("pos");
 		Chest c = target(linker);
 		if (c == null) {
-			return plain(bound ? "O Baú Inteligente deste Vinculador não existe mais. Clique num Baú Inteligente para mapear outro."
-				: "Primeiro clique num Baú Inteligente com o Vinculador.", ChatFormatting.RED);
+			return plain(bound ? "O Baú Central deste Vinculador não existe mais. Clique num Baú Central para mapear outro."
+				: "Primeiro clique num Baú Central com o Vinculador.", ChatFormatting.RED);
 		}
 		String err = linkProblem(c, sl, pos);
 		if (err != null) return plain(err, ChatFormatting.RED);
@@ -333,7 +357,7 @@ public final class SmartChest implements ModInitializer {
 		int adding = 0;
 		for (BlockPos p : group) if (!c.isLinked(p)) adding++;
 		if (c.links.size() + adding > MAX_LINKS) {
-			return plain("Limite de " + MAX_LINKS + " baús por Baú Inteligente atingido.", ChatFormatting.RED);
+			return plain("Limite de " + MAX_LINKS + " baús por Baú Central atingido.", ChatFormatting.RED);
 		}
 		for (BlockPos p : group) c.link(p);
 		store.markDirty();
@@ -344,19 +368,19 @@ public final class SmartChest implements ModInitializer {
 
 	/** Motivo para não ligar este bloco ao baú, ou null se pode. */
 	static String linkProblem(Chest c, ServerLevel sl, BlockPos pos) {
-		if (!c.dim.equals(dim(sl))) return "Só dá para ligar baús que estão na mesma dimensão do Baú Inteligente.";
+		if (!c.dim.equals(dim(sl))) return "Só dá para ligar baús que estão na mesma dimensão do Baú Central.";
 		if (!Storage.isLinkable(sl.getBlockEntity(pos))) return "Só baús e barris podem ser ligados.";
 		return null;
 	}
 
 	/**
 	 * Sem limite de blocos: o baú só precisa estar na área que a distância de visão carrega em volta do Baú
-	 * Inteligente (o mod nunca carrega chunks). Devolve o aviso, ou null se está dentro.
+	 * Central (o mod nunca carrega chunks). Devolve o aviso, ou null se está dentro.
 	 */
 	static String rangeProblem(Chest c, BlockPos pos, int viewDistance) {
 		int chunks = Math.max(Math.abs((pos.getX() >> 4) - (c.x >> 4)), Math.abs((pos.getZ() >> 4) - (c.z >> 4)));
 		if (chunks <= viewDistance) return null;
-		return "Baú muito longe: ele fica a " + chunks + " chunks do Baú Inteligente, e a distância de visão alcança só "
+		return "Baú muito longe: ele fica a " + chunks + " chunks do Baú Central, e a distância de visão alcança só "
 			+ viewDistance + ". Aumente a distância de visão ou ligue um baú mais perto.";
 	}
 
@@ -370,8 +394,8 @@ public final class SmartChest implements ModInitializer {
 	private static void ensureVisual(ServerLevel sl, Chest c) {
 		Entity e = VIS.get(c.key());
 		if (e != null && !e.isRemoved()) return;
-		List<Entity> found = sl.getEntitiesOfClass(Entity.class, new AABB(c.pos()).inflate(0, 1, 0), x -> x.entityTags().contains(tag(c.pos())));
-		if (!found.isEmpty()) {
+		List<Entity> found = visuals(sl, c.pos());
+		if (found.size() == 2) { // corpo e tampa
 			VIS.put(c.key(), found.get(0));
 			return;
 		}
@@ -379,24 +403,80 @@ public final class SmartChest implements ModInitializer {
 	}
 
 	/**
-	 * Cubo do baú um pouco maior que a obsidiana, virado para quem o colocou. Fica um bloco acima (e desce meio bloco
-	 * no modelo) porque a luz da entidade é a do bloco onde ela está: dentro da obsidiana ficaria preto.
+	 * Duas peças um pouco maiores que a obsidiana, viradas para quem colocou o baú: o corpo e a tampa (que gira ao
+	 * abrir). Ficam um bloco acima (e descem no modelo) porque a luz da entidade é a do bloco onde ela está: dentro
+	 * da obsidiana ficariam pretas.
 	 */
 	static void spawnVisual(ServerLevel sl, Chest c) {
 		killVisual(sl, c.pos());
+		open.remove(c); // nasce fechado; se alguém está com a tela aberta, updateLids abre de novo
 		BlockPos pos = c.pos();
-		double half = Math.toRadians(switch (c.facing()) {
+		for (String part : List.of("chest_base", "chest_lid")) {
+			String nbt = "Tags:[\"smartchest\",\"" + tag(pos) + "\",\"smartchest_" + part + "\",\"" + RUN_TAG + "\"],item:{id:\"minecraft:obsidian\","
+				+ "count:1,components:{\"minecraft:item_model\":\"smartchest:" + part + "\"}},"
+				+ (part.equals("chest_lid") ? lidTransform(c.facing(), 0) : baseTransform(c.facing()));
+			command(sl, pos, String.format(Locale.ROOT, "summon minecraft:item_display %.4f %.4f %.4f {%s}",
+				pos.getX() + 0.5, pos.getY() + 1.0, pos.getZ() + 0.5, nbt));
+		}
+	}
+
+	/** Giro (quaternion x, y, z, w) que vira a frente do modelo para o lado do baú. */
+	private static double[] yaw(Direction facing) {
+		double half = Math.toRadians(switch (facing) {
 			case SOUTH -> 180;
 			case EAST -> -90;
 			case WEST -> 90;
 			default -> 0;
 		}) / 2;
-		String nbt = "Tags:[\"smartchest\",\"" + tag(pos) + "\",\"" + RUN_TAG + "\"],item:{id:\"minecraft:obsidian\",count:1,components:"
-			+ "{\"minecraft:item_model\":\"smartchest:chest\"}},"
-			+ String.format(Locale.ROOT, "transformation:{left_rotation:[0f,%.5ff,0f,%.5ff],right_rotation:[0f,0f,0f,1f],"
-				+ "translation:[0f,-0.5f,0f],scale:[1.002f,1.002f,1.002f]}", Math.sin(half), Math.cos(half));
-		command(sl, pos, String.format(Locale.ROOT, "summon minecraft:item_display %.4f %.4f %.4f {%s}",
-			pos.getX() + 0.5, pos.getY() + 1.0, pos.getZ() + 0.5, nbt));
+		return new double[] {0, Math.sin(half), 0, Math.cos(half)};
+	}
+
+	private static String baseTransform(Direction facing) {
+		double[] q = yaw(facing);
+		// O corpo tem 11/16 de altura e o modelo é centrado em 8/16: desce 0.5 como o cubo inteiro descia.
+		return String.format(Locale.ROOT, "transformation:{left_rotation:[0f,%.5ff,0f,%.5ff],right_rotation:[0f,0f,0f,1f],"
+			+ "translation:[0f,-0.5f,0f],scale:[1.002f,1.002f,1.002f]}", q[1], q[3]);
+	}
+
+	/**
+	 * Tampa: o centro do modelo é a dobradiça, que fica na aresta de trás a 11/16 da base do bloco. Aberta, a frente
+	 * da tampa sobe girando em volta da dobradiça (eixo = frente x cima).
+	 */
+	static String lidTransform(Direction facing, double degrees) {
+		double fx = facing.getStepX(), fz = facing.getStepZ(), h = Math.toRadians(degrees) / 2;
+		double[] a = {-fz * Math.sin(h), 0, fx * Math.sin(h), Math.cos(h)}, b = yaw(facing);
+		double[] q = { // a x b: primeiro vira para o lado do baú, depois abre
+			a[3] * b[0] + a[0] * b[3] + a[1] * b[2] - a[2] * b[1],
+			a[3] * b[1] - a[0] * b[2] + a[1] * b[3] + a[2] * b[0],
+			a[3] * b[2] + a[0] * b[1] - a[1] * b[0] + a[2] * b[3],
+			a[3] * b[3] - a[0] * b[0] - a[1] * b[1] - a[2] * b[2]};
+		return String.format(Locale.ROOT, "transformation:{left_rotation:[%.5ff,%.5ff,%.5ff,%.5ff],right_rotation:[0f,0f,0f,1f],"
+			+ "translation:[%.4ff,-0.3125f,%.4ff],scale:[1.002f,1.002f,1.002f]}", q[0], q[1], q[2], q[3], -fx * 0.5, -fz * 0.5);
+	}
+
+	/** Abre a tampa dos baús que alguém está usando e fecha a dos outros (com som), uma vez por mudança. */
+	private static void updateLids(MinecraftServer s) {
+		Set<Chest> now = new HashSet<>();
+		for (ServerPlayer p : s.getPlayerList().getPlayers()) {
+			Chest c = p.containerMenu instanceof StorageMenu m ? m.chest : p.containerMenu instanceof SearchMenu q ? q.chest : null;
+			if (c != null && exists(c)) now.add(c);
+		}
+		if (now.equals(open)) return;
+		for (Chest c : now) if (!open.contains(c)) lid(s, c, true);
+		for (Chest c : open) if (!now.contains(c) && exists(c)) lid(s, c, false);
+		open = now;
+	}
+
+	private static void lid(MinecraftServer s, Chest c, boolean opening) {
+		for (ServerLevel sl : s.getAllLevels()) {
+			if (!dim(sl).equals(c.dim) || !sl.isLoaded(c.pos())) continue;
+			for (Entity e : visuals(sl, c.pos())) {
+				if (!e.entityTags().contains("smartchest_chest_lid")) continue;
+				command(sl, c.pos(), "data merge entity " + e.getStringUUID() + " {start_interpolation:0,interpolation_duration:6,"
+					+ lidTransform(c.facing(), opening ? 75 : 0) + "}");
+			}
+			sl.playSound(null, c.pos(), opening ? SoundEvents.ENDER_CHEST_OPEN : SoundEvents.ENDER_CHEST_CLOSE, SoundSource.BLOCKS, 0.5f, 1.1f);
+		}
 	}
 
 	private static void killVisual(ServerLevel sl, BlockPos pos) {
@@ -419,7 +499,7 @@ public final class SmartChest implements ModInitializer {
 		CommandSourceStack source = server.createCommandSourceStack().withLevel(sl).withPosition(Vec3.atCenterOf(pos))
 			.withSuppressedOutput().withCallback((success, result) -> ok[0] = success);
 		server.getCommands().performPrefixedCommand(source, cmd);
-		if (!ok[0]) LOG.warn("Comando do Baú Inteligente falhou: {}", cmd);
+		if (!ok[0]) LOG.warn("Comando do Baú Central falhou: {}", cmd);
 		return ok[0];
 	}
 
@@ -475,8 +555,12 @@ public final class SmartChest implements ModInitializer {
 		return Identifier.fromNamespaceAndPath("smartchest", name);
 	}
 
-	/** Itens feitos na 1.0.0 (sem item_model): ganham o modelo quando o jogador os segura ou usa. */
+	/** Itens antigos: ganham o modelo próprio (os da 1.0.0 não tinham) e o baú ganha o nome novo. */
 	static void upgrade(ItemStack stack) {
+		if (isChestItem(stack)) {
+			Component name = stack.get(DataComponents.CUSTOM_NAME);
+			if (name != null && name.getString().equals("Baú Inteligente")) stack.set(DataComponents.CUSTOM_NAME, plain(NAME, ChatFormatting.LIGHT_PURPLE));
+		}
 		if (stack.has(DataComponents.ITEM_MODEL) && stack.get(DataComponents.ITEM_MODEL).getNamespace().equals("smartchest")) return;
 		if (isChestItem(stack)) stack.set(DataComponents.ITEM_MODEL, model("chest"));
 		else if (isLinker(stack)) stack.set(DataComponents.ITEM_MODEL, model("linker"));
@@ -510,7 +594,7 @@ public final class SmartChest implements ModInitializer {
 
 	/**
 	 * Título da tela. Com o pack: o fundo inteiro é um caractere da fonte smartchest:gui (arte/gerar.py), com o nome
-	 * "Baú Inteligente" já desenhado; o texto do título só aparece com uma pesquisa ativa ("filtro: ..."). Sem o
+	 * "Baú Central" já desenhado; o texto do título só aparece com uma pesquisa ativa ("filtro: ..."). Sem o
 	 * pack, título comum (senão apareceriam quadradinhos de caractere desconhecido).
 	 */
 	static Component title(ServerPlayer p, String query) {

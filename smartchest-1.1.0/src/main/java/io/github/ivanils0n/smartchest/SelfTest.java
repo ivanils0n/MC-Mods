@@ -20,7 +20,7 @@ import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.storage.LevelResource;
 
 /**
- * Roda só com -Dsmartchest.selftest=true (CI): num servidor de verdade, monta um Baú Inteligente, liga um baú e um
+ * Roda só com -Dsmartchest.selftest=true (CI): num servidor de verdade, monta um Baú Central, liga um baú e um
  * barril, pega e guarda itens pela tela, testa baús cheios, outra dimensão, distância, idioma e desmonta.
  */
 final class SelfTest {
@@ -40,6 +40,10 @@ final class SelfTest {
 		ensure(server.getRecipeManager().getRecipes().stream().anyMatch(r -> r.id().toString().contains("smartchest:chest")), "receita do baú não carregou");
 		ensure(server.getRecipeManager().getRecipes().stream().anyMatch(r -> r.id().toString().contains("smartchest:linker")), "receita do vinculador não carregou");
 		ensure(SmartChest.isChestItem(SmartChest.chestItem()) && !SmartChest.isChestItem(new ItemStack(Items.OBSIDIAN)), "item do baú");
+		ItemStack oldName = SmartChest.chestItem();
+		oldName.set(net.minecraft.core.component.DataComponents.CUSTOM_NAME, Component.literal("Baú Inteligente"));
+		SmartChest.upgrade(oldName);
+		ensure(oldName.getHoverName().getString().equals("Baú Central") && SmartChest.MAX_LINKS == 512, "nome novo no item antigo");
 		ensure(SmartChest.isLinker(SmartChest.linkerItem()) && !SmartChest.isLinker(new ItemStack(Items.BLAZE_ROD)), "item do vinculador");
 		ensure(SmartChest.PACK_SHA1 != null, "hash do resource pack não está no .jar");
 		Component title = SmartChest.themedTitle("\uF000\uE000\uF001\uF002", "filtro: diam");
@@ -69,9 +73,10 @@ final class SelfTest {
 		Chest sc = SmartChest.placeChest(sl, base, Direction.SOUTH);
 		ensure(sc != null && sl.getBlockState(base).is(Blocks.OBSIDIAN), "baú não foi colocado");
 		List<Entity> vis = SmartChest.visuals(sl, base);
-		ensure(vis.size() == 1 && !vis.get(0).shouldBeSaved(), "visual: " + vis.size());
+		ensure(vis.size() == 2 && !vis.get(0).shouldBeSaved() && !vis.get(1).shouldBeSaved()
+			&& vis.stream().filter(e -> e.entityTags().contains("smartchest_chest_lid")).count() == 1, "visual (corpo e tampa): " + vis.size());
 		SmartChest.spawnVisual(sl, sc);
-		ensure(SmartChest.visuals(sl, base).size() == 1, "recriar o visual duplicou");
+		ensure(SmartChest.visuals(sl, base).size() == 2, "recriar o visual duplicou");
 
 		sl.setBlock(chestPos, Blocks.CHEST.defaultBlockState(), Block.UPDATE_ALL);
 		sl.setBlock(barrelPos, Blocks.BARREL.defaultBlockState(), Block.UPDATE_ALL);
@@ -84,7 +89,7 @@ final class SelfTest {
 		// Regras de vínculo.
 		ensure(SmartChest.linkProblem(sc, sl, chestPos) == null, "baú perto não pode ser ligado");
 		ensure(SmartChest.linkProblem(sc, sl, base.west()) != null, "ar foi aceito como baú");
-		// Sem limite de blocos: vale a distância de visão (baú a 40 blocos = 2 chunks do Baú Inteligente).
+		// Sem limite de blocos: vale a distância de visão (baú a 40 blocos = 2 chunks do Baú Central).
 		ensure(SmartChest.linkProblem(sc, sl, farPos) == null, "baú a 40 blocos foi recusado");
 		ensure(SmartChest.rangeProblem(sc, farPos, 2) == null, "baú dentro da distância de visão foi recusado");
 		ensure(SmartChest.rangeProblem(sc, farPos, 1) != null, "baú fora da distância de visão foi aceito");
@@ -103,7 +108,7 @@ final class SelfTest {
 			"ordem/total por quantidade");
 		ensure(menu.getSlot(StorageMenu.GRID_START + 1).getItem().is(Items.DIAMOND) && menu.getSlot(StorageMenu.GRID_START + 1).getItem().getCount() == 15, "vitrine do diamante");
 		ensure(menu.getSlot(StorageMenu.GRID_START + 1).getItem().get(net.minecraft.core.component.DataComponents.LORE).lines().stream()
-			.map(Component::getString).toList().containsAll(List.of("Total: 15", "Em 2 baús")), "texto do item: total e baús");
+			.map(Component::getString).toList().containsAll(List.of("Total: 15", "Em 2 baús", "Categoria: Minérios")), "texto do item: total e baús");
 		ensure(menu.unloaded() == 0, "baús carregados contados como fora: " + menu.unloaded());
 		ensure(SmartChest.viewDistance(fp) >= 2, "distância de visão do jogador: " + SmartChest.viewDistance(fp));
 		// Baú ligado numa área que não está carregada: não aparece, é contado como fora da distância de visão e
@@ -199,12 +204,37 @@ final class SelfTest {
 			if (search.slots.get(i).y == 142 && search.slots.get(i).x == 8) firstBasket = i;
 		}
 		ensure(search.getSlot(firstResult).getItem().is(Items.DIAMOND) && search.getSlot(firstBasket).getItem().isEmpty(), "vitrine da pesquisa");
-		search.clicked(firstResult, 0, ContainerInput.PICKUP, fp); // separa os diamantes
-		ensure(search.getSlot(firstBasket).getItem().is(Items.DIAMOND) && count(List.of(chest, barrel), Items.DIAMOND) == 15
-			&& fp.getInventory().getItem(0).is(Items.DIRT) && count(fp.getInventory(), Items.DIAMOND) == 0, "separar não pode mexer em nada");
+		search.clicked(firstResult, 0, ContainerInput.PICKUP, fp); // pega os diamantes na mão (de mentira)
+		ensure(search.getCarried().is(Items.DIAMOND) && search.getCarried().getCount() == 15 && count(List.of(chest, barrel), Items.DIAMOND) == 15,
+			"pegar na pesquisa não pode tirar do baú");
+		search.clicked(firstBasket, 1, ContainerInput.PICKUP, fp); // botão direito: solta 1
+		search.clicked(firstBasket, 1, ContainerInput.PICKUP, fp);
+		ensure(search.getSlot(firstBasket).getItem().getCount() == 2 && search.getCarried().getCount() == 13, "soltar 1 por vez nos separados");
+		search.clicked(firstResult, 0, ContainerInput.PICKUP, fp); // solta o resto nos resultados: volta para o baú
+		ensure(search.getCarried().isEmpty(), "devolver o que estava na mão");
+		search.clicked(firstResult, 0, ContainerInput.QUICK_MOVE, fp); // Shift+clique: o resto vai direto para a fileira
+		ensure(search.getSlot(firstBasket).getItem().is(Items.DIAMOND) && search.getSlot(firstBasket).getItem().getCount() == 15
+			&& count(List.of(chest, barrel), Items.DIAMOND) == 15 && fp.getInventory().getItem(0).is(Items.DIRT)
+			&& count(fp.getInventory(), Items.DIAMOND) == 0, "separar não pode mexer em nada");
 		search.removed(fp); // Esc: pega os separados
 		ensure(count(fp.getInventory(), Items.DIAMOND) == 15 && count(List.of(chest, barrel), Items.DIAMOND) == 0
-			&& fp.getInventory().getItem(0).getCount() == 5, "Esc não pegou os separados ou mexeu no inventário");
+			&& fp.getInventory().getItem(0).getCount() == 5 && count(fp.getInventory(), Items.ARROW) == 0
+			&& count(fp.getInventory(), Items.WRITABLE_BOOK) == 0, "Esc não pegou os separados ou mexeu no inventário");
+		// Item na mão sem soltar na fileira e seta de voltar: nada sai do baú nem entra no inventário.
+		chest.setItem(5, new ItemStack(Items.EMERALD, 7));
+		for (int back = 0; back < 2; back++) {
+			SearchMenu s2 = SearchMenu.detached(fp, sc, "emerald");
+			s2.clicked(firstResult, 0, ContainerInput.PICKUP, fp);
+			ensure(s2.getCarried().is(Items.EMERALD), "pesquisa de esmeralda");
+			if (back == 1) {
+				s2.clicked(firstBasket, 0, ContainerInput.PICKUP, fp);
+				s2.clicked(1, 0, ContainerInput.PICKUP, fp); // seta de voltar
+			}
+			s2.removed(fp);
+			ensure(count(fp.getInventory(), Items.EMERALD) == 0 && count(List.of(chest, barrel), Items.EMERALD) == 7
+				&& count(fp.getInventory(), Items.ARROW) == 0, "pesquisa deu ou perdeu item (voltar=" + back + ")");
+		}
+		chest.setItem(5, ItemStack.EMPTY);
 		for (int i = 0; i < fp.getInventory().getContainerSize(); i++) fp.getInventory().setItem(i, ItemStack.EMPTY);
 		Storage.insert(List.of(chest, barrel), new ItemStack(Items.DIAMOND, 15));
 

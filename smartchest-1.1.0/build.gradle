@@ -15,7 +15,7 @@ dependencies {
 	implementation "net.fabricmc.fabric-api:fabric-api:${fabricApi}"
 }
 
-// -Pselftest: o runServer sobe um servidor real, monta um Baú Inteligente de teste, vincula baús, pega e guarda itens e desliga (usado no CI).
+// -Pselftest: o runServer sobe um servidor real, monta um Baú Central de teste, vincula baús, pega e guarda itens e desliga (usado no CI).
 if (project.hasProperty('selftest')) {
 	loom.runs.server.vmArg('-Dsmartchest.selftest=true')
 }

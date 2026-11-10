@@ -25,7 +25,7 @@ import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.properties.BlockStateProperties;
 
 /**
- * Abas do Baú Inteligente, montadas uma vez quando o servidor liga. A base são as abas do modo criativo do próprio jogo
+ * Abas do Baú Central, montadas uma vez quando o servidor liga. A base são as abas do modo criativo do próprio jogo
  * (itens novos de cada versão já caem no lugar certo), com estes ajustes: armaduras numa aba só; plantas e sementes
  * junto da comida; madeira, blocos naturais e funcionais em Construção; Redstone só com o que liga ou recebe sinal;
  * minérios, minério bruto, lingotes, gemas e seus blocos em Minérios. O resto fica em "Ingredientes e outros".
@@ -74,7 +74,7 @@ final class Categories {
 		}
 		StringBuilder log = new StringBuilder();
 		for (int i = 1; i < KEYS.length; i++) log.append(i > 1 ? ", " : "").append(NAMES[i]).append(' ').append(count[i]);
-		SmartChest.LOG.info("Categorias do Baú Inteligente: {}", log);
+		SmartChest.LOG.info("Categorias do Baú Central: {}", log);
 	}
 
 	static void clear() {

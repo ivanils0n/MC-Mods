@@ -1,0 +1,79 @@
+{
+ "parent": "minecraft:block/block",
+ "textures": {
+  "particle": "smartchest:block/chest_side",
+  "front": "smartchest:block/chest_front",
+  "side": "smartchest:block/chest_side",
+  "top": "smartchest:block/chest_top"
+ },
+ "elements": [
+  {
+   "from": [
+    0,
+    8,
+    -8
+   ],
+   "to": [
+    16,
+    13,
+    8
+   ],
+   "faces": {
+    "north": {
+     "texture": "#front",
+     "uv": [
+      0,
+      0,
+      16,
+      5
+     ]
+    },
+    "south": {
+     "texture": "#side",
+     "uv": [
+      0,
+      0,
+      16,
+      5
+     ]
+    },
+    "east": {
+     "texture": "#side",
+     "uv": [
+      0,
+      0,
+      16,
+      5
+     ]
+    },
+    "west": {
+     "texture": "#side",
+     "uv": [
+      0,
+      0,
+      16,
+      5
+     ]
+    },
+    "up": {
+     "texture": "#top",
+     "uv": [
+      0,
+      0,
+      16,
+      16
+     ]
+    },
+    "down": {
+     "texture": "#side",
+     "uv": [
+      0,
+      0,
+      16,
+      16
+     ]
+    }
+   }
+  }
+ ]
+}

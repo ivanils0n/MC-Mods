@@ -1,4 +1,4 @@
-"""Gera texturas, modelos, fonte da tela e definições de item do Baú Inteligente.
+"""Gera texturas, modelos, fonte da tela e definições de item do Baú Central.
 
 Rode da pasta smartchest-1.1.0:  python3 arte/gerar.py
 Saída: src/main/resources/assets/... (vai no .jar e no zip do resource pack) e src/pack/pack.png.
@@ -22,7 +22,7 @@ SC = os.path.join(RES, "smartchest")
 # Modelos do mod; SmartChest.java usa os mesmos nomes no componente item_model ("smartchest:<nome>").
 # Abas (mesma ordem de Categories.KEYS no Java): cada uma tem o ícone normal e o "_on" (aba ativa, com moldura).
 TABS = ["todos", "construcao", "armaduras", "minerios", "redstone", "ferramentas", "comida", "ingredientes"]
-MODELS = ["chest", "linker", "btn_prev", "btn_next", "btn_search", "btn_sort", "btn_info", "btn_deposit", "btn_links",
+MODELS = ["chest", "chest_base", "chest_lid", "linker", "btn_prev", "btn_next", "btn_search", "btn_sort", "btn_info", "btn_deposit", "btn_links",
           "btn_confirm", "btn_more", "tab_filter"] + [f"tab_{k}{on}" for k in TABS for on in ("", "_on")]
 
 
@@ -270,6 +270,8 @@ T = dict(panel=["#1a1526", "#1d1729", "#18131f"], hi="#3d2e60", lo="#09070e", ed
 
 # Letras no estilo da fonte padrão do Minecraft (5 px de largura, 7 de altura + descendente) para o título fixo.
 GLYPHS = {
+    "C": [".###.", "#...#", "#....", "#....", "#....", "#...#", ".###."],
+    "r": [".....", ".....", "#.##.", "##..#", "#....", "#....", "#...."],
     "B": ["####.", "#...#", "#...#", "####.", "#...#", "#...#", "####."],
     "I": ["###", ".#.", ".#.", ".#.", ".#.", ".#.", "###"],
     "a": [".....", ".....", ".###.", "....#", ".####", "#...#", ".####"],
@@ -328,10 +330,10 @@ def gui(icons):
     for p in [(0, 0), (175, 0), (0, 221), (175, 221)]:
         img.putpixel(p, (0, 0, 0, 0))
 
-    # cabeçalho: olho + "Baú Inteligente" (fixo); o texto do título da tela (o filtro da pesquisa) vai em x=100
+    # cabeçalho: olho + "Baú Central" (fixo); o texto do título da tela (o filtro da pesquisa) vai em x=100
     rect(img, 8, 6, 13, 9, "#2fa37a"); rect(img, 9, 5, 12, 10, "#2fa37a")
     px(img, [(9, 6)], "#a6f5d0"); rect(img, 11, 6, 11, 9, "#0a2a20")
-    end = text(img, 16, 5, "Baú Inteligente", T["title"])
+    end = text(img, 16, 5, "Baú Central", T["title"])
     assert end <= 98, end  # o título fixo não pode encostar no texto do filtro
 
     # 1ª fileira: abas (encaixe do filtro pelo item + 8 categorias) em forma de pasta; depois 4 fileiras de itens
@@ -369,7 +371,7 @@ def gui(icons):
 # ------------------------------------------------------------------ escrita
 def search_gui(icons, front):
     """
-    Tela da pesquisa (a bigorna do jogo, 176x166), tema "Céu do End". Em cima: o desenho do Baú Inteligente, a caixa
+    Tela da pesquisa (a bigorna do jogo, 176x166), tema "Céu do End". Em cima: o desenho do Baú Central, a caixa
     de texto (vazada: o jogo a desenha) e o botão de pegar (espaço de resultado). Embaixo, o inventário do jogador vira
     parte do baú: 27 resultados e a hotbar como fileira de separados. Ver SearchMenu.
     """
@@ -391,7 +393,7 @@ def search_gui(icons, front):
     for _ in range(90):  # estrelas do portal do End na parte de cima
         img.putpixel((rnd.randrange(3, 173), rnd.randrange(3, 68)),
                      hx(rnd.choice(["#2fa37a", "#5fd4b8", "#8d5fe0", "#c77dff", "#e6fff8", "#3a6fd8"])))
-    img.alpha_composite(front.resize((16, 16), Image.NEAREST), (38, 20))  # o Baú Inteligente ao lado da busca
+    img.alpha_composite(front.resize((16, 16), Image.NEAREST), (38, 20))  # o Baú Central ao lado da busca
     d.rectangle([56, 17, 171, 38], outline=hx("#5fd4b8"))
     for x in range(59, 169):  # caixa de texto vazada (o jogo desenha a caixa e o texto)
         for y in range(20, 36):
@@ -400,6 +402,7 @@ def search_gui(icons, front):
     d.rectangle([127, 40, 157, 70], fill=hx("#3e6b5a"), outline=hx("#2a4a3e"))
     rect(img, 140, 40, 144, 42, "#2fa37a")
     slot(133, 46, "#0b0816", "#5fd4b8")
+    slot(75, 46, "#0b0816", "#8d5fe0")  # botão de voltar (2º espaço da bigorna)
     # faixa dos resultados: o jogo escreve "Inventário" em cinza #404040 em (8,72); fundo da mesma cor = texto some
     d.rectangle([4, 69, 171, 81], fill=hx("#151026"))
     d.rectangle([5, 70, 64, 81], fill=hx("#404040"))
@@ -443,6 +446,23 @@ def cube_model():
     }
 
 
+def lid_models():
+    """
+    O baú no mundo são duas peças (SmartChest.spawnVisual): o corpo e a tampa. A tampa é desenhada com a dobradiça
+    (aresta de trás, embaixo) no centro do modelo, então girar a peça é girar em volta da dobradiça.
+    """
+    tex = {"particle": "smartchest:block/chest_side", "front": "smartchest:block/chest_front",
+           "side": "smartchest:block/chest_side", "top": "smartchest:block/chest_top"}
+    f = lambda t, v0, v1: {"texture": t, "uv": [0, v0, 16, v1]}
+    base = {"parent": "minecraft:block/block", "textures": tex, "elements": [{"from": [0, 0, 0], "to": [16, 11, 16], "faces": {
+        "north": f("#front", 5, 16), "south": f("#side", 5, 16), "east": f("#side", 5, 16), "west": f("#side", 5, 16),
+        "down": f("#top", 0, 16)}}]}
+    lid = {"parent": "minecraft:block/block", "textures": tex, "elements": [{"from": [0, 8, -8], "to": [16, 13, 8], "faces": {
+        "north": f("#front", 0, 5), "south": f("#side", 0, 5), "east": f("#side", 0, 5), "west": f("#side", 0, 5),
+        "up": f("#top", 0, 16), "down": f("#side", 0, 16)}}]}
+    return base, lid
+
+
 def iso(front, side, top, k):
     """Miniatura isométrica (ícone do pack)."""
     c30, s30 = math.cos(math.radians(30)), math.sin(math.radians(30))
@@ -473,6 +493,8 @@ def main():
 
     models = os.path.join(SC, "models/item")
     save_json(cube_model(), os.path.join(models, "chest.json"))
+    base, lid = lid_models()
+    save_json(base, os.path.join(models, "chest_base.json")); save_json(lid, os.path.join(models, "chest_lid.json"))
     save_json({"parent": "minecraft:item/handheld", "textures": {"layer0": "smartchest:item/linker"}}, os.path.join(models, "linker.json"))
     for name in icons:
         save_json({"parent": "minecraft:item/generated", "textures": {"layer0": "smartchest:item/" + name}}, os.path.join(models, name + ".json"))

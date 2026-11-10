@@ -19,7 +19,7 @@ import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.properties.ChestType;
 
 /**
- * O "estoque" de um Baú Inteligente é só a soma dos baús ligados: nada é guardado no Baú Inteligente. Pegar e guardar
+ * O "estoque" de um Baú Central é só a soma dos baús ligados: nada é guardado no Baú Central. Pegar e guardar
  * mexem direto nos baús de verdade, então nenhum item pode duplicar ou sumir se o mod for removido.
  */
 final class Storage {
@@ -88,20 +88,25 @@ final class Storage {
 			Container c = (Container) be;
 			out.containers.add(c);
 			out.totalSlots += c.getContainerSize();
-			for (int i = 0; i < c.getContainerSize(); i++) if (!c.getItem(i).isEmpty()) out.usedSlots++;
 		}
 		if (pruned && store != null) store.markDirty();
 		return out;
 	}
 
-	/** Todos os tipos de item dos baús, com o total de cada um (ordem: como aparecem nos baús). */
-	static List<Entry> scan(List<Container> containers) {
+	/**
+	 * Todos os tipos de item dos baús, com o total de cada um (ordem: como aparecem nos baús). Na mesma passada conta
+	 * os espaços ocupados ({@code usedSlots}).
+	 */
+	static List<Entry> scan(Linked linked) {
+		List<Container> containers = linked.containers;
+		linked.usedSlots = 0;
 		Map<Key, Entry> map = new LinkedHashMap<>();
 		for (int ci = 0; ci < containers.size(); ci++) {
 			Container c = containers.get(ci);
 			for (int i = 0; i < c.getContainerSize(); i++) {
 				ItemStack s = c.getItem(i);
 				if (s.isEmpty()) continue;
+				linked.usedSlots++;
 				Entry e = map.computeIfAbsent(new Key(s), k -> new Entry(s.copyWithCount(1)));
 				e.total += s.getCount();
 				if (e.lastContainer != ci) {
