@@ -10,6 +10,13 @@
      "type": "minecraft:model",
      "model": "tpaltar:item/eye_idle"
     }
+   },
+   {
+    "when": "tpaltar_dest_off",
+    "model": {
+     "type": "minecraft:model",
+     "model": "tpaltar:item/dest_off"
+    }
    }
   ],
   "fallback": {

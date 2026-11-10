@@ -212,9 +212,49 @@ ICON_COLORS = {
 }
 
 
-def icon(scale=1):
+# Ícones dos destinos no menu do altar: olho rúnico aberto (com carga) e fechado (sem ender pearls).
+DEST_ON = [
+    ".......r........",
+    "..r.........r...",
+    "................",
+    ".....kkkkkk.....",
+    "...kkLLLLLLkk...",
+    "..kLLwwGGwwLLk..",
+    ".kLwwwGggGwwwLk.",
+    "kLwwwGgbbgGwwwLk",
+    "kLwwwGgbbgGwwwLk",
+    ".kLwwwGggGwwwLk.",
+    "..kLLwwGGwwLLk..",
+    "...kkLLLLLLkk...",
+    ".....kkkkkk.....",
+    "................",
+    "...r........r...",
+    "........r.......",
+]
+DEST_OFF = [
+    "................",
+    "................",
+    "................",
+    "................",
+    "................",
+    "................",
+    "kk............kk",
+    "kddk........kddk",
+    ".kdddkkkkkkdddk.",
+    "..kkddddddddkk..",
+    "...kkkkkkkkkk...",
+    "..k..k.kk.k..k..",
+    ".k...k....k...k.",
+    "................",
+    "................",
+    "................",
+]
+ICON_COLORS = {**ICON_COLORS, "L": "#afa9ec", "w": "#efe6ff", "d": "#5a4d78"}
+
+
+def icon(scale=1, rows=ICON):
     img = Image.new("RGBA", (16, 16), (0, 0, 0, 0))
-    for y, row in enumerate(ICON):
+    for y, row in enumerate(rows):
         assert len(row) == 16, row
         for x, ch in enumerate(row):
             if ch != ".":
@@ -629,10 +669,15 @@ def main():
     items = os.path.join(RES, "minecraft/items")
     write_json(os.path.join(items, "smooth_stone.json"), select(
         [("tpaltar_obelisk", "tpaltar:item/obelisk"), ("tpaltar_ring", "tpaltar:item/shards")], "minecraft:block/smooth_stone"))
-    write_json(os.path.join(items, "ender_pearl.json"), select([("tpaltar_eye", "tpaltar:item/eye_idle")], "minecraft:item/ender_pearl"))
+    for name, rows in (("dest_on", DEST_ON), ("dest_off", DEST_OFF)):
+        os.makedirs(os.path.join(RES, "tpaltar/textures/item"), exist_ok=True)
+        icon(rows=rows).save(os.path.join(RES, "tpaltar/textures/item", name + ".png"))
+        write_json(os.path.join(MOD, name + ".json"), {"parent": "minecraft:item/generated", "textures": {"layer0": "tpaltar:item/" + name}})
+    write_json(os.path.join(items, "ender_pearl.json"), select(
+        [("tpaltar_eye", "tpaltar:item/eye_idle"), ("tpaltar_dest_off", "tpaltar:item/dest_off")], "minecraft:item/ender_pearl"))
     # O item do altar é um olho do fim com custom_data (inclusive os craftados em versões antigas, sem a marca):
     # olho do fim comum não tem custom_data, então ele vira o obelisco em miniatura.
-    eye = select([("tpaltar_eye", "tpaltar:item/eye_active")], "minecraft:item/ender_eye")["model"]
+    eye = select([("tpaltar_eye", "tpaltar:item/eye_active"), ("tpaltar_dest_on", "tpaltar:item/dest_on")], "minecraft:item/ender_eye")["model"]
     write_json(os.path.join(items, "ender_eye.json"), {"model": {
         "type": "minecraft:condition", "property": "minecraft:has_component", "component": "minecraft:custom_data",
         "on_true": {"type": "minecraft:model", "model": "tpaltar:item/altar_item"},
@@ -640,7 +685,7 @@ def main():
     }})
 
     # Modelos próprios (item_model tpaltar:*), usados no singleplayer: nenhum outro resource pack os substitui.
-    for name in ("obelisk", "shards", "eye_idle", "eye_active", "blank"):
+    for name in ("obelisk", "shards", "eye_idle", "eye_active", "blank", "dest_on", "dest_off"):
         write_json(os.path.join(RES, "tpaltar/items", name + ".json"), {"model": {"type": "minecraft:model", "model": "tpaltar:item/" + name}})
     write_json(os.path.join(RES, "tpaltar/items/altar.json"), {"model": {"type": "minecraft:model", "model": "tpaltar:item/altar_item"}})
 
