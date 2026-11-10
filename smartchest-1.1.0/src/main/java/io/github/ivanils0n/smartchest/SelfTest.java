@@ -157,7 +157,7 @@ final class SelfTest {
 			{Items.IRON_CHESTPLATE, 2}, {Items.DIAMOND_HORSE_ARMOR, 2}, {Items.WOLF_ARMOR, 2}, {Items.TURTLE_HELMET, 2},
 			{Items.DIAMOND_PICKAXE, 5}, {Items.DIAMOND_SWORD, 5}, {Items.ELYTRA, 5}, {Items.SHIELD, 5},
 			{Items.OAK_LOG, 1}, {Items.OAK_PLANKS, 1}, {Items.OAK_DOOR, 1}, {Items.CRAFTING_TABLE, 1}, {Items.CHEST, 1},
-			{Items.FURNACE, 1}, {Items.COBBLESTONE, 1}, {Items.DIRT, 1}, {Items.WHITE_WOOL, 1}, {Items.OAK_LEAVES, 1},
+			{Items.FURNACE, 1}, {Items.COBBLESTONE, 1}, {Items.DIRT, 1}, {Items.BRICKS, 1}, {Items.OAK_LEAVES, 1},
 			{Items.IRON_ORE, 3}, {Items.RAW_IRON, 3}, {Items.IRON_INGOT, 3}, {Items.DIAMOND, 3}, {Items.IRON_BLOCK, 3}, {Items.COAL, 3},
 			{Items.PISTON, 4}, {Items.OBSERVER, 4}, {Items.DROPPER, 4}, {Items.DISPENSER, 4}, {Items.COMPARATOR, 4},
 			{Items.REDSTONE, 4}, {Items.REDSTONE_BLOCK, 4}, {Items.REDSTONE_TORCH, 4}, {Items.HOPPER, 4}, {Items.LEVER, 4},
