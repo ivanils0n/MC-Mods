@@ -15,7 +15,7 @@ Mods Fabric para Minecraft. Cada pasta `<mod>-<versão>/` é um mod independente
 Vai na pasta `mods/` do servidor, junto com o Fabric API; os jogadores entram sem instalar nada. Em singleplayer, coloque o mesmo .jar na pasta `mods/` do jogo.
 
 - **Receita** (bancada): pedra lisa ×3 em cima; pedra lisa, ender pearl, pedra lisa no meio; obsidiana ×3 embaixo. Aparece no livro de receitas quando o jogador pega uma ender pearl.
-- **Colocar**: clique no chão com o altar; abre uma tela de bigorna para digitar o nome (até 24 letras, único por dimensão). Clique na ender pearl do resultado para confirmar ou feche a tela para desistir. Custa 5 níveis de experiência, cobrados só quando o altar é colocado (criativo não paga). Precisa de 3 blocos livres de altura.
+- **Colocar**: clique no chão com o altar; abre uma tela de bigorna para digitar o nome (até 24 letras, único por dimensão). Clique na ender pearl do resultado para confirmar ou feche a tela para desistir. Precisa de 3 blocos livres de altura.
 - **Abastecer**: abra o menu do altar e coloque ender pearls nos 4 espaços da última fileira (até 64); dá para tirar de volta do mesmo jeito. Cada viagem **até** este altar gasta 2 (32 viagens). O estoque é compartilhado por todos.
 - **Viajar**: clique no altar → lista dos outros altares da mesma dimensão → clique no destino. Não há limite de altares: acima de 45 destinos a lista ganha páginas (setas nas pontas da última fileira). Sem 2 pérolas no destino, a viagem é recusada. Saída e chegada soltam partículas roxas.
 - **Em uso**: o olho gira para encarar o jogador mais próximo (até 16 blocos) e muda de cor enquanto alguém está com o menu aberto; nesse tempo ninguém mais abre o menu daquele altar.

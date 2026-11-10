@@ -15,8 +15,8 @@ import net.minecraft.world.item.Items;
 
 /**
  * Tela de bigorna usada como caixa de texto para o nome do altar (o cliente vanilla já sabe desenhá-la).
- * O jogador digita no campo e clica na ender pearl do resultado para confirmar. Nenhum item sai ou entra; o custo
- * mostrado é o de colocar o altar (TpAltar.PLACE_LEVELS), cobrado só quando ele é colocado.
+ * O jogador digita no campo e clica na ender pearl do resultado para confirmar. Nenhum item sai ou entra e não há
+ * custo de experiência (o custo mostrado fica em 0).
  */
 final class NameMenu extends AnvilMenu {
 	private static final int RESULT_SLOT = 2;
@@ -33,7 +33,7 @@ final class NameMenu extends AnvilMenu {
 		ItemStack shown = new ItemStack(Items.ENDER_PEARL);
 		shown.set(DataComponents.CUSTOM_NAME, Component.literal(""));
 		getSlot(0).set(shown);
-		setData(COST_DATA, TpAltar.PLACE_LEVELS);
+		setData(COST_DATA, 0);
 	}
 
 	static void open(ServerPlayer player, TpAltar.Pending pending, String title) {
@@ -45,8 +45,8 @@ final class NameMenu extends AnvilMenu {
 	public boolean setItemName(String name) {
 		typed = name == null ? "" : name; // o cliente manda o texto a cada letra digitada
 		boolean changed = super.setItemName(name);
-		// A bigorna recalcula o custo de renomear (1); mostra o custo do altar e reenvia, pois o cliente também recalcula.
-		setData(COST_DATA, TpAltar.PLACE_LEVELS);
+		// A bigorna recalcula o custo de renomear (1); zera e reenvia, pois o cliente também recalcula.
+		setData(COST_DATA, 0);
 		sendAllDataToRemote();
 		return changed;
 	}
