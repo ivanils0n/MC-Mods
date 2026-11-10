@@ -402,7 +402,8 @@ def search_gui(icons, front):
     d.rectangle([127, 40, 157, 70], fill=hx("#3e6b5a"), outline=hx("#2a4a3e"))
     rect(img, 140, 40, 144, 42, "#2fa37a")
     slot(133, 46, "#0b0816", "#5fd4b8")
-    slot(75, 46, "#0b0816", "#8d5fe0")  # botão de voltar (2º espaço da bigorna)
+    slot(26, 46, "#0b0816", "#8d5fe0")  # botão de voltar (1º espaço da bigorna), com contorno
+    d.rectangle([25, 45, 44, 64], outline=hx("#8d5fe0"))
     # faixa dos resultados: o jogo escreve "Inventário" em cinza #404040 em (8,72); fundo da mesma cor = texto some
     d.rectangle([4, 69, 171, 81], fill=hx("#151026"))
     d.rectangle([5, 70, 64, 81], fill=hx("#404040"))
@@ -449,18 +450,57 @@ def cube_model():
 def lid_models():
     """
     O baú no mundo são duas peças (SmartChest.spawnVisual): o corpo e a tampa. A tampa é desenhada com a dobradiça
-    (aresta de trás, embaixo) no centro do modelo, então girar a peça é girar em volta da dobradiça.
+    (aresta de trás, embaixo) no centro do modelo, então girar a peça é girar em volta da dobradiça. O item_display
+    mostra o modelo virado meia-volta: a frente do baú no mundo é a face sul do modelo, e a tampa se estende para +z.
     """
     tex = {"particle": "smartchest:block/chest_side", "front": "smartchest:block/chest_front",
            "side": "smartchest:block/chest_side", "top": "smartchest:block/chest_top"}
     f = lambda t, v0, v1: {"texture": t, "uv": [0, v0, 16, v1]}
     base = {"parent": "minecraft:block/block", "textures": tex, "elements": [{"from": [0, 0, 0], "to": [16, 11, 16], "faces": {
-        "north": f("#front", 5, 16), "south": f("#side", 5, 16), "east": f("#side", 5, 16), "west": f("#side", 5, 16),
+        "south": f("#front", 5, 16), "north": f("#side", 5, 16), "east": f("#side", 5, 16), "west": f("#side", 5, 16),
         "down": f("#top", 0, 16)}}]}
-    lid = {"parent": "minecraft:block/block", "textures": tex, "elements": [{"from": [0, 8, -8], "to": [16, 13, 8], "faces": {
-        "north": f("#front", 0, 5), "south": f("#side", 0, 5), "east": f("#side", 0, 5), "west": f("#side", 0, 5),
+    lid = {"parent": "minecraft:block/block", "textures": tex, "elements": [{"from": [0, 8, 8], "to": [16, 13, 24], "faces": {
+        "south": f("#front", 0, 5), "north": f("#side", 0, 5), "east": f("#side", 0, 5), "west": f("#side", 0, 5),
         "up": f("#top", 0, 16), "down": f("#side", 0, 16)}}]}
     return base, lid
+
+
+KEY = [  # Vinculador em 3D (chave em pé, como um desenho de 1 px de espessura que ganhou volume): caixa, textura
+    ([7, 0, 7], [9, 10, 9], "gold"), ([9, 1, 7.5], [12, 2.5, 8.5], "frame"), ([9, 4, 7.5], [11, 5.5, 8.5], "frame"),
+    ([4, 10, 7], [12, 11, 9], "frame"), ([4, 15, 7], [12, 16, 9], "frame"), ([4, 11, 7], [5, 15, 9], "frame"),
+    ([11, 11, 7], [12, 15, 9], "frame"), ([6, 11.5, 6.5], [10, 14.5, 9.5], "pearl")]
+
+
+def key_model():
+    """As rotações são as do item/handheld com -45 graus a mais em z: lá o desenho é na diagonal, aqui a chave é reta."""
+    faces = lambda t: {k: {"texture": "#" + t} for k in ("north", "south", "east", "west", "up", "down")}
+    return {
+        "gui_light": "front",
+        "textures": {"particle": "smartchest:item/linker_gold", "gold": "smartchest:item/linker_gold",
+                     "frame": "smartchest:item/linker_frame", "pearl": "smartchest:item/linker_pearl"},
+        "elements": [{"from": a, "to": b, "faces": faces(t)} for a, b, t in KEY],
+        "display": {
+            "gui": {"rotation": [0, 25, -45]},
+            "ground": {"translation": [0, 2, 0], "scale": [0.5, 0.5, 0.5]},
+            "fixed": {"rotation": [0, 180, -45]},
+            "thirdperson_righthand": {"rotation": [0, -90, 10], "translation": [0, 4, 0.5], "scale": [0.85, 0.85, 0.85]},
+            "thirdperson_lefthand": {"rotation": [0, 90, -10], "translation": [0, 4, 0.5], "scale": [0.85, 0.85, 0.85]},
+            "firstperson_righthand": {"rotation": [0, -90, -20], "translation": [1.13, 3.2, 1.13], "scale": [0.68, 0.68, 0.68]},
+            "firstperson_lefthand": {"rotation": [0, 90, 20], "translation": [1.13, 3.2, 1.13], "scale": [0.68, 0.68, 0.68]},
+        },
+    }
+
+
+def key_textures():
+    out = {}
+    for name, pal, hi, lo in (("gold", ["#ffd34e", "#f0b830", "#e07b0e", "#fff3a0"], "#fff3a0", "#b85e08"),
+                              ("frame", ["#4b2f7a", "#5a3f94", "#3a2460"], "#8d5fe0", "#14081f"),
+                              ("pearl", ["#2fa37a", "#1b8c74", "#5fd4b8"], "#a6f5d0", "#0a2a20")):
+        im = Image.new("RGBA", (16, 16), (0, 0, 0, 0))
+        noise(im, pal, 40 + len(name), (0, 0, 16, 16))
+        bevel(im, hi, lo)
+        out["linker_" + name] = im
+    return out
 
 
 def iso(front, side, top, k):
@@ -495,7 +535,9 @@ def main():
     save_json(cube_model(), os.path.join(models, "chest.json"))
     base, lid = lid_models()
     save_json(base, os.path.join(models, "chest_base.json")); save_json(lid, os.path.join(models, "chest_lid.json"))
-    save_json({"parent": "minecraft:item/handheld", "textures": {"layer0": "smartchest:item/linker"}}, os.path.join(models, "linker.json"))
+    for name, im in key_textures().items():
+        save_png(im, "item/" + name)
+    save_json(key_model(), os.path.join(models, "linker.json"))
     for name in icons:
         save_json({"parent": "minecraft:item/generated", "textures": {"layer0": "smartchest:item/" + name}}, os.path.join(models, name + ".json"))
 

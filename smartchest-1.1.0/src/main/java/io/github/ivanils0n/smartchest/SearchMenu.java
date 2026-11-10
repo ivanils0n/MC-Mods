@@ -26,13 +26,13 @@ import net.minecraft.world.phys.Vec3;
  * vira parte do baú: os 27 espaços mostram os itens dos baús ligados que batem com o texto (a cada letra) e a hotbar
  * é a fileira de "separados". O jogador pega o item com o mouse e solta na fileira, como num baú comum (botão direito
  * pega metade / solta 1; Shift+clique manda o pacote direto). O botão de pegar (espaço de resultado), Esc ou E levam
- * os separados para o inventário e voltam à tela do Baú Central; a seta (2º espaço da bigorna) volta sem levar nada.
+ * os separados para o inventário e voltam à tela do Baú Central; a seta (1º espaço da bigorna) volta sem levar nada.
  *
  * Tudo aqui é vitrine: os espaços de baixo apontam para um inventário de mentira, o item "na mão" é só um desenho e
  * nada sai dos baús enquanto se separa. Ao sair o servidor reenvia o inventário real ao jogador.
  */
 final class SearchMenu extends AnvilMenu {
-	private static final int BACK_SLOT = 1, RESULT_SLOT = 2, RESULTS = 27, BASKET = 9;
+	private static final int BACK_SLOT = 0, RESULT_SLOT = 2, RESULTS = 27, BASKET = 9;
 	private static final int COST_DATA = 0; // único DataSlot da bigorna: o custo em níveis (0 = não mostra)
 
 	/** Um espaço da fileira de separados: o tipo e quantos. */
@@ -79,11 +79,11 @@ final class SearchMenu extends AnvilMenu {
 			slot.index = i;
 			slots.set(i, slot);
 		}
-		ItemStack field = new ItemStack(Items.WRITABLE_BOOK); // sem item aqui o jogo não deixa digitar
-		field.set(DataComponents.CUSTOM_NAME, Component.literal(query)); // a caixa de texto começa com a pesquisa atual
-		if (SmartChest.hasPack(player)) field.set(DataComponents.ITEM_MODEL, SmartChest.model("blank")); // invisível
-		getSlot(0).set(field);
-		getSlot(BACK_SLOT).set(icon(Items.ARROW, "btn_prev", "Voltar ao Baú Central", "Volta sem a pesquisa e sem os separados."));
+		// Sem item no 1º espaço o jogo não deixa digitar, e a caixa de texto começa com o nome dele (a pesquisa atual).
+		// Esse item é a seta de voltar.
+		ItemStack field = icon(Items.ARROW, "btn_prev", "", "Clique: voltar ao Baú Central,", "sem a pesquisa e sem os separados.");
+		field.set(DataComponents.CUSTOM_NAME, Component.literal(query));
+		getSlot(BACK_SLOT).set(field);
 		refresh();
 	}
 
@@ -387,8 +387,7 @@ final class SearchMenu extends AnvilMenu {
 
 	@Override
 	public void removed(Player p) {
-		getSlot(0).set(ItemStack.EMPTY); // o item de exibição nunca vai para o inventário
-		getSlot(BACK_SLOT).set(ItemStack.EMPTY);
+		getSlot(BACK_SLOT).set(ItemStack.EMPTY); // o item de exibição nunca vai para o inventário
 		setCarried(ItemStack.EMPTY); // o item na mão é de mentira
 		resultSlots.setItem(0, ItemStack.EMPTY);
 		super.removed(p);

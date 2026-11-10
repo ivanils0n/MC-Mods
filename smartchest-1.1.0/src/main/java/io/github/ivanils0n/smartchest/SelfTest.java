@@ -228,7 +228,7 @@ final class SelfTest {
 			ensure(s2.getCarried().is(Items.EMERALD), "pesquisa de esmeralda");
 			if (back == 1) {
 				s2.clicked(firstBasket, 0, ContainerInput.PICKUP, fp);
-				s2.clicked(1, 0, ContainerInput.PICKUP, fp); // seta de voltar
+				s2.clicked(0, 0, ContainerInput.PICKUP, fp); // seta de voltar
 			}
 			s2.removed(fp);
 			ensure(count(fp.getInventory(), Items.EMERALD) == 0 && count(List.of(chest, barrel), Items.EMERALD) == 7
