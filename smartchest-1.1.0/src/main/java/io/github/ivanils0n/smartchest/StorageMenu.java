@@ -60,7 +60,6 @@ final class StorageMenu extends ChestMenu {
 	private int page, pages = 1, ticks, unloaded;
 	/** Item tirado da grade que ainda está na mão: devolver ele não é "guardar" (sem mensagem nem som). */
 	private ItemStack taken = ItemStack.EMPTY;
-	private int takenTick = -1;
 
 	private StorageMenu(int id, Inventory inv, SimpleContainer box, ServerPlayer player, Chest chest, String query, int page) {
 		super(MenuType.GENERIC_9x6, id, inv, box, 6);
@@ -278,8 +277,9 @@ final class StorageMenu extends ChestMenu {
 	public void clicked(int slot, int button, ContainerInput input, Player p) {
 		if (!(p instanceof ServerPlayer sp)) return;
 		if (slot >= 0 && slot < 54) {
-			if (input == ContainerInput.PICKUP || input == ContainerInput.QUICK_MOVE) {
-				if (slot == FILTER) clickFilter();
+			if (slot == FILTER && input == ContainerInput.SWAP) setFilter(sp.getInventory().getItem(button)); // teclas 1-9 (e F)
+			else if (input == ContainerInput.PICKUP || input == ContainerInput.QUICK_MOVE) {
+				if (slot == FILTER) setFilter(getCarried());
 				else if (slot < GRID_START) clickTab(slot - FIRST_TAB);
 				else if (slot < GRID_START + GRID) clickItem(sp, slot - GRID_START, button, input);
 				else clickButton(sp, slot, button);
@@ -292,23 +292,27 @@ final class StorageMenu extends ChestMenu {
 			sendAllDataToRemote();
 			return;
 		}
-		// Rodinha do Mouse Tweaks (tirar 1 por giro): botão direito no item, botão direito num espaço do inventário e clique
-		// de volta no item, tudo no mesmo tick. O 1 não é solto, então o clique de volta devolve tudo e nada sai.
-		// shortcut: pelo tick, um jogador muito rápido (2 cliques em 50 ms) também cai aqui; se incomodar, olhar a sequência.
+		// Rodinha do Mouse Tweaks: por causa do texto no item ele só enxerga espaços vazios como destino. Se já existe um
+		// monte desse item no inventário, o item vai para o monte em vez de ocupar um espaço novo.
 		ItemStack carried = getCarried();
-		if (input == ContainerInput.PICKUP && button == 1 && slot >= 54 && takenTick == sp.level().getServer().getTickCount()
+		if (input == ContainerInput.PICKUP && button == 1 && slot >= 54 && slot < slots.size() && !slots.get(slot).hasItem()
 			&& !taken.isEmpty() && ItemStack.isSameItemSameComponents(carried, taken)) {
-			sendAllDataToRemote();
-			return;
+			int stack = sp.getInventory().getSlotWithRemainingSpace(carried);
+			if (stack >= 0) {
+				sp.getInventory().getItem(stack).grow(1);
+				carried.shrink(1);
+				if (carried.isEmpty()) taken = ItemStack.EMPTY;
+				sendAllDataToRemote();
+				return;
+			}
 		}
 		super.clicked(slot, button, input, p); // o resto do inventário do jogador funciona normalmente
 	}
 
-	/** Com um item na mão: filtra por ele (o item continua na mão). Sem item: tira o filtro. */
-	private void clickFilter() {
-		ItemStack carried = getCarried();
-		if (carried.isEmpty()) SmartChest.FILTER.remove(player.getUUID());
-		else SmartChest.FILTER.put(player.getUUID(), carried.copyWithCount(1));
+	/** Filtra pelo item (que continua onde está: na mão ou na hotbar). Sem item: tira o filtro. */
+	private void setFilter(ItemStack item) {
+		if (item.isEmpty()) SmartChest.FILTER.remove(player.getUUID());
+		else SmartChest.FILTER.put(player.getUUID(), item.copyWithCount(1));
 		page = 0;
 		refresh();
 	}
@@ -344,7 +348,6 @@ final class StorageMenu extends ChestMenu {
 			int pack = (int) Math.min(max, e.total);
 			setCarried(Storage.take(linked.containers, e.proto, button == 1 ? Math.max(1, (pack + 1) / 2) : max));
 			taken = e.proto;
-			takenTick = button == 1 ? sp.level().getServer().getTickCount() : -1;
 		}
 		refresh();
 		left(sp, e.proto);
@@ -409,7 +412,7 @@ final class StorageMenu extends ChestMenu {
 		setCarried(carried.isEmpty() ? ItemStack.EMPTY : carried);
 		if (carried.isEmpty()) taken = ItemStack.EMPTY;
 		refresh();
-		if (back && moved > 0) left(sp, proto); // devolvendo o que tirou 
+		if (back && moved > 0) left(sp, proto); // devolvendo o que tirou (a rodinha do Mouse Tweaks faz isso a cada giro)
 		else feedback(sp, moved, moved == 0);
 	}
 

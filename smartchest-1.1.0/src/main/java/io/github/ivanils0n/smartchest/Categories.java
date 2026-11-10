@@ -35,7 +35,7 @@ final class Categories {
 	static final String[] NAMES = {"Todos", "Construção", "Armaduras", "Minérios", "Redstone", "Ferramentas e combate",
 		"Comidas, sementes e poções", "Ingredientes e outros"};
 	/** Ícone de cada aba: o item do próprio jogo (segue o resource pack do jogador). */
-	static final Item[] VANILLA = {Items.CHEST, Items.BRICKS, Items.IRON_CHESTPLATE, Items.DIAMOND_ORE, Items.REDSTONE,
+	static final Item[] VANILLA = {Items.CHEST, Items.BRICKS, Items.IRON_CHESTPLATE, Items.EMERALD, Items.REDSTONE,
 		Items.IRON_SWORD, Items.APPLE, Items.BONE};
 	static final int ALL = 0, BUILDING = 1, ARMOR = 2, ORES = 3, REDSTONE = 4, TOOLS = 5, FOOD = 6, OTHER = 7;
 

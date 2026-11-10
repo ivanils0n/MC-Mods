@@ -151,16 +151,15 @@ def lupa():
     im = Image.new("RGBA", (16, 16), (0, 0, 0, 0))
     for y in range(16):
         for x in range(16):
-            if ((x - 6.5) ** 2 + (y - 6.5) ** 2) ** .5 <= 3.6:
-                im.putpixel((x, y), hx("#1b8c74" if x + y > 14 else "#2fa37a"))
-    ring(im, 6.5, 6.5, 4.6, 4.6, "#ffd34e", 1.3)
-    rect(im, 6, 6, 7, 7, "#0b2a22"); px(im, [(5, 6), (8, 7)], "#2fa37a")
-    px(im, [(4, 4), (5, 4), (4, 5)], "#d8fff0")
-    for i in range(5):
-        x = y = 10 + i
-        px(im, [(x, y), (x + 1, y)] if x < 15 else [(x, y)], "#6a4aa8")
-        if x < 15:
-            px(im, [(x, y + 1)], "#3d2e60")
+            if ((x - 6.5) ** 2 + (y - 6.5) ** 2) ** .5 <= 2.6:
+                im.putpixel((x, y), hx("#1b8c74" if x + y > 13 else "#2fa37a"))
+    ring(im, 6.5, 6.5, 3.6, 3.6, "#ffd34e", 1.2)
+    rect(im, 6, 6, 7, 7, "#0b2a22")
+    px(im, [(5, 5)], "#d8fff0")
+    for i in range(3):
+        x = y = 9 + i
+        px(im, [(x, y), (x + 1, y), (x, y + 1)], "#6a4aa8")
+    px(im, [(10, 11), (11, 12), (12, 12)], "#3d2e60")
     outline(im, "#0b0816")
     return im
 
@@ -169,11 +168,11 @@ def organize():
     """Organizar: itens misturados entram no funil e caem separados em 3 baús, cada um com a cor de uma categoria."""
     G, R, Y = "#5fd4b8", "#e52b1a", "#f5d36a"
     im = Image.new("RGBA", (16, 16), (0, 0, 0, 0))
-    px(im, [(3, 1), (7, 2), (11, 1), (5, 3), (9, 3)], R); px(im, [(4, 2), (10, 2), (8, 1)], G); px(im, [(6, 1), (12, 3)], Y)
-    rect(im, 2, 4, 13, 4, "#c9b8ff"); rect(im, 3, 5, 12, 5, "#9d8cc9"); rect(im, 5, 6, 10, 6, "#9d8cc9"); rect(im, 7, 7, 8, 8, "#9d8cc9")
+    px(im, [(4, 2), (8, 3), (11, 2)], R); px(im, [(6, 2), (10, 3)], G); px(im, [(5, 3), (9, 2)], Y)
+    rect(im, 3, 4, 12, 4, "#c9b8ff"); rect(im, 4, 5, 11, 5, "#9d8cc9"); rect(im, 6, 6, 9, 6, "#9d8cc9"); rect(im, 7, 7, 8, 7, "#9d8cc9")
     for i, c in enumerate((G, R, Y)):
-        x = 1 + i * 5
-        rect(im, x, 10, x + 3, 14, "#4b2f7a"); rect(im, x, 11, x + 3, 11, "#2e2348"); px(im, [(x + 1, 12), (x + 2, 12)], c)
+        x = 2 + i * 4
+        rect(im, x, 9, x + 2, 12, "#4b2f7a"); rect(im, x, 10, x + 2, 10, "#2e2348"); px(im, [(x + 1, 11)], c)
     outline(im, "#0b0816")
     return im
 
