@@ -137,7 +137,7 @@ final class SelfTest {
 
 		// Rodinha do Mouse Tweaks para tirar (desligada): botão direito no item (pega metade), botão direito no inventário
 		// (põe 1) e clique no item (devolve), no mesmo tick. Nada sai dos baús.
-		fp.getInventory().setItem(3, new ItemStack(Items.DIAMOND, 2));
+		fp.getInventory().setItem(3, new ItemStack(Items.DIAMOND, 3));
 		int hotbar3 = -1;
 		for (int i = 54; i < menu.slots.size(); i++) if (menu.getSlot(i).container == fp.getInventory() && menu.getSlot(i).getContainerSlot() == 3) hotbar3 = i;
 		int empty4 = hotbar3 + 1;
@@ -145,13 +145,13 @@ final class SelfTest {
 		menu.clicked(diamondSlot, 1, ContainerInput.PICKUP, fp);
 		menu.clicked(empty4, 1, ContainerInput.PICKUP, fp);
 		menu.clicked(diamondSlot, 0, ContainerInput.PICKUP, fp);
-		ensure(fp.getInventory().getItem(4).isEmpty() && fp.getInventory().getItem(3).getCount() == 2 && menu.getCarried().isEmpty() && count(List.of(chest, barrel), Items.DIAMOND) == 15,
+		ensure(fp.getInventory().getItem(4).isEmpty() && fp.getInventory().getItem(3).getCount() == 3 && menu.getCarried().isEmpty() && count(List.of(chest, barrel), Items.DIAMOND) == 15,
 			"rodinha para tirar: " + fp.getInventory().getItem(3) + " " + menu.getCarried() + " " + count(List.of(chest, barrel), Items.DIAMOND));
 		// Guardar: botão direito no inventário (pega metade), botão direito no item (guarda 1), clique no inventário (devolve).
 		menu.clicked(hotbar3, 1, ContainerInput.PICKUP, fp);
 		menu.clicked(diamondSlot, 1, ContainerInput.PICKUP, fp);
 		menu.clicked(hotbar3, 0, ContainerInput.PICKUP, fp);
-		ensure(fp.getInventory().getItem(3).getCount() == 1 && menu.getCarried().isEmpty() && count(List.of(chest, barrel), Items.DIAMOND) == 16,
+		ensure(fp.getInventory().getItem(3).getCount() == 2 && menu.getCarried().isEmpty() && count(List.of(chest, barrel), Items.DIAMOND) == 16,
 			"rodinha para guardar: " + fp.getInventory().getItem(3) + " " + menu.getCarried() + " " + count(List.of(chest, barrel), Items.DIAMOND));
 		fp.getInventory().setItem(3, ItemStack.EMPTY);
 		Storage.take(List.of(chest, barrel), new ItemStack(Items.DIAMOND), 1); // volta aos 15
