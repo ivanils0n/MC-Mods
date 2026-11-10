@@ -51,9 +51,11 @@ import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EquipmentSlot;
 import net.minecraft.world.entity.Interaction;
 import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.item.component.CustomData;
+import net.minecraft.world.item.component.CustomModelData;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
@@ -99,6 +101,9 @@ public final class TpAltar implements ModInitializer {
 	/** Jogadores do servidor dedicado que carregaram o pack (só eles recebem os fundos de tela, que dependem dele). */
 	private static final Set<UUID> PACK_OK = ConcurrentHashMap.newKeySet();
 	private static final Map<UUID, Integer> LAST_USE = new ConcurrentHashMap<>();
+	/** Quem acabou de viajar -> tick do servidor em que tocam o som e as partículas da chegada. */
+	private static final Map<UUID, Integer> ARRIVALS = new HashMap<>();
+	private static final int ARRIVAL_DELAY = 4;
 	/** Quem está com o menu de destinos de cada altar aberto (chave do altar -> jogador). */
 	private static final Map<String, UUID> USERS = new HashMap<>();
 	/** Entidades de cada altar já encontradas, para não procurá-las no mundo a cada tick. */
@@ -106,9 +111,6 @@ public final class TpAltar implements ModInitializer {
 
 	private static final class Visuals {
 		final Display.ItemDisplay eye, ring;
-		// Item que o olho está mostrando (true = em uso). Toda decoração encontrada foi criada nesta execução (as antigas
-		// são apagadas ao carregar) e nasce como pérola; trocar para o mesmo item faria o comando "falhar" a cada tick.
-		boolean shownInUse;
 		int step;
 
 		Visuals(Display.ItemDisplay eye, Display.ItemDisplay ring) {
@@ -142,6 +144,8 @@ public final class TpAltar implements ModInitializer {
 			server = null;
 			store = null;
 			LAST_USE.clear();
+			ARRIVALS.clear();
+			PACK_OK.clear();
 			USERS.clear();
 			VIS.clear();
 			LEFTOVERS.clear();
@@ -153,6 +157,14 @@ public final class TpAltar implements ModInitializer {
 			// Apaga fora do evento de carregamento, para não mexer na lista de entidades enquanto o jogo a percorre.
 			for (Entity e : LEFTOVERS) if (!e.isRemoved()) e.discard();
 			LEFTOVERS.clear();
+			if (!ARRIVALS.isEmpty()) {
+				ARRIVALS.entrySet().removeIf(e -> {
+					if (s.getTickCount() < e.getValue()) return false;
+					ServerPlayer p = s.getPlayerList().getPlayer(e.getKey());
+					if (p != null) arrive(p);
+					return true;
+				});
+			}
 			// Mudanças de pérolas são gravadas no máximo uma vez por segundo (e ao desligar), não a cada clique.
 			if (store != null && s.getTickCount() % 20 == 0) store.saveIfDirty();
 			if (ownModels() && s.getTickCount() % 20 == 0) {
@@ -162,12 +174,15 @@ public final class TpAltar implements ModInitializer {
 			}
 		});
 		ServerPlayConnectionEvents.JOIN.register((handler, sender, s) -> {
-			// Só no servidor dedicado: em singleplayer as texturas já vêm do próprio .jar.
-			if (PACK_SHA1 == null || !s.isDedicatedServer()) return;
+			// O dono do mundo singleplayer já tem as texturas no próprio .jar; os outros (servidor ou LAN) recebem o pack.
+			if (PACK_SHA1 == null || s.isSingleplayerOwner(handler.player.nameAndId())) return;
 			sender.sendPacket(new ClientboundResourcePackPushPacket(PACK_ID, PACK_URL + PACK_SHA1 + ".zip", PACK_SHA1, false,
 				Optional.of(Component.literal("Texturas do Altar de Teleporte"))));
 		});
-		ServerPlayConnectionEvents.DISCONNECT.register((handler, s) -> PACK_OK.remove(handler.player.getUUID()));
+		ServerPlayConnectionEvents.DISCONNECT.register((handler, s) -> {
+			PACK_OK.remove(handler.player.getUUID());
+			LAST_USE.remove(handler.player.getUUID());
+		});
 		UseBlockCallback.EVENT.register(TpAltar::onUseBlock);
 		UseEntityCallback.EVENT.register(TpAltar::onUseEntity);
 		PlayerBlockBreakEvents.BEFORE.register(TpAltar::onBreak);
@@ -188,6 +203,7 @@ public final class TpAltar implements ModInitializer {
 		ItemStack stack = sp.getItemInHand(hand);
 		if (!isAltarItem(stack)) return InteractionResult.PASS;
 		askName(sp, sl, hit, hand, stack);
+		if (sp.containerMenu == sp.inventoryMenu) sp.inventoryMenu.sendAllDataToRemote(); // o jogo já descontou o item por conta própria
 		return InteractionResult.SUCCESS; // nunca deixa a obsidiana "crua" ser colocada
 	}
 
@@ -228,7 +244,10 @@ public final class TpAltar implements ModInitializer {
 		boolean everySecond = time % 20 == 0;
 		boolean animate = time % ANIM_TICKS == 0;
 		List<ServerPlayer> players = sl.players();
+		if (players.isEmpty()) return;
 		for (Altar a : store.inDimUnsorted(dim(sl))) {
+			// Sem ninguém por perto não confere, não gira, não anima e não solta partículas: ninguém veria.
+			if (!anyPlayerNear(players, a)) continue;
 			BlockPos pos = a.pos();
 			if (!sl.isLoaded(pos)) continue;
 			if (everySecond && !sl.getBlockState(pos).is(Blocks.OBSIDIAN)) {
@@ -237,16 +256,12 @@ public final class TpAltar implements ModInitializer {
 				removeAltar(sl, a);
 				continue;
 			}
-			// Sem ninguém por perto não gira, não anima e não solta partículas: ninguém veria.
-			if (!anyPlayerNear(players, a)) continue;
 			Visuals v = visuals(sl, a, everySecond);
 			if (v == null) continue;
 			if (everySecond) sl.sendParticles(ParticleTypes.PORTAL, a.x + 0.5, a.y + EYE_Y, a.z + 0.5, 6, 0.25, 0.3, 0.25, 0.4);
+			// Rede de segurança: o olho já é trocado na hora em lock/unlock.
 			boolean inUse = user(a) != null;
-			if (inUse != v.shownInUse) {
-				showEye(sl, a, v.eye, inUse);
-				v.shownInUse = inUse; // mesmo se falhar: não repete o comando a cada tick
-			}
+			if (inUse != eyeInUse(v.eye)) showEye(v.eye, inUse);
 			lookAtNearest(sl, v.eye);
 			if (animate) animate(sl, a, v);
 		}
@@ -286,9 +301,21 @@ public final class TpAltar implements ModInitializer {
 	}
 
 	/** Pérola parada; vira olho do fim enquanto alguém escolhe o destino (com o pack: olho 3D verde / roxo). */
-	static boolean showEye(ServerLevel sl, Altar a, Display.ItemDisplay eye, boolean inUse) {
-		return command(sl, a.pos(), "data merge entity " + eye.getUUID() + " {item:"
-			+ (inUse ? item("ender_eye", "tpaltar_eye", "eye_active") : item("ender_pearl", "tpaltar_eye", "eye_idle")) + "}");
+	static boolean showEye(Display.ItemDisplay eye, boolean inUse) {
+		// Direto na entidade: um comando não acha a entidade enquanto o chunk dela ainda está carregando.
+		return eye.getSlot(0).set(piece(inUse ? Items.ENDER_EYE : Items.ENDER_PEARL, "tpaltar_eye", inUse ? "eye_active" : "eye_idle"));
+	}
+
+	static boolean eyeInUse(Display.ItemDisplay eye) {
+		return eye.getSlot(0).get().is(Items.ENDER_EYE);
+	}
+
+	/** Item com a marca do pack (cmd) e, no singleplayer, com o modelo próprio do mod (ver ownModels). */
+	static ItemStack piece(Item item, String cmd, String own) {
+		ItemStack s = new ItemStack(item);
+		s.set(DataComponents.CUSTOM_MODEL_DATA, new CustomModelData(List.of(), List.of(), List.of(cmd), List.of()));
+		if (ownModels()) s.set(DataComponents.ITEM_MODEL, model(own));
+		return s;
 	}
 
 	/** Gira o olho (só na horizontal) para encarar o jogador mais próximo em até 16 blocos. */
@@ -329,10 +356,17 @@ public final class TpAltar implements ModInitializer {
 
 	static void lock(Altar a, ServerPlayer p) {
 		USERS.put(a.key(), p.getUUID());
+		refreshEye(a, true);
 	}
 
 	static void unlock(Altar a, Player p) {
-		USERS.remove(a.key(), p.getUUID());
+		if (USERS.remove(a.key(), p.getUUID())) refreshEye(a, false);
+	}
+
+	/** Troca o olho na hora de abrir/fechar o menu: depois de viajar não há mais ninguém perto para o tick trocar. */
+	private static void refreshEye(Altar a, boolean inUse) {
+		Visuals v = VIS.get(a.key());
+		if (v != null && v.alive()) showEye(v.eye, inUse);
 	}
 
 	// ---------- colocar ----------
@@ -382,7 +416,7 @@ public final class TpAltar implements ModInitializer {
 			stack.shrink(1);
 			sp.giveExperienceLevels(-PLACE_LEVELS);
 		}
-		say(sp, "Altar \"" + name + "\" criado! Clique nele com ender pearls para abastecer: cada viagem até aqui gasta " + COST + ".", ChatFormatting.GREEN);
+		say(sp, "Altar \"" + name + "\" criado! Abra o altar e guarde ender pearls nele: cada viagem até aqui gasta " + COST + ".", ChatFormatting.GREEN);
 		return null;
 	}
 
@@ -522,14 +556,22 @@ public final class TpAltar implements ModInitializer {
 		// Se alguém está com o menu do altar de destino aberto, atualiza o estoque mostrado.
 		ServerPlayer atDst = user(dst);
 		if (atDst != null && atDst.containerMenu instanceof AltarMenu menu) menu.loadPearls();
+		// Saída: quem viaja ouve na hora (ainda está aqui); os outros jogadores por perto também.
 		sl.playSound(null, sp.blockPosition(), SoundEvents.ENDERMAN_TELEPORT, SoundSource.PLAYERS, 1f, 1f);
 		portalBurst(sl, sp.position());
 		sp.stopRiding();
 		sp.teleportTo(spot.x, spot.y, spot.z);
 		sp.resetFallDistance();
-		sl.playSound(null, dst.pos(), SoundEvents.ENDERMAN_TELEPORT, SoundSource.PLAYERS, 1f, 1f);
-		portalBurst(sl, spot);
+		// Chegada: som e partículas mandados junto com o teleporte chegam ao jogo antes de ele estar no destino
+		// (longe demais para ouvir); espera uns ticks.
+		ARRIVALS.put(sp.getUUID(), server.getTickCount() + ARRIVAL_DELAY);
 		say(sp, "Bem-vindo a \"" + dst.name + "\". Restam " + dst.pearls / COST + " viagens para cá.", ChatFormatting.LIGHT_PURPLE);
+	}
+
+	private static void arrive(ServerPlayer p) {
+		if (!(p.level() instanceof ServerLevel sl)) return;
+		sl.playSound(null, p.blockPosition(), SoundEvents.ENDERMAN_TELEPORT, SoundSource.PLAYERS, 1f, 1f);
+		portalBurst(sl, p.position());
 	}
 
 	/** Nuvem de partículas roxas na altura do corpo do jogador. */
@@ -614,9 +656,9 @@ public final class TpAltar implements ModInitializer {
 		else if (action != ServerboundResourcePackPacket.Action.ACCEPTED && action != ServerboundResourcePackPacket.Action.DOWNLOADED) PACK_OK.remove(p.getUUID());
 	}
 
-	/** Singleplayer: as texturas vêm do .jar do dono do mundo. Servidor: só de quem carregou o pack. */
+	/** Dono do mundo singleplayer: as texturas vêm do .jar. Os outros: só quem carregou o pack. */
 	static boolean hasPack(ServerPlayer p) {
-		return server.isDedicatedServer() ? PACK_OK.contains(p.getUUID()) : server.isSingleplayerOwner(p.nameAndId());
+		return server.isSingleplayerOwner(p.nameAndId()) || PACK_OK.contains(p.getUUID());
 	}
 
 	/**

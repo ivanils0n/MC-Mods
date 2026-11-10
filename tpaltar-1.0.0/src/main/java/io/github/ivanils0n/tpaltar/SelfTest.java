@@ -44,7 +44,7 @@ final class SelfTest {
 		ensure(sl.getEntitiesOfClass(Interaction.class, area).size() == 1, "entidade de interação não apareceu");
 		Display.ItemDisplay eye = TpAltar.findEye(sl, altar);
 		ensure(eye != null, "olho não encontrado");
-		ensure(TpAltar.showEye(sl, altar, eye, true) && TpAltar.showEye(sl, altar, eye, false), "troca do olho falhou");
+		ensure(TpAltar.showEye(eye, true) && TpAltar.eyeInUse(eye) && TpAltar.showEye(eye, false) && !TpAltar.eyeInUse(eye), "troca do olho falhou");
 		ensure(!eye.shouldBeSaved(), "decoração seria salva no mapa");
 		ensure(TpAltar.animateOnce(sl, altar), "animação falhou");
 		ensure(TpAltar.PACK_SHA1 != null, "hash do resource pack não está no .jar");

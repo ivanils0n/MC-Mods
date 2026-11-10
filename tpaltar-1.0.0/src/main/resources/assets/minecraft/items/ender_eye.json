@@ -18,6 +18,13 @@
       "type": "minecraft:model",
       "model": "tpaltar:item/eye_active"
      }
+    },
+    {
+     "when": "tpaltar_dest_on",
+     "model": {
+      "type": "minecraft:model",
+      "model": "tpaltar:item/dest_on"
+     }
     }
    ],
    "fallback": {
