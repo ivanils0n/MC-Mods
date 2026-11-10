@@ -166,13 +166,14 @@ def lupa():
 
 
 def organize():
-    """Organizar: três baús, cada um com a cor de uma categoria."""
+    """Organizar: itens misturados entram no funil e caem separados em 3 baús, cada um com a cor de uma categoria."""
+    G, R, Y = "#5fd4b8", "#e52b1a", "#f5d36a"
     im = Image.new("RGBA", (16, 16), (0, 0, 0, 0))
-    for i, c in enumerate(["#5fd4b8", "#e52b1a", "#f5d36a"]):
+    px(im, [(3, 1), (7, 2), (11, 1), (5, 3), (9, 3)], R); px(im, [(4, 2), (10, 2), (8, 1)], G); px(im, [(6, 1), (12, 3)], Y)
+    rect(im, 2, 4, 13, 4, "#c9b8ff"); rect(im, 3, 5, 12, 5, "#9d8cc9"); rect(im, 5, 6, 10, 6, "#9d8cc9"); rect(im, 7, 7, 8, 8, "#9d8cc9")
+    for i, c in enumerate((G, R, Y)):
         x = 1 + i * 5
-        rect(im, x, 5, x + 3, 12, "#4b2f7a"); rect(im, x, 8, x + 3, 8, "#2e2348")
-        rect(im, x + 1, 2 + (i % 2), x + 2, 4 + (i % 2), c)  # item saindo do baú
-        px(im, [(x + 1, 9), (x + 2, 9)], c)
+        rect(im, x, 10, x + 3, 14, "#4b2f7a"); rect(im, x, 11, x + 3, 11, "#2e2348"); px(im, [(x + 1, 12), (x + 2, 12)], c)
     outline(im, "#0b0816")
     return im
 
