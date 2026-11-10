@@ -151,6 +151,25 @@ final class SelfTest {
 		ensure(StorageMenu.detached(fp, sc, "cobble").view().size() == 1, "pesquisa pelo id");
 		ensure(StorageMenu.detached(fp, sc, "xyz").view().isEmpty(), "pesquisa sem resultado");
 
+		// Pesquisa com o inventário como vitrine: o inventário de verdade nunca muda até pegar os separados.
+		fp.getInventory().setItem(0, new ItemStack(Items.DIRT, 5));
+		SearchMenu search = SearchMenu.detached(fp, sc, "diam");
+		int firstResult = -1, firstBasket = -1;
+		for (int i = 0; i < search.slots.size(); i++) {
+			if (search.slots.get(i).container == fp.getInventory()) throw new IllegalStateException("pesquisa usa o inventário de verdade");
+			if (search.slots.get(i).y == 84 && search.slots.get(i).x == 8) firstResult = i;
+			if (search.slots.get(i).y == 142 && search.slots.get(i).x == 8) firstBasket = i;
+		}
+		ensure(search.getSlot(firstResult).getItem().is(Items.DIAMOND) && search.getSlot(firstBasket).getItem().isEmpty(), "vitrine da pesquisa");
+		search.clicked(firstResult, 0, ContainerInput.PICKUP, fp); // separa os diamantes
+		ensure(search.getSlot(firstBasket).getItem().is(Items.DIAMOND) && count(List.of(chest, barrel), Items.DIAMOND) == 15
+			&& fp.getInventory().getItem(0).is(Items.DIRT) && count(fp.getInventory(), Items.DIAMOND) == 0, "separar não pode mexer em nada");
+		search.removed(fp); // Esc: pega os separados
+		ensure(count(fp.getInventory(), Items.DIAMOND) == 15 && count(List.of(chest, barrel), Items.DIAMOND) == 0
+			&& fp.getInventory().getItem(0).getCount() == 5, "Esc não pegou os separados ou mexeu no inventário");
+		for (int i = 0; i < fp.getInventory().getContainerSize(); i++) fp.getInventory().setItem(i, ItemStack.EMPTY);
+		Storage.insert(List.of(chest, barrel), new ItemStack(Items.DIAMOND, 15));
+
 		// Baús cheios: não guarda nada e o item fica com o jogador.
 		for (Container c : List.of(chest, barrel)) for (int i = 0; i < c.getContainerSize(); i++) c.setItem(i, new ItemStack(Items.STONE, 64));
 		ItemStack dirt = new ItemStack(Items.DIRT, 5);

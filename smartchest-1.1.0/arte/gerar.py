@@ -23,7 +23,7 @@ SC = os.path.join(RES, "smartchest")
 # Abas (mesma ordem de Categories.KEYS no Java): cada uma tem o ícone normal e o "_on" (aba ativa, com moldura).
 TABS = ["todos", "construcao", "natureza", "funcionais", "redstone", "ferramentas", "comida", "ingredientes"]
 MODELS = ["chest", "linker", "btn_prev", "btn_next", "btn_search", "btn_sort", "btn_info", "btn_deposit", "btn_links",
-          "tab_filter"] + [f"tab_{k}{on}" for k in TABS for on in ("", "_on")]
+          "btn_confirm", "btn_more", "tab_filter"] + [f"tab_{k}{on}" for k in TABS for on in ("", "_on")]
 
 
 def hx(c, a=255):
@@ -165,11 +165,18 @@ def buttons():
                  "...#h+...+h##...", "...#h+++++h##...", "...#hhhhhhh##...", "...#hhhhhhh##...", "...#hhhhhhh##...",
                  "...#hhhhhhh##...", "...#########h...", "....hhhhhhhh....", "................", "................", "................"],
                 c="#6a4aa8", acc="#2fa37a", hl="#d9ccff")
+    confirm = Image.new("RGBA", (16, 16), (0, 0, 0, 0))
+    for x, y in [(3, 8), (4, 9), (5, 10), (6, 11), (7, 10), (8, 9), (9, 8), (10, 7), (11, 6), (12, 5)]:
+        rect(confirm, x, y, x, y + 1, "#5fd4b8")
+    rect(confirm, 2, 13, 13, 13, "#e3d8ff")
+    more = icon(["................", "................", "................", "................", "................",
+                 "................", "................", "..##..##..##....", "..##..##..##....", "................",
+                 "................", "................", "................", "................", "................", "................"])
     links = Image.new("RGBA", (16, 16), (0, 0, 0, 0))
     ring(links, 5.5, 8, 3.6, 2.6, "#c77dff", 1.3)
     ring(links, 10.5, 8, 3.6, 2.6, "#e3d8ff", 1.3)
     return {"btn_prev": prev, "btn_next": prev.transpose(Image.FLIP_LEFT_RIGHT), "btn_search": search, "btn_sort": sort,
-            "btn_deposit": deposit, "btn_info": info, "btn_links": links}
+            "btn_deposit": deposit, "btn_info": info, "btn_links": links, "btn_confirm": confirm, "btn_more": more}
 
 
 # ------------------------------------------------------------------ abas
@@ -248,6 +255,11 @@ GLYPHS = {
     "l": ["#.", "#.", "#.", "#.", "#.", "#.", ".#"],
     "i": ["#", ".", "#", "#", "#", "#", "#"],
     "g": [".....", ".....", ".####", "#...#", "#...#", ".####", "....#", "####."],
+    "R": ["####.", "#...#", "#...#", "####.", "#.#..", "#..#.", "#...#"],
+    "s": [".....", ".....", ".####", "#....", ".###.", "....#", "####."],
+    "u": [".....", ".....", "#...#", "#...#", "#...#", "#...#", ".####"],
+    "d": ["....#", "....#", ".####", "#...#", "#...#", "#...#", ".####"],
+    "o": [".....", ".....", ".###.", "#...#", "#...#", "#...#", ".###."],
     " ": ["...", "...", "...", "...", "...", "...", "..."],
 }
 
@@ -331,38 +343,53 @@ def gui(icons):
 
 # ------------------------------------------------------------------ escrita
 def search_gui(icons, front):
-    """Tela da pesquisa (a bigorna do jogo, 176x166) no mesmo tema; o campo de texto fica vazado para o jogo desenhá-lo."""
+    """
+    Tela da pesquisa (a bigorna do jogo, 176x166), tema "Céu do End". Em cima: o desenho do Baú Inteligente, a caixa
+    de texto (vazada: o jogo a desenha) e o botão de pegar (espaço de resultado). Embaixo, o inventário do jogador vira
+    parte do baú: 27 resultados e a hotbar como fileira de separados. Ver SearchMenu.
+    """
     img = Image.new("RGBA", (176, 166), (0, 0, 0, 0))
-    noise(img, T["panel"], 9, (0, 0, 176, 166))
+    noise(img, ["#0b0816", "#090712", "#07060c"], 9, (0, 0, 176, 166))
     d = ImageDraw.Draw(img)
 
-    def slot(x, y, fill=T["slot"]):
+    def slot(x, y, fill, hl):
         d.rectangle([x, y, x + 17, y + 17], fill=hx(fill))
-        d.line([x, y, x + 16, y], fill=hx(T["s_sh"])); d.line([x, y, x, y + 16], fill=hx(T["s_sh"]))
-        d.line([x + 1, y + 17, x + 17, y + 17], fill=hx(T["s_hl"])); d.line([x + 17, y + 1, x + 17, y + 17], fill=hx(T["s_hl"]))
+        d.line([x, y, x + 16, y], fill=hx("#060409")); d.line([x, y, x, y + 16], fill=hx("#060409"))
+        d.line([x + 1, y + 17, x + 17, y + 17], fill=hx(hl)); d.line([x + 17, y + 1, x + 17, y + 17], fill=hx(hl))
 
     d.rectangle([0, 0, 175, 165], outline=hx(T["edge"]))
-    d.line([1, 1, 174, 1], fill=hx(T["hi"])); d.line([1, 1, 1, 164], fill=hx(T["hi"]))
+    d.line([1, 1, 174, 1], fill=hx("#3a6fd8")); d.line([1, 1, 1, 164], fill=hx("#3a6fd8"))
     d.line([1, 164, 174, 164], fill=hx(T["lo"])); d.line([174, 1, 174, 164], fill=hx(T["lo"]))
     for p in [(0, 0), (175, 0), (0, 165), (175, 165)]:
         img.putpixel(p, (0, 0, 0, 0))
-    img.alpha_composite(front.resize((32, 32), Image.NEAREST), (14, 8))  # olho do baú no lugar do martelo
-    for x in range(58, 171):  # campo de texto: vazado, o jogo desenha o campo e o texto digitado
-        for y in range(19, 38):
-            img.putpixel((x, y), hx(T["group_line"]) if x in (58, 170) or y in (19, 37) else (0, 0, 0, 0))
-    slot(26, 46); slot(75, 46); slot(133, 46, T["btn"])
-    for i in range(-3, 4):  # "+" e seta
-        img.putpixel((59 + i, 55), hx(T["btn_hi"])); img.putpixel((59, 55 + i), hx(T["btn_hi"]))
-    for x in range(100, 126):
-        img.putpixel((x, 55), hx(T["btn_hi"])); img.putpixel((x, 56), hx(T["btn_hi"]))
-    for i in range(4):
-        img.putpixel((125 - i, 55 - i), hx(T["btn_hi"])); img.putpixel((125 - i, 56 + i), hx(T["btn_hi"]))
-    d.rectangle([5, 70, 75, 81], fill=hx(T["plate"]), outline=hx(T["plate_lo"]))  # atrás de "Inventário" (y=72)
+    rnd = random.Random(3)
+    for _ in range(90):  # estrelas do portal do End na parte de cima
+        img.putpixel((rnd.randrange(3, 173), rnd.randrange(3, 68)),
+                     hx(rnd.choice(["#2fa37a", "#5fd4b8", "#8d5fe0", "#c77dff", "#e6fff8", "#3a6fd8"])))
+    img.alpha_composite(front.resize((16, 16), Image.NEAREST), (38, 20))  # o Baú Inteligente ao lado da busca
+    d.rectangle([56, 17, 171, 38], outline=hx("#5fd4b8"))
+    for x in range(59, 169):  # caixa de texto vazada (o jogo desenha a caixa e o texto)
+        for y in range(20, 36):
+            img.putpixel((x, y), (0, 0, 0, 0))
+    # botão de pegar (espaço de resultado da bigorna): moldura de portal com o olho
+    d.rectangle([127, 40, 157, 70], fill=hx("#3e6b5a"), outline=hx("#2a4a3e"))
+    rect(img, 140, 40, 144, 42, "#2fa37a")
+    slot(133, 46, "#0b0816", "#5fd4b8")
+    # faixa dos resultados: o jogo escreve "Inventário" em cinza #404040 em (8,72); fundo da mesma cor = texto some
+    d.rectangle([4, 69, 171, 81], fill=hx("#151026"))
+    d.rectangle([5, 70, 64, 81], fill=hx("#404040"))
+    end = 170 - (sum(len(GLYPHS[c][0]) + 1 for c in "Resultados") - 1)
+    text(img, end, 72, "Resultados", "#dbd99a")
     for r in range(3):
         for c in range(9):
-            slot(7 + c * 18, 83 + r * 18)
+            slot(7 + c * 18, 83 + r * 18, "#0b0816", "#2b2141")
+    # hotbar = separados: moldura de portal e setinha fantasma em cada espaço
+    d.rectangle([5, 139, 170, 160], fill=hx("#2a4a3e"))
     for c in range(9):
-        slot(7 + c * 18, 141)
+        x = 7 + c * 18
+        slot(x, 141, "#0d2420", "#5fd4b8")
+        for i in range(3):
+            img.putpixel((x + 7 + i, 149 + i), hx("#2e6b5e")); img.putpixel((x + 11 - i, 149 + i), hx("#2e6b5e"))
     return img
 
 
@@ -427,6 +454,8 @@ def main():
 
     for m in MODELS:
         save_json({"model": {"type": "minecraft:model", "model": "smartchest:item/" + m}}, os.path.join(SC, "items", m + ".json"))
+    # Item invisível: o livro da caixa de texto da pesquisa (o jogo só deixa digitar com um item ali).
+    save_json({"model": {"type": "minecraft:empty"}}, os.path.join(SC, "items", "blank.json"))
 
     # Fonte da tela: U+E000 é o fundo inteiro; U+F000 volta ao canto da tela, U+F001 desfaz a largura do fundo e
     # U+F002 leva o texto do título (o filtro da pesquisa) para x=100. U+E001 é a tela da pesquisa (bigorna, título em
