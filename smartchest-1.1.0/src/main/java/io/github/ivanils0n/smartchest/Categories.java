@@ -33,10 +33,10 @@ import net.minecraft.world.level.block.state.properties.BlockStateProperties;
 final class Categories {
 	static final String[] KEYS = {"todos", "construcao", "armaduras", "minerios", "redstone", "ferramentas", "comida", "ingredientes"};
 	static final String[] NAMES = {"Todos", "Construção", "Armaduras", "Minérios", "Redstone", "Ferramentas e combate",
-		"Comida e poções", "Ingredientes e outros"};
-	/** Ícone de cada aba para quem está sem o resource pack. */
+		"Comidas, sementes e poções", "Ingredientes e outros"};
+	/** Ícone de cada aba: o item do próprio jogo (segue o resource pack do jogador). */
 	static final Item[] VANILLA = {Items.CHEST, Items.BRICKS, Items.IRON_CHESTPLATE, Items.DIAMOND_ORE, Items.REDSTONE,
-		Items.IRON_PICKAXE, Items.APPLE, Items.BONE};
+		Items.IRON_SWORD, Items.APPLE, Items.BONE};
 	static final int ALL = 0, BUILDING = 1, ARMOR = 2, ORES = 3, REDSTONE = 4, TOOLS = 5, FOOD = 6, OTHER = 7;
 
 	private static final List<String> TABS = List.of("building_blocks", "colored_blocks", "natural_blocks", "functional_blocks",

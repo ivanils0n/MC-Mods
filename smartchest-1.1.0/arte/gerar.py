@@ -21,9 +21,8 @@ SC = os.path.join(RES, "smartchest")
 
 # Modelos do mod; SmartChest.java usa os mesmos nomes no componente item_model ("smartchest:<nome>").
 # Abas (mesma ordem de Categories.KEYS no Java): cada uma tem o ícone normal e o "_on" (aba ativa, com moldura).
-TABS = ["todos", "construcao", "armaduras", "minerios", "redstone", "ferramentas", "comida", "ingredientes"]
 MODELS = ["chest", "chest_base", "chest_lid", "linker", "btn_prev", "btn_next", "btn_search", "btn_sort", "btn_info", "btn_deposit", "btn_links",
-          "btn_confirm", "btn_more", "btn_clear", "tab_filter"] + [f"tab_{k}{on}" for k in TABS for on in ("", "_on")]
+          "btn_confirm", "btn_more", "btn_clear", "btn_organize", "tab_filter"]
 
 
 def hx(c, a=255):
@@ -147,14 +146,42 @@ def icon(rows, c="#e3d8ff", acc="#5fd4b8", hl="#e6fff8"):
     return grid(rows, {"#": c, "+": acc, "h": hl})
 
 
+def lupa():
+    """Lupa: aro dourado, olho do End na lente e cabo roxo."""
+    im = Image.new("RGBA", (16, 16), (0, 0, 0, 0))
+    for y in range(16):
+        for x in range(16):
+            if ((x - 6.5) ** 2 + (y - 6.5) ** 2) ** .5 <= 3.6:
+                im.putpixel((x, y), hx("#1b8c74" if x + y > 14 else "#2fa37a"))
+    ring(im, 6.5, 6.5, 4.6, 4.6, "#ffd34e", 1.3)
+    rect(im, 6, 6, 7, 7, "#0b2a22"); px(im, [(5, 6), (8, 7)], "#2fa37a")
+    px(im, [(4, 4), (5, 4), (4, 5)], "#d8fff0")
+    for i in range(5):
+        x = y = 10 + i
+        px(im, [(x, y), (x + 1, y)] if x < 15 else [(x, y)], "#6a4aa8")
+        if x < 15:
+            px(im, [(x, y + 1)], "#3d2e60")
+    outline(im, "#0b0816")
+    return im
+
+
+def organize():
+    """Organizar: três baús, cada um com a cor de uma categoria."""
+    im = Image.new("RGBA", (16, 16), (0, 0, 0, 0))
+    for i, c in enumerate(["#5fd4b8", "#e52b1a", "#f5d36a"]):
+        x = 1 + i * 5
+        rect(im, x, 5, x + 3, 12, "#4b2f7a"); rect(im, x, 8, x + 3, 8, "#2e2348")
+        rect(im, x + 1, 2 + (i % 2), x + 2, 4 + (i % 2), c)  # item saindo do baú
+        px(im, [(x + 1, 9), (x + 2, 9)], c)
+    outline(im, "#0b0816")
+    return im
+
+
 def buttons():
     prev = icon(["................", "................", "................", "........#.......", ".......##.......",
                  "......##........", ".....##.........", "....##########..", "....##########..", ".....##.........",
                  "......##........", ".......##.......", "........#.......", "................", "................", "................"])
-    search = icon(["................", "................", "....#####.......", "...#h++++#......", "..#h++++++#.....",
-                   "..#++++++++#....", "..#++++++++#....", "..#++++++++#....", "...#++++++#.....", "....######......",
-                   "..........##....", "...........##...", "............##..", ".............#..", "................", "................"],
-                  c="#e3d8ff", acc="#1b8c74", hl="#a6f5d0")
+    search = lupa()
     sort = icon(["................", "................", "................", "..##########....", "..##########....",
                  "................", "..#######....+..", "..#######...+++.", "............+++.", "..####.....+++++",
                  "..####.......+..", ".............+..", "..##.........+..", "..##.........+..", "................", "................"])
@@ -180,85 +207,13 @@ def buttons():
     ring(links, 5.5, 8, 3.6, 2.6, "#c77dff", 1.3)
     ring(links, 10.5, 8, 3.6, 2.6, "#e3d8ff", 1.3)
     return {"btn_prev": prev, "btn_next": prev.transpose(Image.FLIP_LEFT_RIGHT), "btn_search": search, "btn_sort": sort,
-            "btn_deposit": deposit, "btn_info": info, "btn_links": links, "btn_confirm": confirm, "btn_more": more, "btn_clear": clear}
+            "btn_deposit": deposit, "btn_info": info, "btn_links": links, "btn_confirm": confirm, "btn_more": more, "btn_clear": clear,
+            "btn_organize": organize()}
 
 
 # ------------------------------------------------------------------ abas
 def tab_icons():
-    I = lambda rows, pal: grid(rows, pal)
-    icons = {
-        "todos": I(["................", "................", "..############..", "..#hhhhhhhhhh#..", "..#h########h#..",
-                    "..#h#......#h#..", "..############..", "..#hhhhggghhh#..", "..#hhhhgeghhh#..", "..#hhhhggghhh#..",
-                    "..#hhhhhhhhhh#..", "..#hhhhhhhhhh#..", "..############..", "................", "................", "................"],
-                   {"#": "#0b0812", "h": "#4b2f7a", "g": "#2fa37a", "e": "#0a2a20"}),
-        "construcao": I(["................", "................", "..############..", "..#rrr#rrrrr#...", "..#rrr#rrrrr#...",
-                         "..############..", "..#rrrrr#rrr#...", "..#rrrrr#rrr#...", "..############..", "..#rrr#rrrrr#...",
-                         "..#rrr#rrrrr#...", "..############..", "................", "................", "................", "................"],
-                        {"#": "#d9ccc0", "r": "#a0503a"}),
-        "armaduras": I(["................", "................", "..###......###..", ".#llw#....#wwd#.", ".#lwww####wwwd#.",
-                        ".#lwwwwwwwwwwd#.", ".##lwwwwwwwwd##.", "..##lwwwwwwd##..", "...#lwwwwwwd#...", "...#lwwwwwwd#...",
-                        "...#lwwwwwwd#...", "...#lddddddd#...", "...##########...", "................", "................", "................"],
-                       {"#": "#2b2b33", "w": "#d8d8d8", "l": "#ffffff", "d": "#9a9a9a"}),
-        "comida": I(["................", "................", ".......b........", "......b.ll......", "....rrbrrl......",
-                     "...rrrrrrrr.....", "..rRrrrrrrrr....", "..rRrrrrrrrr....", "..rrrrrrrrrr....", "..rrrrrrrrrr....",
-                     "...rrrrrrrr.....", "....rr..rr......", "................", "................", "................", "................"],
-                    {"b": "#5c3f24", "l": "#5da83a", "r": "#d8262a", "R": "#ff8a7a"}),
-    }
-    red = Image.new("RGBA", (16, 16), (0, 0, 0, 0))
-    px(red, [(6, 6), (7, 6), (8, 7), (9, 8), (7, 9), (6, 8), (8, 9), (10, 7), (5, 7), (9, 10), (4, 9)], "#e52b1a")
-    px(red, [(7, 7), (8, 8)], "#ff7a6a")
-    icons["redstone"] = red
-    ore = Image.new("RGBA", (16, 16), (0, 0, 0, 0))  # pedra com pontos de diamante, ouro e esmeralda
-    noise(ore, ["#7d7d7d", "#8a8a8a", "#727272"], 3, (2, 2, 14, 14))
-    rect(ore, 2, 2, 13, 2, "#a3a3a3"); rect(ore, 2, 2, 2, 13, "#a3a3a3")
-    rect(ore, 2, 13, 13, 13, "#575757"); rect(ore, 13, 2, 13, 13, "#575757")
-    for (x, y), (c, h) in {(4, 4): ("#4ee6d8", "#c8fff8"), (9, 5): ("#f5d36a", "#fff3b0"), (5, 9): ("#3fd16b", "#b8ffcc"),
-                           (9, 10): ("#4ee6d8", "#c8fff8")}.items():
-        rect(ore, x, y, x + 1, y + 1, c); px(ore, [(x, y)], h)
-    icons["minerios"] = ore
-    # Espada (lâmina para cima à esquerda) cruzada com uma picareta reta de cabeça simétrica, formando um X.
-    sword = Image.new("RGBA", (16, 16), (0, 0, 0, 0))
-    for i in range(1, 11):
-        sword.putpixel((i, i), hx("#f4f4f4"))
-        if i < 10:
-            sword.putpixel((i + 1, i), hx("#b4b4c0"))
-    for t in (-1, 0, 1):
-        sword.putpixel((11 + t, 11 - t), hx("#f5d36a" if t == 0 else "#d9a23a"))
-    for i in (12, 13):
-        sword.putpixel((i, i), hx("#5c3f24"))
-    sword.putpixel((14, 14), hx("#d9a23a"))
-    outline(sword, "#1c1c22")
-    pick = Image.new("RGBA", (16, 16), (0, 0, 0, 0))
-    for i in range(10):  # cabo reto na diagonal x+y=15
-        pick.putpixel((1 + i, 14 - i), hx("#8a6036" if i % 2 else "#6b4a2a"))
-    for y in range(16):  # cabeça simétrica em relação ao cabo, as duas pontas curvando para o cabo
-        for x in range(16):
-            o, d = x + y - 15, x - y
-            c = 9 - o * o / 8
-            if abs(o) <= 5 and c - 1.6 <= d <= c + 0.4:
-                pick.putpixel((x, y), hx("#7ff0e2" if d >= c - 0.6 else "#22b3a6"))
-    outline(pick, "#0d1f1d")
-    sword.alpha_composite(pick)
-    icons["ferramentas"] = sword
-    bone = Image.new("RGBA", (16, 16), (0, 0, 0, 0))
-    for i in range(4, 12):
-        px(bone, [(i, 15 - i)], "#f2ecd8")
-        if 4 < i < 11:
-            px(bone, [(i, 14 - i)], "#f2ecd8")
-    for kx, ky in ((11, 2), (13, 4), (2, 11), (4, 13)):
-        rect(bone, kx - 1, ky - 1, kx, ky, "#f2ecd8")
-    px(bone, [(i, 15 - i) for i in range(5, 11)], "#cfc6a8")
-    outline(bone, "#4a4238")
-    icons["ingredientes"] = bone
     out = {}
-    for k in TABS:
-        out["tab_" + k] = icons[k]
-        on = Image.new("RGBA", (16, 16), (0, 0, 0, 0))  # aba ativa: fundo claro e moldura na própria textura
-        rect(on, 0, 0, 15, 15, "#5a3f94")
-        rect(on, 0, 0, 15, 0, "#c9b8ff"); rect(on, 0, 0, 0, 15, "#c9b8ff")
-        rect(on, 0, 15, 15, 15, "#2e2348"); rect(on, 15, 0, 15, 15, "#2e2348")
-        on.alpha_composite(icons[k].resize((12, 12), Image.NEAREST), (2, 2))
-        out["tab_" + k + "_on"] = on
     out["tab_filter"] = grid(["................", "................", "..##..##..##....", "..#..........#..", "..............#.",
                               "..#.............", "..#......h...#..", "........hhh.....", ".......hhhhh..#.", "..#.....hhh.....",
                               "..#......h......", "..............#.", "..#..........#..", "....##..##..##..", "................", "................"],
@@ -353,10 +308,10 @@ def gui(icons):
     for r in range(1, 5):
         for c in range(9):
             slot(7 + c * 18, 17 + r * 18)
-    # controles em 3 grupos: [◀ página ▶] [pesquisar ordenar] [guardar vínculos]
-    for x0, x1 in ((6, 61), (78, 115), (132, 169)):
+    # controles em 2 grupos: [◀ página ▶] [pesquisar ordenar organizar guardar vínculos]
+    for x0, x1 in ((6, 61), (78, 169)):
         d.rectangle([x0, 108, x1, 125], fill=hx(T["group"]), outline=hx(T["group_line"]))
-    for c in (0, 2, 4, 5, 7, 8):
+    for c in (0, 2, 4, 5, 6, 7, 8):
         button(7 + c * 18, 108)
     slot(7 + 18, 108)
     # "Inventário" é escrito pelo jogo em cinza escuro (x=8, y=128): placa clara atrás para dar leitura em qualquer idioma
@@ -373,9 +328,9 @@ def gui(icons):
 
 
 # ------------------------------------------------------------------ escrita
-def search_gui(icons, front):
+def search_gui(icons):
     """
-    Tela da pesquisa (a bigorna do jogo, 176x166), tema "Céu do End". Em cima: o desenho do Baú Central, a caixa
+    Tela da pesquisa (a bigorna do jogo, 176x166), tema "Céu do End". Em cima: a lupa, a caixa
     de texto (vazada: o jogo a desenha) e o botão de pegar (espaço de resultado). Embaixo, o inventário do jogador vira
     parte do baú: 27 resultados e a hotbar como fileira de separados. Ver SearchMenu.
     """
@@ -397,7 +352,7 @@ def search_gui(icons, front):
     for _ in range(90):  # estrelas do portal do End na parte de cima
         img.putpixel((rnd.randrange(3, 173), rnd.randrange(3, 68)),
                      hx(rnd.choice(["#2fa37a", "#5fd4b8", "#8d5fe0", "#c77dff", "#e6fff8", "#3a6fd8"])))
-    img.alpha_composite(front.resize((16, 16), Image.NEAREST), (38, 20))  # o Baú Central ao lado da busca
+    img.alpha_composite(icons["btn_search"], (38, 20))  # a lupa ao lado da busca
     d.rectangle([56, 17, 171, 38], outline=hx("#5fd4b8"))
     for x in range(59, 169):  # caixa de texto vazada (o jogo desenha a caixa e o texto)
         for y in range(20, 36):
@@ -536,7 +491,7 @@ def main():
     for name, im in icons.items():
         save_png(im, "item/" + name)
     save_png(gui(icons), "gui/storage")
-    save_png(search_gui(icons, f), "gui/search")
+    save_png(search_gui(icons), "gui/search")
 
     models = os.path.join(SC, "models/item")
     save_json(cube_model(), os.path.join(models, "chest.json"))

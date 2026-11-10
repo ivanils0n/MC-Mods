@@ -40,12 +40,12 @@ import net.minecraft.world.phys.Vec3;
 /**
  * Tela do Baú Central (baú duplo vanilla): 1ª fileira com as abas [filtro pelo item][8 categorias], 4 fileiras
  * com os itens de todos os baús ligados, somados por tipo, e a última com os botões [◀ página ▶] [pesquisar
- * ordenar] [guardar vínculos]. Os espaços de cima são só vitrine (nunca guardam item): cada clique é tratado aqui e
+ * ordenar organizar guardar vínculos]. Os espaços de cima são só vitrine (nunca guardam item): cada clique é tratado aqui e
  * mexe direto nos baús ligados.
  */
 final class StorageMenu extends ChestMenu {
 	static final int FILTER = 0, FIRST_TAB = 1, GRID_START = 9, GRID = 36; // itens nos espaços 9..44
-	static final int PREV = 45, INFO = 46, NEXT = 47, SEARCH = 49, SORT = 50, DEPOSIT = 52, LINKS = 53;
+	static final int PREV = 45, INFO = 46, NEXT = 47, SEARCH = 49, SORT = 50, ORGANIZE = 51, DEPOSIT = 52, LINKS = 53;
 	private static final String[] SORTS = {"Quantidade", "Nome", "Mod / id"};
 	private static final NumberFormat NUM = NumberFormat.getIntegerInstance(Locale.forLanguageTag("pt-BR"));
 
@@ -60,6 +60,7 @@ final class StorageMenu extends ChestMenu {
 	private int page, pages = 1, ticks, unloaded;
 	/** Item tirado da grade que ainda está na mão: devolver ele não é "guardar" (sem mensagem nem som). */
 	private ItemStack taken = ItemStack.EMPTY;
+	private int takenTick = -1;
 
 	private StorageMenu(int id, Inventory inv, SimpleContainer box, ServerPlayer player, Chest chest, String query, int page) {
 		super(MenuType.GENERIC_9x6, id, inv, box, 6);
@@ -100,7 +101,7 @@ final class StorageMenu extends ChestMenu {
 	}
 
 	private int sortMode() {
-		return SmartChest.SORT.getOrDefault(player.getUUID(), 0);
+		return SmartChest.SORT.getOrDefault(player.getUUID(), 1); // padrão: nome
 	}
 
 	private int category() {
@@ -157,7 +158,7 @@ final class StorageMenu extends ChestMenu {
 			? tab("tab_filter", Items.ITEM_FRAME, false, "Filtrar pelo item", "Clique aqui com um item na mão:", "mostra só itens desse tipo.")
 			: filterShown(filter));
 		for (int i = 0; i < Categories.KEYS.length; i++) {
-			box.setItem(FIRST_TAB + i, tab("tab_" + Categories.KEYS[i], Categories.VANILLA[i], i == cat, Categories.NAMES[i],
+			box.setItem(FIRST_TAB + i, tab(null, Categories.VANILLA[i], i == cat, Categories.NAMES[i],
 				i == cat ? "Aba atual" : "Clique: ver só esta categoria"));
 		}
 		long items = 0;
@@ -186,6 +187,9 @@ final class StorageMenu extends ChestMenu {
 		for (int i = 0; i < SORTS.length; i++) sortLines[i] = (i == sortMode() ? "▶ " : "   ") + SORTS[i];
 		sortLines[SORTS.length] = "Clique: trocar";
 		box.setItem(SORT, button(Items.COMPARATOR, "btn_sort", "Ordenar: " + SORTS[sortMode()], sortLines));
+		box.setItem(ORGANIZE, button(Items.CHEST, "btn_organize", "Organizar baús",
+			"Separa os itens por categoria nos baús ligados,", "um baú (ou mais) para cada categoria.",
+			"Com poucos baús, as categorias ficam em sequência.", "Clique: organizar"));
 		box.setItem(DEPOSIT, button(Items.HOPPER, "btn_deposit", "Guardar inventário",
 			"Guarda tudo do inventário nos baús ligados,", "menos a hotbar.", "Shift+clique num item guarda só ele."));
 		box.setItem(LINKS, button(Items.LEAD, "btn_links", SmartChest.count(links, "baú ligado", "baús ligados"),
@@ -229,16 +233,14 @@ final class StorageMenu extends ChestMenu {
 	}
 
 	/**
-	 * Aba: papel com o modelo da aba (com o pack, ícone do mod e moldura na ativa; sem o pack, o visual do item vanilla
-	 * e brilho na ativa). Papel por baixo para não aparecer dano de ferramenta e afins no texto.
+	 * Aba: papel com o visual de um item do jogo (segue o resource pack do jogador) e brilho na ativa; {@code model} =
+	 * ícone do mod no lugar do item, quando o jogador tem o pack. Papel por baixo para não aparecer dano de ferramenta e
+	 * afins no texto.
 	 */
 	private ItemStack tab(String model, Item look, boolean active, String name, String... lines) {
 		ItemStack s = new ItemStack(Items.PAPER);
-		if (SmartChest.hasPack(player)) s.set(DataComponents.ITEM_MODEL, SmartChest.model(active ? model + "_on" : model));
-		else {
-			s.set(DataComponents.ITEM_MODEL, BuiltInRegistries.ITEM.getKey(look));
-			if (active) s.set(DataComponents.ENCHANTMENT_GLINT_OVERRIDE, true);
-		}
+		s.set(DataComponents.ITEM_MODEL, model != null && SmartChest.hasPack(player) ? SmartChest.model(model) : BuiltInRegistries.ITEM.getKey(look));
+		if (active) s.set(DataComponents.ENCHANTMENT_GLINT_OVERRIDE, true);
 		s.set(DataComponents.CUSTOM_NAME, SmartChest.plain(name, active ? ChatFormatting.AQUA : ChatFormatting.LIGHT_PURPLE));
 		List<Component> lore = new ArrayList<>();
 		for (String l : lines) lore.add(SmartChest.plain(l, ChatFormatting.GRAY));
@@ -290,19 +292,14 @@ final class StorageMenu extends ChestMenu {
 			sendAllDataToRemote();
 			return;
 		}
-		// Rodinha do Mouse Tweaks: por causa do texto no item ele só enxerga espaços vazios como destino. Se já existe um
-		// monte desse item no inventário, o item vai para o monte em vez de ocupar um espaço novo.
+		// Rodinha do Mouse Tweaks (tirar 1 por giro): botão direito no item, botão direito num espaço do inventário e clique
+		// de volta no item, tudo no mesmo tick. O 1 não é solto, então o clique de volta devolve tudo e nada sai.
+		// shortcut: pelo tick, um jogador muito rápido (2 cliques em 50 ms) também cai aqui; se incomodar, olhar a sequência.
 		ItemStack carried = getCarried();
-		if (input == ContainerInput.PICKUP && button == 1 && slot >= 54 && slot < slots.size() && !slots.get(slot).hasItem()
+		if (input == ContainerInput.PICKUP && button == 1 && slot >= 54 && takenTick == sp.level().getServer().getTickCount()
 			&& !taken.isEmpty() && ItemStack.isSameItemSameComponents(carried, taken)) {
-			int stack = sp.getInventory().getSlotWithRemainingSpace(carried);
-			if (stack >= 0) {
-				sp.getInventory().getItem(stack).grow(1);
-				carried.shrink(1);
-				if (carried.isEmpty()) taken = ItemStack.EMPTY;
-				sendAllDataToRemote();
-				return;
-			}
+			sendAllDataToRemote();
+			return;
 		}
 		super.clicked(slot, button, input, p); // o resto do inventário do jogador funciona normalmente
 	}
@@ -347,6 +344,7 @@ final class StorageMenu extends ChestMenu {
 			int pack = (int) Math.min(max, e.total);
 			setCarried(Storage.take(linked.containers, e.proto, button == 1 ? Math.max(1, (pack + 1) / 2) : max));
 			taken = e.proto;
+			takenTick = button == 1 ? sp.level().getServer().getTickCount() : -1;
 		}
 		refresh();
 		left(sp, e.proto);
@@ -375,6 +373,7 @@ final class StorageMenu extends ChestMenu {
 				page = 0;
 				refresh();
 			}
+			case ORGANIZE -> organize(sp);
 			case DEPOSIT -> storeInventory(sp);
 			case LINKS -> later(sp, () -> {
 				sp.closeContainer();
@@ -410,7 +409,7 @@ final class StorageMenu extends ChestMenu {
 		setCarried(carried.isEmpty() ? ItemStack.EMPTY : carried);
 		if (carried.isEmpty()) taken = ItemStack.EMPTY;
 		refresh();
-		if (back && moved > 0) left(sp, proto); // devolvendo o que tirou (a rodinha do Mouse Tweaks faz isso a cada giro)
+		if (back && moved > 0) left(sp, proto); // devolvendo o que tirou 
 		else feedback(sp, moved, moved == 0);
 	}
 
@@ -448,6 +447,19 @@ final class StorageMenu extends ChestMenu {
 			feedback(sp, moved, left);
 		}
 		refresh();
+	}
+
+	/** Botão "Organizar baús": uma categoria por baú quando dá; senão, em sequência. */
+	private void organize(ServerPlayer sp) {
+		Linked linked = linked();
+		if (noChests(sp, linked)) return;
+		List<ItemStack> rest = new ArrayList<>();
+		boolean each = Storage.organize(linked.containers, rest);
+		for (ItemStack st : rest) sp.getInventory().placeItemBackInInventory(st); // nunca deve acontecer: nada some
+		refresh();
+		SmartChest.say(sp, each ? "Baús organizados: cada categoria em baús próprios."
+			: "Baús organizados por categoria, em sequência (não há baús para uma categoria em cada).", ChatFormatting.GREEN);
+		sp.level().playSound(null, sp.blockPosition(), SoundEvents.BARREL_CLOSE, SoundSource.PLAYERS, 0.8f, 1f);
 	}
 
 	private static boolean noChests(ServerPlayer sp, Linked linked) {

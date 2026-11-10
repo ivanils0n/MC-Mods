@@ -105,7 +105,7 @@ final class SelfTest {
 		StorageMenu menu = StorageMenu.detached(fp, sc, "");
 		ensure(menu.view().size() == 2, "tipos na tela: " + menu.view().size());
 		ensure(menu.view().get(0).proto.is(Items.COBBLESTONE) && menu.view().get(1).total == 15 && menu.view().get(1).chests == 2,
-			"ordem/total por quantidade");
+			"ordem por nome (padrão) e total");
 		ensure(menu.getSlot(StorageMenu.GRID_START + 1).getItem().is(Items.DIAMOND) && menu.getSlot(StorageMenu.GRID_START + 1).getItem().getCount() == 15, "vitrine do diamante");
 		ensure(menu.getSlot(StorageMenu.GRID_START + 1).getItem().get(net.minecraft.core.component.DataComponents.LORE).lines().stream()
 			.map(Component::getString).toList().containsAll(List.of("Total: 15", "Em 2 baús", "Categoria: Minérios")), "texto do item: total e baús");
@@ -135,8 +135,8 @@ final class SelfTest {
 		menu.clicked(invSlot, 0, ContainerInput.QUICK_MOVE, fp); // Shift+clique no inventário: guarda
 		ensure(count(fp.getInventory(), Items.DIAMOND) == 0 && count(List.of(chest, barrel), Items.DIAMOND) == 15, "Shift+clique para guardar");
 
-		// Rodinha do Mouse Tweaks: botão direito no item (pega metade), botão direito no inventário (põe 1) e clique no
-		// item (devolve o resto). Ele clica num espaço vazio; o diamante vai para o monte que já está no inventário.
+		// Rodinha do Mouse Tweaks para tirar (desligada): botão direito no item (pega metade), botão direito no inventário
+		// (põe 1) e clique no item (devolve), no mesmo tick. Nada sai dos baús.
 		fp.getInventory().setItem(3, new ItemStack(Items.DIAMOND, 2));
 		int hotbar3 = -1;
 		for (int i = 54; i < menu.slots.size(); i++) if (menu.getSlot(i).container == fp.getInventory() && menu.getSlot(i).getContainerSlot() == 3) hotbar3 = i;
@@ -145,15 +145,16 @@ final class SelfTest {
 		menu.clicked(diamondSlot, 1, ContainerInput.PICKUP, fp);
 		menu.clicked(empty4, 1, ContainerInput.PICKUP, fp);
 		menu.clicked(diamondSlot, 0, ContainerInput.PICKUP, fp);
-		ensure(fp.getInventory().getItem(4).isEmpty() && fp.getInventory().getItem(3).getCount() == 3 && menu.getCarried().isEmpty() && count(List.of(chest, barrel), Items.DIAMOND) == 14,
+		ensure(fp.getInventory().getItem(4).isEmpty() && fp.getInventory().getItem(3).getCount() == 2 && menu.getCarried().isEmpty() && count(List.of(chest, barrel), Items.DIAMOND) == 15,
 			"rodinha para tirar: " + fp.getInventory().getItem(3) + " " + menu.getCarried() + " " + count(List.of(chest, barrel), Items.DIAMOND));
 		// Guardar: botão direito no inventário (pega metade), botão direito no item (guarda 1), clique no inventário (devolve).
 		menu.clicked(hotbar3, 1, ContainerInput.PICKUP, fp);
 		menu.clicked(diamondSlot, 1, ContainerInput.PICKUP, fp);
 		menu.clicked(hotbar3, 0, ContainerInput.PICKUP, fp);
-		ensure(fp.getInventory().getItem(3).getCount() == 2 && menu.getCarried().isEmpty() && count(List.of(chest, barrel), Items.DIAMOND) == 15,
+		ensure(fp.getInventory().getItem(3).getCount() == 1 && menu.getCarried().isEmpty() && count(List.of(chest, barrel), Items.DIAMOND) == 16,
 			"rodinha para guardar: " + fp.getInventory().getItem(3) + " " + menu.getCarried() + " " + count(List.of(chest, barrel), Items.DIAMOND));
 		fp.getInventory().setItem(3, ItemStack.EMPTY);
+		Storage.take(List.of(chest, barrel), new ItemStack(Items.DIAMOND), 1); // volta aos 15
 		menu.refresh();
 
 		ensure(StorageMenu.detached(fp, sc, "DIAM").view().size() == 1, "pesquisa pelo nome");
@@ -237,6 +238,19 @@ final class SelfTest {
 		chest.setItem(5, ItemStack.EMPTY);
 		for (int i = 0; i < fp.getInventory().getContainerSize(); i++) fp.getInventory().setItem(i, ItemStack.EMPTY);
 		Storage.insert(List.of(chest, barrel), new ItemStack(Items.DIAMOND, 15));
+
+		// Organizar: uma categoria por baú (Construção no baú, Minérios no barril), juntando as pilhas.
+		chest.setItem(10, new ItemStack(Items.DIAMOND, 3));
+		List<ItemStack> rest = new java.util.ArrayList<>();
+		ensure(Storage.organize(List.of(chest, barrel), rest) && rest.isEmpty() && count(chest, Items.COBBLESTONE) == 64
+			&& count(chest, Items.DIAMOND) == 0 && barrel.getItem(0).is(Items.DIAMOND) && barrel.getItem(0).getCount() == 18,
+			"organizar: " + chest.getItem(0) + " " + barrel.getItem(0));
+		// Mais categorias que baús: em sequência, nada some.
+		barrel.setItem(5, new ItemStack(Items.APPLE, 7));
+		ensure(!Storage.organize(List.of(chest, barrel), rest) && rest.isEmpty() && chest.getItem(0).is(Items.COBBLESTONE)
+			&& chest.getItem(1).getCount() == 18 && chest.getItem(2).getCount() == 7 && count(barrel, Items.APPLE) == 0,
+			"organizar em sequência: " + chest.getItem(1) + " " + chest.getItem(2));
+		chest.setItem(2, ItemStack.EMPTY);
 
 		// Baús cheios: não guarda nada e o item fica com o jogador.
 		for (Container c : List.of(chest, barrel)) for (int i = 0; i < c.getContainerSize(); i++) c.setItem(i, new ItemStack(Items.STONE, 64));

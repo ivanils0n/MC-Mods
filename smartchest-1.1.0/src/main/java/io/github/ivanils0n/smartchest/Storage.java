@@ -2,11 +2,13 @@ package io.github.ivanils0n.smartchest;
 
 import io.github.ivanils0n.smartchest.ChestStore.Chest;
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.component.DataComponents;
+import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.Container;
 import net.minecraft.world.entity.player.Inventory;
@@ -165,6 +167,60 @@ final class Storage {
 			if (changed) c.setChanged();
 		}
 		return before - stack.getCount();
+	}
+
+	/**
+	 * Organiza os baús por categoria (ordem das abas): junta os itens iguais em pilhas cheias e começa cada categoria num
+	 * baú novo quando há baús para isso; senão, as categorias ficam em sequência. Devolve se cada categoria ficou em baús
+	 * próprios. O que não couber (só com pilhas acima do normal, feitas por comando) vai para {@code leftover}.
+	 */
+	static boolean organize(List<Container> containers, List<ItemStack> leftover) {
+		Map<Key, long[]> totals = new LinkedHashMap<>();
+		for (Container c : containers) {
+			for (int i = 0; i < c.getContainerSize(); i++) {
+				ItemStack s = c.getItem(i);
+				if (s.isEmpty()) continue;
+				totals.computeIfAbsent(new Key(s.copyWithCount(1)), k -> new long[1])[0] += s.getCount();
+				c.setItem(i, ItemStack.EMPTY);
+			}
+		}
+		List<Key> keys = new ArrayList<>(totals.keySet());
+		keys.sort(Comparator.comparingInt((Key k) -> Categories.of(k.stack()))
+			.thenComparing(k -> BuiltInRegistries.ITEM.getKey(k.stack().getItem()).toString()));
+		List<ItemStack> stacks = new ArrayList<>();
+		for (Key k : keys) {
+			int max = maxStack(k.stack());
+			for (long n = totals.get(k)[0]; n > 0; n -= max) stacks.add(k.stack().copyWithCount((int) Math.min(max, n)));
+		}
+		boolean each = place(containers, stacks, true, null);
+		place(containers, stacks, each, leftover);
+		for (Container c : containers) c.setChanged();
+		return each;
+	}
+
+	/** Põe as pilhas em ordem nos baús ({@code out == null}: só confere se cabem). */
+	private static boolean place(List<Container> containers, List<ItemStack> stacks, boolean fresh, List<ItemStack> out) {
+		int ci = 0, slot = 0, prev = -1;
+		for (ItemStack st : stacks) {
+			int cat = Categories.of(st);
+			if (fresh && cat != prev && slot > 0) {
+				ci++;
+				slot = 0;
+			}
+			prev = cat;
+			while (ci < containers.size() && slot >= containers.get(ci).getContainerSize()) {
+				ci++;
+				slot = 0;
+			}
+			if (ci >= containers.size()) {
+				if (out == null) return false;
+				out.add(st);
+				continue;
+			}
+			if (out != null) containers.get(ci).setItem(slot, st);
+			slot++;
+		}
+		return true;
 	}
 
 	/** Quantos itens iguais a {@code proto} ainda cabem no inventário principal + hotbar do jogador. */
