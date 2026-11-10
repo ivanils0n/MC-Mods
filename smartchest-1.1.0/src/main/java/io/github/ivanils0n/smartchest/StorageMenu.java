@@ -210,13 +210,16 @@ final class StorageMenu extends ChestMenu {
 		});
 	}
 
-	/**
-	 * O item exatamente como é de verdade (mesmos componentes, sem texto extra), só com a quantidade até 99: assim a
-	 * rodinha do Mouse Tweaks reconhece o item e junta com o que já está no inventário.
-	 */
+	/** O item com a quantidade até 99 e, ao passar o mouse, o total e em quantos baús ele está. */
 	private static ItemStack display(Entry e) {
 		ItemStack s = e.proto.copy();
 		if (Storage.maxStack(s) > 1) s.setCount((int) Math.min(e.total, 99));
+		List<Component> lore = new ArrayList<>();
+		ItemLore old = s.get(DataComponents.LORE);
+		if (old != null) lore.addAll(old.lines().subList(0, Math.min(old.lines().size(), 200)));
+		lore.add(SmartChest.plain("Total: " + NUM.format(e.total), ChatFormatting.GRAY));
+		lore.add(SmartChest.plain("Em " + SmartChest.count(e.chests, "baú", "baús"), ChatFormatting.GRAY));
+		s.set(DataComponents.LORE, new ItemLore(lore));
 		return s;
 	}
 
@@ -281,6 +284,20 @@ final class StorageMenu extends ChestMenu {
 			storeSlot(sp, slots.get(slot)); // Shift+clique no próprio inventário: guarda o item
 			sendAllDataToRemote();
 			return;
+		}
+		// Rodinha do Mouse Tweaks: por causa do texto no item ele só enxerga espaços vazios como destino. Se já existe um
+		// monte desse item no inventário, o item vai para o monte em vez de ocupar um espaço novo.
+		ItemStack carried = getCarried();
+		if (input == ContainerInput.PICKUP && button == 1 && slot >= 54 && slot < slots.size() && !slots.get(slot).hasItem()
+			&& !taken.isEmpty() && ItemStack.isSameItemSameComponents(carried, taken)) {
+			int stack = sp.getInventory().getSlotWithRemainingSpace(carried);
+			if (stack >= 0) {
+				sp.getInventory().getItem(stack).grow(1);
+				carried.shrink(1);
+				if (carried.isEmpty()) taken = ItemStack.EMPTY;
+				sendAllDataToRemote();
+				return;
+			}
 		}
 		super.clicked(slot, button, input, p); // o resto do inventário do jogador funciona normalmente
 	}

@@ -102,8 +102,8 @@ final class SelfTest {
 		ensure(menu.view().get(0).proto.is(Items.COBBLESTONE) && menu.view().get(1).total == 15 && menu.view().get(1).chests == 2,
 			"ordem/total por quantidade");
 		ensure(menu.getSlot(StorageMenu.GRID_START + 1).getItem().is(Items.DIAMOND) && menu.getSlot(StorageMenu.GRID_START + 1).getItem().getCount() == 15, "vitrine do diamante");
-		ensure(ItemStack.isSameItemSameComponents(menu.getSlot(StorageMenu.GRID_START + 1).getItem(), new ItemStack(Items.DIAMOND)),
-			"vitrine diferente do item de verdade (a rodinha do Mouse Tweaks não reconhece)");
+		ensure(menu.getSlot(StorageMenu.GRID_START + 1).getItem().get(net.minecraft.core.component.DataComponents.LORE).lines().stream()
+			.map(Component::getString).toList().containsAll(List.of("Total: 15", "Em 2 baús")), "texto do item: total e baús");
 		ensure(menu.unloaded() == 0, "baús carregados contados como fora: " + menu.unloaded());
 		ensure(SmartChest.viewDistance(fp) >= 2, "distância de visão do jogador: " + SmartChest.viewDistance(fp));
 		// Baú ligado numa área que não está carregada: não aparece, é contado como fora da distância de visão e
@@ -131,15 +131,16 @@ final class SelfTest {
 		ensure(count(fp.getInventory(), Items.DIAMOND) == 0 && count(List.of(chest, barrel), Items.DIAMOND) == 15, "Shift+clique para guardar");
 
 		// Rodinha do Mouse Tweaks: botão direito no item (pega metade), botão direito no inventário (põe 1) e clique no
-		// item (devolve o resto). Tirar: 1 diamante vai para o monte que já está no inventário.
+		// item (devolve o resto). Ele clica num espaço vazio; o diamante vai para o monte que já está no inventário.
 		fp.getInventory().setItem(3, new ItemStack(Items.DIAMOND, 2));
 		int hotbar3 = -1;
 		for (int i = 54; i < menu.slots.size(); i++) if (menu.getSlot(i).container == fp.getInventory() && menu.getSlot(i).getContainerSlot() == 3) hotbar3 = i;
+		int empty4 = hotbar3 + 1;
 		menu.refresh();
 		menu.clicked(diamondSlot, 1, ContainerInput.PICKUP, fp);
-		menu.clicked(hotbar3, 1, ContainerInput.PICKUP, fp);
+		menu.clicked(empty4, 1, ContainerInput.PICKUP, fp);
 		menu.clicked(diamondSlot, 0, ContainerInput.PICKUP, fp);
-		ensure(fp.getInventory().getItem(3).getCount() == 3 && menu.getCarried().isEmpty() && count(List.of(chest, barrel), Items.DIAMOND) == 14,
+		ensure(fp.getInventory().getItem(4).isEmpty() && fp.getInventory().getItem(3).getCount() == 3 && menu.getCarried().isEmpty() && count(List.of(chest, barrel), Items.DIAMOND) == 14,
 			"rodinha para tirar: " + fp.getInventory().getItem(3) + " " + menu.getCarried() + " " + count(List.of(chest, barrel), Items.DIAMOND));
 		// Guardar: botão direito no inventário (pega metade), botão direito no item (guarda 1), clique no inventário (devolve).
 		menu.clicked(hotbar3, 1, ContainerInput.PICKUP, fp);
