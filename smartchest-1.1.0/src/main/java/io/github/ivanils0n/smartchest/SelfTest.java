@@ -222,17 +222,17 @@ final class SelfTest {
 			&& count(fp.getInventory(), Items.WRITABLE_BOOK) == 0, "Esc não pegou os separados ou mexeu no inventário");
 		// Item na mão sem soltar na fileira e seta de voltar: nada sai do baú nem entra no inventário.
 		chest.setItem(5, new ItemStack(Items.EMERALD, 7));
-		for (int back = 0; back < 2; back++) {
+		for (int back = 0; back < 3; back++) { // 0: só fechar; 1: seta de voltar; 2: X de limpar
 			SearchMenu s2 = SearchMenu.detached(fp, sc, "emerald");
 			s2.clicked(firstResult, 0, ContainerInput.PICKUP, fp);
 			ensure(s2.getCarried().is(Items.EMERALD), "pesquisa de esmeralda");
-			if (back == 1) {
+			if (back > 0) {
 				s2.clicked(firstBasket, 0, ContainerInput.PICKUP, fp);
-				s2.clicked(0, 0, ContainerInput.PICKUP, fp); // seta de voltar
+				s2.clicked(back - 1, 0, ContainerInput.PICKUP, fp); // seta de voltar ou X
 			}
 			s2.removed(fp);
 			ensure(count(fp.getInventory(), Items.EMERALD) == 0 && count(List.of(chest, barrel), Items.EMERALD) == 7
-				&& count(fp.getInventory(), Items.ARROW) == 0, "pesquisa deu ou perdeu item (voltar=" + back + ")");
+				&& count(fp.getInventory(), Items.ARROW) == 0 && count(fp.getInventory(), Items.BARRIER) == 0, "pesquisa deu ou perdeu item (voltar=" + back + ")");
 		}
 		chest.setItem(5, ItemStack.EMPTY);
 		for (int i = 0; i < fp.getInventory().getContainerSize(); i++) fp.getInventory().setItem(i, ItemStack.EMPTY);

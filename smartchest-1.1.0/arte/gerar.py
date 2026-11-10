@@ -23,7 +23,7 @@ SC = os.path.join(RES, "smartchest")
 # Abas (mesma ordem de Categories.KEYS no Java): cada uma tem o ícone normal e o "_on" (aba ativa, com moldura).
 TABS = ["todos", "construcao", "armaduras", "minerios", "redstone", "ferramentas", "comida", "ingredientes"]
 MODELS = ["chest", "chest_base", "chest_lid", "linker", "btn_prev", "btn_next", "btn_search", "btn_sort", "btn_info", "btn_deposit", "btn_links",
-          "btn_confirm", "btn_more", "tab_filter"] + [f"tab_{k}{on}" for k in TABS for on in ("", "_on")]
+          "btn_confirm", "btn_more", "btn_clear", "tab_filter"] + [f"tab_{k}{on}" for k in TABS for on in ("", "_on")]
 
 
 def hx(c, a=255):
@@ -172,11 +172,15 @@ def buttons():
     more = icon(["................", "................", "................", "................", "................",
                  "................", "................", "..##..##..##....", "..##..##..##....", "................",
                  "................", "................", "................", "................", "................", "................"])
+    clear = Image.new("RGBA", (16, 16), (0, 0, 0, 0))
+    for i in range(4, 12):
+        rect(clear, i, i, i + 1, i, "#ff6b7a"); rect(clear, 15 - i - 1, i, 15 - i, i, "#ff6b7a")
+    outline(clear, "#3a0d18")
     links = Image.new("RGBA", (16, 16), (0, 0, 0, 0))
     ring(links, 5.5, 8, 3.6, 2.6, "#c77dff", 1.3)
     ring(links, 10.5, 8, 3.6, 2.6, "#e3d8ff", 1.3)
     return {"btn_prev": prev, "btn_next": prev.transpose(Image.FLIP_LEFT_RIGHT), "btn_search": search, "btn_sort": sort,
-            "btn_deposit": deposit, "btn_info": info, "btn_links": links, "btn_confirm": confirm, "btn_more": more}
+            "btn_deposit": deposit, "btn_info": info, "btn_links": links, "btn_confirm": confirm, "btn_more": more, "btn_clear": clear}
 
 
 # ------------------------------------------------------------------ abas
@@ -404,6 +408,8 @@ def search_gui(icons, front):
     slot(133, 46, "#0b0816", "#5fd4b8")
     slot(26, 46, "#0b0816", "#8d5fe0")  # botão de voltar (1º espaço da bigorna), com contorno
     d.rectangle([25, 45, 44, 64], outline=hx("#8d5fe0"))
+    slot(75, 46, "#0b0816", "#b84a5a")  # X de limpar a pesquisa (2º espaço)
+    d.rectangle([74, 45, 93, 64], outline=hx("#b84a5a"))
     # faixa dos resultados: o jogo escreve "Inventário" em cinza #404040 em (8,72); fundo da mesma cor = texto some
     d.rectangle([4, 69, 171, 81], fill=hx("#151026"))
     d.rectangle([5, 70, 64, 81], fill=hx("#404040"))

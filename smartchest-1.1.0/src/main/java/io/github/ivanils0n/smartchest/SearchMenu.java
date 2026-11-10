@@ -32,7 +32,7 @@ import net.minecraft.world.phys.Vec3;
  * nada sai dos baús enquanto se separa. Ao sair o servidor reenvia o inventário real ao jogador.
  */
 final class SearchMenu extends AnvilMenu {
-	private static final int BACK_SLOT = 0, RESULT_SLOT = 2, RESULTS = 27, BASKET = 9;
+	private static final int BACK_SLOT = 0, CLEAR_SLOT = 1, RESULT_SLOT = 2, RESULTS = 27, BASKET = 9;
 	private static final int COST_DATA = 0; // único DataSlot da bigorna: o custo em níveis (0 = não mostra)
 
 	/** Um espaço da fileira de separados: o tipo e quantos. */
@@ -55,7 +55,7 @@ final class SearchMenu extends AnvilMenu {
 	private String typed;
 	private boolean done; // true depois de pegar/sair: nada roda duas vezes
 
-	private SearchMenu(int id, Inventory inv, ServerPlayer player, Chest chest, String query) {
+	private SearchMenu(int id, Inventory inv, ServerPlayer player, Chest chest, String query, Picked[] kept) {
 		super(id, inv);
 		this.player = player;
 		this.chest = chest;
@@ -84,19 +84,25 @@ final class SearchMenu extends AnvilMenu {
 		ItemStack field = icon(Items.ARROW, "btn_prev", "", "Clique: voltar ao Baú Central,", "sem a pesquisa e sem os separados.");
 		field.set(DataComponents.CUSTOM_NAME, Component.literal(query));
 		getSlot(BACK_SLOT).set(field);
+		if (kept != null) System.arraycopy(kept, 0, basket, 0, BASKET); // voltando de "limpar a pesquisa"
+		getSlot(CLEAR_SLOT).set(icon(Items.BARRIER, "btn_clear", "Limpar a pesquisa", "Os separados continuam na fileira."));
 		refresh();
 	}
 
 	/** Para o teste automático: a mesma tela, sem abrir no cliente. */
 	static SearchMenu detached(ServerPlayer player, Chest chest, String query) {
-		return new SearchMenu(0, player.getInventory(), player, chest, query);
+		return new SearchMenu(0, player.getInventory(), player, chest, query, null);
 	}
 
 	static void open(ServerPlayer player, Chest chest, String query) {
+		open(player, chest, query, null);
+	}
+
+	private static void open(ServerPlayer player, Chest chest, String query, Picked[] kept) {
 		// Com o pack, a bigorna ganha o fundo do Baú Central (o título dela começa em x=60).
 		Component title = SmartChest.hasPack(player) ? SmartChest.themedTitle("", "Pesquisar")
 			: Component.literal("Pesquisar no Baú Central");
-		player.openMenu(new SimpleMenuProvider((id, inv, p) -> new SearchMenu(id, inv, player, chest, query), title));
+		player.openMenu(new SimpleMenuProvider((id, inv, p) -> new SearchMenu(id, inv, player, chest, query, kept), title));
 	}
 
 	@Override
@@ -227,6 +233,10 @@ final class SearchMenu extends AnvilMenu {
 				back(sp);
 				return;
 			}
+			if (slot == CLEAR_SLOT) {
+				clear(sp);
+				return;
+			}
 			boolean shift = input == ContainerInput.QUICK_MOVE, right = button == 1;
 			if (slot == -999) setCarried(ItemStack.EMPTY); // soltou fora da tela: o item (de mentira) volta para o baú
 			else if (slot >= 0 && slot < slots.size() && slots.get(slot).container == shown) {
@@ -294,6 +304,16 @@ final class SearchMenu extends AnvilMenu {
 			basket[j] = new Picked(carried.copyWithCount(1), carried.getCount());
 			setCarried(b.proto.copyWithCount(b.count));
 		}
+	}
+
+	/** X: a caixa de texto é do cliente, então limpar é abrir a pesquisa de novo, vazia, com os mesmos separados. */
+	private void clear(ServerPlayer sp) {
+		done = true; // esta tela não pega nada ao fechar
+		setCarried(ItemStack.EMPTY);
+		Picked[] kept = basket.clone();
+		sp.level().getServer().execute(() -> {
+			if (!sp.hasDisconnected()) open(sp, chest, "", kept);
+		});
 	}
 
 	/** Seta de voltar: tela do baú sem a pesquisa e sem os separados (nada saiu dos baús). */
@@ -387,7 +407,8 @@ final class SearchMenu extends AnvilMenu {
 
 	@Override
 	public void removed(Player p) {
-		getSlot(BACK_SLOT).set(ItemStack.EMPTY); // o item de exibição nunca vai para o inventário
+		getSlot(BACK_SLOT).set(ItemStack.EMPTY); // os itens de exibição nunca vão para o inventário
+		getSlot(CLEAR_SLOT).set(ItemStack.EMPTY);
 		setCarried(ItemStack.EMPTY); // o item na mão é de mentira
 		resultSlots.setItem(0, ItemStack.EMPTY);
 		super.removed(p);
