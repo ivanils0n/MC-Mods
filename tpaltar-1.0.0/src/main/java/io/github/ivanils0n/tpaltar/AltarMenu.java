@@ -16,11 +16,10 @@ import net.minecraft.world.inventory.MenuType;
 import net.minecraft.world.inventory.Slot;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
-import net.minecraft.world.item.component.CustomModelData;
 import net.minecraft.world.item.component.ItemLore;
 
 /**
- * Baú virtual do altar: em cima os outros altares da dimensão (clique para viajar), na última fileira 4 espaços
+ * Baú virtual do altar: em cima os outros altares da dimensão (clique para viajar; mais de 45 viram páginas), na última fileira 4 espaços
  * de ender pearls que são o estoque do próprio altar (4 × 16 = 64). Só esses 4 espaços aceitam itens.
  */
 final class AltarMenu extends ChestMenu {
@@ -28,7 +27,7 @@ final class AltarMenu extends ChestMenu {
 		MenuType.GENERIC_9x1, MenuType.GENERIC_9x2, MenuType.GENERIC_9x3,
 		MenuType.GENERIC_9x4, MenuType.GENERIC_9x5, MenuType.GENERIC_9x6
 	};
-	static final int MAX_TARGETS = 45; // 5 fileiras de destinos + 1 de estoque
+	private static final int PAGE = 45; // 5 fileiras de destinos + 1 de estoque; acima disso, páginas
 	private static final int PEARL_SLOTS = 4;
 	private static final int FIRST_PEARL = 2; // posição na fileira de estoque: [vidro vidro P P P P vidro vidro vidro]
 
@@ -37,6 +36,7 @@ final class AltarMenu extends ChestMenu {
 	private final Box box;
 	private final int storeStart; // índice do primeiro espaço da fileira de estoque
 	private boolean loading;
+	private int page;
 
 	/** Baú que avisa o menu a cada mudança (o SimpleContainer da 26.x não tem ouvintes). */
 	private static final class Box extends SimpleContainer {
@@ -83,17 +83,42 @@ final class AltarMenu extends ChestMenu {
 			slot.index = i;
 			slots.set(i, slot);
 		}
+		showPage(0);
 		loadPearls();
 		box.onChange = this::pearlsMoved;
 	}
 
+	private int pages() {
+		return Math.max(1, (targets.size() + PAGE - 1) / PAGE);
+	}
+
+	/** Preenche os destinos da página e a fileira de baixo (vidros e, com mais de uma página, as setas nas pontas). */
+	private void showPage(int p) {
+		page = p;
+		loading = true;
+		for (int i = 0; i < storeStart; i++) {
+			int t = page * PAGE + i;
+			box.setItem(i, t < targets.size() ? icon(targets.get(t)) : ItemStack.EMPTY);
+		}
+		for (int i = storeStart; i < storeStart + 9; i++) if (!isPearlSlot(i)) box.setItem(i, pane());
+		if (pages() > 1) {
+			box.setItem(storeStart, arrow("◀ Página anterior"));
+			box.setItem(storeStart + 8, arrow("Próxima página ▶"));
+		}
+		loading = false;
+	}
+
+	private ItemStack arrow(String name) {
+		ItemStack s = new ItemStack(Items.ARROW);
+		s.set(DataComponents.CUSTOM_NAME, TpAltar.plain(name, ChatFormatting.LIGHT_PURPLE));
+		s.set(DataComponents.LORE, new ItemLore(List.of(TpAltar.plain("Página " + (page + 1) + " de " + pages(), ChatFormatting.GRAY))));
+		return s;
+	}
+
 	static void open(ServerPlayer player, Altar from, List<Altar> all) {
-		// shortcut: mostra só os 45 primeiros destinos; paginar se algum servidor passar disso por dimensão.
-		List<Altar> targets = List.copyOf(all.subList(0, Math.min(all.size(), MAX_TARGETS)));
-		int rows = (targets.size() + 8) / 9 + 1;
+		List<Altar> targets = List.copyOf(all);
+		int rows = (Math.min(targets.size(), PAGE) + 8) / 9 + 1;
 		Box box = new Box(rows * 9);
-		for (int i = 0; i < targets.size(); i++) box.setItem(i, icon(targets.get(i)));
-		for (int i = (rows - 1) * 9; i < rows * 9; i++) box.setItem(i, pane());
 		player.openMenu(new SimpleMenuProvider((id, inv, p) -> new AltarMenu(id, inv, box, rows, from, targets), title(player, rows, from.name)));
 		if (player.containerMenu instanceof AltarMenu) TpAltar.lock(from, player); // trava até teleportar ou fechar
 	}
@@ -143,7 +168,8 @@ final class AltarMenu extends ChestMenu {
 
 	private static ItemStack icon(Altar a) {
 		boolean charged = a.pearls >= TpAltar.COST;
-		ItemStack s = new ItemStack(charged ? Items.ENDER_EYE : Items.ENDER_PEARL);
+		// Sem o pack: olho do fim / ender pearl. Com o pack: olho rúnico aberto / fechado.
+		ItemStack s = charged ? TpAltar.piece(Items.ENDER_EYE, "tpaltar_dest_on", "dest_on") : TpAltar.piece(Items.ENDER_PEARL, "tpaltar_dest_off", "dest_off");
 		s.set(DataComponents.CUSTOM_NAME, TpAltar.plain(a.name, charged ? ChatFormatting.LIGHT_PURPLE : ChatFormatting.GRAY));
 		s.set(DataComponents.LORE, new ItemLore(List.of(
 			TpAltar.plain(a.x + ", " + a.y + ", " + a.z, ChatFormatting.GRAY),
@@ -155,10 +181,8 @@ final class AltarMenu extends ChestMenu {
 	}
 
 	private static ItemStack pane() {
-		ItemStack s = new ItemStack(Items.GLASS_PANE);
 		// Com o pack o vidro fica invisível e aparecem as runas do fundo; sem o pack continua vidro.
-		s.set(DataComponents.CUSTOM_MODEL_DATA, new CustomModelData(List.of(), List.of(), List.of("tpaltar_blank"), List.of()));
-		if (TpAltar.ownModels()) s.set(DataComponents.ITEM_MODEL, TpAltar.model("blank"));
+		ItemStack s = TpAltar.piece(Items.GLASS_PANE, "tpaltar_blank", "blank");
 		s.set(DataComponents.CUSTOM_NAME, TpAltar.plain("Ender pearls deste altar", ChatFormatting.LIGHT_PURPLE));
 		s.set(DataComponents.LORE, new ItemLore(List.of(
 			TpAltar.plain("Guarde até " + TpAltar.MAX_PEARLS + " nos espaços do meio.", ChatFormatting.GRAY),
@@ -169,11 +193,18 @@ final class AltarMenu extends ChestMenu {
 	@Override
 	public void clicked(int slot, int button, ContainerInput type, Player player) {
 		if (slot >= 0 && slot < storeStart + 9 && !isPearlSlot(slot)) {
-			// Destinos e vidros: nunca passam pelo clique normal. Reenvia o estado real ao cliente.
-			sendAllDataToRemote();
-			if (player instanceof ServerPlayer sp && type == ContainerInput.PICKUP && slot < targets.size()) {
-				TpAltar.teleport(sp, from, targets.get(slot));
+			// Destinos, setas e vidros: nunca passam pelo clique normal.
+			if (player instanceof ServerPlayer sp && type == ContainerInput.PICKUP) {
+				int target = page * PAGE + slot;
+				if (slot < storeStart) {
+					if (target < targets.size()) {
+						TpAltar.teleport(sp, from, targets.get(target)); // fecha este menu
+						return;
+					}
+				} else if (pages() > 1 && slot == storeStart) showPage(Math.floorMod(page - 1, pages()));
+				else if (pages() > 1 && slot == storeStart + 8) showPage(Math.floorMod(page + 1, pages()));
 			}
+			sendAllDataToRemote(); // reenvia o estado real ao cliente
 			return;
 		}
 		super.clicked(slot, button, type, player); // estoque e inventário do jogador funcionam como um baú normal

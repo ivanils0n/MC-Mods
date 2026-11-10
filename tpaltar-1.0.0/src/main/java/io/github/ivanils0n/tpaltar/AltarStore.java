@@ -49,6 +49,7 @@ final class AltarStore {
 
 	private final Path file;
 	private final Map<String, Altar> byKey = new LinkedHashMap<>();
+	private final Map<String, List<Altar>> byDim = new java.util.HashMap<>();
 	private boolean dirty;
 
 	private AltarStore(Path file) {
@@ -63,16 +64,18 @@ final class AltarStore {
 		return byKey.get(key(dim, pos.getX(), pos.getY(), pos.getZ()));
 	}
 
-	/** Altares da dimensão, sem ordenar (para o tick). */
+	/** Altares da dimensão, sem ordenar (para o tick). Lista fixa, refeita só quando um altar entra ou sai. */
 	List<Altar> inDimUnsorted(String dim) {
-		List<Altar> out = new ArrayList<>();
-		for (Altar a : byKey.values()) if (a.dim.equals(dim)) out.add(a);
-		return out;
+		return byDim.computeIfAbsent(dim, d -> {
+			List<Altar> out = new ArrayList<>();
+			for (Altar a : byKey.values()) if (a.dim.equals(d)) out.add(a);
+			return List.copyOf(out);
+		});
 	}
 
 	/** Altares da dimensão, em ordem alfabética. */
 	List<Altar> inDim(String dim) {
-		List<Altar> out = inDimUnsorted(dim);
+		List<Altar> out = new ArrayList<>(inDimUnsorted(dim));
 		out.sort(Comparator.comparing(a -> a.name.toLowerCase()));
 		return out;
 	}
@@ -88,11 +91,13 @@ final class AltarStore {
 
 	void add(Altar a) {
 		byKey.put(a.key(), a);
+		byDim.remove(a.dim);
 		save();
 	}
 
 	void remove(Altar a) {
 		byKey.remove(a.key());
+		byDim.remove(a.dim);
 		save();
 	}
 
@@ -141,6 +146,7 @@ final class AltarStore {
 				Files.move(tmp, file, StandardCopyOption.REPLACE_EXISTING);
 			}
 		} catch (IOException e) {
+			dirty = true; // tenta de novo no próximo segundo
 			TpAltar.LOG.error("Falha ao salvar {}", file, e);
 		}
 	}
