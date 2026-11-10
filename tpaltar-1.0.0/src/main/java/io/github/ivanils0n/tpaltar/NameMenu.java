@@ -31,7 +31,7 @@ final class NameMenu extends AnvilMenu {
 		this.pending = pending;
 		// Item só de exibição; nome vazio deixa o campo de texto em branco.
 		ItemStack shown = new ItemStack(Items.ENDER_PEARL);
-		shown.set(DataComponents.CUSTOM_NAME, Component.literal(""));
+		shown.set(DataComponents.CUSTOM_NAME, Component.literal("Teste"));
 		getSlot(0).set(shown);
 		setData(COST_DATA, TpAltar.PLACE_LEVELS);
 	}
