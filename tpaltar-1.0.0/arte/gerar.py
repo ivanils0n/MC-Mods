@@ -467,8 +467,8 @@ SKY = {"bg": "#0b0618", "bg2": "#0e081e", "bg3": "#120a26", "edge": "#3c3489", "
        "star": "#e0c8ff", "star2": "#5dcaa5", "line": "#534ab7", "teal": "#5dcaa5", "teal_dim": "#1d9e75",
        "socket_in": "#0b1f1a", "field": "#140a28", "slot": "#140a28", "slot_edge": "#7f77dd",
        "plate": "#afa9ec", "plate_edge": "#534ab7"}
-# shortcut: o campo escuro cobre o campo bege do jogo; se o nome digitado sumir no jogo, voltar para False (buraco)
-COVER_NAME_FIELD = True
+# O jogo desenha o nome digitado antes do fundo da tela (que é um texto): cobrir o campo esconderia o nome.
+COVER_NAME_FIELD = False
 
 
 def put(img, x, y, c):
