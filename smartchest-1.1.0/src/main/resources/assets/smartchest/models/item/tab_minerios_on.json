@@ -1,6 +1,6 @@
 {
  "parent": "minecraft:item/generated",
  "textures": {
-  "layer0": "smartchest:item/tab_natureza_on"
+  "layer0": "smartchest:item/tab_minerios_on"
  }
 }

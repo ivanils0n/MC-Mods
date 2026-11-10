@@ -102,6 +102,8 @@ final class SelfTest {
 		ensure(menu.view().get(0).proto.is(Items.COBBLESTONE) && menu.view().get(1).total == 15 && menu.view().get(1).chests == 2,
 			"ordem/total por quantidade");
 		ensure(menu.getSlot(StorageMenu.GRID_START + 1).getItem().is(Items.DIAMOND) && menu.getSlot(StorageMenu.GRID_START + 1).getItem().getCount() == 15, "vitrine do diamante");
+		ensure(ItemStack.isSameItemSameComponents(menu.getSlot(StorageMenu.GRID_START + 1).getItem(), new ItemStack(Items.DIAMOND)),
+			"vitrine diferente do item de verdade (a rodinha do Mouse Tweaks não reconhece)");
 		ensure(menu.unloaded() == 0, "baús carregados contados como fora: " + menu.unloaded());
 		ensure(SmartChest.viewDistance(fp) >= 2, "distância de visão do jogador: " + SmartChest.viewDistance(fp));
 		// Baú ligado numa área que não está carregada: não aparece, é contado como fora da distância de visão e
@@ -128,17 +130,52 @@ final class SelfTest {
 		menu.clicked(invSlot, 0, ContainerInput.QUICK_MOVE, fp); // Shift+clique no inventário: guarda
 		ensure(count(fp.getInventory(), Items.DIAMOND) == 0 && count(List.of(chest, barrel), Items.DIAMOND) == 15, "Shift+clique para guardar");
 
+		// Rodinha do Mouse Tweaks: botão direito no item (pega metade), botão direito no inventário (põe 1) e clique no
+		// item (devolve o resto). Tirar: 1 diamante vai para o monte que já está no inventário.
+		fp.getInventory().setItem(3, new ItemStack(Items.DIAMOND, 2));
+		int hotbar3 = -1;
+		for (int i = 54; i < menu.slots.size(); i++) if (menu.getSlot(i).container == fp.getInventory() && menu.getSlot(i).getContainerSlot() == 3) hotbar3 = i;
+		menu.refresh();
+		menu.clicked(diamondSlot, 1, ContainerInput.PICKUP, fp);
+		menu.clicked(hotbar3, 1, ContainerInput.PICKUP, fp);
+		menu.clicked(diamondSlot, 0, ContainerInput.PICKUP, fp);
+		ensure(fp.getInventory().getItem(3).getCount() == 3 && menu.getCarried().isEmpty() && count(List.of(chest, barrel), Items.DIAMOND) == 14,
+			"rodinha para tirar: " + fp.getInventory().getItem(3) + " " + menu.getCarried() + " " + count(List.of(chest, barrel), Items.DIAMOND));
+		// Guardar: botão direito no inventário (pega metade), botão direito no item (guarda 1), clique no inventário (devolve).
+		menu.clicked(hotbar3, 1, ContainerInput.PICKUP, fp);
+		menu.clicked(diamondSlot, 1, ContainerInput.PICKUP, fp);
+		menu.clicked(hotbar3, 0, ContainerInput.PICKUP, fp);
+		ensure(fp.getInventory().getItem(3).getCount() == 2 && menu.getCarried().isEmpty() && count(List.of(chest, barrel), Items.DIAMOND) == 15,
+			"rodinha para guardar: " + fp.getInventory().getItem(3) + " " + menu.getCarried() + " " + count(List.of(chest, barrel), Items.DIAMOND));
+		fp.getInventory().setItem(3, ItemStack.EMPTY);
+		menu.refresh();
+
 		ensure(StorageMenu.detached(fp, sc, "DIAM").view().size() == 1, "pesquisa pelo nome");
 
-		// Abas (categorias do criativo) e filtro pelo item.
-		ensure(Categories.of(new ItemStack(Items.DIAMOND_PICKAXE)) == 5 && Categories.of(new ItemStack(Items.APPLE)) == 6
-			&& Categories.of(new ItemStack(Items.DIAMOND)) == 7 && Categories.of(new ItemStack(Items.REDSTONE_TORCH)) == 4,
-			"categorias: " + Categories.of(new ItemStack(Items.DIAMOND_PICKAXE)) + " " + Categories.of(new ItemStack(Items.APPLE)) + " "
-				+ Categories.of(new ItemStack(Items.DIAMOND)) + " " + Categories.of(new ItemStack(Items.REDSTONE_TORCH)));
+		// Abas e filtro pelo item.
+		Object[][] cats = {
+			{Items.IRON_CHESTPLATE, 2}, {Items.DIAMOND_HORSE_ARMOR, 2}, {Items.WOLF_ARMOR, 2}, {Items.TURTLE_HELMET, 2},
+			{Items.DIAMOND_PICKAXE, 5}, {Items.DIAMOND_SWORD, 5}, {Items.ELYTRA, 5}, {Items.SHIELD, 5},
+			{Items.OAK_LOG, 1}, {Items.OAK_PLANKS, 1}, {Items.OAK_DOOR, 1}, {Items.CRAFTING_TABLE, 1}, {Items.CHEST, 1},
+			{Items.FURNACE, 1}, {Items.COBBLESTONE, 1}, {Items.DIRT, 1}, {Items.WHITE_WOOL, 1}, {Items.OAK_LEAVES, 1},
+			{Items.IRON_ORE, 3}, {Items.RAW_IRON, 3}, {Items.IRON_INGOT, 3}, {Items.DIAMOND, 3}, {Items.IRON_BLOCK, 3}, {Items.COAL, 3},
+			{Items.PISTON, 4}, {Items.OBSERVER, 4}, {Items.DROPPER, 4}, {Items.DISPENSER, 4}, {Items.COMPARATOR, 4},
+			{Items.REDSTONE, 4}, {Items.REDSTONE_BLOCK, 4}, {Items.REDSTONE_TORCH, 4}, {Items.HOPPER, 4}, {Items.LEVER, 4},
+			{Items.STONE_BUTTON, 4}, {Items.REDSTONE_LAMP, 4},
+			{Items.APPLE, 6}, {Items.POTION, 6}, {Items.WHEAT_SEEDS, 6}, {Items.OAK_SAPLING, 6}, {Items.SUGAR_CANE, 6},
+			{Items.STRING, 7}, {Items.BONE, 7}, {Items.SLIME_BALL, 7}};
+		StringBuilder wrong = new StringBuilder();
+		for (Object[] c : cats) {
+			int got = Categories.of(new ItemStack((net.minecraft.world.item.Item) c[0]));
+			if (got != (int) c[1]) wrong.append(' ').append(c[0]).append('=').append(got).append("(esperado ").append(c[1]).append(')');
+		}
+		ensure(wrong.isEmpty(), "categorias:" + wrong);
 		menu.clicked(StorageMenu.FIRST_TAB + 5, 0, ContainerInput.PICKUP, fp); // aba Ferramentas e combate
 		ensure(menu.view().isEmpty(), "aba de ferramentas mostrou " + menu.view().size());
-		menu.clicked(StorageMenu.FIRST_TAB + 7, 0, ContainerInput.PICKUP, fp); // aba Ingredientes e outros
-		ensure(menu.view().size() == 1 && menu.view().get(0).proto.is(Items.DIAMOND), "aba de ingredientes");
+		menu.clicked(StorageMenu.FIRST_TAB + 3, 0, ContainerInput.PICKUP, fp); // aba Minérios
+		ensure(menu.view().size() == 1 && menu.view().get(0).proto.is(Items.DIAMOND), "aba de minérios");
+		menu.clicked(StorageMenu.FIRST_TAB + 1, 0, ContainerInput.PICKUP, fp); // aba Construção
+		ensure(menu.view().size() == 1 && menu.view().get(0).proto.is(Items.COBBLESTONE), "aba de construção");
 		menu.clicked(StorageMenu.FIRST_TAB, 0, ContainerInput.PICKUP, fp); // Todos
 		ensure(menu.view().size() == 2, "aba Todos");
 		menu.setCarried(new ItemStack(Items.COBBLESTONE, 3));

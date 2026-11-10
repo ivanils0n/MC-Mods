@@ -21,7 +21,7 @@ SC = os.path.join(RES, "smartchest")
 
 # Modelos do mod; SmartChest.java usa os mesmos nomes no componente item_model ("smartchest:<nome>").
 # Abas (mesma ordem de Categories.KEYS no Java): cada uma tem o ícone normal e o "_on" (aba ativa, com moldura).
-TABS = ["todos", "construcao", "natureza", "funcionais", "redstone", "ferramentas", "comida", "ingredientes"]
+TABS = ["todos", "construcao", "armaduras", "minerios", "redstone", "ferramentas", "comida", "ingredientes"]
 MODELS = ["chest", "linker", "btn_prev", "btn_next", "btn_search", "btn_sort", "btn_info", "btn_deposit", "btn_links",
           "btn_confirm", "btn_more", "tab_filter"] + [f"tab_{k}{on}" for k in TABS for on in ("", "_on")]
 
@@ -191,14 +191,10 @@ def tab_icons():
                          "..############..", "..#rrrrr#rrr#...", "..#rrrrr#rrr#...", "..############..", "..#rrr#rrrrr#...",
                          "..#rrr#rrrrr#...", "..############..", "................", "................", "................", "................"],
                         {"#": "#d9ccc0", "r": "#a0503a"}),
-        "natureza": I(["................", "................", "..gggggggggggg..", "..gGgggGggggGg..", "..gggGgggGgggg..",
-                       "..dgdddgdddgdd..", "..dddddddddddd..", "..ddDdddddDddd..", "..dddddDdddddd..", "..dDdddddddDdd..",
-                       "..dddddddddddd..", "..ddddDddddddd..", "................", "................", "................", "................"],
-                      {"g": "#5da83a", "G": "#86d05a", "d": "#7a5634", "D": "#5c3f24"}),
-        "funcionais": I(["................", "................", "..############..", "..#wwwwwwwwww#..", "..#w#w#ww#w#w#..",
-                         "..############..", "..#pppppppppp#..", "..#p#pppppp#p#..", "..#p#pppppp#p#..", "..#pppppppppp#..",
-                         "..#p#pppppp#p#..", "..############..", "................", "................", "................", "................"],
-                        {"#": "#3d2a17", "w": "#b8915a", "p": "#8a6634"}),
+        "armaduras": I(["................", "................", "..###......###..", ".#llw#....#wwd#.", ".#lwww####wwwd#.",
+                        ".#lwwwwwwwwwwd#.", ".##lwwwwwwwwd##.", "..##lwwwwwwd##..", "...#lwwwwwwd#...", "...#lwwwwwwd#...",
+                        "...#lwwwwwwd#...", "...#lddddddd#...", "...##########...", "................", "................", "................"],
+                       {"#": "#2b2b33", "w": "#d8d8d8", "l": "#ffffff", "d": "#9a9a9a"}),
         "comida": I(["................", "................", ".......b........", "......b.ll......", "....rrbrrl......",
                      "...rrrrrrrr.....", "..rRrrrrrrrr....", "..rRrrrrrrrr....", "..rrrrrrrrrr....", "..rrrrrrrrrr....",
                      "...rrrrrrrr.....", "....rr..rr......", "................", "................", "................", "................"],
@@ -208,19 +204,48 @@ def tab_icons():
     px(red, [(6, 6), (7, 6), (8, 7), (9, 8), (7, 9), (6, 8), (8, 9), (10, 7), (5, 7), (9, 10), (4, 9)], "#e52b1a")
     px(red, [(7, 7), (8, 8)], "#ff7a6a")
     icons["redstone"] = red
+    ore = Image.new("RGBA", (16, 16), (0, 0, 0, 0))  # pedra com pontos de diamante, ouro e esmeralda
+    noise(ore, ["#7d7d7d", "#8a8a8a", "#727272"], 3, (2, 2, 14, 14))
+    rect(ore, 2, 2, 13, 2, "#a3a3a3"); rect(ore, 2, 2, 2, 13, "#a3a3a3")
+    rect(ore, 2, 13, 13, 13, "#575757"); rect(ore, 13, 2, 13, 13, "#575757")
+    for (x, y), (c, h) in {(4, 4): ("#4ee6d8", "#c8fff8"), (9, 5): ("#f5d36a", "#fff3b0"), (5, 9): ("#3fd16b", "#b8ffcc"),
+                           (9, 10): ("#4ee6d8", "#c8fff8")}.items():
+        rect(ore, x, y, x + 1, y + 1, c); px(ore, [(x, y)], h)
+    icons["minerios"] = ore
+    # Espada (lâmina para cima à esquerda) cruzada com uma picareta reta de cabeça simétrica, formando um X.
+    sword = Image.new("RGBA", (16, 16), (0, 0, 0, 0))
+    for i in range(1, 11):
+        sword.putpixel((i, i), hx("#f4f4f4"))
+        if i < 10:
+            sword.putpixel((i + 1, i), hx("#b4b4c0"))
+    for t in (-1, 0, 1):
+        sword.putpixel((11 + t, 11 - t), hx("#f5d36a" if t == 0 else "#d9a23a"))
+    for i in (12, 13):
+        sword.putpixel((i, i), hx("#5c3f24"))
+    sword.putpixel((14, 14), hx("#d9a23a"))
+    outline(sword, "#1c1c22")
     pick = Image.new("RGBA", (16, 16), (0, 0, 0, 0))
-    for i in range(10):
-        pick.putpixel((2 + i, 13 - i), hx("#7a5530"))
-    for t in range(-5, 6):
-        x, y = 10 + t + (t * t) // 9, 5 + t - (t * t) // 9
-        for a, b, col in ((x, y, "#4ee6d8"), (x + 1, y, "#1fb5a8")):
-            if 0 <= a < 16 and 0 <= b < 16:
-                pick.putpixel((a, b), hx(col))
+    for i in range(10):  # cabo reto na diagonal x+y=15
+        pick.putpixel((1 + i, 14 - i), hx("#8a6036" if i % 2 else "#6b4a2a"))
+    for y in range(16):  # cabeça simétrica em relação ao cabo, as duas pontas curvando para o cabo
+        for x in range(16):
+            o, d = x + y - 15, x - y
+            c = 9 - o * o / 8
+            if abs(o) <= 5 and c - 1.6 <= d <= c + 0.4:
+                pick.putpixel((x, y), hx("#7ff0e2" if d >= c - 0.6 else "#22b3a6"))
     outline(pick, "#0d1f1d")
-    icons["ferramentas"] = pick
-    ingot = Image.new("RGBA", (16, 16), (0, 0, 0, 0))
-    rect(ingot, 3, 7, 12, 10, "#d8d8d8"); rect(ingot, 4, 6, 13, 6, "#ffffff"); rect(ingot, 3, 10, 12, 10, "#9a9a9a")
-    icons["ingredientes"] = ingot
+    sword.alpha_composite(pick)
+    icons["ferramentas"] = sword
+    bone = Image.new("RGBA", (16, 16), (0, 0, 0, 0))
+    for i in range(4, 12):
+        px(bone, [(i, 15 - i)], "#f2ecd8")
+        if 4 < i < 11:
+            px(bone, [(i, 14 - i)], "#f2ecd8")
+    for kx, ky in ((11, 2), (13, 4), (2, 11), (4, 13)):
+        rect(bone, kx - 1, ky - 1, kx, ky, "#f2ecd8")
+    px(bone, [(i, 15 - i) for i in range(5, 11)], "#cfc6a8")
+    outline(bone, "#4a4238")
+    icons["ingredientes"] = bone
     out = {}
     for k in TABS:
         out["tab_" + k] = icons[k]

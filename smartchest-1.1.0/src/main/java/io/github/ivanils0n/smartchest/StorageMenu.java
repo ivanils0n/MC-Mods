@@ -58,6 +58,8 @@ final class StorageMenu extends ChestMenu {
 	private final Map<Key, String> haystacks = new HashMap<>();
 	private List<Entry> view = List.of();
 	private int page, pages = 1, ticks, unloaded;
+	/** Item tirado da grade que ainda está na mão: devolver ele não é "guardar" (sem mensagem nem som). */
+	private ItemStack taken = ItemStack.EMPTY;
 
 	private StorageMenu(int id, Inventory inv, SimpleContainer box, ServerPlayer player, Chest chest, String query, int page) {
 		super(MenuType.GENERIC_9x6, id, inv, box, 6);
@@ -169,6 +171,9 @@ final class StorageMenu extends ChestMenu {
 		if (linked.totalSlots > 0) {
 			info.add("Espaço usado: " + linked.usedSlots + "/" + linked.totalSlots + " (" + linked.usedSlots * 100 / linked.totalSlots + "%)");
 		}
+		info.add("");
+		info.add("Nos itens: clique pega 1 pacote, botão direito");
+		info.add("metade, Shift+clique manda para o inventário.");
 		ItemStack book = button(Items.BOOK, "btn_info", "Página " + (page + 1) + " de " + pages, info.toArray(String[]::new));
 		book.set(DataComponents.MAX_STACK_SIZE, 99);
 		book.setCount(Math.min(page + 1, 99));
@@ -205,24 +210,13 @@ final class StorageMenu extends ChestMenu {
 		});
 	}
 
+	/**
+	 * O item exatamente como é de verdade (mesmos componentes, sem texto extra), só com a quantidade até 99: assim a
+	 * rodinha do Mouse Tweaks reconhece o item e junta com o que já está no inventário.
+	 */
 	private static ItemStack display(Entry e) {
 		ItemStack s = e.proto.copy();
-		int max = Storage.maxStack(s);
-		if (max > 1) {
-			s.set(DataComponents.MAX_STACK_SIZE, 99); // mostra até 99 no espaço; o total exato vai no texto
-			s.setCount((int) Math.min(e.total, 99));
-		}
-		List<Component> lore = new ArrayList<>();
-		ItemLore old = s.get(DataComponents.LORE);
-		if (old != null) lore.addAll(old.lines().subList(0, Math.min(old.lines().size(), 200)));
-		int pack = (int) Math.min(max, e.total);
-		lore.add(SmartChest.plain("Total: " + NUM.format(e.total), ChatFormatting.GRAY));
-		lore.add(SmartChest.plain("Em " + SmartChest.count(e.chests, "baú", "baús"), ChatFormatting.GRAY));
-		lore.add(Component.empty());
-		lore.add(SmartChest.plain("Clique: pegar " + pack, ChatFormatting.DARK_GRAY));
-		lore.add(SmartChest.plain("Botão direito: pegar " + (pack + 1) / 2, ChatFormatting.DARK_GRAY));
-		lore.add(SmartChest.plain("Shift+clique: para o inventário", ChatFormatting.DARK_GRAY));
-		s.set(DataComponents.LORE, new ItemLore(lore));
+		if (Storage.maxStack(s) > 1) s.setCount((int) Math.min(e.total, 99));
 		return s;
 	}
 
@@ -330,8 +324,17 @@ final class StorageMenu extends ChestMenu {
 		} else {
 			int pack = (int) Math.min(max, e.total);
 			setCarried(Storage.take(linked.containers, e.proto, button == 1 ? Math.max(1, (pack + 1) / 2) : max));
+			taken = e.proto;
 		}
 		refresh();
+		left(sp, e.proto);
+	}
+
+	/** Quanto sobrou do item, na barra de ação (o número no item vai só até 99). */
+	private void left(ServerPlayer sp, ItemStack proto) {
+		long n = 0;
+		for (Entry x : view) if (ItemStack.isSameItemSameComponents(x.proto, proto)) n = x.total;
+		sp.sendSystemMessage(SmartChest.plain(Lang.resolve(proto.getHoverName(), tr) + ": " + NUM.format(n) + " no baú", ChatFormatting.GRAY), true);
 	}
 
 	private void clickButton(ServerPlayer sp, int slot, int button) {
@@ -377,12 +380,16 @@ final class StorageMenu extends ChestMenu {
 		ItemStack carried = getCarried();
 		Linked linked = linked();
 		if (noChests(sp, linked)) return;
+		boolean back = !taken.isEmpty() && ItemStack.isSameItemSameComponents(carried, taken);
+		ItemStack proto = carried.copyWithCount(1);
 		ItemStack part = one ? carried.split(1) : carried;
 		int moved = Storage.insert(linked.containers, part);
 		if (one && !part.isEmpty()) carried.grow(part.getCount()); // não coube: volta para a mão
 		setCarried(carried.isEmpty() ? ItemStack.EMPTY : carried);
-		feedback(sp, moved, moved == 0);
+		if (carried.isEmpty()) taken = ItemStack.EMPTY;
 		refresh();
+		if (back && moved > 0) left(sp, proto); // devolvendo o que tirou (a rodinha do Mouse Tweaks faz isso a cada giro)
+		else feedback(sp, moved, moved == 0);
 	}
 
 	/** Shift+clique num item do próprio inventário. */
