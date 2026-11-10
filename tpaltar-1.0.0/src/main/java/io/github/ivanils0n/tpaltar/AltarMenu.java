@@ -3,9 +3,12 @@ package io.github.ivanils0n.tpaltar;
 import io.github.ivanils0n.tpaltar.AltarStore.Altar;
 import java.util.List;
 import net.minecraft.ChatFormatting;
+import net.minecraft.core.BlockPos;
 import net.minecraft.core.component.DataComponents;
 import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.sounds.SoundEvents;
+import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.SimpleContainer;
 import net.minecraft.world.SimpleMenuProvider;
 import net.minecraft.world.entity.player.Inventory;
@@ -98,9 +101,10 @@ final class AltarMenu extends ChestMenu {
 		loading = true;
 		for (int i = 0; i < storeStart; i++) {
 			int t = page * PAGE + i;
-			box.setItem(i, t < targets.size() ? icon(targets.get(t)) : ItemStack.EMPTY);
+			// Vazios ficam ocupados: senão o shift-clique numa ender pearl aparece neles no cliente.
+			box.setItem(i, t < targets.size() ? icon(targets.get(t)) : blank("Sem altar", "Outro altar nesta dimensão aparece aqui."));
 		}
-		for (int i = storeStart; i < storeStart + 9; i++) if (!isPearlSlot(i)) box.setItem(i, pane());
+		for (int i = storeStart; i < storeStart + 9; i++) if (!isPearlSlot(i)) box.setItem(i, blank("Ender pearls deste altar", "Guarde até " + TpAltar.MAX_PEARLS + " nos espaços do meio.", "Cada viagem até aqui gasta " + TpAltar.COST + "."));
 		if (pages() > 1) {
 			box.setItem(storeStart, arrow("◀ Página anterior"));
 			box.setItem(storeStart + 8, arrow("Próxima página ▶"));
@@ -120,7 +124,9 @@ final class AltarMenu extends ChestMenu {
 		int rows = (Math.min(targets.size(), PAGE) + 8) / 9 + 1;
 		Box box = new Box(rows * 9);
 		player.openMenu(new SimpleMenuProvider((id, inv, p) -> new AltarMenu(id, inv, box, rows, from, targets), title(player, rows, from.name)));
-		if (player.containerMenu instanceof AltarMenu) TpAltar.lock(from, player); // trava até teleportar ou fechar
+		if (!(player.containerMenu instanceof AltarMenu)) return;
+		TpAltar.lock(from, player); // trava até teleportar ou fechar
+		player.level().playSound(null, new BlockPos(from.x, from.y, from.z), SoundEvents.ENDER_CHEST_OPEN, SoundSource.BLOCKS, 0.6f, 1.2f);
 	}
 
 	/** Fundo de baú com o mesmo número de fileiras (caracteres \uE000 a \uE005 da fonte tpaltar:gui). */
@@ -180,13 +186,11 @@ final class AltarMenu extends ChestMenu {
 		return s;
 	}
 
-	private static ItemStack pane() {
+	private static ItemStack blank(String name, String... lore) {
 		// Com o pack o vidro fica invisível e aparecem as runas do fundo; sem o pack continua vidro.
 		ItemStack s = TpAltar.piece(Items.GLASS_PANE, "tpaltar_blank", "blank");
-		s.set(DataComponents.CUSTOM_NAME, TpAltar.plain("Ender pearls deste altar", ChatFormatting.LIGHT_PURPLE));
-		s.set(DataComponents.LORE, new ItemLore(List.of(
-			TpAltar.plain("Guarde até " + TpAltar.MAX_PEARLS + " nos espaços do meio.", ChatFormatting.GRAY),
-			TpAltar.plain("Cada viagem até aqui gasta " + TpAltar.COST + ".", ChatFormatting.GRAY))));
+		s.set(DataComponents.CUSTOM_NAME, TpAltar.plain(name, ChatFormatting.LIGHT_PURPLE));
+		s.set(DataComponents.LORE, new ItemLore(java.util.Arrays.stream(lore).map(l -> TpAltar.plain(l, ChatFormatting.GRAY)).toList()));
 		return s;
 	}
 
