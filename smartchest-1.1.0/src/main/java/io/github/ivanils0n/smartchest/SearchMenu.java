@@ -175,7 +175,7 @@ final class SearchMenu extends AnvilMenu {
 
 	private ItemStack confirmItem() {
 		if (basket.isEmpty()) {
-			return icon(Items.LIME_DYE, "btn_confirm", "Ver no Baú Inteligente", "Abre o baú com esta pesquisa.",
+			return icon(Items.EMERALD, "btn_confirm", "Ver no Baú Inteligente", "Abre o baú com esta pesquisa.",
 				"Clique nos resultados para separar itens.");
 		}
 		List<String> lines = new ArrayList<>();
@@ -183,7 +183,7 @@ final class SearchMenu extends AnvilMenu {
 		lines.add("");
 		lines.add("Leva para o seu inventário e volta ao baú.");
 		lines.add("Esc também pega.");
-		ItemStack s = icon(Items.LIME_DYE, "btn_confirm", "Pegar os separados", lines.toArray(String[]::new));
+		ItemStack s = icon(Items.EMERALD, "btn_confirm", "Pegar os separados", lines.toArray(String[]::new));
 		s.setCount(basket.size());
 		return s;
 	}
