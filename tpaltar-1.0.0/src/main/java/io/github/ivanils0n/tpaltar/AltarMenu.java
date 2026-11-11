@@ -190,7 +190,7 @@ final class AltarMenu extends ChestMenu {
 		// Com o pack o vidro fica invisível e aparecem as runas do fundo; sem o pack continua vidro.
 		ItemStack s = TpAltar.piece(Items.GLASS_PANE, "tpaltar_blank", "blank");
 		s.set(DataComponents.CUSTOM_NAME, TpAltar.plain(name, ChatFormatting.LIGHT_PURPLE));
-		s.set(DataComponents.LORE, new ItemLore(java.util.Arrays.stream(lore).map(l -> TpAltar.plain(l, ChatFormatting.GRAY)).toList()));
+		s.set(DataComponents.LORE, new ItemLore(java.util.Arrays.stream(lore).<Component>map(l -> TpAltar.plain(l, ChatFormatting.GRAY)).toList()));
 		return s;
 	}
 
