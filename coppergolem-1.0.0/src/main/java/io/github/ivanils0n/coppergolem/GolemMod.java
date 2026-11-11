@@ -122,7 +122,11 @@ public final class GolemMod implements ModInitializer {
 		if (links == null || hand != InteractionHand.MAIN_HAND || player.isSpectator() || !isWand(player.getMainHandItem()) || !(entity instanceof CopperGolem)) {
 			return InteractionResult.PASS;
 		}
-		if (!(player instanceof ServerPlayer sp)) return InteractionResult.SUCCESS; // cliente: não deixa o jogo fazer a ação normal do golem
+		if (!(player instanceof ServerPlayer sp)) return InteractionResult.CONSUME; // cliente: não deixa o jogo fazer a ação normal do golem
+		if (!sp.isShiftKeyDown()) { // sem agachar: nada acontece (e o golem não é mexido)
+			sp.sendSystemMessage(plain("Agache (shift) + botão direito no golem para ligar o cajado.", ChatFormatting.YELLOW), true);
+			return InteractionResult.CONSUME;
+		}
 		try {
 			ItemStack wand = sp.getMainHandItem();
 			CustomData data = wand.get(DataComponents.CUSTOM_DATA);

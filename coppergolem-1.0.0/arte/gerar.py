@@ -88,15 +88,17 @@ def icon():
     return out
 
 
-def model():
+def model(tilt=True):
     DY = -5.8  # pegada no cabo, perto do pomo: o cabo fica onde o cabo de uma espada do jogo fica na mão
 
     def box(a, b, tex, **over):
         faces = {f: {"texture": "#" + over.get(f, tex)} for f in ("north", "south", "east", "west", "up", "down")}
         if "uv_south" in over:
             faces["south"]["uv"] = over["uv_south"]
-        return {"from": [a[0], a[1] + DY, a[2]], "to": [b[0], b[1] + DY, b[2]], "faces": faces,
-                "rotation": {"angle": -45, "axis": "z", "origin": [8, 8, 8]}}
+        el = {"from": [a[0], a[1] + DY, a[2]], "to": [b[0], b[1] + DY, b[2]], "faces": faces}
+        if tilt:
+            el["rotation"] = {"angle": -45, "axis": "z", "origin": [8, 8, 8]}
+        return el
     els = [
         box([6.5, 0, 6.5], [9.5, 3, 9.5], "cu"),             # pomo
         box([7, 3, 7], [9, 4, 9], "cu"),                     # pescoço do pomo
@@ -120,6 +122,11 @@ def model():
         "firstperson_righthand": {"rotation": [0, -90, 25], "translation": [1.13, 3.2, 1.13], "scale": [0.68, 0.68, 0.68]},
         "firstperson_lefthand": {"rotation": [0, 90, -25], "translation": [1.13, 3.2, 1.13], "scale": [0.68, 0.68, 0.68]},
     }
+    if not tilt:  # 1ª pessoa: reto, rosto para a câmera (valores que já ficaram retos no jogo)
+        disp = {
+            "firstperson_righthand": {"rotation": [0, -90, 160], "translation": [1.13, 3.2, 1.13], "scale": [0.68, 0.68, 0.68]},
+            "firstperson_lefthand": {"rotation": [0, 90, -160], "translation": [1.13, 3.2, 1.13], "scale": [0.68, 0.68, 0.68]},
+        }
     return {"gui_light": "front", "textures": {"particle": "coppergolem:item/wand", "cu": "coppergolem:item/wand",
             "face": "coppergolem:item/wand_face", "ox": "coppergolem:item/wand_ox", "wood": "coppergolem:item/wand_wood", "light": "coppergolem:item/wand_light"}, "elements": els, "display": disp}
 
@@ -173,8 +180,12 @@ def main():
     save(light_tex(), "textures/item/wand_light.png")
     save(gui(), "textures/gui/menu.png")
     save(model(), "models/item/wand.json")
-    # o mesmo modelo 3D em todo lugar (inventário, mão, chão, moldura)
-    save({"model": {"type": "minecraft:model", "model": "coppergolem:item/wand"}}, "items/wand.json")
+    save(model(False), "models/item/wand_fp.json")
+    # 1ª pessoa: modelo reto; o resto (3ª pessoa, inventário, chão, moldura): o modelo inclinado
+    fp = {"type": "minecraft:model", "model": "coppergolem:item/wand_fp"}
+    save({"model": {"type": "minecraft:select", "property": "minecraft:display_context",
+          "cases": [{"when": ["firstperson_righthand", "firstperson_lefthand"], "model": fp}],
+          "fallback": {"type": "minecraft:model", "model": "coppergolem:item/wand"}}}, "items/wand.json")
     save({"providers": [
         {"type": "space", "advances": {"": -8, "": -177, "": 0}},
         {"type": "bitmap", "file": "coppergolem:gui/menu.png", "ascent": 13, "height": 168, "chars": [""]}]}, "font/gui.json")

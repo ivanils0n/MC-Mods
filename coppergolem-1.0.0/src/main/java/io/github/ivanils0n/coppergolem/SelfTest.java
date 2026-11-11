@@ -69,6 +69,8 @@ final class SelfTest {
 		// Clique do jogador com o cajado no golem: tem que ligar o cajado a ele e abrir a tela.
 		FakePlayer fp = FakePlayer.get(sl);
 		fp.setItemInHand(InteractionHand.MAIN_HAND, GolemMod.wandItem());
+		ensure(UseEntityCallback.EVENT.invoker().interact(fp, sl, InteractionHand.MAIN_HAND, g, null) == InteractionResult.CONSUME && GolemMod.golemOf(fp.getMainHandItem()) == null, "sem shift o cajado não pode ligar");
+		fp.setShiftKeyDown(true);
 		InteractionResult r = UseEntityCallback.EVENT.invoker().interact(fp, sl, InteractionHand.MAIN_HAND, g, null);
 		ensure(r == InteractionResult.SUCCESS, "clique com o cajado no golem: " + r);
 		ensure(g.getUUID().equals(GolemMod.golemOf(fp.getMainHandItem())), "cajado não ficou ligado ao golem");
