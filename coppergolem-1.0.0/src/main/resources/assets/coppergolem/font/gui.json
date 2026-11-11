@@ -1,0 +1,21 @@
+{
+ "providers": [
+  {
+   "type": "space",
+   "advances": {
+    "\uf000": -8,
+    "\uf001": -177,
+    "\uf002": 0
+   }
+  },
+  {
+   "type": "bitmap",
+   "file": "coppergolem:gui/menu.png",
+   "ascent": 13,
+   "height": 168,
+   "chars": [
+    "\ue000"
+   ]
+  }
+ ]
+}
