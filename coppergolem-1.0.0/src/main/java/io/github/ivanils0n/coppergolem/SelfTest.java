@@ -4,6 +4,7 @@ import io.github.ivanils0n.coppergolem.Links.Link;
 import net.fabricmc.fabric.api.entity.FakePlayer;
 import net.fabricmc.fabric.api.event.player.UseEntityCallback;
 import net.minecraft.core.BlockPos;
+import net.minecraft.network.chat.Component;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.resources.Identifier;
 import net.minecraft.server.MinecraftServer;
@@ -72,8 +73,8 @@ final class SelfTest {
 		ensure(r == InteractionResult.SUCCESS, "clique com o cajado no golem: " + r);
 		ensure(g.getUUID().equals(GolemMod.golemOf(fp.getMainHandItem())), "cajado não ficou ligado ao golem");
 		ensure(g.mobInteract(fp, InteractionHand.MAIN_HAND) == InteractionResult.SUCCESS, "mobInteract do golem com o cajado");
-		GolemMod.link(fp, sl, fp.getMainHandItem(), refill, true);
-		ensure(GolemMod.links.get(g.getUUID()) != null && GolemMod.links.get(g.getUUID()).refill != null, "baú de recarga não ligou pelo cajado");
+		Component msg = GolemMod.link(fp, sl, fp.getMainHandItem(), refill, true);
+		ensure(GolemMod.links.get(g.getUUID()) != null && GolemMod.links.get(g.getUUID()).refill != null, "baú de recarga não ligou pelo cajado: " + msg.getString());
 		GolemMod.links.remove(g.getUUID());
 		l = GolemMod.links.getOrCreate(g.getUUID(), GolemMod.dim(sl));
 		l.refill = Link.arr(refill);
