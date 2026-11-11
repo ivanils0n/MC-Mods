@@ -45,6 +45,7 @@ import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.animal.golem.CopperGolem;
 import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.item.component.CustomData;
@@ -152,7 +153,9 @@ public final class GolemMod implements ModInitializer {
 		BlockPos pos = hit.getBlockPos();
 		boolean copper = Boxes.isCopperChest(sl, pos);
 		if (!copper && !Boxes.isBox(sl.getBlockEntity(pos))) return InteractionResult.PASS; // outros blocos: uso normal
-		say(sp, link(sp, sl, sp.getMainHandItem(), pos, copper));
+		if (golemOf(sp.getMainHandItem()) == null) say(sp, plain("Primeiro clique num Golem de Cobre com o cajado.", ChatFormatting.RED));
+		else if (copper) say(sp, link(sp, sl, sp.getMainHandItem(), pos, Role.REFILL));
+		else LinkMenu.open(sp, pos); // baú comum: escolhe origem, guardar ou desligar
 		return InteractionResult.SUCCESS;
 	}
 
@@ -182,8 +185,10 @@ public final class GolemMod implements ModInitializer {
 
 	// ---------- vínculos ----------
 
-	/** Liga ou desliga o baú clicado (e a outra metade, se duplo) no golem do cajado. Devolve a mensagem. */
-	static Component link(ServerPlayer sp, ServerLevel sl, ItemStack wand, BlockPos pos, boolean copper) {
+	enum Role {REFILL, SOURCE, DEST, NONE}
+
+	/** Liga o baú clicado (e a outra metade, se duplo) ao golem do cajado no papel escolhido. NONE desliga. Devolve a mensagem. */
+	static Component link(ServerPlayer sp, ServerLevel sl, ItemStack wand, BlockPos pos, Role role) {
 		UUID id = golemOf(wand);
 		if (id == null) return plain("Primeiro clique num Golem de Cobre com o cajado.", ChatFormatting.RED);
 		if (!sl.mayInteract(sp, pos)) return plain("Você não pode mexer nesse baú.", ChatFormatting.RED);
@@ -192,8 +197,8 @@ public final class GolemMod implements ModInitializer {
 			return plain("Esse golem está ligado a baús de outra dimensão. Use 'Desfazer' na tela dele para recomeçar.", ChatFormatting.RED);
 		}
 		Link l = links.getOrCreate(id, dim(sl));
-		BlockPos base = Boxes.group(sl, pos).get(0);
-		if (copper) {
+		List<BlockPos> group = Boxes.group(sl, pos);
+		if (role == Role.REFILL) {
 			if (l.refill != null && Link.indexOf(List.of(l.refill), pos) >= 0) {
 				l.refill = null;
 				links.markDirty();
@@ -205,30 +210,31 @@ public final class GolemMod implements ModInitializer {
 			burst(sl, sp, pos, ParticleTypes.WAX_ON);
 			return plain("Baú de recarga ligado: ponha barras de cobre nele (1 a 3 por vez que o golem enferrujar).", ChatFormatting.GOLD);
 		}
-		boolean origin = mode(wand) == 1;
-		List<int[]> list = origin ? l.sources : l.dests;
-		int at = Link.indexOf(list, pos);
-		if (at < 0) for (BlockPos g : Boxes.group(sl, pos)) if (at < 0) at = Link.indexOf(list, g);
-		String kind = origin ? "de origem" : "de guardar";
-		if (at >= 0) {
-			list.remove(at);
+		boolean had = false;
+		for (BlockPos g : group) {
+			for (List<int[]> list : List.of(l.sources, l.dests)) {
+				int at = Link.indexOf(list, g);
+				if (at >= 0) {
+					list.remove(at);
+					had = true;
+				}
+			}
+		}
+		if (role == Role.NONE) {
 			links.markDirty();
 			sl.playSound(null, pos, SoundEvents.CHAIN_PLACE, SoundSource.PLAYERS, 1f, 0.6f);
-			return plain("Baú " + kind + " desligado.", ChatFormatting.YELLOW);
+			return had ? plain("Baú desligado.", ChatFormatting.YELLOW) : plain("Esse baú não estava ligado.", ChatFormatting.GRAY);
 		}
+		boolean origin = role == Role.SOURCE;
+		List<int[]> list = origin ? l.sources : l.dests;
 		if (list.size() >= (origin ? Links.MAX_SOURCES : Links.MAX_DESTS)) {
+			links.markDirty();
 			return plain("Limite de " + (origin ? Links.MAX_SOURCES + " baús de origem" : Links.MAX_DESTS + " baús de guardar") + " atingido.", ChatFormatting.RED);
 		}
-		// Um baú só tem um papel: sai do outro grupo se estava lá.
-		List<int[]> other = origin ? l.dests : l.sources;
-		for (BlockPos g : Boxes.group(sl, pos)) {
-			int o = Link.indexOf(other, g);
-			if (o >= 0) other.remove(o);
-		}
-		list.add(Link.arr(base));
+		list.add(Link.arr(group.get(0)));
 		links.markDirty();
 		burst(sl, sp, pos, origin ? ParticleTypes.PORTAL : ParticleTypes.HAPPY_VILLAGER);
-		return plain("Baú " + kind + " ligado." + (origin ? "" : " Moldura com um item ao lado dele: só esse item entra."), ChatFormatting.GREEN);
+		return plain("Baú " + (origin ? "de origem" : "de guardar") + " ligado." + (origin ? "" : " Moldura com um item ao lado dele: só esse item entra."), ChatFormatting.GREEN);
 	}
 
 	private static void burst(ServerLevel sl, ServerPlayer sp, BlockPos pos, ParticleOptions type) {
@@ -257,19 +263,6 @@ public final class GolemMod implements ModInitializer {
 		} catch (IllegalArgumentException e) {
 			return null;
 		}
-	}
-
-	/** 0 = guardar (padrão), 1 = origem. */
-	static int mode(ItemStack wand) {
-		CustomData data = wand.get(DataComponents.CUSTOM_DATA);
-		return data == null ? 0 : data.copyTag().getInt("mode").orElse(0);
-	}
-
-	static void setMode(ItemStack wand, int mode) {
-		CustomData data = wand.get(DataComponents.CUSTOM_DATA);
-		CompoundTag tag = data == null ? new CompoundTag() : data.copyTag();
-		tag.putInt("mode", mode);
-		wand.set(DataComponents.CUSTOM_DATA, CustomData.of(tag));
 	}
 
 	/** O mesmo item da receita (data/coppergolem/recipe/wand.json). */
@@ -322,8 +315,13 @@ public final class GolemMod implements ModInitializer {
 
 	/** Título da tela: com o pack, o fundo inteiro é um caractere da fonte coppergolem:gui; sem ele, título comum. */
 	static Component title(ServerPlayer p) {
-		if (!hasPack(p)) return Component.literal(NAME);
-		return themedTitle("", NAME);
+		return title(p, "\uE000", NAME);
+	}
+
+	/** bg = caractere do fundo na fonte coppergolem:gui (E000 = tela do golem, E001 = tela curta de 1 fileira). */
+	static Component title(ServerPlayer p, String bg, String label) {
+		if (!hasPack(p)) return Component.literal(label);
+		return themedTitle("\uF000" + bg + "\uF001\uF002", label);
 	}
 
 	static Component themedTitle(String background, String label) {
@@ -342,6 +340,18 @@ public final class GolemMod implements ModInitializer {
 	}
 
 	// ---------- utilidades ----------
+
+	/** Item de vitrine das telas: com o pack, ícone próprio (coppergolem:<model>); sem ele, o item comum parecido. */
+	static ItemStack icon(ServerPlayer p, String model, Item fallback, String name, ChatFormatting color, String... lines) {
+		boolean pack = hasPack(p);
+		ItemStack s = new ItemStack(pack ? Items.PAPER : fallback);
+		if (pack) s.set(DataComponents.ITEM_MODEL, model(model));
+		s.set(DataComponents.CUSTOM_NAME, plain(name, color));
+		List<Component> lore = new java.util.ArrayList<>();
+		for (String line : lines) lore.add(plain(line, ChatFormatting.GRAY));
+		s.set(DataComponents.LORE, new ItemLore(lore));
+		return s;
+	}
 
 	static MutableComponent plain(String text, ChatFormatting color) {
 		return Component.literal(text).withStyle(st -> st.withItalic(false).withColor(color));

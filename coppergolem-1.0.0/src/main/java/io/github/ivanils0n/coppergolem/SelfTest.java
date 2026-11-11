@@ -74,8 +74,16 @@ final class SelfTest {
 		ensure(g.getUUID().equals(GolemMod.golemOf(fp.getMainHandItem())), "cajado não ficou ligado ao golem");
 		ensure(g.mobInteract(fp, InteractionHand.MAIN_HAND) == InteractionResult.SUCCESS, "mobInteract do golem com o cajado");
 		GolemMod.links.remove(g.getUUID());
-		Component msg = GolemMod.link(fp, sl, fp.getMainHandItem(), refill, true);
+		Component msg = GolemMod.link(fp, sl, fp.getMainHandItem(), refill, GolemMod.Role.REFILL);
 		ensure(GolemMod.links.get(g.getUUID()) != null && GolemMod.links.get(g.getUUID()).refill != null, "baú de recarga não ligou pelo cajado: " + msg.getString());
+		GolemMod.link(fp, sl, fp.getMainHandItem(), src, GolemMod.Role.SOURCE);
+		GolemMod.link(fp, sl, fp.getMainHandItem(), dst, GolemMod.Role.DEST);
+		Link chosen = GolemMod.links.get(g.getUUID());
+		ensure(chosen.sources.size() == 1 && chosen.dests.size() == 1, "escolha de origem/guardar");
+		GolemMod.link(fp, sl, fp.getMainHandItem(), dst, GolemMod.Role.SOURCE);
+		ensure(chosen.sources.size() == 2 && chosen.dests.isEmpty(), "mudar o papel do baú");
+		GolemMod.link(fp, sl, fp.getMainHandItem(), dst, GolemMod.Role.NONE);
+		ensure(chosen.sources.size() == 1, "desligar baú");
 		GolemMod.links.remove(g.getUUID());
 		l = GolemMod.links.getOrCreate(g.getUUID(), GolemMod.dim(sl));
 		l.refill = Link.arr(refill);

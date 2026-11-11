@@ -141,35 +141,108 @@ def model(tilt=True):
             "face": "coppergolem:item/wand_face", "ox": "coppergolem:item/wand_ox", "wood": "coppergolem:item/wand_wood", "light": "coppergolem:item/wand_light"}, "elements": els, "display": disp}
 
 
-def gui():
-    """176x168: baú de 3 fileiras. Slots em (7+18c, 17+18r), inventário em y=84 e hotbar y=142."""
-    im = Image.new("RGBA", (176, 168))
+def gui(rows=3):
+    """176x(114+18*rows): baú de N fileiras. Slots em (7+18c, 17+18r), inventário em 30+18*rows e hotbar 58 abaixo."""
+    H = 114 + 18 * rows
+    inv = 30 + 18 * rows - 1 + 1
+    im = Image.new("RGBA", (176, H))
     rnd = random.Random(7)
-    for y in range(168):
+    for y in range(H):
         for x in range(176):
             im.putpixel((x, y), hx(rnd.choices(["#b8603f", "#a95537", "#c06a47"], [3, 3, 2])[0]))
     d = ImageDraw.Draw(im)
-    d.rectangle([0, 0, 175, 167], outline=hx(CU[4]))
-    d.line([1, 1, 174, 1], fill=hx(CU[0])); d.line([1, 1, 1, 166], fill=hx(CU[0]))
-    d.line([1, 166, 174, 166], fill=hx(CU[4])); d.line([174, 1, 174, 166], fill=hx(CU[4]))
-    for p in ((0, 0), (175, 0), (0, 167), (175, 167)):
+    d.rectangle([0, 0, 175, H - 1], outline=hx(CU[4]))
+    d.line([1, 1, 174, 1], fill=hx(CU[0])); d.line([1, 1, 1, H - 2], fill=hx(CU[0]))
+    d.line([1, H - 2, 174, H - 2], fill=hx(CU[4])); d.line([174, 1, 174, H - 2], fill=hx(CU[4]))
+    for p in ((0, 0), (175, 0), (0, H - 1), (175, H - 1)):
         im.putpixel(p, (0, 0, 0, 0))
 
     def slot(x, y):
         d.rectangle([x, y, x + 17, y + 17], fill=hx("#4a2216"))
         d.line([x, y, x + 16, y], fill=hx("#2a120b")); d.line([x, y, x, y + 16], fill=hx("#2a120b"))
         d.line([x + 1, y + 17, x + 17, y + 17], fill=hx(CU[1])); d.line([x + 17, y + 1, x + 17, y + 17], fill=hx(CU[1]))
-    for r in range(3):
+    for r in range(rows):
         for c in range(9):
             slot(7 + 18 * c, 17 + 18 * r)
     for r in range(3):
         for c in range(9):
-            slot(7 + 18 * c, 84 + 18 * r)
+            slot(7 + 18 * c, inv + 18 * r)
     for c in range(9):
-        slot(7 + 18 * c, 142)
-    d.rectangle([5, 72, 75, 83], fill=hx("#d98a62"), outline=hx(CU[3]))  # placa atrás de "Inventário"
+        slot(7 + 18 * c, inv + 58)
+    d.rectangle([5, inv - 12, 75, inv - 1], fill=hx("#d98a62"), outline=hx(CU[3]))  # placa atrás de "Inventário"
     d.line([6, 15, 169, 15], fill=hx(CU[3]))
     return im
+
+
+OUT = "#2a120b"
+
+
+def outlined(im):
+    out = Image.new("RGBA", (16, 16), (0, 0, 0, 0))
+    for y in range(16):
+        for x in range(16):
+            if im.getpixel((x, y))[3] == 0:
+                for dx, dy in ((1, 0), (-1, 0), (0, 1), (0, -1)):
+                    nx, ny = x + dx, y + dy
+                    if 0 <= nx < 16 and 0 <= ny < 16 and im.getpixel((nx, ny))[3]:
+                        out.putpixel((x, y), hx(OUT)); break
+    out.alpha_composite(im)
+    return out
+
+
+def paint(rows, pal):
+    im = Image.new("RGBA", (16, 16), (0, 0, 0, 0))
+    for y, row in enumerate(rows):
+        for x, ch in enumerate(row):
+            if ch != ".":
+                im.putpixel((x, y), hx(pal[ch]))
+    return im
+
+
+PAL = {"a": CU[0], "b": CU[1], "c": CU[2], "d": CU[3], "e": CU[4], "t": OX[0], "u": OX[1], "w": "#fff1d6", "r": "#e0452d", "q": "#9c2b1b", "g": "#ffe08a", "h": "#d9a36f"}
+CHEST = ["..............", "..............", "..............", "..............", "..............", "..............",
+         "...aaaaaaaaaa.", "...bbbbbbbbbb.", "...bbbbhhbbbb.", "...cccchhcccc.", "...cccccccccc.", "...dddddddddd.", "...dddddddddd.", ".............."]
+
+
+def icons():
+    chest = [r.ljust(16, ".") for r in CHEST] + ["." * 16, "." * 16]
+    out = {}
+    # recarga: barra de cobre com brilho turquesa
+    ing = ["................", "................", "................", "......aaaaaaa...", ".....abbbbbbc...", "....abbbbbbcc...", "...abbbbbbccd...", "...aaaaaaaccd...",
+           "...cccccccddd...", "...ccccccddd....", "...dddddddd.....", "................", "................", "................", "................", "................"]
+    im = paint(ing, PAL)
+    for x, y in ((11, 1), (11, 2), (11, 3), (10, 2), (12, 2)):
+        im.putpixel((x, y), hx(OX[0]))
+    out["btn_refill"] = outlined(im)
+    # origem: baú com seta turquesa saindo para cima
+    im = paint(chest, PAL)
+    for x, y in ((7, 1), (6, 2), (7, 2), (8, 2), (5, 3), (7, 3), (9, 3), (7, 4), (7, 5)):
+        im.putpixel((x, y), hx(OX[0] if (x, y) != (7, 1) else "#ffffff"))
+    out["btn_source"] = outlined(im)
+    # guardar: baú com seta dourada entrando de cima
+    im = paint(chest, PAL)
+    for x, y in ((7, 1), (7, 2), (7, 3), (5, 3), (9, 3), (6, 4), (8, 4), (7, 5)):
+        im.putpixel((x, y), hx("#ffe08a"))
+    out["btn_dest"] = outlined(im)
+    # ver: olho
+    eye = ["................", "................", "................", "......aaaa......", "....aabbbbaa....", "...abbwwwwbba...", "..abbwwttuwbba..", "..abbwwtuuwbba..",
+           "...abbwwwwbba...", "....aabbbbaa....", "......aaaa......", "................", "................", "................", "................", "................"]
+    out["btn_see"] = outlined(paint(eye, PAL))
+    # desfazer: X vermelho
+    x = ["................", "................", "..rr........rr..", "..rrr......rrr..", "...rrr....rrr...", "....rrr..rrr....", ".....rrrrrr.....", "......rrrr......",
+         ".....rrrrrr.....", "....rrr..rrr....", "...rrr....rrr...", "..rrr......rrr..", "..rr........rr..", "................", "................", "................"]
+    out["btn_clear"] = outlined(paint(x, {"r": "#e0452d"}))
+    # vazio: mais apagado
+    plus = ["................"] * 5 + ["......dd........".replace("dd", "dd")] 
+    im = Image.new("RGBA", (16, 16), (0, 0, 0, 0))
+    for yy in range(4, 12):
+        for xx in (7, 8):
+            im.putpixel((xx, yy), hx(CU[3]))
+    for xx in range(4, 12):
+        for yy in (7, 8):
+            im.putpixel((xx, yy), hx(CU[3]))
+    out["btn_add"] = im
+    return out
 
 
 def save(obj, rel):
@@ -188,7 +261,12 @@ def main():
     save(copper_tex(2, 0.9), "textures/item/wand_ox.png")
     save(wood_tex(), "textures/item/wand_wood.png")
     save(light_tex(), "textures/item/wand_light.png")
-    save(gui(), "textures/gui/menu.png")
+    save(gui(3), "textures/gui/menu.png")
+    save(gui(1), "textures/gui/menu_small.png")
+    for name, img in icons().items():
+        save(img, f"textures/item/{name}.png")
+        save({"parent": "minecraft:item/generated", "textures": {"layer0": f"coppergolem:item/{name}"}}, f"models/item/{name}.json")
+        save({"model": {"type": "minecraft:model", "model": f"coppergolem:item/{name}"}}, f"items/{name}.json")
     save(model(), "models/item/wand.json")
     save(model(False), "models/item/wand_fp.json")
     # 1ª pessoa: modelo reto; o resto (3ª pessoa, inventário, chão, moldura): o modelo inclinado
@@ -197,8 +275,9 @@ def main():
           "cases": [{"when": ["firstperson_righthand", "firstperson_lefthand"], "model": fp}],
           "fallback": {"type": "minecraft:model", "model": "coppergolem:item/wand"}}}, "items/wand.json")
     save({"providers": [
-        {"type": "space", "advances": {"": -8, "": -177, "": 0}},
-        {"type": "bitmap", "file": "coppergolem:gui/menu.png", "ascent": 13, "height": 168, "chars": [""]}]}, "font/gui.json")
+        {"type": "space", "advances": {"\uf000": -8, "\uf001": -177, "\uf002": 8}},
+        {"type": "bitmap", "file": "coppergolem:gui/menu.png", "ascent": 13, "height": 168, "chars": ["\ue000"]},
+        {"type": "bitmap", "file": "coppergolem:gui/menu_small.png", "ascent": 13, "height": 132, "chars": ["\ue001"]}]}, "font/gui.json")
     pack = os.path.join(ROOT, "src/pack")
     os.makedirs(pack, exist_ok=True)
     copper_tex(1).resize((64, 64), Image.NEAREST).save(os.path.join(pack, "pack.png"))

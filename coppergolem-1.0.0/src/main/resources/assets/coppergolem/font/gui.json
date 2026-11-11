@@ -5,7 +5,7 @@
    "advances": {
     "\uf000": -8,
     "\uf001": -177,
-    "\uf002": 0
+    "\uf002": 8
    }
   },
   {
@@ -15,6 +15,15 @@
    "height": 168,
    "chars": [
     "\ue000"
+   ]
+  },
+  {
+   "type": "bitmap",
+   "file": "coppergolem:gui/menu_small.png",
+   "ascent": 13,
+   "height": 132,
+   "chars": [
+    "\ue001"
    ]
   }
  ]
