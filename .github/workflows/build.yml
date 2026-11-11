@@ -83,3 +83,17 @@ jobs:
               gh release upload $id-pack "$name" --clobber || { sleep 10; gh release upload $id-pack "$name" --clobber; }
             fi
           fi
+      # Na main, publica o .jar no release "<mod_id>-<versão do mod>" (um release por mod e versão; o nome do .jar já
+      # leva a versão do Minecraft, então cada versão do Minecraft vira um arquivo dentro do mesmo release).
+      - name: Release do mod
+        if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          id=${{ matrix.id }}
+          ver=$(sed -n 's/^mod_version=//p' ${{ matrix.mod }}/gradle.properties)
+          tag="$id-$ver"
+          jar=$(ls ${{ matrix.mod }}/build/libs/*.jar | grep -v sources | head -1)
+          gh release view "$tag" >/dev/null 2>&1 || gh release create "$tag" --title "$id $ver" \
+            --notes "Mod $id, versão $ver. Baixe o .jar da sua versão do Minecraft (mc26.2, mc26.3...) em Assets." || true
+          gh release upload "$tag" "$jar" --clobber || { sleep 10; gh release upload "$tag" "$jar" --clobber; }
