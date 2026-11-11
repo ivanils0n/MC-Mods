@@ -1,121 +1,14 @@
 name: build
-on: [push, pull_request, workflow_dispatch]
-
+on: [push]
 jobs:
-  # Lista mod x versão do Minecraft: uma pasta com build.gradle é um mod, e cada mod diz em quais versões compila
-  # (ci_minecraft_versions no gradle.properties; sem a linha: 26.3 e 26.2). Cada par vira um download separado.
-  mods:
+  probe:
     runs-on: ubuntu-24.04
-    outputs:
-      matrix: ${{ steps.find.outputs.matrix }}
-      any: ${{ steps.find.outputs.any }}
     steps:
       - uses: actions/checkout@v6
-        with:
-          fetch-depth: 0 # precisa do histórico para ver quais pastas mudaram
-      # Só entram na matriz os mods cuja pasta mudou. Mudou algo fora das pastas dos mods (build.gradle, gradle/,
-      # .github/...), ou não dá para comparar (primeiro push, execução manual): builda todos. Só o README.md: nenhum.
-      - id: find
-        env:
-          BASE: ${{ github.event.before || github.event.pull_request.base.sha }}
-        run: |
-          all=1; sel=" "
-          if [ -n "$BASE" ] && [ "${BASE//0/}" != "" ] && files=$(git diff --name-only "$BASE" "$GITHUB_SHA" 2>/dev/null); then
-            all=0
-            while read -r f; do
-              [ -n "$f" ] || continue
-              t=${f%%/*}
-              if [ "$t" != "$f" ] && [ -f "$t/build.gradle" ]; then sel="$sel$t "
-              elif [ "$f" != README.md ]; then all=1; fi
-            done <<< "$files"
-          fi
-          declare -A dep=( [26.3]='>=26.3 <27' [26.2]='~26.2' [26.1.2]='>=26.1 <26.2' )
-          list=""
-          for d in */; do
-            d=${d%/}; [ -f "$d/build.gradle" ] || continue
-            [ $all = 1 ] || [[ "$sel" == *" $d "* ]] || continue
-            v=$(sed -n 's/^ci_minecraft_versions=//p' "$d/gradle.properties"); v=${v:-26.3,26.2}
-            id=$(sed -n 's/^mod_id=//p' "$d/gradle.properties")
-            for mc in ${v//,/ }; do
-              [ -n "${dep[$mc]}" ] || { echo "::error::$d pede o Minecraft $mc, que não está na lista do build.yml"; exit 1; }
-              list="$list{\"mod\":\"$d\",\"id\":\"$id\",\"mc\":\"$mc\",\"dep\":\"${dep[$mc]}\"},"
-            done
-          done
-          echo "matrix={\"include\":[${list%,}]}" | tee -a "$GITHUB_OUTPUT"
-          echo "any=$([ -n "$list" ] && echo true || echo false)" >> "$GITHUB_OUTPUT"
-
-  build:
-    needs: mods
-    if: needs.mods.outputs.any == 'true'
-    runs-on: ubuntu-24.04
-    permissions:
-      contents: write # publicar os releases dos mods (.jar e resource pack)
-    strategy:
-      fail-fast: false
-      max-parallel: 4 # com mais jobs de uma vez o GitHub tem falhado ao criar os restantes ("Internal server error")
-      matrix: ${{ fromJSON(needs.mods.outputs.matrix) }}
-    steps:
-      - uses: actions/checkout@v6
-      - uses: gradle/actions/wrapper-validation@v6
       - uses: actions/setup-java@v5
         with:
           java-version: '25'
           distribution: 'microsoft'
-      - run: chmod +x ./gradlew
-      # --configure-on-demand: só configura o mod pedido (os outros podem não ter a versão do Minecraft da matriz).
-      - run: ./gradlew --configure-on-demand ":${{ matrix.mod }}:build" "-Pminecraft_version=${{ matrix.mc }}" "-Pminecraft_dependency=${{ matrix.dep }}"
-      # Um download por mod e versão do Minecraft, ex.: mc26.2-tpaltar-1.0.0
-      - uses: actions/upload-artifact@v7
-        with:
-          name: mc${{ matrix.mc }}-${{ matrix.mod }}
-          path: ${{ matrix.mod }}/build/libs/*.jar
-      # Mods com autoteste (-Pselftest no build.gradle): sobe um servidor dedicado de verdade, o mod testa a si mesmo
-      # e desliga. O log precisa ter "<MOD_ID> SELFTEST OK".
-      - name: Autoteste num servidor real
-        run: |
-          find ${{ matrix.mod }}/src/main/java -name SelfTest.java | grep -q . || { echo "Mod sem autoteste."; exit 0; }
-          id=${{ matrix.id }}
-          mkdir -p ${{ matrix.mod }}/run
-          echo "eula=true" > ${{ matrix.mod }}/run/eula.txt
-          printf 'level-type=minecraft\\:flat\nonline-mode=false\nspawn-protection=0\n' > ${{ matrix.mod }}/run/server.properties
-          timeout 900 ./gradlew --configure-on-demand ":${{ matrix.mod }}:runServer" -Pselftest "-Pminecraft_version=${{ matrix.mc }}" "-Pminecraft_dependency=${{ matrix.dep }}" | tee server.log
-          grep -q "${id^^} SELFTEST OK" server.log
-          ! grep -q "Serialization errors" server.log
-      # Mods com resource pack (src/pack): confere que o hash dentro do .jar é o do zip e, na main, publica o zip no
-      # release do mod ("<mod_id>-<versão>", o mesmo do .jar). O nome leva o hash, então cada versão do mod aponta para o seu pack.
-      - name: Resource pack
-        env:
-          GH_TOKEN: ${{ github.token }}
-        run: |
-          [ -f ${{ matrix.mod }}/src/pack/pack.mcmeta ] || { echo "Mod sem resource pack."; exit 0; }
-          id=${{ matrix.id }}
-          zip=${{ matrix.mod }}/build/pack/$id-pack.zip
-          sha=$(sha1sum "$zip" | cut -d' ' -f1)
-          jar=$(ls ${{ matrix.mod }}/build/libs/*.jar | grep -v sources | head -1)
-          test "$(unzip -p "$jar" $id/pack.sha1)" = "$sha"
-          echo "SHA-1 do pack: $sha"
-          if [ "${{ github.event_name }}" = push ] && [ "${{ github.ref }}" = refs/heads/main ]; then
-            name="$id-pack-$sha.zip"
-            cp "$zip" "$name"
-            ver=$(sed -n 's/^mod_version=//p' ${{ matrix.mod }}/gradle.properties)
-            tag="$id-$ver"
-            gh release view "$tag" >/dev/null 2>&1 || gh release create "$tag" --title "$id $ver" \
-              --notes "Mod $id, versão $ver. Baixe o .jar da sua versão do Minecraft (mc26.2, mc26.3...) em Assets. O arquivo $id-pack-*.zip é o resource pack: o próprio mod envia o link aos jogadores, não é preciso baixar nem configurar nada." || true
-            if ! gh release view "$tag" --json assets -q '.assets[].name' | grep -qx "$name"; then
-              gh release upload "$tag" "$name" --clobber || { sleep 10; gh release upload "$tag" "$name" --clobber; }
-            fi
-          fi
-      # Na main, publica o .jar no release "<mod_id>-<versão do mod>" (um release por mod e versão; o nome do .jar já
-      # leva a versão do Minecraft, então cada versão do Minecraft vira um arquivo dentro do mesmo release).
-      - name: Release do mod
-        if: github.event_name == 'push' && github.ref == 'refs/heads/main'
-        env:
-          GH_TOKEN: ${{ github.token }}
-        run: |
-          id=${{ matrix.id }}
-          ver=$(sed -n 's/^mod_version=//p' ${{ matrix.mod }}/gradle.properties)
-          tag="$id-$ver"
-          jar=$(ls ${{ matrix.mod }}/build/libs/*.jar | grep -v sources | head -1)
-          gh release view "$tag" >/dev/null 2>&1 || gh release create "$tag" --title "$id $ver" \
-            --notes "Mod $id, versão $ver. Baixe o .jar da sua versão do Minecraft (mc26.2, mc26.3...) em Assets. O arquivo $id-pack-*.zip é o resource pack: o próprio mod envia o link aos jogadores, não é preciso baixar nem configurar nada." || true
-          gh release upload "$tag" "$jar" --clobber || { sleep 10; gh release upload "$tag" "$jar" --clobber; }
+      - run: chmod +x ./gradlew .github/probe.sh
+      - run: ./gradlew --configure-on-demand ":smartchest-1.1.0:genSources"
+      - run: .github/probe.sh
