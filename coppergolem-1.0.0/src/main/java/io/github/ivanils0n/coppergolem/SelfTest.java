@@ -2,6 +2,8 @@ package io.github.ivanils0n.coppergolem;
 
 import io.github.ivanils0n.coppergolem.Links.Link;
 import net.minecraft.core.BlockPos;
+import net.minecraft.core.registries.BuiltInRegistries;
+import net.minecraft.resources.Identifier;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.entity.EntitySpawnReason;
@@ -44,13 +46,15 @@ final class SelfTest {
 		sl.setBlock(src, Blocks.CHEST.defaultBlockState(), Block.UPDATE_ALL);
 		sl.setBlock(dst, Blocks.BARREL.defaultBlockState(), Block.UPDATE_ALL);
 		sl.setBlock(dst2, Blocks.CHEST.defaultBlockState(), Block.UPDATE_ALL);
-		sl.setBlock(refill, Blocks.COPPER_CHEST.defaultBlockState(), Block.UPDATE_ALL);
+		sl.setBlock(refill, BuiltInRegistries.BLOCK.getValue(Identifier.fromNamespaceAndPath("minecraft", "copper_chest")).defaultBlockState(), Block.UPDATE_ALL);
 		ensure(Boxes.isCopperChest(sl, refill) && !Boxes.isCopperChest(sl, src) && Boxes.isBox(sl.getBlockEntity(dst)), "tipos de baú");
 		BaseContainerBlockEntity s = (BaseContainerBlockEntity) sl.getBlockEntity(src);
 		s.setItem(0, new ItemStack(Items.DIAMOND, 5));
 		((BaseContainerBlockEntity) sl.getBlockEntity(refill)).setItem(0, new ItemStack(Items.COPPER_INGOT, 10));
 
-		CopperGolem g = EntityType.COPPER_GOLEM.spawn(sl, o.above(), EntitySpawnReason.COMMAND);
+		@SuppressWarnings("unchecked")
+		EntityType<CopperGolem> type = (EntityType<CopperGolem>) BuiltInRegistries.ENTITY_TYPE.getValue(Identifier.fromNamespaceAndPath("minecraft", "copper_golem"));
+		CopperGolem g = type.spawn(sl, o.above(), EntitySpawnReason.COMMAND);
 		ensure(g != null, "golem não nasceu");
 		Link l = GolemMod.links.getOrCreate(g.getUUID(), GolemMod.dim(sl));
 		l.refill = Link.arr(refill);

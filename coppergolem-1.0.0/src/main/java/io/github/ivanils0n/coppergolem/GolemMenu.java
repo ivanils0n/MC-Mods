@@ -91,7 +91,7 @@ final class GolemMenu extends ChestMenu {
 	}
 
 	private static ItemStack hint(String name, String... lines) {
-		return named(Items.LIGHT_GRAY_STAINED_GLASS_PANE, name, ChatFormatting.GRAY, lines);
+		return named(Items.PAPER, name, ChatFormatting.GRAY, lines);
 	}
 
 	private static ItemStack named(Item item, String name, ChatFormatting color, String... lines) {
