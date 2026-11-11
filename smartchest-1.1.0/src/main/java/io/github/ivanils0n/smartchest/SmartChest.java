@@ -80,6 +80,7 @@ public final class SmartChest implements ModInitializer {
 	static final Logger LOG = LoggerFactory.getLogger("smartchest");
 	static final String NAME = "Baú Central";
 	static final int MAX_LINKS = 512; // baús ligados por Baú Central (cada metade de baú duplo conta 1)
+	static final int TABLE_RANGE = 33; // mesa de trabalho ligada: até essa distância (em blocos) do Baú Central
 	static final double USE_RANGE_SQR = 8 * 8; // a tela fecha se o jogador se afastar mais que isso
 	private static final double ACTIVE_RANGE_SQR = 48 * 48; // sem jogador a essa distância o visual não é conferido
 	static final String CHEST_TAG = "smartchest_chest", LINKER_TAG = "smartchest_linker";
@@ -175,6 +176,7 @@ public final class SmartChest implements ModInitializer {
 		PlayerBlockBreakEvents.AFTER.register((level, player, pos, state, be) -> {
 			// Baú ligado quebrado por um jogador: sai da lista na hora (outros meios são limpos ao abrir a tela).
 			if (store != null && Storage.isLinkable(be)) store.unlinkEverywhere(dim(level), pos);
+			if (store != null && state.is(Blocks.CRAFTING_TABLE) && level instanceof ServerLevel sl) unlinkTable(sl, pos);
 		});
 		ServerTickEvents.END_LEVEL_TICK.register(SmartChest::onWorldTick);
 	}
@@ -191,6 +193,7 @@ public final class SmartChest implements ModInitializer {
 		if (hand == InteractionHand.MAIN_HAND && isLinker(held)) {
 			if (chest != null) bind(sp, sl, held, chest);
 			else if (Storage.isLinkable(sl.getBlockEntity(pos))) say(sp, toggleLink(sp, sl, held, pos));
+			else if (sl.getBlockState(pos).is(Blocks.CRAFTING_TABLE)) say(sp, toggleTable(sp, sl, held, pos));
 			else return InteractionResult.PASS;
 			return InteractionResult.SUCCESS;
 		}
@@ -204,12 +207,14 @@ public final class SmartChest implements ModInitializer {
 				CATEGORY.remove(sp.getUUID());
 				FILTER.remove(sp.getUUID());
 				StorageMenu.open(sp, chest, "", 0);
-				if (sp.containerMenu instanceof StorageMenu menu && menu.unloaded() > 0) {
-					say(sp, count(menu.unloaded(), "baú ligado está", "baús ligados estão") + " fora da distância de visão e não aparece"
-						+ (menu.unloaded() == 1 ? "" : "m") + " agora. Volta" + (menu.unloaded() == 1 ? "" : "m")
-						+ " quando a área estiver carregada (aumente a distância de visão).", ChatFormatting.YELLOW);
-				}
+				if (sp.containerMenu instanceof StorageMenu menu) warnUnloaded(sp, menu.unloaded());
 			}
+			return InteractionResult.SUCCESS;
+		}
+		Chest owner = store.tableOwner(dim(sl), pos);
+		if (owner != null && hand == InteractionHand.MAIN_HAND && !(sp.isSecondaryUseActive() && !held.isEmpty())
+			&& sl.getBlockState(pos).is(Blocks.CRAFTING_TABLE)) {
+			TableMenu.open(sp, owner, pos);
 			return InteractionResult.SUCCESS;
 		}
 		if (isChestItem(held)) {
@@ -217,6 +222,12 @@ public final class SmartChest implements ModInitializer {
 			return InteractionResult.SUCCESS; // nunca deixa a obsidiana "crua" ser colocada
 		}
 		return InteractionResult.PASS;
+	}
+
+	static void warnUnloaded(ServerPlayer sp, int n) {
+		if (n <= 0) return;
+		say(sp, count(n, "baú ligado está", "baús ligados estão") + " fora da distância de visão e não aparece" + (n == 1 ? "" : "m")
+			+ " agora. Volta" + (n == 1 ? "" : "m") + " quando a área estiver carregada (aumente a distância de visão).", ChatFormatting.YELLOW);
 	}
 
 	private static boolean onBreak(Level level, Player player, BlockPos pos, BlockState state, BlockEntity be) {
@@ -251,6 +262,11 @@ public final class SmartChest implements ModInitializer {
 				continue;
 			}
 			if (anyPlayerNear(players, pos) && sl.isPositionEntityTicking(pos)) ensureVisual(sl, c);
+			for (BlockPos t : c.tablePositions()) {
+				if (!sl.isLoaded(t)) continue;
+				if (!sl.getBlockState(t).is(Blocks.CRAFTING_TABLE)) unlinkTable(sl, t); // quebrada por explosão, comando etc.
+				else if (anyPlayerNear(players, t) && sl.isPositionEntityTicking(t) && visuals(sl, t).isEmpty()) spawnTableVisual(sl, t);
+			}
 		}
 		// Quem segura um Vinculador ligado vê partículas nos baús ligados (só ele vê).
 		for (ServerPlayer p : players) {
@@ -262,6 +278,9 @@ public final class SmartChest implements ModInitializer {
 			particles(sl, p, c.pos(), ParticleTypes.PORTAL, 6);
 			for (BlockPos l : c.linkPositions()) {
 				if (p.distanceToSqr(Vec3.atCenterOf(l)) < ACTIVE_RANGE_SQR) particles(sl, p, l, ParticleTypes.END_ROD, 2);
+			}
+			for (BlockPos t : c.tablePositions()) {
+				if (p.distanceToSqr(Vec3.atCenterOf(t)) < ACTIVE_RANGE_SQR) particles(sl, p, t, ParticleTypes.END_ROD, 2);
 			}
 		}
 	}
@@ -305,6 +324,7 @@ public final class SmartChest implements ModInitializer {
 		store.remove(c);
 		VIS.remove(c.key());
 		killVisual(sl, c.pos());
+		for (BlockPos t : c.tablePositions()) killVisual(sl, t); // as mesas voltam a ser comuns
 	}
 
 	static boolean exists(Chest c) {
@@ -313,7 +333,7 @@ public final class SmartChest implements ModInitializer {
 
 	// ---------- vínculos ----------
 
-	private static void bind(ServerPlayer sp, ServerLevel sl, ItemStack linker, Chest c) {
+	static void bind(ServerPlayer sp, ServerLevel sl, ItemStack linker, Chest c) {
 		CustomData data = linker.get(DataComponents.CUSTOM_DATA);
 		CompoundTag tag = data == null ? new CompoundTag() : data.copyTag();
 		tag.putBoolean(LINKER_TAG, true);
@@ -398,8 +418,40 @@ public final class SmartChest implements ModInitializer {
 	/** Motivo para não ligar este bloco ao baú, ou null se pode. */
 	static String linkProblem(Chest c, ServerLevel sl, BlockPos pos) {
 		if (!c.dim.equals(dim(sl))) return "Só dá para ligar baús que estão na mesma dimensão do Baú Central.";
-		if (!Storage.isLinkable(sl.getBlockEntity(pos))) return "Só baús e barris podem ser ligados.";
+		if (!Storage.isLinkable(sl.getBlockEntity(pos)) && !sl.getBlockState(pos).is(Blocks.CRAFTING_TABLE)) {
+			return "Só baús, barris e mesas de trabalho podem ser ligados.";
+		}
 		return null;
+	}
+
+	/** Liga a mesa de trabalho (até TABLE_RANGE blocos do Baú Central) ou desliga se já está ligada. */
+	static Component toggleTable(ServerPlayer sp, ServerLevel sl, ItemStack linker, BlockPos pos) {
+		Component err = linkProblem(sp, sl, linker, pos);
+		if (err != null) return err;
+		Chest c = target(linker);
+		if (c.hasTable(pos)) {
+			unlinkTable(sl, pos);
+			sl.playSound(null, pos, SoundEvents.CHAIN_PLACE, SoundSource.PLAYERS, 1f, 0.6f);
+			return plain("Mesa de trabalho desligada: voltou a ser uma mesa comum.", ChatFormatting.YELLOW);
+		}
+		if (pos.distSqr(c.pos()) > TABLE_RANGE * TABLE_RANGE) {
+			return plain("Mesa muito longe: ela precisa estar a até " + TABLE_RANGE + " blocos do Baú Central.", ChatFormatting.RED);
+		}
+		unlinkTable(sl, pos); // estava ligada a outro Baú Central: passa para este
+		c.tables.add(new int[] {pos.getX(), pos.getY(), pos.getZ()});
+		store.markDirty();
+		spawnTableVisual(sl, pos);
+		particles(sl, sp, pos, ParticleTypes.HAPPY_VILLAGER, 12);
+		sl.playSound(null, pos, SoundEvents.CHAIN_PLACE, SoundSource.PLAYERS, 1f, 1.4f);
+		return plain("Mesa de trabalho ligada: o livro de receitas dela usa os itens dos baús ligados.", ChatFormatting.GREEN);
+	}
+
+	/** Desliga a mesa de qualquer Baú Central e tira o visual. */
+	static void unlinkTable(ServerLevel sl, BlockPos pos) {
+		boolean any = false;
+		for (Chest c : store.inDim(dim(sl))) any |= c.unlinkTable(pos);
+		if (any) store.markDirty();
+		killVisual(sl, pos);
 	}
 
 	/**
@@ -447,6 +499,15 @@ public final class SmartChest implements ModInitializer {
 			command(sl, pos, String.format(Locale.ROOT, "summon minecraft:item_display %.4f %.4f %.4f {%s}",
 				pos.getX() + 0.5, pos.getY() + 1.0, pos.getZ() + 0.5, nbt));
 		}
+	}
+
+	/** Mesa de trabalho ligada: um cubo um pouco maior que a mesa com a textura do mod (sai ao desligar). */
+	static void spawnTableVisual(ServerLevel sl, BlockPos pos) {
+		killVisual(sl, pos);
+		String nbt = "Tags:[\"smartchest\",\"" + tag(pos) + "\",\"smartchest_table\",\"" + RUN_TAG + "\"],item:{id:\"minecraft:crafting_table\","
+			+ "count:1,components:{\"minecraft:item_model\":\"smartchest:crafting_table\"}}," + baseTransform(Direction.NORTH);
+		command(sl, pos, String.format(Locale.ROOT, "summon minecraft:item_display %.4f %.4f %.4f {%s}",
+			pos.getX() + 0.5, pos.getY() + 1.0, pos.getZ() + 0.5, nbt));
 	}
 
 	/** Giro (quaternion x, y, z, w) que vira a frente do modelo para o lado do baú. */

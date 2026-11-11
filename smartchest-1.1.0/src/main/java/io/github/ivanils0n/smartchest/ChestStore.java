@@ -29,6 +29,8 @@ final class ChestStore {
 		String facing = "north";
 		/** x, y, z e o modo do baú ligado: 0 = qualquer item, 1-7 = só essa categoria (Categories), 8 = só retirar. */
 		List<int[]> links = new ArrayList<>();
+		/** Mesas de trabalho ligadas (x, y, z): o livro de receitas delas puxa os itens dos baús ligados. */
+		List<int[]> tables = new ArrayList<>();
 
 		Chest() {}
 
@@ -82,6 +84,21 @@ final class ChestStore {
 			return links.removeIf(l -> l[0] == p.getX() && l[1] == p.getY() && l[2] == p.getZ());
 		}
 
+		boolean hasTable(BlockPos p) {
+			for (int[] t : tables) if (t[0] == p.getX() && t[1] == p.getY() && t[2] == p.getZ()) return true;
+			return false;
+		}
+
+		boolean unlinkTable(BlockPos p) {
+			return tables.removeIf(t -> t[0] == p.getX() && t[1] == p.getY() && t[2] == p.getZ());
+		}
+
+		List<BlockPos> tablePositions() {
+			List<BlockPos> out = new ArrayList<>(tables.size());
+			for (int[] t : tables) out.add(new BlockPos(t[0], t[1], t[2]));
+			return out;
+		}
+
 		List<BlockPos> linkPositions() {
 			List<BlockPos> out = new ArrayList<>(links.size());
 			for (int[] l : links) out.add(new BlockPos(l[0], l[1], l[2]));
@@ -131,6 +148,12 @@ final class ChestStore {
 		save();
 	}
 
+	/** Baú Central da mesa de trabalho ligada nessa posição, ou null. */
+	Chest tableOwner(String dim, BlockPos pos) {
+		for (Chest c : byKey.values()) if (c.dim.equals(dim) && c.hasTable(pos)) return c;
+		return null;
+	}
+
 	/** Um baú vinculado foi quebrado: some de todos os Baús Centrais da dimensão. */
 	void unlinkEverywhere(String dim, BlockPos pos) {
 		for (Chest c : byKey.values()) if (c.dim.equals(dim) && c.unlink(pos)) dirty = true;
@@ -153,6 +176,9 @@ final class ChestStore {
 						}
 					}
 					c.links = ok;
+					List<int[]> tables = new ArrayList<>();
+					if (c.tables != null) for (int[] t : c.tables) if (t != null && t.length >= 3) tables.add(new int[] {t[0], t[1], t[2]});
+					c.tables = tables; // arquivo antigo: sem mesas
 					c.facing = c.facing().getName();
 					store.byKey.put(c.key(), c);
 				}

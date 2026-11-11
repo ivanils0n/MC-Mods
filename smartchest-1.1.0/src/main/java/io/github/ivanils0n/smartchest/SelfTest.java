@@ -283,6 +283,36 @@ final class SelfTest {
 		chest.setItem(3, ItemStack.EMPTY);
 		ensure(Storage.insert(List.of(chest, barrel), dirt) == 5 && dirt.isEmpty(), "não guardou com espaço livre");
 
+		// Mesa de trabalho ligada: até 33 blocos, visual próprio, livro de receitas puxando dos baús.
+		BlockPos tablePos = base.north(3), farTable = base.north(40);
+		for (BlockPos p : List.of(tablePos, farTable)) sl.setBlock(p, Blocks.CRAFTING_TABLE.defaultBlockState(), Block.UPDATE_ALL);
+		ItemStack lk = SmartChest.linkerItem();
+		SmartChest.bind(fp, sl, lk, sc);
+		SmartChest.toggleTable(fp, sl, lk, farTable);
+		ensure(!sc.hasTable(farTable), "mesa a 40 blocos foi ligada");
+		SmartChest.toggleTable(fp, sl, lk, tablePos);
+		ensure(sc.hasTable(tablePos) && SmartChest.store.tableOwner(SmartChest.dim(sl), tablePos) == sc, "mesa não foi ligada");
+		ensure(SmartChest.visuals(sl, tablePos).size() == 1, "visual da mesa: " + SmartChest.visuals(sl, tablePos).size());
+		var stick = server.getRecipeManager().getRecipes().stream().filter(r -> r.id().identifier().toString().equals("minecraft:stick")).findFirst().orElseThrow();
+		var pick = server.getRecipeManager().getRecipes().stream().filter(r -> r.id().identifier().toString().equals("minecraft:diamond_pickaxe")).findFirst().orElseThrow();
+		fp.getInventory().clearContent();
+		chest.setItem(20, new ItemStack(Items.OAK_PLANKS, 5));
+		TableMenu table = new TableMenu(0, fp.getInventory(), sl, tablePos, sc);
+		var none = net.minecraft.world.inventory.RecipeBookMenu.PostPlaceAction.NOTHING;
+		ensure(table.handlePlacement(false, false, stick, sl, fp.getInventory()) == none, "receita do graveto");
+		ensure(gridCount(table, Items.OAK_PLANKS) == 2 && count(chest, Items.OAK_PLANKS) == 3 && table.getSlot(0).getItem().is(Items.STICK),
+			"graveto com tábuas do baú: grade " + gridCount(table, Items.OAK_PLANKS) + ", baú " + count(chest, Items.OAK_PLANKS));
+		ensure(table.handlePlacement(true, false, stick, sl, fp.getInventory()) == none, "graveto com Shift");
+		ensure(gridCount(table, Items.OAK_PLANKS) == 4 && count(chest, Items.OAK_PLANKS) == 1 && count(fp.getInventory(), Items.OAK_PLANKS) == 0,
+			"graveto com Shift: grade " + gridCount(table, Items.OAK_PLANKS) + ", baú " + count(chest, Items.OAK_PLANKS));
+		ensure(table.handlePlacement(false, false, pick, sl, fp.getInventory()) == net.minecraft.world.inventory.RecipeBookMenu.PostPlaceAction.PLACE_GHOST_RECIPE
+			&& gridCount(table, Items.OAK_PLANKS) == 0 && count(fp.getInventory(), Items.OAK_PLANKS) == 4, "receita sem itens deveria virar fantasma");
+		fp.getInventory().clearContent();
+		chest.setItem(20, ItemStack.EMPTY);
+		SmartChest.toggleTable(fp, sl, lk, tablePos);
+		ensure(!sc.hasTable(tablePos) && SmartChest.visuals(sl, tablePos).isEmpty(), "desligar a mesa");
+		for (BlockPos p : List.of(tablePos, farTable)) sl.setBlock(p, Blocks.AIR.defaultBlockState(), Block.UPDATE_ALL);
+
 		// Arquivo, quebrar e colocar de novo: os vínculos somem.
 		SmartChest.store.saveIfDirty();
 		SmartChest.store.save();
@@ -307,6 +337,12 @@ final class SelfTest {
 		l.containers.addAll(cs);
 		for (int m : modes) l.modes.add(m);
 		return l;
+	}
+
+	private static int gridCount(TableMenu m, net.minecraft.world.item.Item item) {
+		int n = 0;
+		for (var slot : m.getInputGridSlots()) if (slot.getItem().is(item)) n += slot.getItem().getCount();
+		return n;
 	}
 
 	private static int count(Container c, net.minecraft.world.item.Item item) {
