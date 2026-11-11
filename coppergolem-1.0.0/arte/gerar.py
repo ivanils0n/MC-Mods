@@ -20,69 +20,39 @@ def hx(c, a=255):
     return (int(c[0:2], 16), int(c[2:4], 16), int(c[4:6], 16), a)
 
 
-CU = ["#f4a77d", "#e07e5c", "#c06a47", "#a1492f", "#6b2e1c"]  # claro -> escuro
+CU = ["#f6a468", "#ee8644", "#e0702f", "#c15a24", "#8a3a17"]  # claro -> escuro
 OX = ["#8fe0c6", "#4fa58c", "#3d8a74"]
 DK = "#2a120b"
 
 
-def flat(c, edge):
-    im = Image.new("RGBA", (16, 16), hx(c))
-    d = ImageDraw.Draw(im)
-    d.line([0, 15, 15, 15], fill=hx(edge)); d.line([15, 0, 15, 15], fill=hx(edge))
-    rnd = random.Random(sum(map(ord, c)))
-    for _ in range(7):  # poucos pontos de variação, para não ficar chapado
-        x, y = rnd.randrange(1, 14), rnd.randrange(1, 14)
-        im.putpixel((x, y), hx(edge if rnd.random() < .6 else "#f4a77d" if c != "#4fa58c" else "#8fe0c6"))
-    return im
-
-
-def copper_tex(seed=1, ox=0.0):
-    return flat("#e07e5c" if not ox else "#4fa58c", "#c06a47" if not ox else "#3d8a74")
-
-
-def _old_copper_tex(seed=1, ox=0.0):
+def noisy(palette, weights, seed):
     rnd = random.Random(seed)
     im = Image.new("RGBA", (16, 16))
     for y in range(16):
         for x in range(16):
-            c = rnd.choices(CU[:4], [1, 4, 4, 1])[0]
-            if rnd.random() < ox:
-                c = rnd.choice(OX)
-            im.putpixel((x, y), hx(c))
+            im.putpixel((x, y), hx(rnd.choices(palette, weights)[0]))
     return im
+
+
+def copper_tex(seed=1, ox=0.0):
+    if ox:
+        return noisy(OX, [3, 4, 2], seed)
+    return noisy(CU[:4], [2, 5, 5, 2], seed)
 
 
 def wood_tex():
-    return flat("#5b3620", "#4a2a18")
-
-
-def _old_wood_tex():
-    rnd = random.Random(9)
-    im = Image.new("RGBA", (16, 16))
-    for y in range(16):
-        for x in range(16):
-            im.putpixel((x, y), hx(rnd.choices(["#4a2a18", "#5b3620", "#3a1f10"], [3, 3, 2])[0]))
-    return im
+    return noisy(["#5b3620", "#4a2a18", "#3a1f10", "#6a4228"], [3, 4, 2, 1], 9)
 
 
 def light_tex():
-    return flat("#f4a77d", "#e07e5c")
-
-
-def _old_light_tex():
-    rnd = random.Random(11)
-    im = Image.new("RGBA", (16, 16))
-    for y in range(16):
-        for x in range(16):
-            im.putpixel((x, y), hx(rnd.choices(["#f8c3a0", "#f4a77d", "#fbd3b6"], [3, 4, 2])[0]))
-    return im
+    return noisy(["#fbc08a", "#f6a468", "#ffd2a3"], [3, 4, 2], 11)
 
 
 def face_tex():
-    im = copper_tex()
-    d = ImageDraw.Draw(im)
-    for x in (3, 11):
-        d.rectangle([x, 5, x + 1, 7], fill=hx(DK))  # olhos
+    im = copper_tex(5)
+    for x in (4, 10):  # olhos pequenos nas pontas da área mapeada no rosto (uv 3,2 -> 13,6.5)
+        for y in (3, 4):
+            im.putpixel((x, y), hx("#3b1214"))
     return im
 
 
@@ -119,13 +89,13 @@ def icon():
 
 
 def model():
-    def box(a, b, tex, only=None, up=None):
-        faces = {f: {"texture": "#" + tex} for f in ("north", "south", "east", "west", "up", "down")}
-        if up:
-            faces["up"] = {"texture": "#" + up}
-        if only:
-            faces = {only: {"texture": "#" + tex}}
-        return {"from": a, "to": b, "faces": faces}
+    DY = 4  # sobe o modelo: o ponto de pegada (centro do item) fica no cabo, perto do pomo
+
+    def box(a, b, tex, **over):
+        faces = {f: {"texture": "#" + over.get(f, tex)} for f in ("north", "south", "east", "west", "up", "down")}
+        if "uv_south" in over:
+            faces["south"]["uv"] = over["uv_south"]
+        return {"from": [a[0], a[1] + DY, a[2]], "to": [b[0], b[1] + DY, b[2]], "faces": faces}
     els = [
         box([6.5, 0, 6.5], [9.5, 3, 9.5], "cu"),             # pomo
         box([7, 3, 7], [9, 4, 9], "cu"),                     # pescoço do pomo
@@ -133,14 +103,13 @@ def model():
         box([6.5, 10, 6.5], [9.5, 11, 9.5], "cu"),           # colar
         box([6, 11, 6.5], [10, 15, 9.5], "cu"),              # corpo
         box([10, 12, 7], [11.5, 15, 9], "cu"),               # braço
-        box([5, 15, 5.5], [11, 19.5, 10.5], "cu", up="light"),   # cabeça
-        box([5, 15, 5.5], [11, 19.5, 10.5], "face", "south"),    # olhos (virados para quem segura)
+        box([5, 15, 5.5], [11, 19.5, 10.5], "cu", up="light", south="face", uv_south=[3, 2, 13, 6.5]),  # cabeça com rosto
         box([7.25, 15.75, 10.5], [8.75, 17.5, 12], "cu"),    # nariz
         box([7.25, 19.5, 7.25], [8.75, 21.5, 8.75], "cu"),   # haste da cabeça
         box([7.5, 21.5, 7.5], [8.5, 22.5, 8.5], "ox"),       # ponta oxidada
     ]
     disp = {
-        "gui": {"rotation": [20, -35, 0], "translation": [0, -2, 0], "scale": [0.56, 0.56, 0.56]},
+        "gui": {"rotation": [20, -35, 0], "translation": [0, -4.5, 0], "scale": [0.5, 0.5, 0.5]},
         "ground": {"translation": [0, 2, 0], "scale": [0.5, 0.5, 0.5]},
         "fixed": {"rotation": [0, 180, 0], "scale": [0.6, 0.6, 0.6]},
         "thirdperson_righthand": {"rotation": [0, -90, -170], "translation": [0, 4, 0.5], "scale": [0.85, 0.85, 0.85]},
