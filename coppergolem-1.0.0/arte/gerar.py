@@ -89,7 +89,7 @@ def icon():
 
 
 def model():
-    DY = 4  # sobe o modelo: o ponto de pegada (centro do item) fica no cabo, perto do pomo
+    DY = -5.8  # pegada no cabo, perto do pomo: o cabo fica onde o cabo de uma espada do jogo fica na mão
 
     def box(a, b, tex, **over):
         faces = {f: {"texture": "#" + over.get(f, tex)} for f in ("north", "south", "east", "west", "up", "down")}
@@ -109,13 +109,13 @@ def model():
         box([7.5, 21.5, 7.5], [8.5, 22.5, 8.5], "ox"),       # ponta oxidada
     ]
     disp = {
-        "gui": {"rotation": [20, -35, 0], "translation": [0, -4.5, 0], "scale": [0.5, 0.5, 0.5]},
+        "gui": {"rotation": [20, -35, 0], "translation": [0, 1.5, 0], "scale": [0.55, 0.55, 0.55]},
         "ground": {"translation": [0, 2, 0], "scale": [0.5, 0.5, 0.5]},
         "fixed": {"rotation": [0, 180, 0], "scale": [0.6, 0.6, 0.6]},
-        "thirdperson_righthand": {"rotation": [0, -90, -170], "translation": [0, 4, 0.5], "scale": [0.85, 0.85, 0.85]},
-        "thirdperson_lefthand": {"rotation": [0, 90, 170], "translation": [0, 4, 0.5], "scale": [0.85, 0.85, 0.85]},
-        "firstperson_righthand": {"rotation": [0, -90, 160], "translation": [1.13, 3.2, 1.13], "scale": [0.68, 0.68, 0.68]},
-        "firstperson_lefthand": {"rotation": [0, 90, -160], "translation": [1.13, 3.2, 1.13], "scale": [0.68, 0.68, 0.68]},
+        "thirdperson_righthand": {"rotation": [90, -45, -35], "translation": [0, 4, 0.5], "scale": [0.85, 0.85, 0.85]},
+        "thirdperson_lefthand": {"rotation": [90, 45, 35], "translation": [0, 4, 0.5], "scale": [0.85, 0.85, 0.85]},
+        "firstperson_righthand": {"rotation": [90, -45, -65], "translation": [1.13, 3.2, 1.13], "scale": [0.68, 0.68, 0.68]},
+        "firstperson_lefthand": {"rotation": [90, 45, 65], "translation": [1.13, 3.2, 1.13], "scale": [0.68, 0.68, 0.68]},
     }
     return {"gui_light": "front", "textures": {"particle": "coppergolem:item/wand", "cu": "coppergolem:item/wand",
             "face": "coppergolem:item/wand_face", "ox": "coppergolem:item/wand_ox", "wood": "coppergolem:item/wand_wood", "light": "coppergolem:item/wand_light"}, "elements": els, "display": disp}
