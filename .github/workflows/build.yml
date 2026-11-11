@@ -67,7 +67,7 @@ jobs:
       - name: probe
         run: |
           j=$(find ~/.gradle /home/runner/work -name '*.jar' -path '*minecraft*' 2>/dev/null | grep -iE 'merged|common|minecraft-[0-9]' | head -5); echo "$j"
-          for f in $j; do javap -p -cp "$f" net.minecraft.world.entity.animal.golem.CopperGolem 2>/dev/null | grep -iE 'brain|weather' ; javap -p -cp "$f" net.minecraft.world.entity.LivingEntity 2>/dev/null | grep -iE 'brain'; done
+          for f in $j; do for c in "net.minecraft.world.entity.ai.Brain\$Packed" "net.minecraft.world.entity.ai.Brain\$Provider" net.minecraft.world.entity.ai.Brain; do javap -p -cp "$f" "$c" | grep -iE "packed|provider|static|make|empty"; done; done
       # Um download por mod e versão do Minecraft, ex.: mc26.2-tpaltar-1.0.0
       - uses: actions/upload-artifact@v7
         with:
