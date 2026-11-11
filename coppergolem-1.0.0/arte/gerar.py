@@ -95,7 +95,8 @@ def model():
         faces = {f: {"texture": "#" + over.get(f, tex)} for f in ("north", "south", "east", "west", "up", "down")}
         if "uv_south" in over:
             faces["south"]["uv"] = over["uv_south"]
-        return {"from": [a[0], a[1] + DY, a[2]], "to": [b[0], b[1] + DY, b[2]], "faces": faces}
+        return {"from": [a[0], a[1] + DY, a[2]], "to": [b[0], b[1] + DY, b[2]], "faces": faces,
+                "rotation": {"angle": -45, "axis": "z", "origin": [8, 8, 8]}}
     els = [
         box([6.5, 0, 6.5], [9.5, 3, 9.5], "cu"),             # pomo
         box([7, 3, 7], [9, 4, 9], "cu"),                     # pescoço do pomo
@@ -108,14 +109,16 @@ def model():
         box([7.25, 19.5, 7.25], [8.75, 21.5, 8.75], "cu"),   # haste da cabeça
         box([7.5, 21.5, 7.5], [8.5, 22.5, 8.5], "ox"),       # ponta oxidada
     ]
+    # Mesmos valores das ferramentas do jogo (item/handheld): com o cajado inclinado como o sprite de uma espada, ele
+    # fica na mão do mesmo jeito: cabo na mão, cabeça à frente, rosto para o jogador.
     disp = {
-        "gui": {"rotation": [20, -35, 0], "translation": [0, 1.5, 0], "scale": [0.55, 0.55, 0.55]},
+        "gui": {"rotation": [10, -20, 0], "translation": [0, 0, 0], "scale": [0.6, 0.6, 0.6]},
         "ground": {"translation": [0, 2, 0], "scale": [0.5, 0.5, 0.5]},
-        "fixed": {"rotation": [0, 180, 0], "scale": [0.6, 0.6, 0.6]},
-        "thirdperson_righthand": {"rotation": [90, -45, -35], "translation": [0, 4, 0.5], "scale": [0.85, 0.85, 0.85]},
-        "thirdperson_lefthand": {"rotation": [90, 45, 35], "translation": [0, 4, 0.5], "scale": [0.85, 0.85, 0.85]},
-        "firstperson_righthand": {"rotation": [90, -45, -65], "translation": [1.13, 3.2, 1.13], "scale": [0.68, 0.68, 0.68]},
-        "firstperson_lefthand": {"rotation": [90, 45, 65], "translation": [1.13, 3.2, 1.13], "scale": [0.68, 0.68, 0.68]},
+        "fixed": {"rotation": [0, 180, 0], "scale": [0.5, 0.5, 0.5]},
+        "thirdperson_righthand": {"rotation": [0, -90, 55], "translation": [0, 4, 0.5], "scale": [0.85, 0.85, 0.85]},
+        "thirdperson_lefthand": {"rotation": [0, 90, -55], "translation": [0, 4, 0.5], "scale": [0.85, 0.85, 0.85]},
+        "firstperson_righthand": {"rotation": [0, -90, 25], "translation": [1.13, 3.2, 1.13], "scale": [0.68, 0.68, 0.68]},
+        "firstperson_lefthand": {"rotation": [0, 90, -25], "translation": [1.13, 3.2, 1.13], "scale": [0.68, 0.68, 0.68]},
     }
     return {"gui_light": "front", "textures": {"particle": "coppergolem:item/wand", "cu": "coppergolem:item/wand",
             "face": "coppergolem:item/wand_face", "ox": "coppergolem:item/wand_ox", "wood": "coppergolem:item/wand_wood", "light": "coppergolem:item/wand_light"}, "elements": els, "display": disp}
