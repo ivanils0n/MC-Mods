@@ -29,6 +29,10 @@ def flat(c, edge):
     im = Image.new("RGBA", (16, 16), hx(c))
     d = ImageDraw.Draw(im)
     d.line([0, 15, 15, 15], fill=hx(edge)); d.line([15, 0, 15, 15], fill=hx(edge))
+    rnd = random.Random(sum(map(ord, c)))
+    for _ in range(7):  # poucos pontos de variação, para não ficar chapado
+        x, y = rnd.randrange(1, 14), rnd.randrange(1, 14)
+        im.putpixel((x, y), hx(edge if rnd.random() < .6 else "#f4a77d" if c != "#4fa58c" else "#8fe0c6"))
     return im
 
 
