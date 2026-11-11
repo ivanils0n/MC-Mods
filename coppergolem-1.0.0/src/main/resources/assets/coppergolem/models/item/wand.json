@@ -220,9 +220,19 @@
  "display": {
   "gui": {
    "rotation": [
+    20,
+    -35,
+    0
+   ],
+   "translation": [
     0,
-    25,
-    -45
+    -1.5,
+    0
+   ],
+   "scale": [
+    0.62,
+    0.62,
+    0.62
    ]
   },
   "ground": {
@@ -241,7 +251,12 @@
    "rotation": [
     0,
     180,
-    -45
+    0
+   ],
+   "scale": [
+    0.6,
+    0.6,
+    0.6
    ]
   },
   "thirdperson_righthand": {

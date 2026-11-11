@@ -95,9 +95,9 @@ def model():
         box([7.5, 19, 7.5], [8.5, 21, 8.5], "ox"),   # ponta oxidada
     ]
     disp = {
-        "gui": {"rotation": [0, 25, -45]},
+        "gui": {"rotation": [20, -35, 0], "translation": [0, -1.5, 0], "scale": [0.62, 0.62, 0.62]},
         "ground": {"translation": [0, 2, 0], "scale": [0.5, 0.5, 0.5]},
-        "fixed": {"rotation": [0, 180, -45]},
+        "fixed": {"rotation": [0, 180, 0], "scale": [0.6, 0.6, 0.6]},
         "thirdperson_righthand": {"rotation": [0, -90, -170], "translation": [0, 4, 0.5], "scale": [0.85, 0.85, 0.85]},
         "thirdperson_lefthand": {"rotation": [0, 90, 170], "translation": [0, 4, 0.5], "scale": [0.85, 0.85, 0.85]},
         "firstperson_righthand": {"rotation": [0, -90, 160], "translation": [1.13, 3.2, 1.13], "scale": [0.68, 0.68, 0.68]},
@@ -152,14 +152,10 @@ def main():
     save(copper_tex(1), "textures/item/wand.png")
     save(face_tex(), "textures/item/wand_face.png")
     save(copper_tex(2, 0.9), "textures/item/wand_ox.png")
-    save(icon(), "textures/item/wand_icon.png")
     save(gui(), "textures/gui/menu.png")
     save(model(), "models/item/wand.json")
-    save({"parent": "minecraft:item/generated", "textures": {"layer0": "coppergolem:item/wand_icon"}}, "models/item/wand_icon.json")
-    # inventário, chão e moldura: ícone 2D; na mão: modelo 3D
-    save({"model": {"type": "minecraft:select", "property": "minecraft:display_context",
-          "cases": [{"when": ["gui", "ground", "fixed"], "model": {"type": "minecraft:model", "model": "coppergolem:item/wand_icon"}}],
-          "fallback": {"type": "minecraft:model", "model": "coppergolem:item/wand"}}}, "items/wand.json")
+    # o mesmo modelo 3D em todo lugar (inventário, mão, chão, moldura)
+    save({"model": {"type": "minecraft:model", "model": "coppergolem:item/wand"}}, "items/wand.json")
     save({"providers": [
         {"type": "space", "advances": {"": -8, "": -177, "": 0}},
         {"type": "bitmap", "file": "coppergolem:gui/menu.png", "ascent": 13, "height": 168, "chars": [""]}]}, "font/gui.json")
