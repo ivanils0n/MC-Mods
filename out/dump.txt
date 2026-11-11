@@ -1,0 +1,2325 @@
+JAR /home/runner/.gradle/caches/fabric-loom/26.2/minecraft-merged.jar
+assets/minecraft/blockstates/chiseled_copper.json
+assets/minecraft/blockstates/copper_bars.json
+assets/minecraft/blockstates/copper_bulb.json
+assets/minecraft/blockstates/copper_chain.json
+assets/minecraft/blockstates/copper_chest.json
+assets/minecraft/blockstates/copper_door.json
+assets/minecraft/blockstates/copper_golem_statue.json
+assets/minecraft/blockstates/copper_grate.json
+assets/minecraft/blockstates/copper_lantern.json
+assets/minecraft/blockstates/copper_ore.json
+assets/minecraft/blockstates/copper_torch.json
+assets/minecraft/blockstates/copper_trapdoor.json
+assets/minecraft/blockstates/copper_wall_torch.json
+assets/minecraft/blockstates/cut_copper.json
+assets/minecraft/blockstates/cut_copper_slab.json
+assets/minecraft/blockstates/cut_copper_stairs.json
+assets/minecraft/blockstates/copper_block.json
+assets/minecraft/blockstates/deepslate_copper_ore.json
+assets/minecraft/blockstates/exposed_chiseled_copper.json
+assets/minecraft/blockstates/exposed_copper.json
+assets/minecraft/blockstates/exposed_copper_bars.json
+assets/minecraft/blockstates/exposed_copper_chest.json
+assets/minecraft/blockstates/exposed_copper_door.json
+assets/minecraft/blockstates/exposed_copper_golem_statue.json
+assets/minecraft/blockstates/exposed_copper_grate.json
+assets/minecraft/blockstates/exposed_copper_lantern.json
+assets/minecraft/blockstates/exposed_copper_trapdoor.json
+assets/minecraft/blockstates/exposed_cut_copper.json
+assets/minecraft/blockstates/exposed_cut_copper_slab.json
+assets/minecraft/blockstates/exposed_cut_copper_stairs.json
+assets/minecraft/blockstates/exposed_copper_chain.json
+assets/minecraft/blockstates/exposed_copper_bulb.json
+assets/minecraft/blockstates/oxidized_chiseled_copper.json
+assets/minecraft/blockstates/oxidized_copper.json
+assets/minecraft/blockstates/oxidized_copper_bars.json
+assets/minecraft/blockstates/oxidized_copper_bulb.json
+assets/minecraft/blockstates/oxidized_copper_chain.json
+assets/minecraft/blockstates/oxidized_copper_chest.json
+assets/minecraft/blockstates/oxidized_copper_door.json
+assets/minecraft/blockstates/oxidized_copper_golem_statue.json
+assets/minecraft/blockstates/oxidized_copper_grate.json
+assets/minecraft/blockstates/oxidized_copper_lantern.json
+assets/minecraft/blockstates/oxidized_copper_trapdoor.json
+assets/minecraft/blockstates/oxidized_cut_copper.json
+assets/minecraft/blockstates/oxidized_cut_copper_slab.json
+assets/minecraft/blockstates/oxidized_cut_copper_stairs.json
+assets/minecraft/blockstates/raw_copper_block.json
+assets/minecraft/blockstates/waxed_chiseled_copper.json
+assets/minecraft/blockstates/waxed_copper_bars.json
+assets/minecraft/blockstates/waxed_copper_block.json
+assets/minecraft/blockstates/waxed_copper_bulb.json
+assets/minecraft/blockstates/waxed_copper_chain.json
+assets/minecraft/blockstates/waxed_copper_chest.json
+assets/minecraft/blockstates/waxed_copper_door.json
+assets/minecraft/blockstates/waxed_copper_grate.json
+assets/minecraft/blockstates/waxed_copper_lantern.json
+assets/minecraft/blockstates/waxed_copper_trapdoor.json
+assets/minecraft/blockstates/waxed_cut_copper.json
+assets/minecraft/blockstates/waxed_cut_copper_slab.json
+assets/minecraft/blockstates/waxed_cut_copper_stairs.json
+assets/minecraft/blockstates/waxed_exposed_chiseled_copper.json
+assets/minecraft/blockstates/waxed_exposed_copper.json
+assets/minecraft/blockstates/waxed_exposed_copper_bars.json
+assets/minecraft/blockstates/waxed_exposed_copper_bulb.json
+assets/minecraft/blockstates/waxed_exposed_copper_chain.json
+assets/minecraft/blockstates/waxed_exposed_copper_chest.json
+assets/minecraft/blockstates/waxed_exposed_copper_door.json
+assets/minecraft/blockstates/waxed_exposed_copper_golem_statue.json
+assets/minecraft/blockstates/waxed_exposed_copper_grate.json
+assets/minecraft/blockstates/waxed_exposed_copper_lantern.json
+assets/minecraft/blockstates/waxed_exposed_copper_trapdoor.json
+assets/minecraft/blockstates/waxed_exposed_cut_copper.json
+assets/minecraft/blockstates/waxed_exposed_cut_copper_slab.json
+assets/minecraft/blockstates/waxed_exposed_cut_copper_stairs.json
+assets/minecraft/blockstates/waxed_oxidized_chiseled_copper.json
+assets/minecraft/blockstates/waxed_oxidized_copper.json
+assets/minecraft/blockstates/waxed_oxidized_copper_bars.json
+assets/minecraft/blockstates/waxed_oxidized_copper_bulb.json
+assets/minecraft/blockstates/waxed_oxidized_copper_chain.json
+assets/minecraft/blockstates/waxed_oxidized_copper_chest.json
+assets/minecraft/blockstates/waxed_oxidized_copper_door.json
+assets/minecraft/blockstates/waxed_oxidized_copper_golem_statue.json
+assets/minecraft/blockstates/waxed_oxidized_copper_grate.json
+assets/minecraft/blockstates/waxed_oxidized_copper_lantern.json
+assets/minecraft/blockstates/waxed_oxidized_copper_trapdoor.json
+assets/minecraft/blockstates/waxed_oxidized_cut_copper.json
+assets/minecraft/blockstates/waxed_oxidized_cut_copper_slab.json
+assets/minecraft/blockstates/waxed_oxidized_cut_copper_stairs.json
+assets/minecraft/blockstates/waxed_weathered_chiseled_copper.json
+assets/minecraft/blockstates/waxed_weathered_copper.json
+assets/minecraft/blockstates/waxed_weathered_copper_bars.json
+assets/minecraft/blockstates/waxed_weathered_copper_bulb.json
+assets/minecraft/blockstates/waxed_weathered_copper_chain.json
+assets/minecraft/blockstates/waxed_weathered_copper_chest.json
+assets/minecraft/blockstates/waxed_weathered_copper_door.json
+assets/minecraft/blockstates/waxed_weathered_copper_golem_statue.json
+assets/minecraft/blockstates/waxed_weathered_copper_grate.json
+assets/minecraft/blockstates/waxed_weathered_copper_lantern.json
+assets/minecraft/blockstates/waxed_weathered_copper_trapdoor.json
+assets/minecraft/blockstates/waxed_weathered_cut_copper.json
+assets/minecraft/blockstates/waxed_weathered_cut_copper_slab.json
+assets/minecraft/blockstates/waxed_weathered_cut_copper_stairs.json
+assets/minecraft/blockstates/weathered_chiseled_copper.json
+assets/minecraft/blockstates/weathered_copper.json
+assets/minecraft/blockstates/weathered_copper_bars.json
+assets/minecraft/blockstates/weathered_copper_bulb.json
+assets/minecraft/blockstates/weathered_copper_chain.json
+assets/minecraft/blockstates/weathered_copper_chest.json
+assets/minecraft/blockstates/weathered_copper_door.json
+assets/minecraft/blockstates/weathered_copper_golem_statue.json
+assets/minecraft/blockstates/weathered_copper_grate.json
+assets/minecraft/blockstates/weathered_copper_trapdoor.json
+assets/minecraft/blockstates/weathered_cut_copper.json
+assets/minecraft/blockstates/weathered_cut_copper_slab.json
+assets/minecraft/blockstates/weathered_cut_copper_stairs.json
+assets/minecraft/blockstates/waxed_copper_golem_statue.json
+assets/minecraft/blockstates/weathered_copper_lantern.json
+assets/minecraft/equipment/copper.json
+assets/minecraft/items/chiseled_copper.json
+assets/minecraft/items/copper_axe.json
+assets/minecraft/items/copper_bars.json
+assets/minecraft/items/copper_block.json
+assets/minecraft/items/copper_boots.json
+assets/minecraft/items/copper_bulb.json
+assets/minecraft/items/copper_chain.json
+assets/minecraft/items/copper_chest.json
+assets/minecraft/items/copper_chestplate.json
+assets/minecraft/items/copper_door.json
+assets/minecraft/items/copper_golem_spawn_egg.json
+assets/minecraft/items/copper_golem_statue.json
+assets/minecraft/items/copper_grate.json
+assets/minecraft/items/copper_helmet.json
+assets/minecraft/items/copper_hoe.json
+assets/minecraft/items/copper_horse_armor.json
+assets/minecraft/items/copper_ingot.json
+assets/minecraft/items/copper_lantern.json
+assets/minecraft/items/copper_leggings.json
+assets/minecraft/items/copper_nautilus_armor.json
+assets/minecraft/items/copper_nugget.json
+assets/minecraft/items/copper_ore.json
+assets/minecraft/items/copper_pickaxe.json
+assets/minecraft/items/copper_shovel.json
+assets/minecraft/items/copper_spear.json
+assets/minecraft/items/copper_sword.json
+assets/minecraft/items/copper_torch.json
+assets/minecraft/items/copper_trapdoor.json
+assets/minecraft/items/cut_copper_slab.json
+assets/minecraft/items/cut_copper_stairs.json
+assets/minecraft/items/deepslate_copper_ore.json
+assets/minecraft/items/cut_copper.json
+assets/minecraft/items/exposed_chiseled_copper.json
+assets/minecraft/items/exposed_copper.json
+assets/minecraft/items/exposed_copper_bars.json
+assets/minecraft/items/exposed_copper_bulb.json
+assets/minecraft/items/exposed_copper_chain.json
+assets/minecraft/items/exposed_copper_chest.json
+assets/minecraft/items/exposed_copper_door.json
+assets/minecraft/items/exposed_copper_golem_statue.json
+assets/minecraft/items/exposed_copper_grate.json
+assets/minecraft/items/exposed_copper_lantern.json
+assets/minecraft/items/exposed_copper_trapdoor.json
+assets/minecraft/items/exposed_cut_copper.json
+assets/minecraft/items/exposed_cut_copper_slab.json
+assets/minecraft/items/exposed_cut_copper_stairs.json
+assets/minecraft/items/oxidized_chiseled_copper.json
+assets/minecraft/items/oxidized_copper.json
+assets/minecraft/items/oxidized_copper_bars.json
+assets/minecraft/items/oxidized_copper_bulb.json
+assets/minecraft/items/oxidized_copper_chain.json
+assets/minecraft/items/oxidized_copper_chest.json
+assets/minecraft/items/oxidized_copper_door.json
+assets/minecraft/items/oxidized_copper_golem_statue.json
+assets/minecraft/items/oxidized_copper_grate.json
+assets/minecraft/items/oxidized_copper_lantern.json
+assets/minecraft/items/oxidized_copper_trapdoor.json
+assets/minecraft/items/oxidized_cut_copper.json
+assets/minecraft/items/oxidized_cut_copper_slab.json
+assets/minecraft/items/oxidized_cut_copper_stairs.json
+assets/minecraft/items/raw_copper.json
+assets/minecraft/items/raw_copper_block.json
+assets/minecraft/items/waxed_chiseled_copper.json
+assets/minecraft/items/waxed_copper_bars.json
+assets/minecraft/items/waxed_copper_block.json
+assets/minecraft/items/waxed_copper_bulb.json
+assets/minecraft/items/waxed_copper_chain.json
+assets/minecraft/items/waxed_copper_chest.json
+assets/minecraft/items/waxed_copper_door.json
+assets/minecraft/items/waxed_copper_golem_statue.json
+assets/minecraft/items/waxed_copper_grate.json
+assets/minecraft/items/waxed_copper_lantern.json
+assets/minecraft/items/waxed_copper_trapdoor.json
+assets/minecraft/items/waxed_cut_copper.json
+assets/minecraft/items/waxed_cut_copper_slab.json
+assets/minecraft/items/waxed_cut_copper_stairs.json
+assets/minecraft/items/waxed_exposed_chiseled_copper.json
+assets/minecraft/items/waxed_exposed_copper.json
+assets/minecraft/items/waxed_exposed_copper_bars.json
+assets/minecraft/items/waxed_exposed_copper_bulb.json
+assets/minecraft/items/waxed_exposed_copper_chain.json
+assets/minecraft/items/waxed_exposed_copper_chest.json
+assets/minecraft/items/waxed_exposed_copper_door.json
+assets/minecraft/items/waxed_exposed_copper_golem_statue.json
+assets/minecraft/items/waxed_exposed_copper_grate.json
+assets/minecraft/items/waxed_exposed_copper_lantern.json
+assets/minecraft/items/waxed_exposed_copper_trapdoor.json
+assets/minecraft/items/waxed_exposed_cut_copper.json
+assets/minecraft/items/waxed_exposed_cut_copper_slab.json
+assets/minecraft/items/waxed_oxidized_chiseled_copper.json
+assets/minecraft/items/waxed_oxidized_copper.json
+assets/minecraft/items/waxed_oxidized_copper_bars.json
+assets/minecraft/items/waxed_oxidized_copper_bulb.json
+assets/minecraft/items/waxed_oxidized_copper_chain.json
+assets/minecraft/items/waxed_oxidized_copper_chest.json
+assets/minecraft/items/waxed_oxidized_copper_door.json
+assets/minecraft/items/waxed_oxidized_copper_golem_statue.json
+assets/minecraft/items/waxed_oxidized_copper_grate.json
+assets/minecraft/items/waxed_oxidized_copper_lantern.json
+assets/minecraft/items/waxed_oxidized_copper_trapdoor.json
+assets/minecraft/items/waxed_oxidized_cut_copper.json
+assets/minecraft/items/waxed_oxidized_cut_copper_slab.json
+assets/minecraft/items/waxed_oxidized_cut_copper_stairs.json
+assets/minecraft/items/waxed_weathered_chiseled_copper.json
+assets/minecraft/items/waxed_weathered_copper.json
+assets/minecraft/items/waxed_weathered_copper_bulb.json
+assets/minecraft/items/waxed_weathered_copper_chain.json
+assets/minecraft/items/waxed_weathered_copper_bars.json
+assets/minecraft/items/waxed_weathered_copper_door.json
+assets/minecraft/items/waxed_weathered_copper_grate.json
+assets/minecraft/items/waxed_weathered_copper_lantern.json
+assets/minecraft/items/waxed_weathered_copper_golem_statue.json
+assets/minecraft/items/waxed_weathered_cut_copper.json
+assets/minecraft/items/waxed_weathered_copper_trapdoor.json
+assets/minecraft/items/waxed_weathered_copper_chest.json
+assets/minecraft/items/waxed_exposed_cut_copper_stairs.json
+assets/minecraft/items/weathered_copper.json
+assets/minecraft/items/weathered_copper_bars.json
+assets/minecraft/items/weathered_copper_bulb.json
+assets/minecraft/items/weathered_copper_chain.json
+assets/minecraft/items/weathered_copper_chest.json
+assets/minecraft/items/weathered_copper_door.json
+assets/minecraft/items/weathered_copper_golem_statue.json
+assets/minecraft/items/weathered_copper_grate.json
+assets/minecraft/items/weathered_copper_lantern.json
+assets/minecraft/items/weathered_copper_trapdoor.json
+assets/minecraft/items/weathered_cut_copper.json
+assets/minecraft/items/weathered_cut_copper_slab.json
+assets/minecraft/items/weathered_cut_copper_stairs.json
+assets/minecraft/items/waxed_weathered_cut_copper_stairs.json
+assets/minecraft/items/weathered_chiseled_copper.json
+assets/minecraft/items/waxed_weathered_cut_copper_slab.json
+assets/minecraft/models/block/chiseled_copper.json
+assets/minecraft/models/block/copper_bars_cap.json
+assets/minecraft/models/block/copper_bars_cap_alt.json
+assets/minecraft/models/block/copper_bars_post.json
+assets/minecraft/models/block/copper_bars_post_ends.json
+assets/minecraft/models/block/copper_bars_side.json
+assets/minecraft/models/block/copper_bars_side_alt.json
+assets/minecraft/models/block/copper_block.json
+assets/minecraft/models/block/copper_bulb.json
+assets/minecraft/models/block/copper_bulb_lit.json
+assets/minecraft/models/block/copper_bulb_lit_powered.json
+assets/minecraft/models/block/copper_bulb_powered.json
+assets/minecraft/models/block/copper_chain.json
+assets/minecraft/models/block/copper_chest.json
+assets/minecraft/models/block/copper_door_bottom_left.json
+assets/minecraft/models/block/copper_door_bottom_left_open.json
+assets/minecraft/models/block/copper_door_bottom_right.json
+assets/minecraft/models/block/copper_door_bottom_right_open.json
+assets/minecraft/models/block/copper_door_top_left.json
+assets/minecraft/models/block/copper_door_top_left_open.json
+assets/minecraft/models/block/copper_door_top_right.json
+assets/minecraft/models/block/copper_door_top_right_open.json
+assets/minecraft/models/block/copper_golem_statue.json
+assets/minecraft/models/block/copper_grate.json
+assets/minecraft/models/block/copper_lantern.json
+assets/minecraft/models/block/copper_lantern_hanging.json
+assets/minecraft/models/block/copper_ore.json
+assets/minecraft/models/block/copper_torch.json
+assets/minecraft/models/block/copper_trapdoor_bottom.json
+assets/minecraft/models/block/copper_trapdoor_open.json
+assets/minecraft/models/block/copper_trapdoor_top.json
+assets/minecraft/models/block/copper_wall_torch.json
+assets/minecraft/models/block/cut_copper.json
+assets/minecraft/models/block/cut_copper_slab.json
+assets/minecraft/models/block/cut_copper_slab_top.json
+assets/minecraft/models/block/cut_copper_stairs.json
+assets/minecraft/models/block/cut_copper_stairs_inner.json
+assets/minecraft/models/block/cut_copper_stairs_outer.json
+assets/minecraft/models/block/deepslate_copper_ore.json
+assets/minecraft/models/block/exposed_chiseled_copper.json
+assets/minecraft/models/block/exposed_copper.json
+assets/minecraft/models/block/exposed_copper_bars_cap.json
+assets/minecraft/models/block/exposed_copper_bars_cap_alt.json
+assets/minecraft/models/block/exposed_copper_bars_post.json
+assets/minecraft/models/block/exposed_copper_bars_post_ends.json
+assets/minecraft/models/block/exposed_copper_bars_side.json
+assets/minecraft/models/block/exposed_copper_bars_side_alt.json
+assets/minecraft/models/block/exposed_copper_bulb.json
+assets/minecraft/models/block/exposed_copper_bulb_lit.json
+assets/minecraft/models/block/exposed_copper_bulb_lit_powered.json
+assets/minecraft/models/block/exposed_copper_bulb_powered.json
+assets/minecraft/models/block/exposed_copper_chain.json
+assets/minecraft/models/block/exposed_copper_chest.json
+assets/minecraft/models/block/exposed_copper_door_bottom_left.json
+assets/minecraft/models/block/exposed_copper_door_bottom_left_open.json
+assets/minecraft/models/block/exposed_copper_door_bottom_right.json
+assets/minecraft/models/block/exposed_copper_door_bottom_right_open.json
+assets/minecraft/models/block/exposed_copper_door_top_left.json
+assets/minecraft/models/block/exposed_copper_door_top_left_open.json
+assets/minecraft/models/block/exposed_copper_door_top_right.json
+assets/minecraft/models/block/exposed_copper_door_top_right_open.json
+assets/minecraft/models/block/exposed_copper_golem_statue.json
+assets/minecraft/models/block/exposed_copper_grate.json
+assets/minecraft/models/block/exposed_copper_lantern.json
+assets/minecraft/models/block/exposed_copper_lantern_hanging.json
+assets/minecraft/models/block/exposed_copper_trapdoor_bottom.json
+assets/minecraft/models/block/exposed_copper_trapdoor_open.json
+assets/minecraft/models/block/exposed_copper_trapdoor_top.json
+assets/minecraft/models/block/exposed_cut_copper.json
+assets/minecraft/models/block/exposed_cut_copper_slab.json
+assets/minecraft/models/block/exposed_cut_copper_slab_top.json
+assets/minecraft/models/block/exposed_cut_copper_stairs.json
+assets/minecraft/models/block/exposed_cut_copper_stairs_inner.json
+assets/minecraft/models/block/exposed_cut_copper_stairs_outer.json
+assets/minecraft/models/block/oxidized_chiseled_copper.json
+assets/minecraft/models/block/oxidized_copper.json
+assets/minecraft/models/block/oxidized_copper_bars_cap.json
+assets/minecraft/models/block/oxidized_copper_bars_cap_alt.json
+assets/minecraft/models/block/oxidized_copper_bars_post.json
+assets/minecraft/models/block/oxidized_copper_bars_post_ends.json
+assets/minecraft/models/block/oxidized_copper_bars_side.json
+assets/minecraft/models/block/oxidized_copper_bars_side_alt.json
+assets/minecraft/models/block/oxidized_copper_bulb.json
+assets/minecraft/models/block/oxidized_copper_bulb_lit.json
+assets/minecraft/models/block/oxidized_copper_bulb_lit_powered.json
+assets/minecraft/models/block/oxidized_copper_bulb_powered.json
+assets/minecraft/models/block/oxidized_copper_chain.json
+assets/minecraft/models/block/oxidized_copper_chest.json
+assets/minecraft/models/block/oxidized_copper_door_bottom_left.json
+assets/minecraft/models/block/oxidized_copper_door_bottom_left_open.json
+assets/minecraft/models/block/oxidized_copper_door_bottom_right.json
+assets/minecraft/models/block/oxidized_copper_door_bottom_right_open.json
+assets/minecraft/models/block/oxidized_copper_door_top_left.json
+assets/minecraft/models/block/oxidized_copper_door_top_left_open.json
+assets/minecraft/models/block/oxidized_copper_door_top_right.json
+assets/minecraft/models/block/oxidized_copper_door_top_right_open.json
+assets/minecraft/models/block/oxidized_copper_golem_statue.json
+assets/minecraft/models/block/oxidized_copper_grate.json
+assets/minecraft/models/block/oxidized_copper_trapdoor_bottom.json
+assets/minecraft/models/block/oxidized_copper_trapdoor_open.json
+assets/minecraft/models/block/oxidized_copper_trapdoor_top.json
+assets/minecraft/models/block/oxidized_cut_copper.json
+assets/minecraft/models/block/oxidized_cut_copper_slab.json
+assets/minecraft/models/block/oxidized_cut_copper_slab_top.json
+assets/minecraft/models/block/oxidized_cut_copper_stairs.json
+assets/minecraft/models/block/oxidized_cut_copper_stairs_inner.json
+assets/minecraft/models/block/oxidized_cut_copper_stairs_outer.json
+assets/minecraft/models/block/oxidized_copper_lantern_hanging.json
+assets/minecraft/models/block/oxidized_copper_lantern.json
+assets/minecraft/models/block/raw_copper_block.json
+assets/minecraft/models/block/weathered_copper.json
+assets/minecraft/models/block/weathered_copper_bars_cap.json
+assets/minecraft/models/block/weathered_copper_bars_cap_alt.json
+assets/minecraft/models/block/weathered_copper_bars_post.json
+assets/minecraft/models/block/weathered_copper_bars_post_ends.json
+assets/minecraft/models/block/weathered_copper_bars_side.json
+assets/minecraft/models/block/weathered_copper_bars_side_alt.json
+assets/minecraft/models/block/weathered_copper_bulb.json
+assets/minecraft/models/block/weathered_copper_bulb_lit.json
+assets/minecraft/models/block/weathered_copper_bulb_lit_powered.json
+assets/minecraft/models/block/weathered_copper_bulb_powered.json
+assets/minecraft/models/block/weathered_copper_chain.json
+assets/minecraft/models/block/weathered_copper_chest.json
+assets/minecraft/models/block/weathered_copper_door_bottom_left.json
+assets/minecraft/models/block/weathered_copper_door_bottom_left_open.json
+assets/minecraft/models/block/weathered_copper_door_bottom_right.json
+assets/minecraft/models/block/weathered_copper_door_bottom_right_open.json
+assets/minecraft/models/block/weathered_copper_door_top_left.json
+assets/minecraft/models/block/weathered_copper_door_top_left_open.json
+assets/minecraft/models/block/weathered_copper_door_top_right.json
+assets/minecraft/models/block/weathered_copper_door_top_right_open.json
+assets/minecraft/models/block/weathered_copper_golem_statue.json
+assets/minecraft/models/block/weathered_copper_lantern.json
+assets/minecraft/models/block/weathered_copper_lantern_hanging.json
+assets/minecraft/models/block/weathered_copper_trapdoor_bottom.json
+assets/minecraft/models/block/weathered_copper_trapdoor_open.json
+assets/minecraft/models/block/weathered_copper_trapdoor_top.json
+assets/minecraft/models/block/weathered_cut_copper.json
+assets/minecraft/models/block/weathered_cut_copper_slab.json
+assets/minecraft/models/block/weathered_cut_copper_slab_top.json
+assets/minecraft/models/block/weathered_cut_copper_stairs.json
+assets/minecraft/models/block/weathered_cut_copper_stairs_inner.json
+assets/minecraft/models/block/weathered_cut_copper_stairs_outer.json
+assets/minecraft/models/block/weathered_chiseled_copper.json
+assets/minecraft/models/block/weathered_copper_grate.json
+assets/minecraft/models/item/chainmail_boots_copper_trim.json
+assets/minecraft/models/item/chainmail_chestplate_copper_trim.json
+assets/minecraft/models/item/chainmail_helmet_copper_trim.json
+assets/minecraft/models/item/chainmail_leggings_copper_trim.json
+assets/minecraft/models/item/copper_axe.json
+assets/minecraft/models/item/copper_bars.json
+assets/minecraft/models/item/copper_boots.json
+assets/minecraft/models/item/copper_boots_amethyst_trim.json
+assets/minecraft/models/item/copper_boots_copper_trim.json
+assets/minecraft/models/item/copper_boots_diamond_trim.json
+assets/minecraft/models/item/copper_boots_emerald_trim.json
+assets/minecraft/models/item/copper_boots_gold_trim.json
+assets/minecraft/models/item/copper_boots_iron_trim.json
+assets/minecraft/models/item/copper_boots_lapis_trim.json
+assets/minecraft/models/item/copper_boots_netherite_trim.json
+assets/minecraft/models/item/copper_boots_quartz_trim.json
+assets/minecraft/models/item/copper_boots_redstone_trim.json
+assets/minecraft/models/item/copper_boots_resin_trim.json
+assets/minecraft/models/item/copper_chain.json
+assets/minecraft/models/item/copper_chest.json
+assets/minecraft/models/item/copper_chestplate.json
+assets/minecraft/models/item/copper_chestplate_amethyst_trim.json
+assets/minecraft/models/item/copper_chestplate_copper_trim.json
+assets/minecraft/models/item/copper_chestplate_diamond_trim.json
+assets/minecraft/models/item/copper_chestplate_emerald_trim.json
+assets/minecraft/models/item/copper_chestplate_gold_trim.json
+assets/minecraft/models/item/copper_chestplate_iron_trim.json
+assets/minecraft/models/item/copper_chestplate_netherite_trim.json
+assets/minecraft/models/item/copper_chestplate_quartz_trim.json
+assets/minecraft/models/item/copper_chestplate_redstone_trim.json
+assets/minecraft/models/item/copper_chestplate_resin_trim.json
+assets/minecraft/models/item/copper_door.json
+assets/minecraft/models/item/copper_golem_spawn_egg.json
+assets/minecraft/models/item/copper_helmet.json
+assets/minecraft/models/item/copper_helmet_amethyst_trim.json
+assets/minecraft/models/item/copper_helmet_copper_trim.json
+assets/minecraft/models/item/copper_helmet_diamond_trim.json
+assets/minecraft/models/item/copper_helmet_emerald_trim.json
+assets/minecraft/models/item/copper_helmet_gold_trim.json
+assets/minecraft/models/item/copper_helmet_iron_trim.json
+assets/minecraft/models/item/copper_helmet_lapis_trim.json
+assets/minecraft/models/item/copper_helmet_netherite_trim.json
+assets/minecraft/models/item/copper_helmet_quartz_trim.json
+assets/minecraft/models/item/copper_helmet_redstone_trim.json
+assets/minecraft/models/item/copper_helmet_resin_trim.json
+assets/minecraft/models/item/copper_hoe.json
+assets/minecraft/models/item/copper_horse_armor.json
+assets/minecraft/models/item/copper_ingot.json
+assets/minecraft/models/item/copper_lantern.json
+assets/minecraft/models/item/copper_leggings.json
+assets/minecraft/models/item/copper_leggings_amethyst_trim.json
+assets/minecraft/models/item/copper_leggings_copper_trim.json
+assets/minecraft/models/item/copper_leggings_diamond_trim.json
+assets/minecraft/models/item/copper_leggings_emerald_trim.json
+assets/minecraft/models/item/copper_leggings_gold_trim.json
+assets/minecraft/models/item/copper_leggings_iron_trim.json
+assets/minecraft/models/item/copper_leggings_lapis_trim.json
+assets/minecraft/models/item/copper_leggings_netherite_trim.json
+assets/minecraft/models/item/copper_leggings_quartz_trim.json
+assets/minecraft/models/item/copper_leggings_redstone_trim.json
+assets/minecraft/models/item/copper_leggings_resin_trim.json
+assets/minecraft/models/item/copper_nautilus_armor.json
+assets/minecraft/models/item/copper_nugget.json
+assets/minecraft/models/item/copper_pickaxe.json
+assets/minecraft/models/item/copper_shovel.json
+assets/minecraft/models/item/copper_spear.json
+assets/minecraft/models/item/copper_spear_in_hand.json
+assets/minecraft/models/item/copper_sword.json
+assets/minecraft/models/item/copper_torch.json
+assets/minecraft/models/item/diamond_boots_copper_trim.json
+assets/minecraft/models/item/diamond_chestplate_copper_trim.json
+assets/minecraft/models/item/diamond_helmet_copper_trim.json
+assets/minecraft/models/item/diamond_leggings_copper_trim.json
+assets/minecraft/models/item/copper_chestplate_lapis_trim.json
+assets/minecraft/models/item/exposed_copper_bars.json
+assets/minecraft/models/item/exposed_copper_chain.json
+assets/minecraft/models/item/exposed_copper_chest.json
+assets/minecraft/models/item/exposed_copper_door.json
+assets/minecraft/models/item/exposed_copper_lantern.json
+assets/minecraft/models/item/golden_boots_copper_trim.json
+assets/minecraft/models/item/golden_chestplate_copper_trim.json
+assets/minecraft/models/item/golden_helmet_copper_trim.json
+assets/minecraft/models/item/golden_leggings_copper_trim.json
+assets/minecraft/models/item/iron_boots_copper_trim.json
+assets/minecraft/models/item/iron_chestplate_copper_trim.json
+assets/minecraft/models/item/iron_helmet_copper_trim.json
+assets/minecraft/models/item/iron_leggings_copper_trim.json
+assets/minecraft/models/item/leather_boots_copper_trim.json
+assets/minecraft/models/item/leather_chestplate_copper_trim.json
+assets/minecraft/models/item/leather_helmet_copper_trim.json
+assets/minecraft/models/item/leather_leggings_copper_trim.json
+assets/minecraft/models/item/netherite_boots_copper_trim.json
+assets/minecraft/models/item/netherite_chestplate_copper_trim.json
+assets/minecraft/models/item/netherite_helmet_copper_trim.json
+assets/minecraft/models/item/netherite_leggings_copper_trim.json
+assets/minecraft/models/item/oxidized_copper_bars.json
+assets/minecraft/models/item/oxidized_copper_chain.json
+assets/minecraft/models/item/oxidized_copper_chest.json
+assets/minecraft/models/item/oxidized_copper_door.json
+assets/minecraft/models/item/oxidized_copper_lantern.json
+assets/minecraft/models/item/raw_copper.json
+assets/minecraft/models/item/template_copper_golem_statue.json
+assets/minecraft/models/item/turtle_helmet_copper_trim.json
+assets/minecraft/models/item/weathered_copper_bars.json
+assets/minecraft/models/item/weathered_copper_chain.json
+assets/minecraft/models/item/weathered_copper_chest.json
+assets/minecraft/models/item/weathered_copper_door.json
+assets/minecraft/models/item/weathered_copper_lantern.json
+assets/minecraft/particles/copper_fire_flame.json
+assets/minecraft/textures/block/chiseled_copper.png
+assets/minecraft/textures/block/copper_bars.png
+assets/minecraft/textures/block/copper_block.png
+assets/minecraft/textures/block/copper_bulb.png
+assets/minecraft/textures/block/copper_bulb_lit.png
+assets/minecraft/textures/block/copper_bulb_lit_powered.png
+assets/minecraft/textures/block/copper_bulb_powered.png
+assets/minecraft/textures/block/copper_chain.png
+assets/minecraft/textures/block/copper_door_bottom.png
+assets/minecraft/textures/block/copper_door_top.png
+assets/minecraft/textures/block/copper_grate.png
+assets/minecraft/textures/block/copper_lantern.png
+assets/minecraft/textures/block/copper_lantern.png.mcmeta
+assets/minecraft/textures/block/copper_ore.png
+assets/minecraft/textures/block/copper_torch.png
+assets/minecraft/textures/block/copper_trapdoor.png
+assets/minecraft/textures/block/cut_copper.png
+assets/minecraft/textures/block/deepslate_copper_ore.png
+assets/minecraft/textures/block/exposed_chiseled_copper.png
+assets/minecraft/textures/block/exposed_copper.png
+assets/minecraft/textures/block/exposed_copper_bars.png
+assets/minecraft/textures/block/exposed_copper_bulb_lit.png
+assets/minecraft/textures/block/exposed_copper_bulb_lit_powered.png
+assets/minecraft/textures/block/exposed_copper_bulb_powered.png
+assets/minecraft/textures/block/exposed_copper_chain.png
+assets/minecraft/textures/block/exposed_copper_door_bottom.png
+assets/minecraft/textures/block/exposed_copper_door_top.png
+assets/minecraft/textures/block/exposed_copper_grate.png
+assets/minecraft/textures/block/exposed_copper_lantern.png
+assets/minecraft/textures/block/exposed_copper_lantern.png.mcmeta
+assets/minecraft/textures/block/exposed_copper_trapdoor.png
+assets/minecraft/textures/block/exposed_cut_copper.png
+assets/minecraft/textures/block/exposed_copper_bulb.png
+assets/minecraft/textures/block/oxidized_chiseled_copper.png
+assets/minecraft/textures/block/oxidized_copper.png
+assets/minecraft/textures/block/oxidized_copper_bars.png
+assets/minecraft/textures/block/oxidized_copper_bulb.png
+assets/minecraft/textures/block/oxidized_copper_bulb_lit.png
+assets/minecraft/textures/block/oxidized_copper_bulb_lit_powered.png
+assets/minecraft/textures/block/oxidized_copper_bulb_powered.png
+assets/minecraft/textures/block/oxidized_copper_chain.png
+assets/minecraft/textures/block/oxidized_copper_door_bottom.png
+assets/minecraft/textures/block/oxidized_copper_door_top.png
+assets/minecraft/textures/block/oxidized_copper_grate.png
+assets/minecraft/textures/block/oxidized_copper_lantern.png
+assets/minecraft/textures/block/oxidized_copper_lantern.png.mcmeta
+assets/minecraft/textures/block/oxidized_copper_trapdoor.png
+assets/minecraft/textures/block/oxidized_cut_copper.png
+assets/minecraft/textures/block/raw_copper_block.png
+assets/minecraft/textures/block/weathered_chiseled_copper.png
+assets/minecraft/textures/block/weathered_copper.png
+assets/minecraft/textures/block/weathered_copper_bars.png
+assets/minecraft/textures/block/weathered_copper_bulb.png
+assets/minecraft/textures/block/weathered_copper_bulb_lit.png
+assets/minecraft/textures/block/weathered_copper_bulb_lit_powered.png
+assets/minecraft/textures/block/weathered_copper_bulb_powered.png
+assets/minecraft/textures/block/weathered_copper_chain.png
+assets/minecraft/textures/block/weathered_copper_door_bottom.png
+assets/minecraft/textures/block/weathered_copper_door_top.png
+assets/minecraft/textures/block/weathered_copper_grate.png
+assets/minecraft/textures/block/weathered_copper_lantern.png
+assets/minecraft/textures/block/weathered_copper_lantern.png.mcmeta
+assets/minecraft/textures/block/weathered_copper_trapdoor.png
+assets/minecraft/textures/block/weathered_cut_copper.png
+assets/minecraft/textures/entity/chest/copper.png
+assets/minecraft/textures/entity/chest/copper_exposed.png
+assets/minecraft/textures/entity/chest/copper_exposed_left.png
+assets/minecraft/textures/entity/chest/copper_exposed_right.png
+assets/minecraft/textures/entity/chest/copper_left.png
+assets/minecraft/textures/entity/chest/copper_oxidized.png
+assets/minecraft/textures/entity/chest/copper_oxidized_left.png
+assets/minecraft/textures/entity/chest/copper_oxidized_right.png
+assets/minecraft/textures/entity/chest/copper_right.png
+assets/minecraft/textures/entity/chest/copper_weathered.png
+assets/minecraft/textures/entity/chest/copper_weathered_left.png
+assets/minecraft/textures/entity/chest/copper_weathered_right.png
+assets/minecraft/textures/entity/copper_golem/
+assets/minecraft/textures/entity/copper_golem/copper_golem.png
+assets/minecraft/textures/entity/copper_golem/copper_golem_exposed.png
+assets/minecraft/textures/entity/copper_golem/copper_golem_eyes_exposed.png
+assets/minecraft/textures/entity/copper_golem/copper_golem_eyes_oxidized.png
+assets/minecraft/textures/entity/copper_golem/copper_golem_eyes_weathered.png
+assets/minecraft/textures/entity/copper_golem/copper_golem_oxidized.png
+assets/minecraft/textures/entity/copper_golem/copper_golem_weathered.png
+assets/minecraft/textures/entity/copper_golem/copper_golem_eyes.png
+assets/minecraft/textures/entity/equipment/horse_body/copper.png
+assets/minecraft/textures/entity/equipment/humanoid/copper.png
+assets/minecraft/textures/entity/equipment/humanoid_baby/copper.png
+assets/minecraft/textures/entity/equipment/humanoid_leggings/copper.png
+assets/minecraft/textures/entity/equipment/nautilus_body/copper.png
+assets/minecraft/textures/item/copper_axe.png
+assets/minecraft/textures/item/copper_boots.png
+assets/minecraft/textures/item/copper_chain.png
+assets/minecraft/textures/item/copper_chestplate.png
+assets/minecraft/textures/item/copper_door.png
+assets/minecraft/textures/item/copper_golem_spawn_egg.png
+assets/minecraft/textures/item/copper_helmet.png
+assets/minecraft/textures/item/copper_hoe.png
+assets/minecraft/textures/item/copper_horse_armor.png
+assets/minecraft/textures/item/copper_ingot.png
+assets/minecraft/textures/item/copper_lantern.png
+assets/minecraft/textures/item/copper_leggings.png
+assets/minecraft/textures/item/copper_nautilus_armor.png
+assets/minecraft/textures/item/copper_nugget.png
+assets/minecraft/textures/item/copper_pickaxe.png
+assets/minecraft/textures/item/copper_shovel.png
+assets/minecraft/textures/item/copper_spear.png
+assets/minecraft/textures/item/copper_spear_in_hand.png
+assets/minecraft/textures/item/copper_sword.png
+assets/minecraft/textures/item/exposed_copper_chain.png
+assets/minecraft/textures/item/exposed_copper_door.png
+assets/minecraft/textures/item/exposed_copper_lantern.png
+assets/minecraft/textures/item/oxidized_copper_chain.png
+assets/minecraft/textures/item/oxidized_copper_door.png
+assets/minecraft/textures/item/oxidized_copper_lantern.png
+assets/minecraft/textures/item/raw_copper.png
+assets/minecraft/textures/item/weathered_copper_chain.png
+assets/minecraft/textures/item/weathered_copper_door.png
+assets/minecraft/textures/item/weathered_copper_lantern.png
+assets/minecraft/textures/particle/copper_fire_flame.png
+assets/minecraft/textures/trims/color_palettes/copper.png
+assets/minecraft/textures/trims/color_palettes/copper_darker.png
+data/minecraft/advancement/recipes/building_blocks/chiseled_copper.json
+data/minecraft/advancement/recipes/building_blocks/chiseled_copper_from_copper_block_stonecutting.json
+data/minecraft/advancement/recipes/building_blocks/chiseled_copper_from_cut_copper_stonecutting.json
+data/minecraft/advancement/recipes/building_blocks/copper_block.json
+data/minecraft/advancement/recipes/building_blocks/copper_grate.json
+data/minecraft/advancement/recipes/building_blocks/copper_grate_from_copper_block_stonecutting.json
+data/minecraft/advancement/recipes/building_blocks/cut_copper.json
+data/minecraft/advancement/recipes/building_blocks/cut_copper_from_copper_block_stonecutting.json
+data/minecraft/advancement/recipes/building_blocks/cut_copper_slab.json
+data/minecraft/advancement/recipes/building_blocks/cut_copper_slab_from_copper_block_stonecutting.json
+data/minecraft/advancement/recipes/building_blocks/cut_copper_slab_from_cut_copper_stonecutting.json
+data/minecraft/advancement/recipes/building_blocks/cut_copper_stairs.json
+data/minecraft/advancement/recipes/building_blocks/cut_copper_stairs_from_copper_block_stonecutting.json
+data/minecraft/advancement/recipes/building_blocks/cut_copper_stairs_from_cut_copper_stonecutting.json
+data/minecraft/advancement/recipes/building_blocks/exposed_chiseled_copper.json
+data/minecraft/advancement/recipes/building_blocks/exposed_chiseled_copper_from_exposed_copper_stonecutting.json
+data/minecraft/advancement/recipes/building_blocks/exposed_chiseled_copper_from_exposed_cut_copper_stonecutting.json
+data/minecraft/advancement/recipes/building_blocks/exposed_copper_grate.json
+data/minecraft/advancement/recipes/building_blocks/exposed_copper_grate_from_exposed_copper_stonecutting.json
+data/minecraft/advancement/recipes/building_blocks/exposed_cut_copper.json
+data/minecraft/advancement/recipes/building_blocks/exposed_cut_copper_from_exposed_copper_stonecutting.json
+data/minecraft/advancement/recipes/building_blocks/exposed_cut_copper_slab.json
+data/minecraft/advancement/recipes/building_blocks/exposed_cut_copper_slab_from_exposed_copper_stonecutting.json
+data/minecraft/advancement/recipes/building_blocks/exposed_cut_copper_slab_from_exposed_cut_copper_stonecutting.json
+data/minecraft/advancement/recipes/building_blocks/exposed_cut_copper_stairs.json
+data/minecraft/advancement/recipes/building_blocks/exposed_cut_copper_stairs_from_exposed_copper_stonecutting.json
+data/minecraft/advancement/recipes/building_blocks/oxidized_chiseled_copper.json
+data/minecraft/advancement/recipes/building_blocks/oxidized_chiseled_copper_from_oxidized_copper_stonecutting.json
+data/minecraft/advancement/recipes/building_blocks/oxidized_chiseled_copper_from_oxidized_cut_copper_stonecutting.json
+data/minecraft/advancement/recipes/building_blocks/oxidized_copper_grate.json
+data/minecraft/advancement/recipes/building_blocks/oxidized_cut_copper.json
+data/minecraft/advancement/recipes/building_blocks/oxidized_cut_copper_from_oxidized_copper_stonecutting.json
+data/minecraft/advancement/recipes/building_blocks/oxidized_cut_copper_slab.json
+data/minecraft/advancement/recipes/building_blocks/oxidized_cut_copper_slab_from_oxidized_copper_stonecutting.json
+data/minecraft/advancement/recipes/building_blocks/exposed_cut_copper_stairs_from_exposed_cut_copper_stonecutting.json
+data/minecraft/advancement/recipes/building_blocks/oxidized_cut_copper_slab_from_oxidized_cut_copper_stonecutting.json
+data/minecraft/advancement/recipes/building_blocks/oxidized_cut_copper_stairs_from_oxidized_cut_copper_stonecutting.json
+data/minecraft/advancement/recipes/building_blocks/oxidized_cut_copper_stairs.json
+data/minecraft/advancement/recipes/building_blocks/oxidized_cut_copper_stairs_from_oxidized_copper_stonecutting.json
+data/minecraft/advancement/recipes/building_blocks/oxidized_copper_grate_from_oxidized_copper_stonecutting.json
+data/minecraft/advancement/recipes/building_blocks/raw_copper_block.json
+data/minecraft/advancement/recipes/building_blocks/waxed_chiseled_copper_from_honeycomb.json
+data/minecraft/advancement/recipes/building_blocks/waxed_chiseled_copper_from_waxed_copper_block_stonecutting.json
+data/minecraft/advancement/recipes/building_blocks/waxed_chiseled_copper_from_waxed_cut_copper_stonecutting.json
+data/minecraft/advancement/recipes/building_blocks/waxed_copper_bars_from_honeycomb.json
+data/minecraft/advancement/recipes/building_blocks/waxed_copper_block_from_honeycomb.json
+data/minecraft/advancement/recipes/building_blocks/waxed_copper_chain_from_honeycomb.json
+data/minecraft/advancement/recipes/building_blocks/waxed_copper_chest_from_honeycomb.json
+data/minecraft/advancement/recipes/building_blocks/waxed_copper_golem_statue_from_honeycomb.json
+data/minecraft/advancement/recipes/building_blocks/waxed_copper_grate.json
+data/minecraft/advancement/recipes/building_blocks/waxed_copper_grate_from_honeycomb.json
+data/minecraft/advancement/recipes/building_blocks/waxed_copper_grate_from_waxed_copper_block_stonecutting.json
+data/minecraft/advancement/recipes/building_blocks/waxed_copper_lantern_from_honeycomb.json
+data/minecraft/advancement/recipes/building_blocks/waxed_cut_copper.json
+data/minecraft/advancement/recipes/building_blocks/waxed_cut_copper_from_honeycomb.json
+data/minecraft/advancement/recipes/building_blocks/waxed_cut_copper_from_waxed_copper_block_stonecutting.json
+data/minecraft/advancement/recipes/building_blocks/waxed_cut_copper_slab.json
+data/minecraft/advancement/recipes/building_blocks/waxed_cut_copper_slab_from_honeycomb.json
+data/minecraft/advancement/recipes/building_blocks/waxed_cut_copper_slab_from_waxed_copper_block_stonecutting.json
+data/minecraft/advancement/recipes/building_blocks/waxed_cut_copper_slab_from_waxed_cut_copper_stonecutting.json
+data/minecraft/advancement/recipes/building_blocks/waxed_cut_copper_stairs.json
+data/minecraft/advancement/recipes/building_blocks/waxed_cut_copper_stairs_from_honeycomb.json
+data/minecraft/advancement/recipes/building_blocks/waxed_cut_copper_stairs_from_waxed_copper_block_stonecutting.json
+data/minecraft/advancement/recipes/building_blocks/waxed_cut_copper_stairs_from_waxed_cut_copper_stonecutting.json
+data/minecraft/advancement/recipes/building_blocks/waxed_exposed_chiseled_copper.json
+data/minecraft/advancement/recipes/building_blocks/waxed_exposed_chiseled_copper_from_honeycomb.json
+data/minecraft/advancement/recipes/building_blocks/waxed_exposed_chiseled_copper_from_waxed_exposed_copper_stonecutting.json
+data/minecraft/advancement/recipes/building_blocks/waxed_exposed_chiseled_copper_from_waxed_exposed_cut_copper_stonecutting.json
+data/minecraft/advancement/recipes/building_blocks/waxed_exposed_copper_bars_from_honeycomb.json
+data/minecraft/advancement/recipes/building_blocks/waxed_exposed_copper_chain_from_honeycomb.json
+data/minecraft/advancement/recipes/building_blocks/waxed_exposed_copper_chest_from_honeycomb.json
+data/minecraft/advancement/recipes/building_blocks/waxed_exposed_copper_from_honeycomb.json
+data/minecraft/advancement/recipes/building_blocks/waxed_exposed_copper_golem_statue_from_honeycomb.json
+data/minecraft/advancement/recipes/building_blocks/waxed_exposed_copper_grate.json
+data/minecraft/advancement/recipes/building_blocks/waxed_exposed_copper_grate_from_honeycomb.json
+data/minecraft/advancement/recipes/building_blocks/waxed_exposed_copper_grate_from_waxed_exposed_copper_stonecutting.json
+data/minecraft/advancement/recipes/building_blocks/waxed_exposed_copper_lantern_from_honeycomb.json
+data/minecraft/advancement/recipes/building_blocks/waxed_exposed_cut_copper.json
+data/minecraft/advancement/recipes/building_blocks/waxed_exposed_cut_copper_from_honeycomb.json
+data/minecraft/advancement/recipes/building_blocks/waxed_exposed_cut_copper_from_waxed_exposed_copper_stonecutting.json
+data/minecraft/advancement/recipes/building_blocks/waxed_exposed_cut_copper_slab.json
+data/minecraft/advancement/recipes/building_blocks/waxed_exposed_cut_copper_slab_from_honeycomb.json
+data/minecraft/advancement/recipes/building_blocks/waxed_exposed_cut_copper_slab_from_waxed_exposed_copper_stonecutting.json
+data/minecraft/advancement/recipes/building_blocks/waxed_exposed_cut_copper_slab_from_waxed_exposed_cut_copper_stonecutting.json
+data/minecraft/advancement/recipes/building_blocks/waxed_exposed_cut_copper_stairs.json
+data/minecraft/advancement/recipes/building_blocks/waxed_exposed_cut_copper_stairs_from_honeycomb.json
+data/minecraft/advancement/recipes/building_blocks/waxed_exposed_cut_copper_stairs_from_waxed_exposed_copper_stonecutting.json
+data/minecraft/advancement/recipes/building_blocks/waxed_exposed_cut_copper_stairs_from_waxed_exposed_cut_copper_stonecutting.json
+data/minecraft/advancement/recipes/building_blocks/waxed_oxidized_chiseled_copper.json
+data/minecraft/advancement/recipes/building_blocks/waxed_oxidized_chiseled_copper_from_waxed_oxidized_copper_stonecutting.json
+data/minecraft/advancement/recipes/building_blocks/waxed_oxidized_chiseled_copper_from_waxed_oxidized_cut_copper_stonecutting.json
+data/minecraft/advancement/recipes/building_blocks/waxed_oxidized_chiseled_copper_from_honeycomb.json
+data/minecraft/advancement/recipes/building_blocks/waxed_chiseled_copper.json
+data/minecraft/advancement/recipes/building_blocks/waxed_oxidized_copper_chest_from_honeycomb.json
+data/minecraft/advancement/recipes/building_blocks/waxed_oxidized_copper_chain_from_honeycomb.json
+data/minecraft/advancement/recipes/building_blocks/waxed_oxidized_copper_golem_statue_from_honeycomb.json
+data/minecraft/advancement/recipes/building_blocks/waxed_oxidized_copper_grate_from_honeycomb.json
+data/minecraft/advancement/recipes/building_blocks/waxed_oxidized_copper_grate_from_waxed_oxidized_copper_stonecutting.json
+data/minecraft/advancement/recipes/building_blocks/waxed_oxidized_copper_lantern_from_honeycomb.json
+data/minecraft/advancement/recipes/building_blocks/waxed_oxidized_cut_copper.json
+data/minecraft/advancement/recipes/building_blocks/waxed_oxidized_cut_copper_from_honeycomb.json
+data/minecraft/advancement/recipes/building_blocks/waxed_oxidized_cut_copper_from_waxed_oxidized_copper_stonecutting.json
+data/minecraft/advancement/recipes/building_blocks/waxed_oxidized_cut_copper_slab.json
+data/minecraft/advancement/recipes/building_blocks/waxed_oxidized_cut_copper_slab_from_honeycomb.json
+data/minecraft/advancement/recipes/building_blocks/waxed_oxidized_cut_copper_slab_from_waxed_oxidized_copper_stonecutting.json
+data/minecraft/advancement/recipes/building_blocks/waxed_oxidized_cut_copper_slab_from_waxed_oxidized_cut_copper_stonecutting.json
+data/minecraft/advancement/recipes/building_blocks/waxed_oxidized_cut_copper_stairs.json
+data/minecraft/advancement/recipes/building_blocks/waxed_oxidized_cut_copper_stairs_from_honeycomb.json
+data/minecraft/advancement/recipes/building_blocks/waxed_oxidized_cut_copper_stairs_from_waxed_oxidized_copper_stonecutting.json
+data/minecraft/advancement/recipes/building_blocks/waxed_oxidized_cut_copper_stairs_from_waxed_oxidized_cut_copper_stonecutting.json
+data/minecraft/advancement/recipes/building_blocks/waxed_weathered_chiseled_copper.json
+data/minecraft/advancement/recipes/building_blocks/waxed_weathered_chiseled_copper_from_honeycomb.json
+data/minecraft/advancement/recipes/building_blocks/waxed_oxidized_copper_from_honeycomb.json
+data/minecraft/advancement/recipes/building_blocks/waxed_oxidized_copper_bars_from_honeycomb.json
+data/minecraft/advancement/recipes/building_blocks/waxed_weathered_copper_bars_from_honeycomb.json
+data/minecraft/advancement/recipes/building_blocks/waxed_weathered_copper_chain_from_honeycomb.json
+data/minecraft/advancement/recipes/building_blocks/waxed_weathered_copper_chest_from_honeycomb.json
+data/minecraft/advancement/recipes/building_blocks/waxed_weathered_copper_from_honeycomb.json
+data/minecraft/advancement/recipes/building_blocks/waxed_weathered_copper_golem_statue_from_honeycomb.json
+data/minecraft/advancement/recipes/building_blocks/waxed_weathered_copper_grate.json
+data/minecraft/advancement/recipes/building_blocks/waxed_weathered_copper_grate_from_honeycomb.json
+data/minecraft/advancement/recipes/building_blocks/waxed_weathered_copper_grate_from_waxed_weathered_copper_stonecutting.json
+data/minecraft/advancement/recipes/building_blocks/waxed_weathered_copper_lantern_from_honeycomb.json
+data/minecraft/advancement/recipes/building_blocks/waxed_weathered_cut_copper.json
+data/minecraft/advancement/recipes/building_blocks/waxed_weathered_cut_copper_from_honeycomb.json
+data/minecraft/advancement/recipes/building_blocks/waxed_weathered_cut_copper_from_waxed_weathered_copper_stonecutting.json
+data/minecraft/advancement/recipes/building_blocks/waxed_weathered_cut_copper_slab.json
+data/minecraft/advancement/recipes/building_blocks/waxed_weathered_cut_copper_slab_from_honeycomb.json
+data/minecraft/advancement/recipes/building_blocks/waxed_weathered_cut_copper_slab_from_waxed_weathered_copper_stonecutting.json
+data/minecraft/advancement/recipes/building_blocks/waxed_weathered_cut_copper_slab_from_waxed_weathered_cut_copper_stonecutting.json
+data/minecraft/advancement/recipes/building_blocks/waxed_weathered_cut_copper_stairs.json
+data/minecraft/advancement/recipes/building_blocks/waxed_weathered_cut_copper_stairs_from_honeycomb.json
+data/minecraft/advancement/recipes/building_blocks/waxed_weathered_cut_copper_stairs_from_waxed_weathered_copper_stonecutting.json
+data/minecraft/advancement/recipes/building_blocks/waxed_weathered_cut_copper_stairs_from_waxed_weathered_cut_copper_stonecutting.json
+data/minecraft/advancement/recipes/building_blocks/weathered_chiseled_copper.json
+data/minecraft/advancement/recipes/building_blocks/weathered_chiseled_copper_from_weathered_copper_stonecutting.json
+data/minecraft/advancement/recipes/building_blocks/weathered_chiseled_copper_from_weathered_cut_copper_stonecutting.json
+data/minecraft/advancement/recipes/building_blocks/weathered_copper_grate.json
+data/minecraft/advancement/recipes/building_blocks/weathered_copper_grate_from_weathered_copper_stonecutting.json
+data/minecraft/advancement/recipes/building_blocks/weathered_cut_copper.json
+data/minecraft/advancement/recipes/building_blocks/weathered_cut_copper_from_weathered_copper_stonecutting.json
+data/minecraft/advancement/recipes/building_blocks/weathered_cut_copper_slab.json
+data/minecraft/advancement/recipes/building_blocks/weathered_cut_copper_slab_from_weathered_copper_stonecutting.json
+data/minecraft/advancement/recipes/building_blocks/weathered_cut_copper_slab_from_weathered_cut_copper_stonecutting.json
+data/minecraft/advancement/recipes/building_blocks/weathered_cut_copper_stairs.json
+data/minecraft/advancement/recipes/building_blocks/weathered_cut_copper_stairs_from_weathered_copper_stonecutting.json
+data/minecraft/advancement/recipes/building_blocks/weathered_cut_copper_stairs_from_weathered_cut_copper_stonecutting.json
+data/minecraft/advancement/recipes/combat/copper_boots.json
+data/minecraft/advancement/recipes/combat/copper_chestplate.json
+data/minecraft/advancement/recipes/combat/copper_helmet.json
+data/minecraft/advancement/recipes/combat/copper_leggings.json
+data/minecraft/advancement/recipes/combat/copper_spear.json
+data/minecraft/advancement/recipes/combat/copper_sword.json
+data/minecraft/advancement/recipes/building_blocks/waxed_oxidized_copper_grate.json
+data/minecraft/advancement/recipes/building_blocks/waxed_weathered_chiseled_copper_from_waxed_weathered_copper_stonecutting.json
+data/minecraft/advancement/recipes/building_blocks/waxed_weathered_chiseled_copper_from_waxed_weathered_cut_copper_stonecutting.json
+data/minecraft/advancement/recipes/decorations/copper_bars.json
+data/minecraft/advancement/recipes/decorations/copper_chain.json
+data/minecraft/advancement/recipes/decorations/copper_chest.json
+data/minecraft/advancement/recipes/decorations/copper_lantern.json
+data/minecraft/advancement/recipes/decorations/copper_torch.json
+data/minecraft/advancement/recipes/misc/copper_ingot.json
+data/minecraft/advancement/recipes/misc/copper_ingot_from_blasting_copper_ore.json
+data/minecraft/advancement/recipes/misc/copper_ingot_from_blasting_deepslate_copper_ore.json
+data/minecraft/advancement/recipes/misc/copper_ingot_from_blasting_raw_copper.json
+data/minecraft/advancement/recipes/misc/copper_ingot_from_nuggets.json
+data/minecraft/advancement/recipes/misc/copper_ingot_from_smelting_deepslate_copper_ore.json
+data/minecraft/advancement/recipes/misc/copper_ingot_from_waxed_copper_block.json
+data/minecraft/advancement/recipes/misc/copper_ingot_from_smelting_raw_copper.json
+data/minecraft/advancement/recipes/misc/copper_nugget_from_smelting.json
+data/minecraft/advancement/recipes/misc/copper_ingot_from_smelting_copper_ore.json
+data/minecraft/advancement/recipes/misc/copper_nugget.json
+data/minecraft/advancement/recipes/misc/copper_nugget_from_blasting.json
+data/minecraft/advancement/recipes/misc/raw_copper.json
+data/minecraft/advancement/recipes/redstone/copper_bulb.json
+data/minecraft/advancement/recipes/redstone/copper_door.json
+data/minecraft/advancement/recipes/redstone/copper_trapdoor.json
+data/minecraft/advancement/recipes/redstone/exposed_copper_bulb.json
+data/minecraft/advancement/recipes/redstone/oxidized_copper_bulb.json
+data/minecraft/advancement/recipes/redstone/waxed_copper_bulb.json
+data/minecraft/advancement/recipes/redstone/waxed_copper_bulb_from_honeycomb.json
+data/minecraft/advancement/recipes/redstone/waxed_copper_door_from_honeycomb.json
+data/minecraft/advancement/recipes/redstone/waxed_copper_trapdoor_from_honeycomb.json
+data/minecraft/advancement/recipes/redstone/waxed_exposed_copper_bulb.json
+data/minecraft/advancement/recipes/redstone/waxed_exposed_copper_bulb_from_honeycomb.json
+data/minecraft/advancement/recipes/redstone/waxed_exposed_copper_door_from_honeycomb.json
+data/minecraft/advancement/recipes/redstone/waxed_exposed_copper_trapdoor_from_honeycomb.json
+data/minecraft/advancement/recipes/redstone/waxed_oxidized_copper_bulb.json
+data/minecraft/advancement/recipes/redstone/waxed_oxidized_copper_bulb_from_honeycomb.json
+data/minecraft/advancement/recipes/redstone/waxed_oxidized_copper_door_from_honeycomb.json
+data/minecraft/advancement/recipes/redstone/waxed_oxidized_copper_trapdoor_from_honeycomb.json
+data/minecraft/advancement/recipes/redstone/waxed_weathered_copper_bulb.json
+data/minecraft/advancement/recipes/redstone/waxed_weathered_copper_bulb_from_honeycomb.json
+data/minecraft/advancement/recipes/redstone/waxed_weathered_copper_door_from_honeycomb.json
+data/minecraft/advancement/recipes/redstone/waxed_weathered_copper_trapdoor_from_honeycomb.json
+data/minecraft/advancement/recipes/redstone/weathered_copper_bulb.json
+data/minecraft/advancement/recipes/tools/copper_axe.json
+data/minecraft/advancement/recipes/tools/copper_hoe.json
+data/minecraft/advancement/recipes/tools/copper_pickaxe.json
+data/minecraft/advancement/recipes/tools/copper_shovel.json
+data/minecraft/loot_table/blocks/chiseled_copper.json
+data/minecraft/loot_table/blocks/copper_bars.json
+data/minecraft/loot_table/blocks/copper_block.json
+data/minecraft/loot_table/blocks/copper_bulb.json
+data/minecraft/loot_table/blocks/copper_chain.json
+data/minecraft/loot_table/blocks/copper_chest.json
+data/minecraft/loot_table/blocks/copper_door.json
+data/minecraft/loot_table/blocks/copper_golem_statue.json
+data/minecraft/loot_table/blocks/copper_grate.json
+data/minecraft/loot_table/blocks/copper_lantern.json
+data/minecraft/loot_table/blocks/copper_ore.json
+data/minecraft/loot_table/blocks/copper_torch.json
+data/minecraft/loot_table/blocks/copper_trapdoor.json
+data/minecraft/loot_table/blocks/cut_copper.json
+data/minecraft/loot_table/blocks/cut_copper_slab.json
+data/minecraft/loot_table/blocks/cut_copper_stairs.json
+data/minecraft/loot_table/blocks/deepslate_copper_ore.json
+data/minecraft/loot_table/blocks/exposed_chiseled_copper.json
+data/minecraft/loot_table/blocks/exposed_copper.json
+data/minecraft/loot_table/blocks/exposed_copper_bars.json
+data/minecraft/loot_table/blocks/exposed_copper_bulb.json
+data/minecraft/loot_table/blocks/exposed_copper_chain.json
+data/minecraft/loot_table/blocks/exposed_copper_chest.json
+data/minecraft/loot_table/blocks/exposed_copper_door.json
+data/minecraft/loot_table/blocks/exposed_copper_golem_statue.json
+data/minecraft/loot_table/blocks/exposed_copper_grate.json
+data/minecraft/loot_table/blocks/exposed_copper_lantern.json
+data/minecraft/loot_table/blocks/exposed_copper_trapdoor.json
+data/minecraft/loot_table/blocks/exposed_cut_copper.json
+data/minecraft/loot_table/blocks/exposed_cut_copper_slab.json
+data/minecraft/loot_table/blocks/exposed_cut_copper_stairs.json
+data/minecraft/loot_table/blocks/oxidized_chiseled_copper.json
+data/minecraft/loot_table/blocks/oxidized_copper.json
+data/minecraft/loot_table/blocks/oxidized_copper_bars.json
+data/minecraft/loot_table/blocks/oxidized_copper_bulb.json
+data/minecraft/loot_table/blocks/oxidized_copper_chain.json
+data/minecraft/loot_table/blocks/oxidized_copper_chest.json
+data/minecraft/loot_table/blocks/oxidized_copper_door.json
+data/minecraft/loot_table/blocks/oxidized_copper_golem_statue.json
+data/minecraft/loot_table/blocks/oxidized_copper_grate.json
+data/minecraft/loot_table/blocks/oxidized_copper_lantern.json
+data/minecraft/loot_table/blocks/oxidized_copper_trapdoor.json
+data/minecraft/loot_table/blocks/oxidized_cut_copper.json
+data/minecraft/loot_table/blocks/oxidized_cut_copper_slab.json
+data/minecraft/loot_table/blocks/oxidized_cut_copper_stairs.json
+data/minecraft/loot_table/blocks/raw_copper_block.json
+data/minecraft/loot_table/blocks/waxed_chiseled_copper.json
+data/minecraft/loot_table/blocks/waxed_copper_bars.json
+data/minecraft/loot_table/blocks/waxed_copper_block.json
+data/minecraft/loot_table/blocks/waxed_copper_bulb.json
+data/minecraft/loot_table/blocks/waxed_copper_chain.json
+data/minecraft/loot_table/blocks/waxed_copper_chest.json
+data/minecraft/loot_table/blocks/waxed_copper_door.json
+data/minecraft/loot_table/blocks/waxed_copper_golem_statue.json
+data/minecraft/loot_table/blocks/waxed_copper_grate.json
+data/minecraft/loot_table/blocks/waxed_copper_lantern.json
+data/minecraft/loot_table/blocks/waxed_copper_trapdoor.json
+data/minecraft/loot_table/blocks/waxed_cut_copper.json
+data/minecraft/loot_table/blocks/waxed_cut_copper_slab.json
+data/minecraft/loot_table/blocks/waxed_cut_copper_stairs.json
+data/minecraft/loot_table/blocks/waxed_exposed_chiseled_copper.json
+data/minecraft/loot_table/blocks/waxed_exposed_copper.json
+data/minecraft/loot_table/blocks/waxed_exposed_copper_bars.json
+data/minecraft/loot_table/blocks/waxed_exposed_copper_bulb.json
+data/minecraft/loot_table/blocks/waxed_exposed_copper_chain.json
+data/minecraft/loot_table/blocks/waxed_exposed_copper_chest.json
+data/minecraft/loot_table/blocks/waxed_exposed_copper_door.json
+data/minecraft/loot_table/blocks/waxed_exposed_copper_golem_statue.json
+data/minecraft/loot_table/blocks/waxed_exposed_copper_grate.json
+data/minecraft/loot_table/blocks/waxed_exposed_copper_lantern.json
+data/minecraft/loot_table/blocks/waxed_exposed_copper_trapdoor.json
+data/minecraft/loot_table/blocks/waxed_exposed_cut_copper.json
+data/minecraft/loot_table/blocks/waxed_exposed_cut_copper_slab.json
+data/minecraft/loot_table/blocks/waxed_exposed_cut_copper_stairs.json
+data/minecraft/loot_table/blocks/waxed_oxidized_chiseled_copper.json
+data/minecraft/loot_table/blocks/waxed_oxidized_copper.json
+data/minecraft/loot_table/blocks/waxed_oxidized_copper_bars.json
+data/minecraft/loot_table/blocks/waxed_oxidized_copper_bulb.json
+data/minecraft/loot_table/blocks/waxed_oxidized_copper_chain.json
+data/minecraft/loot_table/blocks/waxed_oxidized_copper_chest.json
+data/minecraft/loot_table/blocks/waxed_oxidized_copper_door.json
+data/minecraft/loot_table/blocks/waxed_oxidized_copper_golem_statue.json
+data/minecraft/loot_table/blocks/waxed_oxidized_cut_copper.json
+data/minecraft/loot_table/blocks/waxed_oxidized_copper_lantern.json
+data/minecraft/loot_table/blocks/waxed_oxidized_cut_copper_slab.json
+data/minecraft/loot_table/blocks/waxed_weathered_chiseled_copper.json
+data/minecraft/loot_table/blocks/waxed_weathered_copper.json
+data/minecraft/loot_table/blocks/waxed_weathered_copper_bars.json
+data/minecraft/loot_table/blocks/waxed_weathered_copper_bulb.json
+data/minecraft/loot_table/blocks/waxed_weathered_copper_chain.json
+data/minecraft/loot_table/blocks/waxed_weathered_copper_chest.json
+data/minecraft/loot_table/blocks/waxed_weathered_copper_door.json
+data/minecraft/loot_table/blocks/waxed_weathered_copper_golem_statue.json
+data/minecraft/loot_table/blocks/waxed_weathered_copper_grate.json
+data/minecraft/loot_table/blocks/waxed_weathered_copper_lantern.json
+data/minecraft/loot_table/blocks/waxed_weathered_copper_trapdoor.json
+data/minecraft/loot_table/blocks/waxed_weathered_cut_copper.json
+data/minecraft/loot_table/blocks/waxed_weathered_cut_copper_slab.json
+data/minecraft/loot_table/blocks/waxed_weathered_cut_copper_stairs.json
+data/minecraft/loot_table/blocks/weathered_chiseled_copper.json
+data/minecraft/loot_table/blocks/weathered_copper.json
+data/minecraft/loot_table/blocks/weathered_copper_bars.json
+data/minecraft/loot_table/blocks/weathered_copper_bulb.json
+data/minecraft/loot_table/blocks/weathered_copper_chain.json
+data/minecraft/loot_table/blocks/weathered_copper_chest.json
+data/minecraft/loot_table/blocks/weathered_copper_door.json
+data/minecraft/loot_table/blocks/weathered_copper_golem_statue.json
+data/minecraft/loot_table/blocks/weathered_copper_grate.json
+data/minecraft/loot_table/blocks/weathered_copper_lantern.json
+data/minecraft/loot_table/blocks/weathered_copper_trapdoor.json
+data/minecraft/loot_table/blocks/weathered_cut_copper.json
+data/minecraft/loot_table/blocks/weathered_cut_copper_slab.json
+data/minecraft/loot_table/blocks/weathered_cut_copper_stairs.json
+data/minecraft/loot_table/blocks/waxed_oxidized_copper_grate.json
+data/minecraft/loot_table/blocks/waxed_oxidized_cut_copper_stairs.json
+data/minecraft/loot_table/blocks/waxed_oxidized_copper_trapdoor.json
+data/minecraft/loot_table/entities/copper_golem.json
+data/minecraft/recipe/chiseled_copper.json
+data/minecraft/recipe/chiseled_copper_from_copper_block_stonecutting.json
+data/minecraft/recipe/chiseled_copper_from_cut_copper_stonecutting.json
+data/minecraft/recipe/copper_axe.json
+data/minecraft/recipe/copper_bars.json
+data/minecraft/recipe/copper_block.json
+data/minecraft/recipe/copper_boots.json
+data/minecraft/recipe/copper_bulb.json
+data/minecraft/recipe/copper_chain.json
+data/minecraft/recipe/copper_chest.json
+data/minecraft/recipe/copper_chestplate.json
+data/minecraft/recipe/copper_door.json
+data/minecraft/recipe/copper_grate.json
+data/minecraft/recipe/copper_grate_from_copper_block_stonecutting.json
+data/minecraft/recipe/copper_helmet.json
+data/minecraft/recipe/copper_hoe.json
+data/minecraft/recipe/copper_ingot.json
+data/minecraft/recipe/copper_ingot_from_blasting_copper_ore.json
+data/minecraft/recipe/copper_ingot_from_blasting_deepslate_copper_ore.json
+data/minecraft/recipe/copper_ingot_from_blasting_raw_copper.json
+data/minecraft/recipe/copper_ingot_from_nuggets.json
+data/minecraft/recipe/copper_ingot_from_smelting_copper_ore.json
+data/minecraft/recipe/copper_ingot_from_smelting_deepslate_copper_ore.json
+data/minecraft/recipe/copper_ingot_from_smelting_raw_copper.json
+data/minecraft/recipe/copper_ingot_from_waxed_copper_block.json
+data/minecraft/recipe/copper_lantern.json
+data/minecraft/recipe/copper_leggings.json
+data/minecraft/recipe/copper_nugget.json
+data/minecraft/recipe/copper_nugget_from_blasting.json
+data/minecraft/recipe/copper_nugget_from_smelting.json
+data/minecraft/recipe/copper_pickaxe.json
+data/minecraft/recipe/copper_shovel.json
+data/minecraft/recipe/copper_spear.json
+data/minecraft/recipe/copper_sword.json
+data/minecraft/recipe/copper_torch.json
+data/minecraft/recipe/copper_trapdoor.json
+data/minecraft/recipe/cut_copper.json
+data/minecraft/recipe/cut_copper_from_copper_block_stonecutting.json
+data/minecraft/recipe/cut_copper_slab.json
+data/minecraft/recipe/cut_copper_slab_from_copper_block_stonecutting.json
+data/minecraft/recipe/cut_copper_slab_from_cut_copper_stonecutting.json
+data/minecraft/recipe/cut_copper_stairs.json
+data/minecraft/recipe/cut_copper_stairs_from_copper_block_stonecutting.json
+data/minecraft/recipe/cut_copper_stairs_from_cut_copper_stonecutting.json
+data/minecraft/recipe/exposed_chiseled_copper.json
+data/minecraft/recipe/exposed_chiseled_copper_from_exposed_copper_stonecutting.json
+data/minecraft/recipe/exposed_chiseled_copper_from_exposed_cut_copper_stonecutting.json
+data/minecraft/recipe/exposed_copper_bulb.json
+data/minecraft/recipe/exposed_copper_grate.json
+data/minecraft/recipe/exposed_copper_grate_from_exposed_copper_stonecutting.json
+data/minecraft/recipe/exposed_cut_copper.json
+data/minecraft/recipe/exposed_cut_copper_from_exposed_copper_stonecutting.json
+data/minecraft/recipe/exposed_cut_copper_slab.json
+data/minecraft/recipe/exposed_cut_copper_slab_from_exposed_copper_stonecutting.json
+data/minecraft/recipe/exposed_cut_copper_slab_from_exposed_cut_copper_stonecutting.json
+data/minecraft/recipe/exposed_cut_copper_stairs.json
+data/minecraft/recipe/exposed_cut_copper_stairs_from_exposed_copper_stonecutting.json
+data/minecraft/recipe/exposed_cut_copper_stairs_from_exposed_cut_copper_stonecutting.json
+data/minecraft/recipe/oxidized_chiseled_copper.json
+data/minecraft/recipe/oxidized_chiseled_copper_from_oxidized_copper_stonecutting.json
+data/minecraft/recipe/oxidized_chiseled_copper_from_oxidized_cut_copper_stonecutting.json
+data/minecraft/recipe/oxidized_copper_bulb.json
+data/minecraft/recipe/oxidized_copper_grate_from_oxidized_copper_stonecutting.json
+data/minecraft/recipe/oxidized_copper_grate.json
+data/minecraft/recipe/oxidized_cut_copper_from_oxidized_copper_stonecutting.json
+data/minecraft/recipe/oxidized_cut_copper_slab.json
+data/minecraft/recipe/oxidized_cut_copper.json
+data/minecraft/recipe/oxidized_cut_copper_stairs.json
+data/minecraft/recipe/oxidized_cut_copper_slab_from_oxidized_copper_stonecutting.json
+data/minecraft/recipe/oxidized_cut_copper_stairs_from_oxidized_copper_stonecutting.json
+data/minecraft/recipe/oxidized_cut_copper_stairs_from_oxidized_cut_copper_stonecutting.json
+data/minecraft/recipe/oxidized_cut_copper_slab_from_oxidized_cut_copper_stonecutting.json
+data/minecraft/recipe/raw_copper.json
+data/minecraft/recipe/raw_copper_block.json
+data/minecraft/recipe/waxed_chiseled_copper.json
+data/minecraft/recipe/waxed_chiseled_copper_from_honeycomb.json
+data/minecraft/recipe/waxed_chiseled_copper_from_waxed_copper_block_stonecutting.json
+data/minecraft/recipe/waxed_chiseled_copper_from_waxed_cut_copper_stonecutting.json
+data/minecraft/recipe/waxed_copper_bars_from_honeycomb.json
+data/minecraft/recipe/waxed_copper_bulb.json
+data/minecraft/recipe/waxed_copper_block_from_honeycomb.json
+data/minecraft/recipe/waxed_copper_bulb_from_honeycomb.json
+data/minecraft/recipe/waxed_copper_door_from_honeycomb.json
+data/minecraft/recipe/waxed_copper_golem_statue_from_honeycomb.json
+data/minecraft/recipe/waxed_copper_grate.json
+data/minecraft/recipe/waxed_copper_grate_from_honeycomb.json
+data/minecraft/recipe/waxed_copper_grate_from_waxed_copper_block_stonecutting.json
+data/minecraft/recipe/waxed_copper_lantern_from_honeycomb.json
+data/minecraft/recipe/waxed_copper_trapdoor_from_honeycomb.json
+data/minecraft/recipe/waxed_cut_copper.json
+data/minecraft/recipe/waxed_cut_copper_from_honeycomb.json
+data/minecraft/recipe/waxed_cut_copper_from_waxed_copper_block_stonecutting.json
+data/minecraft/recipe/waxed_cut_copper_slab.json
+data/minecraft/recipe/waxed_cut_copper_slab_from_honeycomb.json
+data/minecraft/recipe/waxed_cut_copper_slab_from_waxed_copper_block_stonecutting.json
+data/minecraft/recipe/waxed_cut_copper_slab_from_waxed_cut_copper_stonecutting.json
+data/minecraft/recipe/waxed_cut_copper_stairs.json
+data/minecraft/recipe/waxed_cut_copper_stairs_from_honeycomb.json
+data/minecraft/recipe/waxed_cut_copper_stairs_from_waxed_copper_block_stonecutting.json
+data/minecraft/recipe/waxed_cut_copper_stairs_from_waxed_cut_copper_stonecutting.json
+data/minecraft/recipe/waxed_exposed_chiseled_copper.json
+data/minecraft/recipe/waxed_exposed_chiseled_copper_from_honeycomb.json
+data/minecraft/recipe/waxed_exposed_chiseled_copper_from_waxed_exposed_copper_stonecutting.json
+data/minecraft/recipe/waxed_exposed_chiseled_copper_from_waxed_exposed_cut_copper_stonecutting.json
+data/minecraft/recipe/waxed_exposed_copper_bars_from_honeycomb.json
+data/minecraft/recipe/waxed_exposed_copper_bulb.json
+data/minecraft/recipe/waxed_exposed_copper_bulb_from_honeycomb.json
+data/minecraft/recipe/waxed_exposed_copper_chain_from_honeycomb.json
+data/minecraft/recipe/waxed_exposed_copper_chest_from_honeycomb.json
+data/minecraft/recipe/waxed_exposed_copper_door_from_honeycomb.json
+data/minecraft/recipe/waxed_exposed_copper_from_honeycomb.json
+data/minecraft/recipe/waxed_exposed_copper_golem_statue_from_honeycomb.json
+data/minecraft/recipe/waxed_exposed_copper_grate.json
+data/minecraft/recipe/waxed_exposed_copper_grate_from_honeycomb.json
+data/minecraft/recipe/waxed_exposed_copper_grate_from_waxed_exposed_copper_stonecutting.json
+data/minecraft/recipe/waxed_exposed_copper_lantern_from_honeycomb.json
+data/minecraft/recipe/waxed_exposed_copper_trapdoor_from_honeycomb.json
+data/minecraft/recipe/waxed_exposed_cut_copper.json
+data/minecraft/recipe/waxed_exposed_cut_copper_from_honeycomb.json
+data/minecraft/recipe/waxed_exposed_cut_copper_from_waxed_exposed_copper_stonecutting.json
+data/minecraft/recipe/waxed_exposed_cut_copper_slab.json
+data/minecraft/recipe/waxed_exposed_cut_copper_slab_from_honeycomb.json
+data/minecraft/recipe/waxed_exposed_cut_copper_slab_from_waxed_exposed_copper_stonecutting.json
+data/minecraft/recipe/waxed_exposed_cut_copper_slab_from_waxed_exposed_cut_copper_stonecutting.json
+data/minecraft/recipe/waxed_exposed_cut_copper_stairs.json
+data/minecraft/recipe/waxed_exposed_cut_copper_stairs_from_honeycomb.json
+data/minecraft/recipe/waxed_exposed_cut_copper_stairs_from_waxed_exposed_copper_stonecutting.json
+data/minecraft/recipe/waxed_exposed_cut_copper_stairs_from_waxed_exposed_cut_copper_stonecutting.json
+data/minecraft/recipe/waxed_oxidized_chiseled_copper.json
+data/minecraft/recipe/waxed_oxidized_chiseled_copper_from_honeycomb.json
+data/minecraft/recipe/waxed_oxidized_chiseled_copper_from_waxed_oxidized_copper_stonecutting.json
+data/minecraft/recipe/waxed_oxidized_chiseled_copper_from_waxed_oxidized_cut_copper_stonecutting.json
+data/minecraft/recipe/waxed_oxidized_copper_bars_from_honeycomb.json
+data/minecraft/recipe/waxed_oxidized_copper_bulb.json
+data/minecraft/recipe/waxed_oxidized_copper_bulb_from_honeycomb.json
+data/minecraft/recipe/waxed_oxidized_copper_chain_from_honeycomb.json
+data/minecraft/recipe/waxed_oxidized_copper_chest_from_honeycomb.json
+data/minecraft/recipe/waxed_oxidized_copper_door_from_honeycomb.json
+data/minecraft/recipe/waxed_oxidized_copper_from_honeycomb.json
+data/minecraft/recipe/waxed_oxidized_copper_golem_statue_from_honeycomb.json
+data/minecraft/recipe/waxed_oxidized_copper_grate.json
+data/minecraft/recipe/waxed_oxidized_copper_grate_from_honeycomb.json
+data/minecraft/recipe/waxed_oxidized_copper_grate_from_waxed_oxidized_copper_stonecutting.json
+data/minecraft/recipe/waxed_oxidized_copper_lantern_from_honeycomb.json
+data/minecraft/recipe/waxed_copper_chain_from_honeycomb.json
+data/minecraft/recipe/waxed_oxidized_cut_copper.json
+data/minecraft/recipe/waxed_oxidized_copper_trapdoor_from_honeycomb.json
+data/minecraft/recipe/waxed_oxidized_cut_copper_from_waxed_oxidized_copper_stonecutting.json
+data/minecraft/recipe/waxed_copper_chest_from_honeycomb.json
+data/minecraft/recipe/waxed_oxidized_cut_copper_from_honeycomb.json
+data/minecraft/recipe/waxed_oxidized_cut_copper_slab_from_waxed_oxidized_copper_stonecutting.json
+data/minecraft/recipe/waxed_oxidized_cut_copper_slab.json
+data/minecraft/recipe/waxed_oxidized_cut_copper_slab_from_waxed_oxidized_cut_copper_stonecutting.json
+data/minecraft/recipe/waxed_oxidized_cut_copper_stairs_from_honeycomb.json
+data/minecraft/recipe/waxed_oxidized_cut_copper_stairs_from_waxed_oxidized_copper_stonecutting.json
+data/minecraft/recipe/waxed_oxidized_cut_copper_stairs_from_waxed_oxidized_cut_copper_stonecutting.json
+data/minecraft/recipe/waxed_oxidized_cut_copper_slab_from_honeycomb.json
+data/minecraft/recipe/waxed_weathered_chiseled_copper.json
+data/minecraft/recipe/waxed_oxidized_cut_copper_stairs.json
+data/minecraft/recipe/waxed_weathered_chiseled_copper_from_honeycomb.json
+data/minecraft/recipe/waxed_weathered_copper_bulb.json
+data/minecraft/recipe/waxed_weathered_chiseled_copper_from_waxed_weathered_copper_stonecutting.json
+data/minecraft/recipe/waxed_weathered_copper_bulb_from_honeycomb.json
+data/minecraft/recipe/waxed_weathered_copper_chain_from_honeycomb.json
+data/minecraft/recipe/waxed_weathered_copper_chest_from_honeycomb.json
+data/minecraft/recipe/waxed_weathered_copper_door_from_honeycomb.json
+data/minecraft/recipe/waxed_weathered_copper_from_honeycomb.json
+data/minecraft/recipe/waxed_weathered_copper_golem_statue_from_honeycomb.json
+data/minecraft/recipe/waxed_weathered_copper_grate.json
+data/minecraft/recipe/waxed_weathered_copper_grate_from_honeycomb.json
+data/minecraft/recipe/waxed_weathered_copper_grate_from_waxed_weathered_copper_stonecutting.json
+data/minecraft/recipe/waxed_weathered_copper_lantern_from_honeycomb.json
+data/minecraft/recipe/waxed_weathered_copper_trapdoor_from_honeycomb.json
+data/minecraft/recipe/waxed_weathered_cut_copper.json
+data/minecraft/recipe/waxed_weathered_cut_copper_from_honeycomb.json
+data/minecraft/recipe/waxed_weathered_cut_copper_from_waxed_weathered_copper_stonecutting.json
+data/minecraft/recipe/waxed_weathered_cut_copper_slab.json
+data/minecraft/recipe/waxed_weathered_cut_copper_slab_from_honeycomb.json
+data/minecraft/recipe/waxed_weathered_cut_copper_slab_from_waxed_weathered_copper_stonecutting.json
+data/minecraft/recipe/waxed_weathered_cut_copper_slab_from_waxed_weathered_cut_copper_stonecutting.json
+data/minecraft/recipe/waxed_weathered_cut_copper_stairs.json
+data/minecraft/recipe/waxed_weathered_cut_copper_stairs_from_honeycomb.json
+data/minecraft/recipe/waxed_weathered_cut_copper_stairs_from_waxed_weathered_copper_stonecutting.json
+data/minecraft/recipe/waxed_weathered_cut_copper_stairs_from_waxed_weathered_cut_copper_stonecutting.json
+data/minecraft/recipe/weathered_chiseled_copper.json
+data/minecraft/recipe/weathered_chiseled_copper_from_weathered_copper_stonecutting.json
+data/minecraft/recipe/weathered_chiseled_copper_from_weathered_cut_copper_stonecutting.json
+data/minecraft/recipe/weathered_copper_bulb.json
+data/minecraft/recipe/weathered_copper_grate.json
+data/minecraft/recipe/weathered_copper_grate_from_weathered_copper_stonecutting.json
+data/minecraft/recipe/weathered_cut_copper.json
+data/minecraft/recipe/weathered_cut_copper_from_weathered_copper_stonecutting.json
+data/minecraft/recipe/weathered_cut_copper_slab.json
+data/minecraft/recipe/weathered_cut_copper_slab_from_weathered_copper_stonecutting.json
+data/minecraft/recipe/weathered_cut_copper_slab_from_weathered_cut_copper_stonecutting.json
+data/minecraft/recipe/weathered_cut_copper_stairs.json
+data/minecraft/recipe/weathered_cut_copper_stairs_from_weathered_copper_stonecutting.json
+data/minecraft/recipe/weathered_cut_copper_stairs_from_weathered_cut_copper_stonecutting.json
+data/minecraft/recipe/waxed_weathered_chiseled_copper_from_waxed_weathered_cut_copper_stonecutting.json
+data/minecraft/recipe/waxed_weathered_copper_bars_from_honeycomb.json
+data/minecraft/tags/block/copper.json
+data/minecraft/tags/block/copper_chests.json
+data/minecraft/tags/block/copper_ores.json
+data/minecraft/tags/block/copper_golem_statues.json
+data/minecraft/tags/block/incorrect_for_copper_tool.json
+data/minecraft/tags/item/copper.json
+data/minecraft/tags/item/copper_chests.json
+data/minecraft/tags/item/copper_golem_statues.json
+data/minecraft/tags/item/copper_ores.json
+data/minecraft/tags/item/copper_tool_materials.json
+data/minecraft/tags/item/repairs_copper_armor.json
+data/minecraft/tags/item/shearable_from_copper_golem.json
+data/minecraft/trim_material/copper.json
+data/minecraft/worldgen/configured_feature/ore_copper_large.json
+data/minecraft/worldgen/configured_feature/ore_copper_small.json
+data/minecraft/worldgen/placed_feature/ore_copper.json
+data/minecraft/worldgen/placed_feature/ore_copper_large.json
+data/minecraft/worldgen/processor_list/trial_chambers_copper_bulb_degradation.json
+net/minecraft/client/animation/definitions/CopperGolemAnimation.class
+net/minecraft/client/model/animal/golem/CopperGolemModel.class
+net/minecraft/client/model/object/statue/CopperGolemStatueModel.class
+net/minecraft/client/renderer/blockentity/CopperGolemStatueBlockRenderer.class
+net/minecraft/client/renderer/blockentity/state/CopperGolemStatueRenderState.class
+net/minecraft/client/renderer/entity/CopperGolemRenderer.class
+net/minecraft/client/renderer/entity/state/CopperGolemRenderState.class
+net/minecraft/client/renderer/special/CopperGolemStatueSpecialRenderer$1.class
+net/minecraft/client/renderer/special/CopperGolemStatueSpecialRenderer.class
+net/minecraft/client/renderer/special/CopperGolemStatueSpecialRenderer$Unbaked.class
+net/minecraft/util/datafix/fixes/CopperGolemWeatherStateFix.class
+net/minecraft/world/entity/animal/golem/CopperGolem$1.class
+net/minecraft/world/entity/animal/golem/CopperGolemAi.class
+net/minecraft/world/entity/animal/golem/CopperGolemOxidationLevel.class
+net/minecraft/world/entity/animal/golem/CopperGolemOxidationLevels.class
+net/minecraft/world/entity/animal/golem/CopperGolem.class
+net/minecraft/world/entity/animal/golem/CopperGolemState.class
+net/minecraft/world/level/block/CopperChestBlock$1.class
+net/minecraft/world/level/block/CopperChestBlock.class
+net/minecraft/world/level/block/CopperGolemStatueBlock$Pose.class
+net/minecraft/world/level/block/CopperGolemStatueBlock.class
+net/minecraft/world/level/block/CopperBulbBlock.class
+net/minecraft/world/level/block/WeatheringCopper$WeatherState.class
+net/minecraft/world/level/block/WeatheringCopper.class
+net/minecraft/world/level/block/WeatheringCopperBarsBlock.class
+net/minecraft/world/level/block/WeatheringCopperBulbBlock.class
+net/minecraft/world/level/block/WeatheringCopperCollection$1.class
+net/minecraft/world/level/block/WeatheringCopperChestBlock.class
+net/minecraft/world/level/block/WeatheringCopperCollection$ByState.class
+net/minecraft/world/level/block/WeatheringCopperDoorBlock.class
+net/minecraft/world/level/block/WeatheringCopperFullBlock.class
+net/minecraft/world/level/block/WeatheringCopperGolemStatueBlock.class
+net/minecraft/world/level/block/WeatheringCopperGrateBlock.class
+net/minecraft/world/level/block/WeatheringCopperSlabBlock.class
+net/minecraft/world/level/block/WeatheringCopperStairBlock.class
+net/minecraft/world/level/block/WeatheringCopperTrapDoorBlock.class
+net/minecraft/world/level/block/WeatheringLanternBlock.class
+net/minecraft/world/level/block/WeatheringLightningRodBlock.class
+net/minecraft/world/level/block/WeatheringCopperCollection.class
+net/minecraft/world/level/block/WeatheringCopperChainBlock.class
+net/minecraft/world/level/block/entity/CopperGolemStatueBlockEntity.class
+=== net.minecraft.client.animation.definitions.CopperGolemAnimation
+Compiled from "CopperGolemAnimation.java"
+public class net.minecraft.client.animation.definitions.CopperGolemAnimation {
+  public static final net.minecraft.client.animation.AnimationDefinition COPPER_GOLEM_WALK;
+  public static final net.minecraft.client.animation.AnimationDefinition COPPER_GOLEM_IDLE;
+  public static final net.minecraft.client.animation.AnimationDefinition COPPER_GOLEM_WALK_ITEM;
+  public static final net.minecraft.client.animation.AnimationDefinition COPPER_GOLEM_CHEST_INTERACTION_ITEM_DROP;
+  public static final net.minecraft.client.animation.AnimationDefinition COPPER_GOLEM_CHEST_INTERACTION_ITEM_NODROP;
+  public static final net.minecraft.client.animation.AnimationDefinition COPPER_GOLEM_CHEST_INTERACTION_NOITEM_GET;
+  public static final net.minecraft.client.animation.AnimationDefinition COPPER_GOLEM_CHEST_INTERACTION_NOITEM_NOGET;
+  public net.minecraft.client.animation.definitions.CopperGolemAnimation();
+  static {};
+}
+=== net.minecraft.client.model.animal.golem.CopperGolemModel
+Compiled from "CopperGolemModel.java"
+public class net.minecraft.client.model.animal.golem.CopperGolemModel extends net.minecraft.client.model.EntityModel<net.minecraft.client.renderer.entity.state.CopperGolemRenderState> implements net.minecraft.client.model.ArmedModel<net.minecraft.client.renderer.entity.state.CopperGolemRenderState>, net.minecraft.client.model.HeadedModel {
+  private static final float MAX_WALK_ANIMATION_SPEED;
+  private static final float WALK_ANIMATION_SCALE_FACTOR;
+  private static final float Z_FIGHT_MITIGATION;
+  private final net.minecraft.client.model.geom.ModelPart head;
+  private final net.minecraft.client.model.geom.ModelPart body;
+  private final net.minecraft.client.model.geom.ModelPart rightArm;
+  private final net.minecraft.client.model.geom.ModelPart leftArm;
+  private final net.minecraft.client.animation.KeyframeAnimation walkAnimation;
+  private final net.minecraft.client.animation.KeyframeAnimation walkWithItemAnimation;
+  private final net.minecraft.client.animation.KeyframeAnimation idleAnimation;
+  private final net.minecraft.client.animation.KeyframeAnimation interactionGetItem;
+  private final net.minecraft.client.animation.KeyframeAnimation interactionGetNoItem;
+  private final net.minecraft.client.animation.KeyframeAnimation interactionDropItem;
+  private final net.minecraft.client.animation.KeyframeAnimation interactionDropNoItem;
+  public net.minecraft.client.model.animal.golem.CopperGolemModel(net.minecraft.client.model.geom.ModelPart);
+  public static net.minecraft.client.model.geom.builders.LayerDefinition createBodyLayer();
+  public static net.minecraft.client.model.geom.builders.LayerDefinition createRunningPoseBodyLayer();
+  public static net.minecraft.client.model.geom.builders.LayerDefinition createSittingPoseBodyLayer();
+  public static net.minecraft.client.model.geom.builders.LayerDefinition createStarPoseBodyLayer();
+  public static net.minecraft.client.model.geom.builders.LayerDefinition createEyesLayer();
+  public void setupAnim(net.minecraft.client.renderer.entity.state.CopperGolemRenderState);
+  public void translateToHand(net.minecraft.client.renderer.entity.state.CopperGolemRenderState, net.minecraft.world.entity.HumanoidArm, com.mojang.blaze3d.vertex.PoseStack);
+  public net.minecraft.client.model.geom.ModelPart getHead();
+  public void translateToHead(com.mojang.blaze3d.vertex.PoseStack);
+  public void applyBlockOnAntennaTransform(com.mojang.blaze3d.vertex.PoseStack);
+  private void poseHeldItemArmsIfStill();
+  public void setupAnim(java.lang.Object);
+  public void translateToHand(net.minecraft.client.renderer.entity.state.EntityRenderState, net.minecraft.world.entity.HumanoidArm, com.mojang.blaze3d.vertex.PoseStack);
+  private static net.minecraft.client.model.geom.builders.MeshDefinition lambda$createEyesLayer$0(net.minecraft.client.model.geom.builders.MeshDefinition);
+  private static net.minecraft.client.model.geom.PartPose lambda$createStarPoseBodyLayer$0(net.minecraft.client.model.geom.PartPose);
+  private static net.minecraft.client.model.geom.PartPose lambda$createSittingPoseBodyLayer$0(net.minecraft.client.model.geom.PartPose);
+  private static net.minecraft.client.model.geom.PartPose lambda$createRunningPoseBodyLayer$0(net.minecraft.client.model.geom.PartPose);
+  private static net.minecraft.client.model.geom.PartPose lambda$createBodyLayer$0(net.minecraft.client.model.geom.PartPose);
+}
+=== net.minecraft.client.model.object.statue.CopperGolemStatueModel
+Compiled from "CopperGolemStatueModel.java"
+public class net.minecraft.client.model.object.statue.CopperGolemStatueModel extends net.minecraft.client.model.Model<net.minecraft.util.Unit> {
+  public net.minecraft.client.model.object.statue.CopperGolemStatueModel(net.minecraft.client.model.geom.ModelPart);
+  public void setupAnim(net.minecraft.util.Unit);
+  public void setupAnim(java.lang.Object);
+}
+=== net.minecraft.client.renderer.blockentity.CopperGolemStatueBlockRenderer
+Compiled from "CopperGolemStatueBlockRenderer.java"
+public class net.minecraft.client.renderer.blockentity.CopperGolemStatueBlockRenderer implements net.minecraft.client.renderer.blockentity.BlockEntityRenderer<net.minecraft.world.level.block.entity.CopperGolemStatueBlockEntity, net.minecraft.client.renderer.blockentity.state.CopperGolemStatueRenderState> {
+  private static final java.util.Map<net.minecraft.core.Direction, com.mojang.math.Transformation> TRANSFORMATIONS;
+  private final java.util.Map<net.minecraft.world.level.block.CopperGolemStatueBlock$Pose, net.minecraft.client.model.object.statue.CopperGolemStatueModel> models;
+  public net.minecraft.client.renderer.blockentity.CopperGolemStatueBlockRenderer(net.minecraft.client.renderer.blockentity.BlockEntityRendererProvider$Context);
+  public net.minecraft.client.renderer.blockentity.state.CopperGolemStatueRenderState createRenderState();
+  public void extractRenderState(net.minecraft.world.level.block.entity.CopperGolemStatueBlockEntity, net.minecraft.client.renderer.blockentity.state.CopperGolemStatueRenderState, float, net.minecraft.world.phys.Vec3, net.minecraft.client.renderer.feature.ModelFeatureRenderer$CrumblingOverlay);
+  public void submit(net.minecraft.client.renderer.blockentity.state.CopperGolemStatueRenderState, com.mojang.blaze3d.vertex.PoseStack, net.minecraft.client.renderer.SubmitNodeCollector, net.minecraft.client.renderer.state.level.CameraRenderState);
+  public static com.mojang.math.Transformation modelTransformation(net.minecraft.core.Direction);
+  private static com.mojang.math.Transformation createModelTransformation(net.minecraft.core.Direction);
+  public void submit(net.minecraft.client.renderer.blockentity.state.BlockEntityRenderState, com.mojang.blaze3d.vertex.PoseStack, net.minecraft.client.renderer.SubmitNodeCollector, net.minecraft.client.renderer.state.level.CameraRenderState);
+  public void extractRenderState(net.minecraft.world.level.block.entity.BlockEntity, net.minecraft.client.renderer.blockentity.state.BlockEntityRenderState, float, net.minecraft.world.phys.Vec3, net.minecraft.client.renderer.feature.ModelFeatureRenderer$CrumblingOverlay);
+  public net.minecraft.client.renderer.blockentity.state.BlockEntityRenderState createRenderState();
+  static {};
+}
+=== net.minecraft.client.renderer.blockentity.state.CopperGolemStatueRenderState
+Compiled from "CopperGolemStatueRenderState.java"
+public class net.minecraft.client.renderer.blockentity.state.CopperGolemStatueRenderState extends net.minecraft.client.renderer.blockentity.state.BlockEntityRenderState {
+  public net.minecraft.world.level.block.CopperGolemStatueBlock$Pose pose;
+  public net.minecraft.core.Direction direction;
+  public net.minecraft.world.level.block.WeatheringCopper$WeatherState oxidationState;
+  public net.minecraft.client.renderer.blockentity.state.CopperGolemStatueRenderState();
+}
+=== net.minecraft.client.renderer.entity.CopperGolemRenderer
+Compiled from "CopperGolemRenderer.java"
+public class net.minecraft.client.renderer.entity.CopperGolemRenderer extends net.minecraft.client.renderer.entity.MobRenderer<net.minecraft.world.entity.animal.golem.CopperGolem, net.minecraft.client.renderer.entity.state.CopperGolemRenderState, net.minecraft.client.model.animal.golem.CopperGolemModel> {
+  public static final net.minecraft.client.renderer.block.model.BlockDisplayContext BLOCK_DISPLAY_CONTEXT;
+  private final net.minecraft.client.renderer.block.BlockModelResolver blockModelResolver;
+  public net.minecraft.client.renderer.entity.CopperGolemRenderer(net.minecraft.client.renderer.entity.EntityRendererProvider$Context);
+  public net.minecraft.resources.Identifier getTextureLocation(net.minecraft.client.renderer.entity.state.CopperGolemRenderState);
+  private static java.util.function.Function<net.minecraft.client.renderer.entity.state.CopperGolemRenderState, net.minecraft.resources.Identifier> getEyeTextureLocationProvider();
+  public net.minecraft.client.renderer.entity.state.CopperGolemRenderState createRenderState();
+  public void extractRenderState(net.minecraft.world.entity.animal.golem.CopperGolem, net.minecraft.client.renderer.entity.state.CopperGolemRenderState, float);
+  public void extractRenderState(net.minecraft.world.entity.LivingEntity, net.minecraft.client.renderer.entity.state.LivingEntityRenderState, float);
+  public net.minecraft.resources.Identifier getTextureLocation(net.minecraft.client.renderer.entity.state.LivingEntityRenderState);
+  public void extractRenderState(net.minecraft.world.entity.Entity, net.minecraft.client.renderer.entity.state.EntityRenderState, float);
+  public net.minecraft.client.renderer.entity.state.EntityRenderState createRenderState();
+  private static net.minecraft.resources.Identifier lambda$getEyeTextureLocationProvider$0(net.minecraft.client.renderer.entity.state.CopperGolemRenderState);
+  private static net.minecraft.client.renderer.block.BlockModelRenderState lambda$new$1(net.minecraft.client.renderer.entity.state.CopperGolemRenderState);
+  private static float lambda$new$0(net.minecraft.client.renderer.entity.state.CopperGolemRenderState, float);
+  static {};
+}
+=== net.minecraft.client.renderer.entity.state.CopperGolemRenderState
+Compiled from "CopperGolemRenderState.java"
+public class net.minecraft.client.renderer.entity.state.CopperGolemRenderState extends net.minecraft.client.renderer.entity.state.ArmedEntityRenderState {
+  public net.minecraft.world.level.block.WeatheringCopper$WeatherState weathering;
+  public net.minecraft.world.entity.animal.golem.CopperGolemState copperGolemState;
+  public final net.minecraft.world.entity.AnimationState idleAnimationState;
+  public final net.minecraft.world.entity.AnimationState interactionGetItem;
+  public final net.minecraft.world.entity.AnimationState interactionGetNoItem;
+  public final net.minecraft.world.entity.AnimationState interactionDropItem;
+  public final net.minecraft.world.entity.AnimationState interactionDropNoItem;
+  public final net.minecraft.client.renderer.block.BlockModelRenderState blockOnAntenna;
+  public net.minecraft.client.renderer.entity.state.CopperGolemRenderState();
+}
+=== net.minecraft.client.renderer.special.CopperGolemStatueSpecialRenderer
+Compiled from "CopperGolemStatueSpecialRenderer.java"
+public class net.minecraft.client.renderer.special.CopperGolemStatueSpecialRenderer implements net.minecraft.client.renderer.special.NoDataSpecialModelRenderer {
+  private final net.minecraft.client.model.object.statue.CopperGolemStatueModel model;
+  private final net.minecraft.resources.Identifier texture;
+  public net.minecraft.client.renderer.special.CopperGolemStatueSpecialRenderer(net.minecraft.client.model.object.statue.CopperGolemStatueModel, net.minecraft.resources.Identifier);
+  public void submit(com.mojang.blaze3d.vertex.PoseStack, net.minecraft.client.renderer.SubmitNodeCollector, int, int, boolean, int);
+  public void getExtents(java.util.function.Consumer<org.joml.Vector3fc>);
+}
+=== net.minecraft.client.renderer.special.CopperGolemStatueSpecialRenderer$Unbaked
+Compiled from "CopperGolemStatueSpecialRenderer.java"
+public final class net.minecraft.client.renderer.special.CopperGolemStatueSpecialRenderer$Unbaked extends java.lang.Record implements net.minecraft.client.renderer.special.NoDataSpecialModelRenderer$Unbaked {
+  private final net.minecraft.resources.Identifier texture;
+  private final net.minecraft.world.level.block.CopperGolemStatueBlock$Pose pose;
+  public static final com.mojang.serialization.MapCodec<net.minecraft.client.renderer.special.CopperGolemStatueSpecialRenderer$Unbaked> MAP_CODEC;
+  public net.minecraft.client.renderer.special.CopperGolemStatueSpecialRenderer$Unbaked(net.minecraft.world.level.block.WeatheringCopper$WeatherState, net.minecraft.world.level.block.CopperGolemStatueBlock$Pose);
+  public net.minecraft.client.renderer.special.CopperGolemStatueSpecialRenderer$Unbaked(net.minecraft.resources.Identifier, net.minecraft.world.level.block.CopperGolemStatueBlock$Pose);
+  public com.mojang.serialization.MapCodec<net.minecraft.client.renderer.special.CopperGolemStatueSpecialRenderer$Unbaked> type();
+  public net.minecraft.client.renderer.special.CopperGolemStatueSpecialRenderer bake(net.minecraft.client.renderer.special.SpecialModelRenderer$BakingContext);
+  private static net.minecraft.client.model.geom.ModelLayerLocation getModel(net.minecraft.world.level.block.CopperGolemStatueBlock$Pose);
+  public final java.lang.String toString();
+  public final int hashCode();
+  public final boolean equals(java.lang.Object);
+  public net.minecraft.resources.Identifier texture();
+  public net.minecraft.world.level.block.CopperGolemStatueBlock$Pose pose();
+  public net.minecraft.client.renderer.special.SpecialModelRenderer bake(net.minecraft.client.renderer.special.SpecialModelRenderer$BakingContext);
+  private static com.mojang.datafixers.kinds.App lambda$static$0(com.mojang.serialization.codecs.RecordCodecBuilder$Instance);
+  static {};
+}
+=== net.minecraft.util.datafix.fixes.CopperGolemWeatherStateFix
+Compiled from "CopperGolemWeatherStateFix.java"
+public class net.minecraft.util.datafix.fixes.CopperGolemWeatherStateFix extends net.minecraft.util.datafix.fixes.NamedEntityFix {
+  public net.minecraft.util.datafix.fixes.CopperGolemWeatherStateFix(com.mojang.datafixers.schemas.Schema);
+  protected com.mojang.datafixers.Typed<?> fix(com.mojang.datafixers.Typed<?>);
+  private static com.mojang.serialization.Dynamic<?> fixWeatherState(com.mojang.serialization.Dynamic<?>);
+  private static com.mojang.serialization.Dynamic lambda$fix$0(com.mojang.serialization.Dynamic);
+}
+=== net.minecraft.world.entity.animal.golem.CopperGolemAi
+Compiled from "CopperGolemAi.java"
+public class net.minecraft.world.entity.animal.golem.CopperGolemAi {
+  private static final float SPEED_MULTIPLIER_WHEN_PANICKING;
+  private static final float SPEED_MULTIPLIER_WHEN_IDLING;
+  private static final int TRANSPORT_ITEM_HORIZONTAL_SEARCH_RADIUS;
+  private static final int TRANSPORT_ITEM_VERTICAL_SEARCH_RADIUS;
+  private static final int TICK_TO_START_ON_REACHED_INTERACTION;
+  private static final int TICK_TO_PLAY_ON_REACHED_SOUND;
+  private static final java.util.function.Predicate<net.minecraft.world.level.block.state.BlockState> TRANSPORT_ITEM_SOURCE_BLOCK;
+  private static final java.util.function.Predicate<net.minecraft.world.level.block.state.BlockState> TRANSPORT_ITEM_DESTINATION_BLOCK;
+  public net.minecraft.world.entity.animal.golem.CopperGolemAi();
+  protected static java.util.List<net.minecraft.world.entity.ai.ActivityData<net.minecraft.world.entity.animal.golem.CopperGolem>> getActivities();
+  public static void updateActivity(net.minecraft.world.entity.animal.golem.CopperGolem);
+  private static net.minecraft.world.entity.ai.ActivityData<net.minecraft.world.entity.animal.golem.CopperGolem> initCoreActivity();
+  private static net.minecraft.world.entity.ai.ActivityData<net.minecraft.world.entity.animal.golem.CopperGolem> initIdleActivity();
+  private static java.util.Map<net.minecraft.world.entity.ai.behavior.TransportItemsBetweenContainers$ContainerInteractionState, net.minecraft.world.entity.ai.behavior.TransportItemsBetweenContainers$OnTargetReachedInteraction> getTargetReachedInteractions();
+  private static net.minecraft.world.entity.ai.behavior.TransportItemsBetweenContainers$OnTargetReachedInteraction onReachedTargetInteraction(net.minecraft.world.entity.animal.golem.CopperGolemState, net.minecraft.sounds.SoundEvent);
+  private static java.util.function.Consumer<net.minecraft.world.entity.PathfinderMob> onTravelling();
+  private static java.util.function.Predicate<net.minecraft.world.entity.ai.behavior.TransportItemsBetweenContainers$TransportItemTarget> shouldQueueForTarget();
+  private static boolean lambda$shouldQueueForTarget$0(net.minecraft.world.entity.ai.behavior.TransportItemsBetweenContainers$TransportItemTarget);
+  private static void lambda$onTravelling$0(net.minecraft.world.entity.PathfinderMob);
+  private static void lambda$onReachedTargetInteraction$0(net.minecraft.world.entity.animal.golem.CopperGolemState, net.minecraft.sounds.SoundEvent, net.minecraft.world.entity.PathfinderMob, net.minecraft.world.entity.ai.behavior.TransportItemsBetweenContainers$TransportItemTarget, java.lang.Integer);
+  private static boolean lambda$static$1(net.minecraft.world.level.block.state.BlockState);
+  private static boolean lambda$static$0(net.minecraft.world.level.block.state.BlockState);
+  static {};
+}
+=== net.minecraft.world.entity.animal.golem.CopperGolemOxidationLevel
+Compiled from "CopperGolemOxidationLevel.java"
+public final class net.minecraft.world.entity.animal.golem.CopperGolemOxidationLevel extends java.lang.Record {
+  private final net.minecraft.sounds.SoundEvent spinHeadSound;
+  private final net.minecraft.sounds.SoundEvent hurtSound;
+  private final net.minecraft.sounds.SoundEvent deathSound;
+  private final net.minecraft.sounds.SoundEvent stepSound;
+  private final net.minecraft.resources.Identifier texture;
+  private final net.minecraft.resources.Identifier eyeTexture;
+  public net.minecraft.world.entity.animal.golem.CopperGolemOxidationLevel(net.minecraft.sounds.SoundEvent, net.minecraft.sounds.SoundEvent, net.minecraft.sounds.SoundEvent, net.minecraft.sounds.SoundEvent, net.minecraft.resources.Identifier, net.minecraft.resources.Identifier);
+  public final java.lang.String toString();
+  public final int hashCode();
+  public final boolean equals(java.lang.Object);
+  public net.minecraft.sounds.SoundEvent spinHeadSound();
+  public net.minecraft.sounds.SoundEvent hurtSound();
+  public net.minecraft.sounds.SoundEvent deathSound();
+  public net.minecraft.sounds.SoundEvent stepSound();
+  public net.minecraft.resources.Identifier texture();
+  public net.minecraft.resources.Identifier eyeTexture();
+}
+=== net.minecraft.world.entity.animal.golem.CopperGolemOxidationLevels
+Compiled from "CopperGolemOxidationLevels.java"
+public class net.minecraft.world.entity.animal.golem.CopperGolemOxidationLevels {
+  private static final net.minecraft.world.entity.animal.golem.CopperGolemOxidationLevel UNAFFECTED;
+  private static final net.minecraft.world.entity.animal.golem.CopperGolemOxidationLevel EXPOSED;
+  private static final net.minecraft.world.entity.animal.golem.CopperGolemOxidationLevel WEATHERED;
+  private static final net.minecraft.world.entity.animal.golem.CopperGolemOxidationLevel OXIDIZED;
+  private static final java.util.Map<net.minecraft.world.level.block.WeatheringCopper$WeatherState, net.minecraft.world.entity.animal.golem.CopperGolemOxidationLevel> WEATHERED_STATES;
+  public net.minecraft.world.entity.animal.golem.CopperGolemOxidationLevels();
+  public static net.minecraft.world.entity.animal.golem.CopperGolemOxidationLevel getOxidationLevel(net.minecraft.world.level.block.WeatheringCopper$WeatherState);
+  static {};
+}
+=== net.minecraft.world.entity.animal.golem.CopperGolem
+Compiled from "CopperGolem.java"
+public class net.minecraft.world.entity.animal.golem.CopperGolem extends net.minecraft.world.entity.animal.golem.AbstractGolem implements net.minecraft.world.entity.ContainerUser,net.minecraft.world.entity.Shearable {
+  private static final long IGNORE_WEATHERING_TICK;
+  private static final long UNSET_WEATHERING_TICK;
+  private static final int WEATHERING_TICK_FROM;
+  private static final int WEATHERING_TICK_TO;
+  private static final int SPIN_ANIMATION_MIN_COOLDOWN;
+  private static final int SPIN_ANIMATION_MAX_COOLDOWN;
+  private static final float SPIN_SOUND_TIME_INTERVAL_OFFSET;
+  private static final float TURN_TO_STATUE_CHANCE;
+  private static final int SPAWN_COOLDOWN_MIN;
+  private static final int SPAWN_COOLDOWN_MAX;
+  private static final net.minecraft.world.entity.ai.Brain$Provider<net.minecraft.world.entity.animal.golem.CopperGolem> BRAIN_PROVIDER;
+  private static final net.minecraft.network.syncher.EntityDataAccessor<net.minecraft.world.level.block.WeatheringCopper$WeatherState> DATA_WEATHER_STATE;
+  private static final net.minecraft.network.syncher.EntityDataAccessor<net.minecraft.world.entity.animal.golem.CopperGolemState> COPPER_GOLEM_STATE;
+  private net.minecraft.core.BlockPos openedChestPos;
+  private java.util.UUID lastLightningBoltUUID;
+  private long nextWeatheringTick;
+  private int idleAnimationStartTick;
+  private final net.minecraft.world.entity.AnimationState idleAnimationState;
+  private final net.minecraft.world.entity.AnimationState interactionGetItemAnimationState;
+  private final net.minecraft.world.entity.AnimationState interactionGetNoItemAnimationState;
+  private final net.minecraft.world.entity.AnimationState interactionDropItemAnimationState;
+  private final net.minecraft.world.entity.AnimationState interactionDropNoItemAnimationState;
+  public static final net.minecraft.world.entity.EquipmentSlot EQUIPMENT_SLOT_ANTENNA;
+  public net.minecraft.world.entity.animal.golem.CopperGolem(net.minecraft.world.entity.EntityType<? extends net.minecraft.world.entity.animal.golem.AbstractGolem>, net.minecraft.world.level.Level);
+  public static net.minecraft.world.entity.ai.attributes.AttributeSupplier$Builder createAttributes();
+  public net.minecraft.world.entity.animal.golem.CopperGolemState getState();
+  public void setState(net.minecraft.world.entity.animal.golem.CopperGolemState);
+  public net.minecraft.world.level.block.WeatheringCopper$WeatherState getWeatherState();
+  public void setWeatherState(net.minecraft.world.level.block.WeatheringCopper$WeatherState);
+  public void setOpenedChestPos(net.minecraft.core.BlockPos);
+  public void clearOpenedChestPos();
+  public net.minecraft.world.entity.AnimationState getIdleAnimationState();
+  public net.minecraft.world.entity.AnimationState getInteractionGetItemAnimationState();
+  public net.minecraft.world.entity.AnimationState getInteractionGetNoItemAnimationState();
+  public net.minecraft.world.entity.AnimationState getInteractionDropItemAnimationState();
+  public net.minecraft.world.entity.AnimationState getInteractionDropNoItemAnimationState();
+  protected net.minecraft.world.entity.ai.Brain<net.minecraft.world.entity.animal.golem.CopperGolem> makeBrain(net.minecraft.world.entity.ai.Brain$Packed);
+  public net.minecraft.world.entity.ai.Brain<net.minecraft.world.entity.animal.golem.CopperGolem> getBrain();
+  protected void defineSynchedData(net.minecraft.network.syncher.SynchedEntityData$Builder);
+  public void addAdditionalSaveData(net.minecraft.world.level.storage.ValueOutput);
+  public void readAdditionalSaveData(net.minecraft.world.level.storage.ValueInput);
+  protected void customServerAiStep(net.minecraft.server.level.ServerLevel);
+  public void tick();
+  public net.minecraft.world.InteractionResult mobInteract(net.minecraft.world.entity.player.Player, net.minecraft.world.InteractionHand);
+  private void updateWeathering(net.minecraft.server.level.ServerLevel, net.minecraft.util.RandomSource, long);
+  private boolean canTurnToStatue(net.minecraft.world.level.Level);
+  private void turnToStatue(net.minecraft.server.level.ServerLevel);
+  private void setupAnimationStates();
+  public void spawn(net.minecraft.world.level.block.WeatheringCopper$WeatherState);
+  public net.minecraft.world.entity.SpawnGroupData finalizeSpawn(net.minecraft.world.level.ServerLevelAccessor, net.minecraft.world.DifficultyInstance, net.minecraft.world.entity.EntitySpawnReason, net.minecraft.world.entity.SpawnGroupData);
+  public void playSpawnSound();
+  private void playHeadSpinSound();
+  protected net.minecraft.sounds.SoundEvent getHurtSound(net.minecraft.world.damagesource.DamageSource);
+  protected net.minecraft.sounds.SoundEvent getDeathSound();
+  protected void playStepSound(net.minecraft.core.BlockPos, net.minecraft.world.level.block.state.BlockState);
+  private net.minecraft.sounds.SoundEvent getSpinHeadSound();
+  public net.minecraft.world.phys.Vec3 getLeashOffset();
+  public boolean hasContainerOpen(net.minecraft.world.level.block.entity.ContainerOpenersCounter, net.minecraft.core.BlockPos);
+  public double getContainerInteractionRange();
+  public void shear(net.minecraft.server.level.ServerLevel, net.minecraft.sounds.SoundSource, net.minecraft.world.item.ItemStack);
+  public boolean readyForShearing();
+  protected void dropEquipment(net.minecraft.server.level.ServerLevel);
+  protected void actuallyHurt(net.minecraft.server.level.ServerLevel, net.minecraft.world.damagesource.DamageSource, float);
+  public void thunderHit(net.minecraft.server.level.ServerLevel, net.minecraft.world.entity.LightningBolt);
+  private static java.util.List lambda$static$0(net.minecraft.world.entity.animal.golem.CopperGolem);
+  static {};
+}
+=== net.minecraft.world.entity.animal.golem.CopperGolemState
+Compiled from "CopperGolemState.java"
+public final class net.minecraft.world.entity.animal.golem.CopperGolemState extends java.lang.Enum<net.minecraft.world.entity.animal.golem.CopperGolemState> implements net.minecraft.util.StringRepresentable {
+  public static final net.minecraft.world.entity.animal.golem.CopperGolemState IDLE;
+  public static final net.minecraft.world.entity.animal.golem.CopperGolemState GETTING_ITEM;
+  public static final net.minecraft.world.entity.animal.golem.CopperGolemState GETTING_NO_ITEM;
+  public static final net.minecraft.world.entity.animal.golem.CopperGolemState DROPPING_ITEM;
+  public static final net.minecraft.world.entity.animal.golem.CopperGolemState DROPPING_NO_ITEM;
+  public static final com.mojang.serialization.Codec<net.minecraft.world.entity.animal.golem.CopperGolemState> CODEC;
+  private static final java.util.function.IntFunction<net.minecraft.world.entity.animal.golem.CopperGolemState> BY_ID;
+  public static final net.minecraft.network.codec.StreamCodec<io.netty.buffer.ByteBuf, net.minecraft.world.entity.animal.golem.CopperGolemState> STREAM_CODEC;
+  private final java.lang.String name;
+  private final int id;
+  private static final net.minecraft.world.entity.animal.golem.CopperGolemState[] $VALUES;
+  public static net.minecraft.world.entity.animal.golem.CopperGolemState[] values();
+  public static net.minecraft.world.entity.animal.golem.CopperGolemState valueOf(java.lang.String);
+  private net.minecraft.world.entity.animal.golem.CopperGolemState(java.lang.String, int);
+  public java.lang.String getSerializedName();
+  private int id();
+  private static net.minecraft.world.entity.animal.golem.CopperGolemState[] $values();
+  static {};
+}
+=== net.minecraft.world.level.block.CopperChestBlock
+Compiled from "CopperChestBlock.java"
+public class net.minecraft.world.level.block.CopperChestBlock extends net.minecraft.world.level.block.ChestBlock {
+  public static final com.mojang.serialization.MapCodec<net.minecraft.world.level.block.CopperChestBlock> CODEC;
+  private static final java.util.function.Supplier<java.util.Map<net.minecraft.world.level.block.Block, net.minecraft.world.level.block.Block>> COPPER_TO_COPPER_CHEST_MAPPING;
+  private final net.minecraft.world.level.block.WeatheringCopper$WeatherState weatherState;
+  public com.mojang.serialization.MapCodec<? extends net.minecraft.world.level.block.CopperChestBlock> codec();
+  public net.minecraft.world.level.block.CopperChestBlock(net.minecraft.world.level.block.WeatheringCopper$WeatherState, net.minecraft.sounds.SoundEvent, net.minecraft.sounds.SoundEvent, net.minecraft.world.level.block.state.BlockBehaviour$Properties);
+  public static net.minecraft.sounds.SoundEvent getHingeSound(net.minecraft.world.level.block.WeatheringCopper$WeatherState, boolean);
+  public boolean chestCanConnectTo(net.minecraft.world.level.block.state.BlockState);
+  public net.minecraft.world.level.block.state.BlockState getStateForPlacement(net.minecraft.world.item.context.BlockPlaceContext);
+  private static net.minecraft.world.level.block.state.BlockState getLeastOxidizedChestOfConnectedBlocks(net.minecraft.world.level.block.state.BlockState, net.minecraft.world.level.Level, net.minecraft.core.BlockPos);
+  protected net.minecraft.world.level.block.state.BlockState updateShape(net.minecraft.world.level.block.state.BlockState, net.minecraft.world.level.LevelReader, net.minecraft.world.level.ScheduledTickAccess, net.minecraft.core.BlockPos, net.minecraft.core.Direction, net.minecraft.core.BlockPos, net.minecraft.world.level.block.state.BlockState, net.minecraft.util.RandomSource);
+  private static java.util.Optional<net.minecraft.world.level.block.state.BlockState> unwaxBlock(net.minecraft.world.level.block.CopperChestBlock, net.minecraft.world.level.block.state.BlockState);
+  public net.minecraft.world.level.block.WeatheringCopper$WeatherState getState();
+  public static net.minecraft.world.level.block.state.BlockState getFromCopperBlock(net.minecraft.world.level.block.Block, net.minecraft.core.Direction, net.minecraft.world.level.Level, net.minecraft.core.BlockPos);
+  public boolean isWaxed();
+  public boolean shouldChangedStateKeepBlockEntity(net.minecraft.world.level.block.state.BlockState);
+  private static net.minecraft.world.level.block.state.BlockState lambda$unwaxBlock$0(net.minecraft.world.level.block.state.BlockState, net.minecraft.world.level.block.Block);
+  private static net.minecraft.world.level.block.entity.BlockEntityType lambda$new$0();
+  private static java.util.Map lambda$static$1();
+  private static com.mojang.datafixers.kinds.App lambda$static$0(com.mojang.serialization.codecs.RecordCodecBuilder$Instance);
+  static {};
+}
+=== net.minecraft.world.level.block.CopperGolemStatueBlock$Pose
+Compiled from "CopperGolemStatueBlock.java"
+public final class net.minecraft.world.level.block.CopperGolemStatueBlock$Pose extends java.lang.Enum<net.minecraft.world.level.block.CopperGolemStatueBlock$Pose> implements net.minecraft.util.StringRepresentable {
+  public static final net.minecraft.world.level.block.CopperGolemStatueBlock$Pose STANDING;
+  public static final net.minecraft.world.level.block.CopperGolemStatueBlock$Pose SITTING;
+  public static final net.minecraft.world.level.block.CopperGolemStatueBlock$Pose RUNNING;
+  public static final net.minecraft.world.level.block.CopperGolemStatueBlock$Pose STAR;
+  public static final java.util.function.IntFunction<net.minecraft.world.level.block.CopperGolemStatueBlock$Pose> BY_ID;
+  public static final com.mojang.serialization.Codec<net.minecraft.world.level.block.CopperGolemStatueBlock$Pose> CODEC;
+  private final java.lang.String name;
+  private static final net.minecraft.world.level.block.CopperGolemStatueBlock$Pose[] $VALUES;
+  public static net.minecraft.world.level.block.CopperGolemStatueBlock$Pose[] values();
+  public static net.minecraft.world.level.block.CopperGolemStatueBlock$Pose valueOf(java.lang.String);
+  private net.minecraft.world.level.block.CopperGolemStatueBlock$Pose(java.lang.String);
+  public java.lang.String getSerializedName();
+  public net.minecraft.world.level.block.CopperGolemStatueBlock$Pose getNextPose();
+  private static net.minecraft.world.level.block.CopperGolemStatueBlock$Pose[] $values();
+  static {};
+}
+=== net.minecraft.world.level.block.CopperGolemStatueBlock
+Compiled from "CopperGolemStatueBlock.java"
+public class net.minecraft.world.level.block.CopperGolemStatueBlock extends net.minecraft.world.level.block.BaseEntityBlock implements net.minecraft.world.level.block.SimpleWaterloggedBlock {
+  public static final com.mojang.serialization.MapCodec<net.minecraft.world.level.block.CopperGolemStatueBlock> CODEC;
+  public static final net.minecraft.world.level.block.state.properties.EnumProperty<net.minecraft.core.Direction> FACING;
+  public static final net.minecraft.world.level.block.state.properties.EnumProperty<net.minecraft.world.level.block.CopperGolemStatueBlock$Pose> POSE;
+  public static final net.minecraft.world.level.block.state.properties.BooleanProperty WATERLOGGED;
+  private static final net.minecraft.world.phys.shapes.VoxelShape SHAPE;
+  private final net.minecraft.world.level.block.WeatheringCopper$WeatherState weatheringState;
+  public com.mojang.serialization.MapCodec<? extends net.minecraft.world.level.block.CopperGolemStatueBlock> codec();
+  public net.minecraft.world.level.block.CopperGolemStatueBlock(net.minecraft.world.level.block.WeatheringCopper$WeatherState, net.minecraft.world.level.block.state.BlockBehaviour$Properties);
+  protected void createBlockStateDefinition(net.minecraft.world.level.block.state.StateDefinition$Builder<net.minecraft.world.level.block.Block, net.minecraft.world.level.block.state.BlockState>);
+  public net.minecraft.world.level.block.state.BlockState getStateForPlacement(net.minecraft.world.item.context.BlockPlaceContext);
+  protected net.minecraft.world.level.block.state.BlockState rotate(net.minecraft.world.level.block.state.BlockState, net.minecraft.world.level.block.Rotation);
+  protected net.minecraft.world.level.block.state.BlockState mirror(net.minecraft.world.level.block.state.BlockState, net.minecraft.world.level.block.Mirror);
+  protected net.minecraft.world.phys.shapes.VoxelShape getShape(net.minecraft.world.level.block.state.BlockState, net.minecraft.world.level.BlockGetter, net.minecraft.core.BlockPos, net.minecraft.world.phys.shapes.CollisionContext);
+  public net.minecraft.world.level.block.WeatheringCopper$WeatherState getWeatheringState();
+  protected net.minecraft.world.InteractionResult useItemOn(net.minecraft.world.item.ItemStack, net.minecraft.world.level.block.state.BlockState, net.minecraft.world.level.Level, net.minecraft.core.BlockPos, net.minecraft.world.entity.player.Player, net.minecraft.world.InteractionHand, net.minecraft.world.phys.BlockHitResult);
+  protected void updatePose(net.minecraft.world.level.Level, net.minecraft.world.level.block.state.BlockState, net.minecraft.core.BlockPos, net.minecraft.world.entity.player.Player);
+  protected boolean isPathfindable(net.minecraft.world.level.block.state.BlockState, net.minecraft.world.level.pathfinder.PathComputationType);
+  public net.minecraft.world.level.block.entity.BlockEntity newBlockEntity(net.minecraft.core.BlockPos, net.minecraft.world.level.block.state.BlockState);
+  public boolean shouldChangedStateKeepBlockEntity(net.minecraft.world.level.block.state.BlockState);
+  protected boolean hasAnalogOutputSignal(net.minecraft.world.level.block.state.BlockState);
+  protected int getAnalogOutputSignal(net.minecraft.world.level.block.state.BlockState, net.minecraft.world.level.Level, net.minecraft.core.BlockPos, net.minecraft.core.Direction);
+  protected net.minecraft.world.item.ItemStack getCloneItemStack(net.minecraft.world.level.LevelReader, net.minecraft.core.BlockPos, net.minecraft.world.level.block.state.BlockState, boolean);
+  protected void affectNeighborsAfterRemoval(net.minecraft.world.level.block.state.BlockState, net.minecraft.server.level.ServerLevel, net.minecraft.core.BlockPos, boolean);
+  protected net.minecraft.world.level.material.FluidState getFluidState(net.minecraft.world.level.block.state.BlockState);
+  protected net.minecraft.world.level.block.state.BlockState updateShape(net.minecraft.world.level.block.state.BlockState, net.minecraft.world.level.LevelReader, net.minecraft.world.level.ScheduledTickAccess, net.minecraft.core.BlockPos, net.minecraft.core.Direction, net.minecraft.core.BlockPos, net.minecraft.world.level.block.state.BlockState, net.minecraft.util.RandomSource);
+  private static com.mojang.datafixers.kinds.App lambda$static$0(com.mojang.serialization.codecs.RecordCodecBuilder$Instance);
+  static {};
+}
+=== net.minecraft.world.level.block.WeatheringCopper$WeatherState
+Compiled from "WeatheringCopper.java"
+public final class net.minecraft.world.level.block.WeatheringCopper$WeatherState extends java.lang.Enum<net.minecraft.world.level.block.WeatheringCopper$WeatherState> implements net.minecraft.util.StringRepresentable {
+  public static final net.minecraft.world.level.block.WeatheringCopper$WeatherState UNAFFECTED;
+  public static final net.minecraft.world.level.block.WeatheringCopper$WeatherState EXPOSED;
+  public static final net.minecraft.world.level.block.WeatheringCopper$WeatherState WEATHERED;
+  public static final net.minecraft.world.level.block.WeatheringCopper$WeatherState OXIDIZED;
+  public static final java.util.function.IntFunction<net.minecraft.world.level.block.WeatheringCopper$WeatherState> BY_ID;
+  public static final com.mojang.serialization.Codec<net.minecraft.world.level.block.WeatheringCopper$WeatherState> CODEC;
+  public static final net.minecraft.network.codec.StreamCodec<io.netty.buffer.ByteBuf, net.minecraft.world.level.block.WeatheringCopper$WeatherState> STREAM_CODEC;
+  private final java.lang.String name;
+  private static final net.minecraft.world.level.block.WeatheringCopper$WeatherState[] $VALUES;
+  public static net.minecraft.world.level.block.WeatheringCopper$WeatherState[] values();
+  public static net.minecraft.world.level.block.WeatheringCopper$WeatherState valueOf(java.lang.String);
+  private net.minecraft.world.level.block.WeatheringCopper$WeatherState(java.lang.String);
+  public java.lang.String getSerializedName();
+  public static void forEach(java.util.function.Consumer<net.minecraft.world.level.block.WeatheringCopper$WeatherState>);
+  public net.minecraft.world.level.block.WeatheringCopper$WeatherState next();
+  public net.minecraft.world.level.block.WeatheringCopper$WeatherState previous();
+  private static net.minecraft.world.level.block.WeatheringCopper$WeatherState[] $values();
+  static {};
+}
+=== net.minecraft.world.level.block.WeatheringCopper
+Compiled from "WeatheringCopper.java"
+public interface net.minecraft.world.level.block.WeatheringCopper extends net.minecraft.world.level.block.ChangeOverTimeBlock<net.minecraft.world.level.block.WeatheringCopper$WeatherState> {
+  public static final java.util.function.Supplier<com.google.common.collect.BiMap<net.minecraft.world.level.block.Block, net.minecraft.world.level.block.Block>> NEXT_BY_BLOCK;
+  public static final java.util.function.Supplier<com.google.common.collect.BiMap<net.minecraft.world.level.block.Block, net.minecraft.world.level.block.Block>> PREVIOUS_BY_BLOCK;
+  public static java.util.Optional<net.minecraft.world.level.block.Block> getPrevious(net.minecraft.world.level.block.Block);
+  public static net.minecraft.world.level.block.Block getFirst(net.minecraft.world.level.block.Block);
+  public static java.util.Optional<net.minecraft.world.level.block.state.BlockState> getPrevious(net.minecraft.world.level.block.state.BlockState);
+  public static java.util.Optional<net.minecraft.world.level.block.Block> getNext(net.minecraft.world.level.block.Block);
+  public static net.minecraft.world.level.block.state.BlockState getFirst(net.minecraft.world.level.block.state.BlockState);
+  public default java.util.Optional<net.minecraft.world.level.block.state.BlockState> getNext(net.minecraft.world.level.block.state.BlockState);
+  public default float getChanceModifier();
+  private static net.minecraft.world.level.block.state.BlockState lambda$getNext$0(net.minecraft.world.level.block.state.BlockState, net.minecraft.world.level.block.Block);
+  private static net.minecraft.world.level.block.state.BlockState lambda$getPrevious$0(net.minecraft.world.level.block.state.BlockState, net.minecraft.world.level.block.Block);
+  private static com.google.common.collect.BiMap lambda$static$2();
+  private static com.google.common.collect.BiMap lambda$static$0();
+  private static void lambda$static$1(com.google.common.collect.ImmutableBiMap$Builder, net.minecraft.world.level.block.WeatheringCopperCollection);
+  static {};
+}
+=== net.minecraft.world.level.block.WeatheringCopperBarsBlock
+Compiled from "WeatheringCopperBarsBlock.java"
+public class net.minecraft.world.level.block.WeatheringCopperBarsBlock extends net.minecraft.world.level.block.IronBarsBlock implements net.minecraft.world.level.block.WeatheringCopper {
+  public static final com.mojang.serialization.MapCodec<net.minecraft.world.level.block.WeatheringCopperBarsBlock> CODEC;
+  private final net.minecraft.world.level.block.WeatheringCopper$WeatherState weatherState;
+  public com.mojang.serialization.MapCodec<net.minecraft.world.level.block.WeatheringCopperBarsBlock> codec();
+  protected net.minecraft.world.level.block.WeatheringCopperBarsBlock(net.minecraft.world.level.block.WeatheringCopper$WeatherState, net.minecraft.world.level.block.state.BlockBehaviour$Properties);
+  protected void randomTick(net.minecraft.world.level.block.state.BlockState, net.minecraft.server.level.ServerLevel, net.minecraft.core.BlockPos, net.minecraft.util.RandomSource);
+  protected boolean isRandomlyTicking(net.minecraft.world.level.block.state.BlockState);
+  public net.minecraft.world.level.block.WeatheringCopper$WeatherState getAge();
+  public java.lang.Enum getAge();
+  private static com.mojang.datafixers.kinds.App lambda$static$0(com.mojang.serialization.codecs.RecordCodecBuilder$Instance);
+  static {};
+}
+=== net.minecraft.world.level.block.WeatheringCopperBulbBlock
+Compiled from "WeatheringCopperBulbBlock.java"
+public class net.minecraft.world.level.block.WeatheringCopperBulbBlock extends net.minecraft.world.level.block.CopperBulbBlock implements net.minecraft.world.level.block.WeatheringCopper {
+  public static final com.mojang.serialization.MapCodec<net.minecraft.world.level.block.WeatheringCopperBulbBlock> CODEC;
+  private final net.minecraft.world.level.block.WeatheringCopper$WeatherState weatherState;
+  protected com.mojang.serialization.MapCodec<net.minecraft.world.level.block.WeatheringCopperBulbBlock> codec();
+  public net.minecraft.world.level.block.WeatheringCopperBulbBlock(net.minecraft.world.level.block.WeatheringCopper$WeatherState, net.minecraft.world.level.block.state.BlockBehaviour$Properties);
+  protected void randomTick(net.minecraft.world.level.block.state.BlockState, net.minecraft.server.level.ServerLevel, net.minecraft.core.BlockPos, net.minecraft.util.RandomSource);
+  protected boolean isRandomlyTicking(net.minecraft.world.level.block.state.BlockState);
+  public net.minecraft.world.level.block.WeatheringCopper$WeatherState getAge();
+  public java.lang.Enum getAge();
+  private static com.mojang.datafixers.kinds.App lambda$static$0(com.mojang.serialization.codecs.RecordCodecBuilder$Instance);
+  static {};
+}
+=== net.minecraft.world.level.block.WeatheringCopperChestBlock
+Compiled from "WeatheringCopperChestBlock.java"
+public class net.minecraft.world.level.block.WeatheringCopperChestBlock extends net.minecraft.world.level.block.CopperChestBlock implements net.minecraft.world.level.block.WeatheringCopper {
+  public static final com.mojang.serialization.MapCodec<net.minecraft.world.level.block.WeatheringCopperChestBlock> CODEC;
+  public com.mojang.serialization.MapCodec<net.minecraft.world.level.block.WeatheringCopperChestBlock> codec();
+  public net.minecraft.world.level.block.WeatheringCopperChestBlock(net.minecraft.world.level.block.WeatheringCopper$WeatherState, net.minecraft.sounds.SoundEvent, net.minecraft.sounds.SoundEvent, net.minecraft.world.level.block.state.BlockBehaviour$Properties);
+  protected boolean isRandomlyTicking(net.minecraft.world.level.block.state.BlockState);
+  protected void randomTick(net.minecraft.world.level.block.state.BlockState, net.minecraft.server.level.ServerLevel, net.minecraft.core.BlockPos, net.minecraft.util.RandomSource);
+  public net.minecraft.world.level.block.WeatheringCopper$WeatherState getAge();
+  public boolean isWaxed();
+  public java.lang.Enum getAge();
+  private static com.mojang.datafixers.kinds.App lambda$static$0(com.mojang.serialization.codecs.RecordCodecBuilder$Instance);
+  static {};
+}
+=== net.minecraft.world.level.block.WeatheringCopperCollection$ByState
+Compiled from "WeatheringCopperCollection.java"
+public final class net.minecraft.world.level.block.WeatheringCopperCollection$ByState<T> extends java.lang.Record {
+  private final T unaffected;
+  private final T exposed;
+  private final T weathered;
+  private final T oxidized;
+  public net.minecraft.world.level.block.WeatheringCopperCollection$ByState(T, T, T, T);
+  public static <T> net.minecraft.world.level.block.WeatheringCopperCollection$ByState<T> create(T);
+  public <U> net.minecraft.world.level.block.WeatheringCopperCollection$ByState<U> map(java.util.function.Function<T, U>);
+  public T pick(net.minecraft.world.level.block.WeatheringCopper$WeatherState);
+  public void forEach(java.util.function.Consumer<T>);
+  public void progressMapping(java.util.function.BiConsumer<T, T>);
+  public final java.lang.String toString();
+  public final int hashCode();
+  public final boolean equals(java.lang.Object);
+  public T unaffected();
+  public T exposed();
+  public T weathered();
+  public T oxidized();
+}
+=== net.minecraft.world.level.block.WeatheringCopperDoorBlock
+Compiled from "WeatheringCopperDoorBlock.java"
+public class net.minecraft.world.level.block.WeatheringCopperDoorBlock extends net.minecraft.world.level.block.DoorBlock implements net.minecraft.world.level.block.WeatheringCopper {
+  public static final com.mojang.serialization.MapCodec<net.minecraft.world.level.block.WeatheringCopperDoorBlock> CODEC;
+  private final net.minecraft.world.level.block.WeatheringCopper$WeatherState weatherState;
+  public com.mojang.serialization.MapCodec<net.minecraft.world.level.block.WeatheringCopperDoorBlock> codec();
+  protected net.minecraft.world.level.block.WeatheringCopperDoorBlock(net.minecraft.world.level.block.state.properties.BlockSetType, net.minecraft.world.level.block.WeatheringCopper$WeatherState, net.minecraft.world.level.block.state.BlockBehaviour$Properties);
+  protected void randomTick(net.minecraft.world.level.block.state.BlockState, net.minecraft.server.level.ServerLevel, net.minecraft.core.BlockPos, net.minecraft.util.RandomSource);
+  protected boolean isRandomlyTicking(net.minecraft.world.level.block.state.BlockState);
+  public net.minecraft.world.level.block.WeatheringCopper$WeatherState getAge();
+  public java.lang.Enum getAge();
+  private static com.mojang.datafixers.kinds.App lambda$static$0(com.mojang.serialization.codecs.RecordCodecBuilder$Instance);
+  static {};
+}
+=== net.minecraft.world.level.block.WeatheringCopperFullBlock
+Compiled from "WeatheringCopperFullBlock.java"
+public class net.minecraft.world.level.block.WeatheringCopperFullBlock extends net.minecraft.world.level.block.Block implements net.minecraft.world.level.block.WeatheringCopper {
+  public static final com.mojang.serialization.MapCodec<net.minecraft.world.level.block.WeatheringCopperFullBlock> CODEC;
+  private final net.minecraft.world.level.block.WeatheringCopper$WeatherState weatherState;
+  public com.mojang.serialization.MapCodec<net.minecraft.world.level.block.WeatheringCopperFullBlock> codec();
+  public net.minecraft.world.level.block.WeatheringCopperFullBlock(net.minecraft.world.level.block.WeatheringCopper$WeatherState, net.minecraft.world.level.block.state.BlockBehaviour$Properties);
+  protected void randomTick(net.minecraft.world.level.block.state.BlockState, net.minecraft.server.level.ServerLevel, net.minecraft.core.BlockPos, net.minecraft.util.RandomSource);
+  protected boolean isRandomlyTicking(net.minecraft.world.level.block.state.BlockState);
+  public net.minecraft.world.level.block.WeatheringCopper$WeatherState getAge();
+  public java.lang.Enum getAge();
+  private static com.mojang.datafixers.kinds.App lambda$static$0(com.mojang.serialization.codecs.RecordCodecBuilder$Instance);
+  static {};
+}
+=== net.minecraft.world.level.block.WeatheringCopperGolemStatueBlock
+Compiled from "WeatheringCopperGolemStatueBlock.java"
+public class net.minecraft.world.level.block.WeatheringCopperGolemStatueBlock extends net.minecraft.world.level.block.CopperGolemStatueBlock implements net.minecraft.world.level.block.WeatheringCopper {
+  public static final com.mojang.serialization.MapCodec<net.minecraft.world.level.block.WeatheringCopperGolemStatueBlock> CODEC;
+  public com.mojang.serialization.MapCodec<net.minecraft.world.level.block.WeatheringCopperGolemStatueBlock> codec();
+  public net.minecraft.world.level.block.WeatheringCopperGolemStatueBlock(net.minecraft.world.level.block.WeatheringCopper$WeatherState, net.minecraft.world.level.block.state.BlockBehaviour$Properties);
+  protected boolean isRandomlyTicking(net.minecraft.world.level.block.state.BlockState);
+  protected void randomTick(net.minecraft.world.level.block.state.BlockState, net.minecraft.server.level.ServerLevel, net.minecraft.core.BlockPos, net.minecraft.util.RandomSource);
+  public net.minecraft.world.level.block.WeatheringCopper$WeatherState getAge();
+  protected net.minecraft.world.InteractionResult useItemOn(net.minecraft.world.item.ItemStack, net.minecraft.world.level.block.state.BlockState, net.minecraft.world.level.Level, net.minecraft.core.BlockPos, net.minecraft.world.entity.player.Player, net.minecraft.world.InteractionHand, net.minecraft.world.phys.BlockHitResult);
+  public java.lang.Enum getAge();
+  private static com.mojang.datafixers.kinds.App lambda$static$0(com.mojang.serialization.codecs.RecordCodecBuilder$Instance);
+  static {};
+}
+=== net.minecraft.world.level.block.WeatheringCopperGrateBlock
+Compiled from "WeatheringCopperGrateBlock.java"
+public class net.minecraft.world.level.block.WeatheringCopperGrateBlock extends net.minecraft.world.level.block.WaterloggedTransparentBlock implements net.minecraft.world.level.block.WeatheringCopper {
+  public static final com.mojang.serialization.MapCodec<net.minecraft.world.level.block.WeatheringCopperGrateBlock> CODEC;
+  private final net.minecraft.world.level.block.WeatheringCopper$WeatherState weatherState;
+  protected com.mojang.serialization.MapCodec<net.minecraft.world.level.block.WeatheringCopperGrateBlock> codec();
+  protected net.minecraft.world.level.block.WeatheringCopperGrateBlock(net.minecraft.world.level.block.WeatheringCopper$WeatherState, net.minecraft.world.level.block.state.BlockBehaviour$Properties);
+  protected void randomTick(net.minecraft.world.level.block.state.BlockState, net.minecraft.server.level.ServerLevel, net.minecraft.core.BlockPos, net.minecraft.util.RandomSource);
+  protected boolean isRandomlyTicking(net.minecraft.world.level.block.state.BlockState);
+  public net.minecraft.world.level.block.WeatheringCopper$WeatherState getAge();
+  public java.lang.Enum getAge();
+  private static com.mojang.datafixers.kinds.App lambda$static$0(com.mojang.serialization.codecs.RecordCodecBuilder$Instance);
+  static {};
+}
+=== net.minecraft.world.level.block.WeatheringCopperSlabBlock
+Compiled from "WeatheringCopperSlabBlock.java"
+public class net.minecraft.world.level.block.WeatheringCopperSlabBlock extends net.minecraft.world.level.block.SlabBlock implements net.minecraft.world.level.block.WeatheringCopper {
+  public static final com.mojang.serialization.MapCodec<net.minecraft.world.level.block.WeatheringCopperSlabBlock> CODEC;
+  private final net.minecraft.world.level.block.WeatheringCopper$WeatherState weatherState;
+  public com.mojang.serialization.MapCodec<net.minecraft.world.level.block.WeatheringCopperSlabBlock> codec();
+  public net.minecraft.world.level.block.WeatheringCopperSlabBlock(net.minecraft.world.level.block.WeatheringCopper$WeatherState, net.minecraft.world.level.block.state.BlockBehaviour$Properties);
+  protected void randomTick(net.minecraft.world.level.block.state.BlockState, net.minecraft.server.level.ServerLevel, net.minecraft.core.BlockPos, net.minecraft.util.RandomSource);
+  protected boolean isRandomlyTicking(net.minecraft.world.level.block.state.BlockState);
+  public net.minecraft.world.level.block.WeatheringCopper$WeatherState getAge();
+  public java.lang.Enum getAge();
+  private static com.mojang.datafixers.kinds.App lambda$static$0(com.mojang.serialization.codecs.RecordCodecBuilder$Instance);
+  static {};
+}
+=== net.minecraft.world.level.block.WeatheringCopperStairBlock
+Compiled from "WeatheringCopperStairBlock.java"
+public class net.minecraft.world.level.block.WeatheringCopperStairBlock extends net.minecraft.world.level.block.StairBlock implements net.minecraft.world.level.block.WeatheringCopper {
+  public static final com.mojang.serialization.MapCodec<net.minecraft.world.level.block.WeatheringCopperStairBlock> CODEC;
+  private final net.minecraft.world.level.block.WeatheringCopper$WeatherState weatherState;
+  public com.mojang.serialization.MapCodec<net.minecraft.world.level.block.WeatheringCopperStairBlock> codec();
+  public net.minecraft.world.level.block.WeatheringCopperStairBlock(net.minecraft.world.level.block.WeatheringCopper$WeatherState, net.minecraft.world.level.block.state.BlockState, net.minecraft.world.level.block.state.BlockBehaviour$Properties);
+  protected void randomTick(net.minecraft.world.level.block.state.BlockState, net.minecraft.server.level.ServerLevel, net.minecraft.core.BlockPos, net.minecraft.util.RandomSource);
+  protected boolean isRandomlyTicking(net.minecraft.world.level.block.state.BlockState);
+  public net.minecraft.world.level.block.WeatheringCopper$WeatherState getAge();
+  public java.lang.Enum getAge();
+  private static com.mojang.datafixers.kinds.App lambda$static$0(com.mojang.serialization.codecs.RecordCodecBuilder$Instance);
+  private static net.minecraft.world.level.block.state.BlockState lambda$static$1(net.minecraft.world.level.block.WeatheringCopperStairBlock);
+  static {};
+}
+=== net.minecraft.world.level.block.WeatheringCopperTrapDoorBlock
+Compiled from "WeatheringCopperTrapDoorBlock.java"
+public class net.minecraft.world.level.block.WeatheringCopperTrapDoorBlock extends net.minecraft.world.level.block.TrapDoorBlock implements net.minecraft.world.level.block.WeatheringCopper {
+  public static final com.mojang.serialization.MapCodec<net.minecraft.world.level.block.WeatheringCopperTrapDoorBlock> CODEC;
+  private final net.minecraft.world.level.block.WeatheringCopper$WeatherState weatherState;
+  public com.mojang.serialization.MapCodec<net.minecraft.world.level.block.WeatheringCopperTrapDoorBlock> codec();
+  protected net.minecraft.world.level.block.WeatheringCopperTrapDoorBlock(net.minecraft.world.level.block.state.properties.BlockSetType, net.minecraft.world.level.block.WeatheringCopper$WeatherState, net.minecraft.world.level.block.state.BlockBehaviour$Properties);
+  protected void randomTick(net.minecraft.world.level.block.state.BlockState, net.minecraft.server.level.ServerLevel, net.minecraft.core.BlockPos, net.minecraft.util.RandomSource);
+  protected boolean isRandomlyTicking(net.minecraft.world.level.block.state.BlockState);
+  public net.minecraft.world.level.block.WeatheringCopper$WeatherState getAge();
+  public java.lang.Enum getAge();
+  private static com.mojang.datafixers.kinds.App lambda$static$0(com.mojang.serialization.codecs.RecordCodecBuilder$Instance);
+  static {};
+}
+=== net.minecraft.world.level.block.WeatheringCopperCollection
+Compiled from "WeatheringCopperCollection.java"
+public final class net.minecraft.world.level.block.WeatheringCopperCollection<T> extends java.lang.Record {
+  private final net.minecraft.world.level.block.WeatheringCopperCollection$ByState<T> weathering;
+  private final net.minecraft.world.level.block.WeatheringCopperCollection$ByState<T> waxed;
+  public static final net.minecraft.world.level.block.WeatheringCopperCollection$ByState<net.minecraft.world.level.block.WeatheringCopper$WeatherState> STATES;
+  public static final net.minecraft.world.level.block.WeatheringCopperCollection<java.lang.String> PREFIXES;
+  public net.minecraft.world.level.block.WeatheringCopperCollection(net.minecraft.world.level.block.WeatheringCopperCollection$ByState<T>, net.minecraft.world.level.block.WeatheringCopperCollection$ByState<T>);
+  public static net.minecraft.world.level.block.WeatheringCopperCollection<java.lang.String> prefixWithState(net.minecraft.world.level.block.WeatheringCopperCollection<java.lang.String>);
+  public static net.minecraft.world.level.block.WeatheringCopperCollection<java.lang.String> create(java.lang.String);
+  public static net.minecraft.world.level.block.WeatheringCopperCollection<java.lang.String> same(net.minecraft.world.level.block.WeatheringCopperCollection$ByState<java.lang.String>);
+  public static <WaxedBlock extends net.minecraft.world.level.block.Block, WeatheringBlock extends net.minecraft.world.level.block.Block & net.minecraft.world.level.block.WeatheringCopper, Id> net.minecraft.world.level.block.WeatheringCopperCollection<net.minecraft.world.level.block.Block> registerBlocks(net.minecraft.world.level.block.WeatheringCopperCollection<Id>, org.apache.commons.lang3.function.TriFunction<Id, java.util.function.Function<net.minecraft.world.level.block.state.BlockBehaviour$Properties, net.minecraft.world.level.block.Block>, net.minecraft.world.level.block.state.BlockBehaviour$Properties, net.minecraft.world.level.block.Block>, java.util.function.BiFunction<net.minecraft.world.level.block.WeatheringCopper$WeatherState, net.minecraft.world.level.block.state.BlockBehaviour$Properties, WaxedBlock>, java.util.function.BiFunction<net.minecraft.world.level.block.WeatheringCopper$WeatherState, net.minecraft.world.level.block.state.BlockBehaviour$Properties, WeatheringBlock>, java.util.function.Function<net.minecraft.world.level.block.WeatheringCopper$WeatherState, net.minecraft.world.level.block.state.BlockBehaviour$Properties>);
+  public static <Id> net.minecraft.world.level.block.WeatheringCopperCollection<net.minecraft.world.item.Item> registerItems(net.minecraft.world.level.block.WeatheringCopperCollection<Id>, net.minecraft.world.level.block.WeatheringCopperCollection<net.minecraft.world.level.block.Block>, java.util.function.BiFunction<Id, net.minecraft.world.level.block.Block, net.minecraft.world.item.Item>);
+  public static net.minecraft.world.level.block.WeatheringCopperCollection<net.minecraft.data.BlockFamily> createFamily(java.util.function.BiFunction<java.lang.String, net.minecraft.world.level.block.WeatheringCopper$WeatherState, net.minecraft.data.BlockFamily>, java.util.function.BiFunction<java.lang.String, net.minecraft.world.level.block.WeatheringCopper$WeatherState, net.minecraft.data.BlockFamily>);
+  public java.util.List<T> asList();
+  public void forEach(java.util.function.Consumer<T>);
+  public <U> net.minecraft.world.level.block.WeatheringCopperCollection<U> map(java.util.function.Function<T, U>);
+  public <U> net.minecraft.world.level.block.WeatheringCopperCollection<U> apply(java.util.function.Function<net.minecraft.world.level.block.WeatheringCopperCollection$ByState<T>, net.minecraft.world.level.block.WeatheringCopperCollection$ByState<U>>);
+  public <U> net.minecraft.world.level.block.WeatheringCopperCollection<U> apply(java.util.function.Function<net.minecraft.world.level.block.WeatheringCopperCollection$ByState<T>, net.minecraft.world.level.block.WeatheringCopperCollection$ByState<U>>, java.util.function.Function<net.minecraft.world.level.block.WeatheringCopperCollection$ByState<T>, net.minecraft.world.level.block.WeatheringCopperCollection$ByState<U>>);
+  public static <T, U> void zipApply(net.minecraft.world.level.block.WeatheringCopperCollection<T>, net.minecraft.world.level.block.WeatheringCopperCollection<U>, java.util.function.BiConsumer<T, U>);
+  public static <T, U, R> net.minecraft.world.level.block.WeatheringCopperCollection<R> zipMap(net.minecraft.world.level.block.WeatheringCopperCollection<T>, net.minecraft.world.level.block.WeatheringCopperCollection<U>, java.util.function.BiFunction<T, U, R>);
+  public void zipUnwaxedWaxed(java.util.function.BiConsumer<T, T>);
+  public static <T, U> void zipApply(net.minecraft.world.level.block.WeatheringCopperCollection$ByState<T>, net.minecraft.world.level.block.WeatheringCopperCollection$ByState<U>, java.util.function.BiConsumer<T, U>);
+  public static <T, U, R> net.minecraft.world.level.block.WeatheringCopperCollection$ByState<R> zipMap(net.minecraft.world.level.block.WeatheringCopperCollection$ByState<T>, net.minecraft.world.level.block.WeatheringCopperCollection$ByState<U>, java.util.function.BiFunction<T, U, R>);
+  public final java.lang.String toString();
+  public final int hashCode();
+  public final boolean equals(java.lang.Object);
+  public net.minecraft.world.level.block.WeatheringCopperCollection$ByState<T> weathering();
+  public net.minecraft.world.level.block.WeatheringCopperCollection$ByState<T> waxed();
+  private static net.minecraft.world.level.block.WeatheringCopperCollection$ByState lambda$createFamily$1(java.util.function.BiFunction, net.minecraft.world.level.block.WeatheringCopperCollection$ByState);
+  private static net.minecraft.world.level.block.WeatheringCopperCollection$ByState lambda$createFamily$0(java.util.function.BiFunction, net.minecraft.world.level.block.WeatheringCopperCollection$ByState);
+  private static net.minecraft.world.level.block.WeatheringCopperCollection$ByState lambda$registerBlocks$3(org.apache.commons.lang3.function.TriFunction, java.util.function.BiFunction, java.util.function.Function, net.minecraft.world.level.block.WeatheringCopperCollection$ByState);
+  private static net.minecraft.world.level.block.Block lambda$registerBlocks$4(org.apache.commons.lang3.function.TriFunction, java.util.function.BiFunction, java.util.function.Function, net.minecraft.world.level.block.WeatheringCopper$WeatherState, java.lang.Object);
+  private static net.minecraft.world.level.block.Block lambda$registerBlocks$5(java.util.function.BiFunction, net.minecraft.world.level.block.WeatheringCopper$WeatherState, net.minecraft.world.level.block.state.BlockBehaviour$Properties);
+  private static net.minecraft.world.level.block.WeatheringCopperCollection$ByState lambda$registerBlocks$0(org.apache.commons.lang3.function.TriFunction, java.util.function.BiFunction, java.util.function.Function, net.minecraft.world.level.block.WeatheringCopperCollection$ByState);
+  private static net.minecraft.world.level.block.Block lambda$registerBlocks$1(org.apache.commons.lang3.function.TriFunction, java.util.function.BiFunction, java.util.function.Function, net.minecraft.world.level.block.WeatheringCopper$WeatherState, java.lang.Object);
+  private static net.minecraft.world.level.block.Block lambda$registerBlocks$2(java.util.function.BiFunction, net.minecraft.world.level.block.WeatheringCopper$WeatherState, net.minecraft.world.level.block.state.BlockBehaviour$Properties);
+  private static java.lang.String lambda$prefixWithState$0(java.lang.String, java.lang.String);
+  static {};
+}
+=== net.minecraft.world.level.block.WeatheringCopperChainBlock
+Compiled from "WeatheringCopperChainBlock.java"
+public class net.minecraft.world.level.block.WeatheringCopperChainBlock extends net.minecraft.world.level.block.ChainBlock implements net.minecraft.world.level.block.WeatheringCopper {
+  public static final com.mojang.serialization.MapCodec<net.minecraft.world.level.block.WeatheringCopperChainBlock> CODEC;
+  private final net.minecraft.world.level.block.WeatheringCopper$WeatherState weatherState;
+  public com.mojang.serialization.MapCodec<net.minecraft.world.level.block.WeatheringCopperChainBlock> codec();
+  protected net.minecraft.world.level.block.WeatheringCopperChainBlock(net.minecraft.world.level.block.WeatheringCopper$WeatherState, net.minecraft.world.level.block.state.BlockBehaviour$Properties);
+  protected void randomTick(net.minecraft.world.level.block.state.BlockState, net.minecraft.server.level.ServerLevel, net.minecraft.core.BlockPos, net.minecraft.util.RandomSource);
+  protected boolean isRandomlyTicking(net.minecraft.world.level.block.state.BlockState);
+  public net.minecraft.world.level.block.WeatheringCopper$WeatherState getAge();
+  public java.lang.Enum getAge();
+  private static com.mojang.datafixers.kinds.App lambda$static$0(com.mojang.serialization.codecs.RecordCodecBuilder$Instance);
+  static {};
+}
+=== net.minecraft.world.level.block.entity.CopperGolemStatueBlockEntity
+Compiled from "CopperGolemStatueBlockEntity.java"
+public class net.minecraft.world.level.block.entity.CopperGolemStatueBlockEntity extends net.minecraft.world.level.block.entity.BlockEntity {
+  public net.minecraft.world.level.block.entity.CopperGolemStatueBlockEntity(net.minecraft.core.BlockPos, net.minecraft.world.level.block.state.BlockState);
+  public void createStatue(net.minecraft.world.entity.animal.golem.CopperGolem);
+  public net.minecraft.world.entity.animal.golem.CopperGolem removeStatue(net.minecraft.world.level.block.state.BlockState);
+  private net.minecraft.world.entity.animal.golem.CopperGolem initCopperGolem(net.minecraft.world.level.block.state.BlockState, net.minecraft.world.entity.animal.golem.CopperGolem);
+  public net.minecraft.network.protocol.game.ClientboundBlockEntityDataPacket getUpdatePacket();
+  public net.minecraft.world.item.ItemStack getItem(net.minecraft.world.item.ItemStack, net.minecraft.world.level.block.CopperGolemStatueBlock$Pose);
+  public net.minecraft.network.protocol.Packet getUpdatePacket();
+}
+=== net.minecraft.world.entity.ai.behavior.TransportItemsBetweenContainers
+Compiled from "TransportItemsBetweenContainers.java"
+public class net.minecraft.world.entity.ai.behavior.TransportItemsBetweenContainers extends net.minecraft.world.entity.ai.behavior.Behavior<net.minecraft.world.entity.PathfinderMob> {
+  public static final int TARGET_INTERACTION_TIME;
+  private static final int VISITED_POSITIONS_MEMORY_TIME;
+  private static final int TRANSPORTED_ITEM_MAX_STACK_SIZE;
+  private static final int MAX_VISITED_POSITIONS;
+  private static final int MAX_UNREACHABLE_POSITIONS;
+  private static final int PASSENGER_MOB_TARGET_SEARCH_DISTANCE;
+  private static final int IDLE_COOLDOWN;
+  private static final double CLOSE_ENOUGH_TO_START_QUEUING_DISTANCE;
+  private static final double CLOSE_ENOUGH_TO_START_INTERACTING_WITH_TARGET_DISTANCE;
+  private static final double CLOSE_ENOUGH_TO_START_INTERACTING_WITH_TARGET_PATH_END_DISTANCE;
+  private static final double CLOSE_ENOUGH_TO_CONTINUE_INTERACTING_WITH_TARGET;
+  private final float speedModifier;
+  private final int horizontalSearchDistance;
+  private final int verticalSearchDistance;
+  private final java.util.function.Predicate<net.minecraft.world.level.block.state.BlockState> sourceBlockType;
+  private final java.util.function.Predicate<net.minecraft.world.level.block.state.BlockState> destinationBlockType;
+  private final java.util.function.Predicate<net.minecraft.world.entity.ai.behavior.TransportItemsBetweenContainers$TransportItemTarget> shouldQueueForTarget;
+  private final java.util.function.Consumer<net.minecraft.world.entity.PathfinderMob> onStartTravelling;
+  private final java.util.Map<net.minecraft.world.entity.ai.behavior.TransportItemsBetweenContainers$ContainerInteractionState, net.minecraft.world.entity.ai.behavior.TransportItemsBetweenContainers$OnTargetReachedInteraction> onTargetInteractionActions;
+  private net.minecraft.world.entity.ai.behavior.TransportItemsBetweenContainers$TransportItemTarget target;
+  private net.minecraft.world.entity.ai.behavior.TransportItemsBetweenContainers$TransportItemState state;
+  private net.minecraft.world.entity.ai.behavior.TransportItemsBetweenContainers$ContainerInteractionState interactionState;
+  private int ticksSinceReachingTarget;
+  public net.minecraft.world.entity.ai.behavior.TransportItemsBetweenContainers(float, java.util.function.Predicate<net.minecraft.world.level.block.state.BlockState>, java.util.function.Predicate<net.minecraft.world.level.block.state.BlockState>, int, int, java.util.Map<net.minecraft.world.entity.ai.behavior.TransportItemsBetweenContainers$ContainerInteractionState, net.minecraft.world.entity.ai.behavior.TransportItemsBetweenContainers$OnTargetReachedInteraction>, java.util.function.Consumer<net.minecraft.world.entity.PathfinderMob>, java.util.function.Predicate<net.minecraft.world.entity.ai.behavior.TransportItemsBetweenContainers$TransportItemTarget>);
+  protected void start(net.minecraft.server.level.ServerLevel, net.minecraft.world.entity.PathfinderMob, long);
+  protected boolean checkExtraStartConditions(net.minecraft.server.level.ServerLevel, net.minecraft.world.entity.PathfinderMob);
+  protected boolean canStillUse(net.minecraft.server.level.ServerLevel, net.minecraft.world.entity.PathfinderMob, long);
+  protected boolean timedOut(long);
+  protected void tick(net.minecraft.server.level.ServerLevel, net.minecraft.world.entity.PathfinderMob, long);
+  private boolean updateInvalidTarget(net.minecraft.server.level.ServerLevel, net.minecraft.world.entity.PathfinderMob);
+  private void onQueuingForTarget(net.minecraft.world.entity.ai.behavior.TransportItemsBetweenContainers$TransportItemTarget, net.minecraft.world.level.Level, net.minecraft.world.entity.PathfinderMob);
+  protected void onTravelToTarget(net.minecraft.world.entity.ai.behavior.TransportItemsBetweenContainers$TransportItemTarget, net.minecraft.world.level.Level, net.minecraft.world.entity.PathfinderMob);
+  private net.minecraft.world.phys.Vec3 getCenterPos(net.minecraft.world.entity.PathfinderMob);
+  protected void onReachedTarget(net.minecraft.world.entity.ai.behavior.TransportItemsBetweenContainers$TransportItemTarget, net.minecraft.world.level.Level, net.minecraft.world.entity.PathfinderMob);
+  private void startQueuing(net.minecraft.world.entity.PathfinderMob);
+  private void resumeTravelling(net.minecraft.world.entity.PathfinderMob);
+  private void walkTowardsTarget(net.minecraft.world.entity.PathfinderMob);
+  private void startOnReachedTargetInteraction(net.minecraft.world.entity.ai.behavior.TransportItemsBetweenContainers$TransportItemTarget, net.minecraft.world.entity.PathfinderMob);
+  private void onStartTravelling(net.minecraft.world.entity.PathfinderMob);
+  private java.util.function.BiConsumer<net.minecraft.world.entity.PathfinderMob, net.minecraft.world.Container> onReachedInteraction(net.minecraft.world.entity.ai.behavior.TransportItemsBetweenContainers$ContainerInteractionState);
+  private void setTransportingState(net.minecraft.world.entity.ai.behavior.TransportItemsBetweenContainers$TransportItemState);
+  private void setInteractionState(net.minecraft.world.entity.ai.behavior.TransportItemsBetweenContainers$ContainerInteractionState);
+  private void onTargetInteraction(net.minecraft.world.entity.ai.behavior.TransportItemsBetweenContainers$TransportItemTarget, net.minecraft.world.entity.PathfinderMob);
+  private void doReachedTargetInteraction(net.minecraft.world.entity.PathfinderMob, net.minecraft.world.Container, java.util.function.BiConsumer<net.minecraft.world.entity.PathfinderMob, net.minecraft.world.Container>, java.util.function.BiConsumer<net.minecraft.world.entity.PathfinderMob, net.minecraft.world.Container>, java.util.function.BiConsumer<net.minecraft.world.entity.PathfinderMob, net.minecraft.world.Container>, java.util.function.BiConsumer<net.minecraft.world.entity.PathfinderMob, net.minecraft.world.Container>);
+  private java.util.Optional<net.minecraft.world.entity.ai.behavior.TransportItemsBetweenContainers$TransportItemTarget> getTransportTarget(net.minecraft.server.level.ServerLevel, net.minecraft.world.entity.PathfinderMob);
+  private net.minecraft.world.entity.ai.behavior.TransportItemsBetweenContainers$TransportItemTarget isTargetValidToPick(net.minecraft.world.entity.PathfinderMob, net.minecraft.world.level.Level, net.minecraft.world.level.block.entity.BlockEntity, java.util.Set<net.minecraft.core.GlobalPos>, java.util.Set<net.minecraft.core.GlobalPos>, net.minecraft.world.phys.AABB);
+  private boolean isContainerLocked(net.minecraft.world.entity.ai.behavior.TransportItemsBetweenContainers$TransportItemTarget);
+  private boolean hasValidTarget(net.minecraft.world.level.Level, net.minecraft.world.entity.PathfinderMob);
+  private boolean hasValidTravellingPath(net.minecraft.world.level.Level, net.minecraft.world.entity.ai.behavior.TransportItemsBetweenContainers$TransportItemTarget, net.minecraft.world.entity.PathfinderMob);
+  private net.minecraft.world.phys.Vec3 getPositionToReachTargetFrom(net.minecraft.world.level.pathfinder.Path, net.minecraft.world.entity.PathfinderMob);
+  private net.minecraft.world.phys.Vec3 setMiddleYPosition(net.minecraft.world.entity.PathfinderMob, net.minecraft.world.phys.Vec3);
+  private boolean isTargetBlocked(net.minecraft.world.level.Level, net.minecraft.world.entity.ai.behavior.TransportItemsBetweenContainers$TransportItemTarget);
+  private boolean targetHasNotChanged(net.minecraft.world.level.Level, net.minecraft.world.entity.ai.behavior.TransportItemsBetweenContainers$TransportItemTarget);
+  private java.util.stream.Stream<net.minecraft.world.entity.ai.behavior.TransportItemsBetweenContainers$TransportItemTarget> getConnectedTargets(net.minecraft.world.entity.ai.behavior.TransportItemsBetweenContainers$TransportItemTarget, net.minecraft.world.level.Level);
+  private net.minecraft.world.phys.AABB getTargetSearchArea(net.minecraft.world.entity.PathfinderMob);
+  private int getHorizontalSearchDistance(net.minecraft.world.entity.PathfinderMob);
+  private int getVerticalSearchDistance(net.minecraft.world.entity.PathfinderMob);
+  private static java.util.Set<net.minecraft.core.GlobalPos> getVisitedPositions(net.minecraft.world.entity.PathfinderMob);
+  private static java.util.Set<net.minecraft.core.GlobalPos> getUnreachablePositions(net.minecraft.world.entity.PathfinderMob);
+  private boolean isPositionAlreadyVisited(java.util.Set<net.minecraft.core.GlobalPos>, java.util.Set<net.minecraft.core.GlobalPos>, net.minecraft.world.entity.ai.behavior.TransportItemsBetweenContainers$TransportItemTarget, net.minecraft.world.level.Level);
+  private static boolean hasFinishedPath(net.minecraft.world.entity.PathfinderMob);
+  protected void setVisitedBlockPos(net.minecraft.world.entity.PathfinderMob, net.minecraft.world.level.Level, net.minecraft.core.BlockPos);
+  protected void markVisitedBlockPosAsUnreachable(net.minecraft.world.entity.PathfinderMob, net.minecraft.world.level.Level, net.minecraft.core.BlockPos);
+  private boolean isWantedBlock(net.minecraft.world.entity.PathfinderMob, net.minecraft.world.level.block.state.BlockState);
+  private static double getInteractionRange(net.minecraft.world.entity.PathfinderMob);
+  private boolean isWithinTargetDistance(double, net.minecraft.world.entity.ai.behavior.TransportItemsBetweenContainers$TransportItemTarget, net.minecraft.world.level.Level, net.minecraft.world.entity.PathfinderMob, net.minecraft.world.phys.Vec3);
+  private boolean targetIsReachableFromPosition(net.minecraft.world.level.Level, boolean, net.minecraft.world.phys.Vec3, net.minecraft.world.entity.ai.behavior.TransportItemsBetweenContainers$TransportItemTarget, net.minecraft.world.entity.PathfinderMob);
+  private boolean canSeeAnyTargetSide(net.minecraft.world.entity.ai.behavior.TransportItemsBetweenContainers$TransportItemTarget, net.minecraft.world.level.Level, net.minecraft.world.entity.PathfinderMob, net.minecraft.world.phys.Vec3);
+  private boolean isAnotherMobInteractingWithTarget(net.minecraft.world.entity.ai.behavior.TransportItemsBetweenContainers$TransportItemTarget, net.minecraft.world.level.Level);
+  private static boolean isPickingUpItems(net.minecraft.world.entity.PathfinderMob);
+  private static boolean matchesGettingItemsRequirement(net.minecraft.world.Container);
+  private static boolean matchesLeavingItemsRequirement(net.minecraft.world.entity.PathfinderMob, net.minecraft.world.Container);
+  private static boolean hasItemMatchingHandItem(net.minecraft.world.entity.PathfinderMob, net.minecraft.world.Container);
+  private void pickUpItems(net.minecraft.world.entity.PathfinderMob, net.minecraft.world.Container);
+  private void putDownItem(net.minecraft.world.entity.PathfinderMob, net.minecraft.world.Container);
+  private static net.minecraft.world.item.ItemStack pickupItemFromContainer(net.minecraft.world.Container);
+  private static net.minecraft.world.item.ItemStack addItemsToContainer(net.minecraft.world.entity.PathfinderMob, net.minecraft.world.Container);
+  protected void stopTargetingCurrentTarget(net.minecraft.world.entity.PathfinderMob);
+  protected void clearMemoriesAfterMatchingTargetFound(net.minecraft.world.entity.PathfinderMob);
+  private void enterCooldownAfterNoMatchingTargetFound(net.minecraft.world.entity.PathfinderMob);
+  protected void stop(net.minecraft.server.level.ServerLevel, net.minecraft.world.entity.PathfinderMob, long);
+  private void stopInPlace(net.minecraft.world.entity.PathfinderMob);
+  protected boolean checkExtraStartConditions(net.minecraft.server.level.ServerLevel, net.minecraft.world.entity.LivingEntity);
+  protected boolean canStillUse(net.minecraft.server.level.ServerLevel, net.minecraft.world.entity.LivingEntity, long);
+  protected void stop(net.minecraft.server.level.ServerLevel, net.minecraft.world.entity.LivingEntity, long);
+  protected void tick(net.minecraft.server.level.ServerLevel, net.minecraft.world.entity.LivingEntity, long);
+  protected void start(net.minecraft.server.level.ServerLevel, net.minecraft.world.entity.LivingEntity, long);
+  private static boolean lambda$canSeeAnyTargetSide$2(net.minecraft.world.entity.ai.behavior.TransportItemsBetweenContainers$TransportItemTarget, net.minecraft.world.phys.BlockHitResult);
+  private static net.minecraft.world.phys.BlockHitResult lambda$canSeeAnyTargetSide$1(net.minecraft.world.level.Level, net.minecraft.world.phys.Vec3, net.minecraft.world.entity.PathfinderMob, net.minecraft.world.phys.Vec3);
+  private static net.minecraft.world.phys.Vec3 lambda$canSeeAnyTargetSide$0(net.minecraft.world.phys.Vec3, net.minecraft.core.Direction);
+  private static boolean lambda$isPositionAlreadyVisited$1(java.util.Set, java.util.Set, net.minecraft.core.GlobalPos);
+  private static net.minecraft.core.GlobalPos lambda$isPositionAlreadyVisited$0(net.minecraft.world.level.Level, net.minecraft.world.entity.ai.behavior.TransportItemsBetweenContainers$TransportItemTarget);
+  private void lambda$onTargetInteraction$0(net.minecraft.world.entity.PathfinderMob, net.minecraft.world.entity.ai.behavior.TransportItemsBetweenContainers$TransportItemTarget, net.minecraft.world.entity.ai.behavior.TransportItemsBetweenContainers$OnTargetReachedInteraction);
+  private void lambda$onReachedInteraction$0(net.minecraft.world.entity.ai.behavior.TransportItemsBetweenContainers$ContainerInteractionState, net.minecraft.world.entity.PathfinderMob, net.minecraft.world.Container);
+  private void lambda$onReachedTarget$1(net.minecraft.world.entity.PathfinderMob, net.minecraft.world.entity.PathfinderMob, net.minecraft.world.Container);
+  private void lambda$onReachedTarget$0(net.minecraft.world.entity.PathfinderMob, net.minecraft.world.entity.PathfinderMob, net.minecraft.world.Container);
+}
+=== net.minecraft.world.entity.ai.memory.MemoryModuleType
+Compiled from "MemoryModuleType.java"
+public class net.minecraft.world.entity.ai.memory.MemoryModuleType<U> {
+  public static final net.minecraft.world.entity.ai.memory.MemoryModuleType<java.lang.Void> DUMMY;
+  public static final net.minecraft.world.entity.ai.memory.MemoryModuleType<net.minecraft.core.GlobalPos> HOME;
+  public static final net.minecraft.world.entity.ai.memory.MemoryModuleType<net.minecraft.core.GlobalPos> JOB_SITE;
+  public static final net.minecraft.world.entity.ai.memory.MemoryModuleType<net.minecraft.core.GlobalPos> POTENTIAL_JOB_SITE;
+  public static final net.minecraft.world.entity.ai.memory.MemoryModuleType<net.minecraft.core.GlobalPos> MEETING_POINT;
+  public static final net.minecraft.world.entity.ai.memory.MemoryModuleType<java.util.List<net.minecraft.core.GlobalPos>> SECONDARY_JOB_SITE;
+  public static final net.minecraft.world.entity.ai.memory.MemoryModuleType<java.util.List<net.minecraft.world.entity.LivingEntity>> NEAREST_LIVING_ENTITIES;
+  public static final net.minecraft.world.entity.ai.memory.MemoryModuleType<net.minecraft.world.entity.ai.memory.NearestVisibleLivingEntities> NEAREST_VISIBLE_LIVING_ENTITIES;
+  public static final net.minecraft.world.entity.ai.memory.MemoryModuleType<java.util.List<net.minecraft.world.entity.LivingEntity>> VISIBLE_VILLAGER_BABIES;
+  public static final net.minecraft.world.entity.ai.memory.MemoryModuleType<java.util.List<net.minecraft.world.entity.player.Player>> NEAREST_PLAYERS;
+  public static final net.minecraft.world.entity.ai.memory.MemoryModuleType<net.minecraft.world.entity.player.Player> NEAREST_VISIBLE_PLAYER;
+  public static final net.minecraft.world.entity.ai.memory.MemoryModuleType<net.minecraft.world.entity.player.Player> NEAREST_VISIBLE_ATTACKABLE_PLAYER;
+  public static final net.minecraft.world.entity.ai.memory.MemoryModuleType<java.util.List<net.minecraft.world.entity.player.Player>> NEAREST_VISIBLE_ATTACKABLE_PLAYERS;
+  public static final net.minecraft.world.entity.ai.memory.MemoryModuleType<net.minecraft.world.entity.ai.memory.WalkTarget> WALK_TARGET;
+  public static final net.minecraft.world.entity.ai.memory.MemoryModuleType<net.minecraft.world.entity.ai.behavior.PositionTracker> LOOK_TARGET;
+  public static final net.minecraft.world.entity.ai.memory.MemoryModuleType<net.minecraft.world.entity.LivingEntity> ATTACK_TARGET;
+  public static final net.minecraft.world.entity.ai.memory.MemoryModuleType<java.lang.Boolean> ATTACK_COOLING_DOWN;
+  public static final net.minecraft.world.entity.ai.memory.MemoryModuleType<net.minecraft.world.entity.LivingEntity> INTERACTION_TARGET;
+  public static final net.minecraft.world.entity.ai.memory.MemoryModuleType<net.minecraft.world.entity.AgeableMob> BREED_TARGET;
+  public static final net.minecraft.world.entity.ai.memory.MemoryModuleType<net.minecraft.world.entity.Entity> RIDE_TARGET;
+  public static final net.minecraft.world.entity.ai.memory.MemoryModuleType<net.minecraft.world.level.pathfinder.Path> PATH;
+  public static final net.minecraft.world.entity.ai.memory.MemoryModuleType<java.util.Set<net.minecraft.core.GlobalPos>> DOORS_TO_CLOSE;
+  public static final net.minecraft.world.entity.ai.memory.MemoryModuleType<net.minecraft.core.BlockPos> NEAREST_BED;
+  public static final net.minecraft.world.entity.ai.memory.MemoryModuleType<net.minecraft.world.damagesource.DamageSource> HURT_BY;
+  public static final net.minecraft.world.entity.ai.memory.MemoryModuleType<net.minecraft.world.entity.LivingEntity> HURT_BY_ENTITY;
+  public static final net.minecraft.world.entity.ai.memory.MemoryModuleType<net.minecraft.world.entity.LivingEntity> AVOID_TARGET;
+  public static final net.minecraft.world.entity.ai.memory.MemoryModuleType<net.minecraft.world.entity.LivingEntity> NEAREST_HOSTILE;
+  public static final net.minecraft.world.entity.ai.memory.MemoryModuleType<net.minecraft.world.entity.LivingEntity> NEAREST_ATTACKABLE;
+  public static final net.minecraft.world.entity.ai.memory.MemoryModuleType<net.minecraft.core.GlobalPos> HIDING_PLACE;
+  public static final net.minecraft.world.entity.ai.memory.MemoryModuleType<java.lang.Long> HEARD_BELL_TIME;
+  public static final net.minecraft.world.entity.ai.memory.MemoryModuleType<java.lang.Long> CANT_REACH_WALK_TARGET_SINCE;
+  public static final net.minecraft.world.entity.ai.memory.MemoryModuleType<java.lang.Boolean> GOLEM_DETECTED_RECENTLY;
+  public static final net.minecraft.world.entity.ai.memory.MemoryModuleType<java.lang.Boolean> DANGER_DETECTED_RECENTLY;
+  public static final net.minecraft.world.entity.ai.memory.MemoryModuleType<java.lang.Long> LAST_SLEPT;
+  public static final net.minecraft.world.entity.ai.memory.MemoryModuleType<java.lang.Long> LAST_WOKEN;
+  public static final net.minecraft.world.entity.ai.memory.MemoryModuleType<java.lang.Long> LAST_WORKED_AT_POI;
+  public static final net.minecraft.world.entity.ai.memory.MemoryModuleType<net.minecraft.world.entity.LivingEntity> NEAREST_VISIBLE_ADULT;
+  public static final net.minecraft.world.entity.ai.memory.MemoryModuleType<net.minecraft.world.entity.item.ItemEntity> NEAREST_VISIBLE_WANTED_ITEM;
+  public static final net.minecraft.world.entity.ai.memory.MemoryModuleType<net.minecraft.world.entity.Mob> NEAREST_VISIBLE_NEMESIS;
+  public static final net.minecraft.world.entity.ai.memory.MemoryModuleType<java.lang.Integer> PLAY_DEAD_TICKS;
+  public static final net.minecraft.world.entity.ai.memory.MemoryModuleType<net.minecraft.world.entity.player.Player> TEMPTING_PLAYER;
+  public static final net.minecraft.world.entity.ai.memory.MemoryModuleType<java.lang.Integer> TEMPTATION_COOLDOWN_TICKS;
+  public static final net.minecraft.world.entity.ai.memory.MemoryModuleType<java.lang.Integer> GAZE_COOLDOWN_TICKS;
+  public static final net.minecraft.world.entity.ai.memory.MemoryModuleType<java.lang.Boolean> IS_TEMPTED;
+  public static final net.minecraft.world.entity.ai.memory.MemoryModuleType<java.lang.Integer> LONG_JUMP_COOLDOWN_TICKS;
+  public static final net.minecraft.world.entity.ai.memory.MemoryModuleType<java.lang.Boolean> LONG_JUMP_MID_JUMP;
+  public static final net.minecraft.world.entity.ai.memory.MemoryModuleType<java.lang.Boolean> HAS_HUNTING_COOLDOWN;
+  public static final net.minecraft.world.entity.ai.memory.MemoryModuleType<java.lang.Integer> RAM_COOLDOWN_TICKS;
+  public static final net.minecraft.world.entity.ai.memory.MemoryModuleType<net.minecraft.world.phys.Vec3> RAM_TARGET;
+  public static final net.minecraft.world.entity.ai.memory.MemoryModuleType<net.minecraft.util.Unit> IS_IN_WATER;
+  public static final net.minecraft.world.entity.ai.memory.MemoryModuleType<net.minecraft.util.Unit> IS_PREGNANT;
+  public static final net.minecraft.world.entity.ai.memory.MemoryModuleType<java.lang.Boolean> IS_PANICKING;
+  public static final net.minecraft.world.entity.ai.memory.MemoryModuleType<java.util.List<java.util.UUID>> UNREACHABLE_TONGUE_TARGETS;
+  public static final net.minecraft.world.entity.ai.memory.MemoryModuleType<java.util.Set<net.minecraft.core.GlobalPos>> VISITED_BLOCK_POSITIONS;
+  public static final net.minecraft.world.entity.ai.memory.MemoryModuleType<java.util.Set<net.minecraft.core.GlobalPos>> UNREACHABLE_TRANSPORT_BLOCK_POSITIONS;
+  public static final net.minecraft.world.entity.ai.memory.MemoryModuleType<java.lang.Integer> TRANSPORT_ITEMS_COOLDOWN_TICKS;
+  public static final net.minecraft.world.entity.ai.memory.MemoryModuleType<java.lang.Integer> CHARGE_COOLDOWN_TICKS;
+  public static final net.minecraft.world.entity.ai.memory.MemoryModuleType<java.lang.Integer> ATTACK_TARGET_COOLDOWN;
+  public static final net.minecraft.world.entity.ai.memory.MemoryModuleType<java.lang.Integer> SPEAR_FLEEING_TIME;
+  public static final net.minecraft.world.entity.ai.memory.MemoryModuleType<net.minecraft.world.phys.Vec3> SPEAR_FLEEING_POSITION;
+  public static final net.minecraft.world.entity.ai.memory.MemoryModuleType<net.minecraft.world.phys.Vec3> SPEAR_CHARGE_POSITION;
+  public static final net.minecraft.world.entity.ai.memory.MemoryModuleType<java.lang.Integer> SPEAR_ENGAGE_TIME;
+  public static final net.minecraft.world.entity.ai.memory.MemoryModuleType<net.minecraft.world.entity.ai.behavior.SpearAttack$SpearStatus> SPEAR_STATUS;
+  public static final net.minecraft.world.entity.ai.memory.MemoryModuleType<java.util.UUID> ANGRY_AT;
+  public static final net.minecraft.world.entity.ai.memory.MemoryModuleType<java.lang.Boolean> UNIVERSAL_ANGER;
+  public static final net.minecraft.world.entity.ai.memory.MemoryModuleType<java.lang.Boolean> ADMIRING_ITEM;
+  public static final net.minecraft.world.entity.ai.memory.MemoryModuleType<java.lang.Integer> TIME_TRYING_TO_REACH_ADMIRE_ITEM;
+  public static final net.minecraft.world.entity.ai.memory.MemoryModuleType<java.lang.Boolean> DISABLE_WALK_TO_ADMIRE_ITEM;
+  public static final net.minecraft.world.entity.ai.memory.MemoryModuleType<java.lang.Boolean> ADMIRING_DISABLED;
+  public static final net.minecraft.world.entity.ai.memory.MemoryModuleType<java.lang.Boolean> HUNTED_RECENTLY;
+  public static final net.minecraft.world.entity.ai.memory.MemoryModuleType<net.minecraft.core.BlockPos> CELEBRATE_LOCATION;
+  public static final net.minecraft.world.entity.ai.memory.MemoryModuleType<java.lang.Boolean> DANCING;
+  public static final net.minecraft.world.entity.ai.memory.MemoryModuleType<net.minecraft.world.entity.monster.hoglin.Hoglin> NEAREST_VISIBLE_HUNTABLE_HOGLIN;
+  public static final net.minecraft.world.entity.ai.memory.MemoryModuleType<net.minecraft.world.entity.monster.hoglin.Hoglin> NEAREST_VISIBLE_BABY_HOGLIN;
+  public static final net.minecraft.world.entity.ai.memory.MemoryModuleType<net.minecraft.world.entity.player.Player> NEAREST_TARGETABLE_PLAYER_NOT_WEARING_GOLD;
+  public static final net.minecraft.world.entity.ai.memory.MemoryModuleType<java.util.List<net.minecraft.world.entity.monster.piglin.AbstractPiglin>> NEARBY_ADULT_PIGLINS;
+  public static final net.minecraft.world.entity.ai.memory.MemoryModuleType<java.util.List<net.minecraft.world.entity.monster.piglin.AbstractPiglin>> NEAREST_VISIBLE_ADULT_PIGLINS;
+  public static final net.minecraft.world.entity.ai.memory.MemoryModuleType<java.util.List<net.minecraft.world.entity.monster.hoglin.Hoglin>> NEAREST_VISIBLE_ADULT_HOGLINS;
+  public static final net.minecraft.world.entity.ai.memory.MemoryModuleType<net.minecraft.world.entity.monster.piglin.AbstractPiglin> NEAREST_VISIBLE_ADULT_PIGLIN;
+  public static final net.minecraft.world.entity.ai.memory.MemoryModuleType<net.minecraft.world.entity.LivingEntity> NEAREST_VISIBLE_ZOMBIFIED;
+  public static final net.minecraft.world.entity.ai.memory.MemoryModuleType<java.lang.Integer> VISIBLE_ADULT_PIGLIN_COUNT;
+  public static final net.minecraft.world.entity.ai.memory.MemoryModuleType<java.lang.Integer> VISIBLE_ADULT_HOGLIN_COUNT;
+  public static final net.minecraft.world.entity.ai.memory.MemoryModuleType<net.minecraft.world.entity.player.Player> NEAREST_PLAYER_HOLDING_WANTED_ITEM;
+  public static final net.minecraft.world.entity.ai.memory.MemoryModuleType<java.lang.Boolean> ATE_RECENTLY;
+  public static final net.minecraft.world.entity.ai.memory.MemoryModuleType<net.minecraft.core.BlockPos> NEAREST_REPELLENT;
+  public static final net.minecraft.world.entity.ai.memory.MemoryModuleType<java.lang.Boolean> PACIFIED;
+  public static final net.minecraft.world.entity.ai.memory.MemoryModuleType<net.minecraft.world.entity.LivingEntity> ROAR_TARGET;
+  public static final net.minecraft.world.entity.ai.memory.MemoryModuleType<net.minecraft.core.BlockPos> DISTURBANCE_LOCATION;
+  public static final net.minecraft.world.entity.ai.memory.MemoryModuleType<net.minecraft.util.Unit> RECENT_PROJECTILE;
+  public static final net.minecraft.world.entity.ai.memory.MemoryModuleType<net.minecraft.util.Unit> IS_SNIFFING;
+  public static final net.minecraft.world.entity.ai.memory.MemoryModuleType<net.minecraft.util.Unit> IS_EMERGING;
+  public static final net.minecraft.world.entity.ai.memory.MemoryModuleType<net.minecraft.util.Unit> ROAR_SOUND_DELAY;
+  public static final net.minecraft.world.entity.ai.memory.MemoryModuleType<net.minecraft.util.Unit> DIG_COOLDOWN;
+  public static final net.minecraft.world.entity.ai.memory.MemoryModuleType<net.minecraft.util.Unit> ROAR_SOUND_COOLDOWN;
+  public static final net.minecraft.world.entity.ai.memory.MemoryModuleType<net.minecraft.util.Unit> SNIFF_COOLDOWN;
+  public static final net.minecraft.world.entity.ai.memory.MemoryModuleType<net.minecraft.util.Unit> TOUCH_COOLDOWN;
+  public static final net.minecraft.world.entity.ai.memory.MemoryModuleType<net.minecraft.util.Unit> VIBRATION_COOLDOWN;
+  public static final net.minecraft.world.entity.ai.memory.MemoryModuleType<net.minecraft.util.Unit> SONIC_BOOM_COOLDOWN;
+  public static final net.minecraft.world.entity.ai.memory.MemoryModuleType<net.minecraft.util.Unit> SONIC_BOOM_SOUND_COOLDOWN;
+  public static final net.minecraft.world.entity.ai.memory.MemoryModuleType<net.minecraft.util.Unit> SONIC_BOOM_SOUND_DELAY;
+  public static final net.minecraft.world.entity.ai.memory.MemoryModuleType<java.util.UUID> LIKED_PLAYER;
+  public static final net.minecraft.world.entity.ai.memory.MemoryModuleType<net.minecraft.core.GlobalPos> LIKED_NOTEBLOCK_POSITION;
+  public static final net.minecraft.world.entity.ai.memory.MemoryModuleType<java.lang.Integer> LIKED_NOTEBLOCK_COOLDOWN_TICKS;
+  public static final net.minecraft.world.entity.ai.memory.MemoryModuleType<java.lang.Integer> ITEM_PICKUP_COOLDOWN_TICKS;
+  public static final net.minecraft.world.entity.ai.memory.MemoryModuleType<java.util.List<net.minecraft.core.GlobalPos>> SNIFFER_EXPLORED_POSITIONS;
+  public static final net.minecraft.world.entity.ai.memory.MemoryModuleType<net.minecraft.core.BlockPos> SNIFFER_SNIFFING_TARGET;
+  public static final net.minecraft.world.entity.ai.memory.MemoryModuleType<java.lang.Boolean> SNIFFER_DIGGING;
+  public static final net.minecraft.world.entity.ai.memory.MemoryModuleType<java.lang.Boolean> SNIFFER_HAPPY;
+  public static final net.minecraft.world.entity.ai.memory.MemoryModuleType<net.minecraft.util.Unit> BREEZE_JUMP_COOLDOWN;
+  public static final net.minecraft.world.entity.ai.memory.MemoryModuleType<net.minecraft.util.Unit> BREEZE_SHOOT;
+  public static final net.minecraft.world.entity.ai.memory.MemoryModuleType<net.minecraft.util.Unit> BREEZE_SHOOT_CHARGING;
+  public static final net.minecraft.world.entity.ai.memory.MemoryModuleType<net.minecraft.util.Unit> BREEZE_SHOOT_RECOVERING;
+  public static final net.minecraft.world.entity.ai.memory.MemoryModuleType<net.minecraft.util.Unit> BREEZE_SHOOT_COOLDOWN;
+  public static final net.minecraft.world.entity.ai.memory.MemoryModuleType<net.minecraft.util.Unit> BREEZE_JUMP_INHALING;
+  public static final net.minecraft.world.entity.ai.memory.MemoryModuleType<net.minecraft.core.BlockPos> BREEZE_JUMP_TARGET;
+  public static final net.minecraft.world.entity.ai.memory.MemoryModuleType<net.minecraft.util.Unit> BREEZE_LEAVING_WATER;
+  private final java.util.Optional<com.mojang.serialization.Codec<net.minecraft.world.entity.ai.memory.ExpirableValue<U>>> codec;
+  public net.minecraft.world.entity.ai.memory.MemoryModuleType(java.util.Optional<com.mojang.serialization.Codec<U>>);
+  public java.lang.String toString();
+  public java.util.Optional<com.mojang.serialization.Codec<net.minecraft.world.entity.ai.memory.ExpirableValue<U>>> getCodec();
+  public boolean canSerialize();
+  private static <U> net.minecraft.world.entity.ai.memory.MemoryModuleType<U> register(java.lang.String, com.mojang.serialization.Codec<U>);
+  private static <U> net.minecraft.world.entity.ai.memory.MemoryModuleType<U> register(java.lang.String);
+  static {};
+}
+=== net.minecraft.world.entity.ai.Brain
+Compiled from "Brain.java"
+public class net.minecraft.world.entity.ai.Brain<E extends net.minecraft.world.entity.LivingEntity> {
+  private static final int SCHEDULE_UPDATE_DELAY;
+  private final java.util.Map<net.minecraft.world.entity.ai.memory.MemoryModuleType<?>, net.minecraft.world.entity.ai.memory.MemorySlot<?>> memories;
+  private final java.util.Map<net.minecraft.world.entity.ai.sensing.SensorType<? extends net.minecraft.world.entity.ai.sensing.Sensor<? super E>>, net.minecraft.world.entity.ai.sensing.Sensor<? super E>> sensors;
+  private final java.util.Map<java.lang.Integer, java.util.Map<net.minecraft.world.entity.schedule.Activity, java.util.Set<net.minecraft.world.entity.ai.behavior.BehaviorControl<? super E>>>> availableBehaviorsByPriority;
+  private net.minecraft.world.attribute.EnvironmentAttribute<net.minecraft.world.entity.schedule.Activity> schedule;
+  private final java.util.Map<net.minecraft.world.entity.schedule.Activity, java.util.Set<com.mojang.datafixers.util.Pair<net.minecraft.world.entity.ai.memory.MemoryModuleType<?>, net.minecraft.world.entity.ai.memory.MemoryStatus>>> activityRequirements;
+  private final java.util.Map<net.minecraft.world.entity.schedule.Activity, java.util.Set<net.minecraft.world.entity.ai.memory.MemoryModuleType<?>>> activityMemoriesToEraseWhenStopped;
+  private java.util.Set<net.minecraft.world.entity.schedule.Activity> coreActivities;
+  private final java.util.Set<net.minecraft.world.entity.schedule.Activity> activeActivities;
+  private net.minecraft.world.entity.schedule.Activity defaultActivity;
+  private long lastScheduleUpdate;
+  public static <E extends net.minecraft.world.entity.LivingEntity> net.minecraft.world.entity.ai.Brain$Provider<E> provider(java.util.Collection<? extends net.minecraft.world.entity.ai.sensing.SensorType<? extends net.minecraft.world.entity.ai.sensing.Sensor<? super E>>>);
+  public static <E extends net.minecraft.world.entity.LivingEntity> net.minecraft.world.entity.ai.Brain$Provider<E> provider(java.util.Collection<? extends net.minecraft.world.entity.ai.sensing.SensorType<? extends net.minecraft.world.entity.ai.sensing.Sensor<? super E>>>, net.minecraft.world.entity.ai.Brain$ActivitySupplier<E>);
+  public static <E extends net.minecraft.world.entity.LivingEntity> net.minecraft.world.entity.ai.Brain$Provider<E> provider(java.util.Collection<? extends net.minecraft.world.entity.ai.memory.MemoryModuleType<?>>, java.util.Collection<? extends net.minecraft.world.entity.ai.sensing.SensorType<? extends net.minecraft.world.entity.ai.sensing.Sensor<? super E>>>, net.minecraft.world.entity.ai.Brain$ActivitySupplier<E>);
+  protected net.minecraft.world.entity.ai.Brain(java.util.Collection<? extends net.minecraft.world.entity.ai.memory.MemoryModuleType<?>>, java.util.Collection<? extends net.minecraft.world.entity.ai.sensing.SensorType<? extends net.minecraft.world.entity.ai.sensing.Sensor<? super E>>>, java.util.List<net.minecraft.world.entity.ai.ActivityData<E>>, net.minecraft.world.entity.ai.memory.MemoryMap, net.minecraft.util.RandomSource);
+  private void registerMemory(net.minecraft.world.entity.ai.memory.MemoryModuleType<?>);
+  public net.minecraft.world.entity.ai.Brain();
+  public net.minecraft.world.entity.ai.Brain$Packed pack();
+  private <T> net.minecraft.world.entity.ai.memory.MemorySlot<T> getMemorySlotIfPresent(net.minecraft.world.entity.ai.memory.MemoryModuleType<T>);
+  private <T> net.minecraft.world.entity.ai.memory.MemorySlot<T> getMemorySlot(net.minecraft.world.entity.ai.memory.MemoryModuleType<T>);
+  public boolean hasMemoryValue(net.minecraft.world.entity.ai.memory.MemoryModuleType<?>);
+  public void clearMemories();
+  public <U> void eraseMemory(net.minecraft.world.entity.ai.memory.MemoryModuleType<U>);
+  public <U> void setMemory(net.minecraft.world.entity.ai.memory.MemoryModuleType<U>, U);
+  public <U> void setMemoryWithExpiry(net.minecraft.world.entity.ai.memory.MemoryModuleType<U>, U, long);
+  public <U> void setMemory(net.minecraft.world.entity.ai.memory.MemoryModuleType<U>, java.util.Optional<? extends U>);
+  private <U> void setMemoryInternal(net.minecraft.world.entity.ai.memory.MemoryMap$Value<U>);
+  private <U> void setMemoryInternal(net.minecraft.world.entity.ai.memory.MemoryModuleType<U>, U, long);
+  private <U> void setMemoryInternal(net.minecraft.world.entity.ai.memory.MemoryModuleType<U>, U);
+  public <U> java.util.Optional<U> getMemory(net.minecraft.world.entity.ai.memory.MemoryModuleType<U>);
+  public <U> java.util.Optional<U> getMemoryInternal(net.minecraft.world.entity.ai.memory.MemoryModuleType<U>);
+  public <U> long getTimeUntilExpiry(net.minecraft.world.entity.ai.memory.MemoryModuleType<U>);
+  public void forEach(net.minecraft.world.entity.ai.Brain$Visitor);
+  private static <U> void callVisitor(net.minecraft.world.entity.ai.Brain$Visitor, net.minecraft.world.entity.ai.memory.MemoryModuleType<U>, net.minecraft.world.entity.ai.memory.MemorySlot<?>);
+  public <U> boolean isMemoryValue(net.minecraft.world.entity.ai.memory.MemoryModuleType<U>, U);
+  public boolean checkMemory(net.minecraft.world.entity.ai.memory.MemoryModuleType<?>, net.minecraft.world.entity.ai.memory.MemoryStatus);
+  public void setSchedule(net.minecraft.world.attribute.EnvironmentAttribute<net.minecraft.world.entity.schedule.Activity>);
+  public void setCoreActivities(java.util.Set<net.minecraft.world.entity.schedule.Activity>);
+  public java.util.Set<net.minecraft.world.entity.schedule.Activity> getActiveActivities();
+  public java.util.List<net.minecraft.world.entity.ai.behavior.BehaviorControl<? super E>> getRunningBehaviors();
+  public void useDefaultActivity();
+  public java.util.Optional<net.minecraft.world.entity.schedule.Activity> getActiveNonCoreActivity();
+  public void setActiveActivityIfPossible(net.minecraft.world.entity.schedule.Activity);
+  private void setActiveActivity(net.minecraft.world.entity.schedule.Activity);
+  private void eraseMemoriesForOtherActivitesThan(net.minecraft.world.entity.schedule.Activity);
+  public void updateActivityFromSchedule(net.minecraft.world.attribute.EnvironmentAttributeSystem, long, net.minecraft.world.phys.Vec3);
+  public void setActiveActivityToFirstValid(java.util.List<net.minecraft.world.entity.schedule.Activity>);
+  public void setDefaultActivity(net.minecraft.world.entity.schedule.Activity);
+  public void addActivity(net.minecraft.world.entity.schedule.Activity, com.google.common.collect.ImmutableList<? extends com.mojang.datafixers.util.Pair<java.lang.Integer, ? extends net.minecraft.world.entity.ai.behavior.BehaviorControl<? super E>>>, java.util.Set<com.mojang.datafixers.util.Pair<net.minecraft.world.entity.ai.memory.MemoryModuleType<?>, net.minecraft.world.entity.ai.memory.MemoryStatus>>, java.util.Set<net.minecraft.world.entity.ai.memory.MemoryModuleType<?>>);
+  public void removeAllBehaviors();
+  public boolean isActive(net.minecraft.world.entity.schedule.Activity);
+  public void tick(net.minecraft.server.level.ServerLevel, E);
+  private void tickSensors(net.minecraft.server.level.ServerLevel, E);
+  private void forgetOutdatedMemories();
+  public void stopAll(net.minecraft.server.level.ServerLevel, E);
+  private void startEachNonRunningBehavior(net.minecraft.server.level.ServerLevel, E);
+  private void tickEachRunningBehavior(net.minecraft.server.level.ServerLevel, E);
+  private boolean activityRequirementsAreMet(net.minecraft.world.entity.schedule.Activity);
+  private static boolean isEmptyCollection(java.lang.Object);
+  public boolean isBrainDead();
+  private static java.util.Set lambda$addActivity$1(net.minecraft.world.entity.schedule.Activity);
+  private static java.util.Map lambda$addActivity$0(java.lang.Integer);
+  private static void lambda$forEach$0(net.minecraft.world.entity.ai.Brain$Visitor, net.minecraft.world.entity.ai.memory.MemoryModuleType, net.minecraft.world.entity.ai.memory.MemorySlot);
+  private static java.util.List lambda$provider$0(net.minecraft.world.entity.LivingEntity);
+}
+=== net.minecraft.world.entity.ai.navigation.PathNavigation
+Compiled from "PathNavigation.java"
+public abstract class net.minecraft.world.entity.ai.navigation.PathNavigation {
+  private static final int MAX_TIME_RECOMPUTE;
+  private static final int STUCK_CHECK_INTERVAL;
+  private static final float STUCK_THRESHOLD_DISTANCE_FACTOR;
+  protected final net.minecraft.world.entity.Mob mob;
+  protected final net.minecraft.world.level.Level level;
+  protected net.minecraft.world.level.pathfinder.Path path;
+  protected double speedModifier;
+  protected int tick;
+  protected int lastStuckCheck;
+  protected net.minecraft.world.phys.Vec3 lastStuckCheckPos;
+  protected net.minecraft.core.Vec3i timeoutCachedNode;
+  protected long timeoutTimer;
+  protected long lastTimeoutCheck;
+  protected double timeoutLimit;
+  protected float maxDistanceToWaypoint;
+  protected boolean hasDelayedRecomputation;
+  protected long timeLastRecompute;
+  protected net.minecraft.world.level.pathfinder.NodeEvaluator nodeEvaluator;
+  private net.minecraft.core.BlockPos targetPos;
+  private int reachRange;
+  private float maxVisitedNodesMultiplier;
+  private final net.minecraft.world.level.pathfinder.PathFinder pathFinder;
+  private boolean isStuck;
+  private float requiredPathLength;
+  public net.minecraft.world.entity.ai.navigation.PathNavigation(net.minecraft.world.entity.Mob, net.minecraft.world.level.Level);
+  public void updatePathfinderMaxVisitedNodes();
+  public void setRequiredPathLength(float);
+  private float getMaxPathLength();
+  public void resetMaxVisitedNodesMultiplier();
+  public void setMaxVisitedNodesMultiplier(float);
+  public net.minecraft.core.BlockPos getTargetPos();
+  protected abstract net.minecraft.world.level.pathfinder.PathFinder createPathFinder(int);
+  public void setSpeedModifier(double);
+  public void recomputePath();
+  public final net.minecraft.world.level.pathfinder.Path createPath(double, double, double, int);
+  public net.minecraft.world.level.pathfinder.Path createPath(java.util.stream.Stream<net.minecraft.core.BlockPos>, int);
+  public net.minecraft.world.level.pathfinder.Path createPath(java.util.Set<net.minecraft.core.BlockPos>, int);
+  public net.minecraft.world.level.pathfinder.Path createPath(net.minecraft.core.BlockPos, int);
+  public net.minecraft.world.level.pathfinder.Path createPath(net.minecraft.core.BlockPos, int, int);
+  public net.minecraft.world.level.pathfinder.Path createPath(net.minecraft.world.entity.Entity, int);
+  protected net.minecraft.world.level.pathfinder.Path createPath(java.util.Set<net.minecraft.core.BlockPos>, int, boolean, int);
+  protected net.minecraft.world.level.pathfinder.Path createPath(java.util.Set<net.minecraft.core.BlockPos>, int, boolean, int, float);
+  public boolean moveTo(double, double, double, double);
+  public boolean moveTo(double, double, double, int, double);
+  public boolean moveTo(net.minecraft.world.entity.Entity, double);
+  public boolean moveTo(net.minecraft.world.level.pathfinder.Path, double);
+  public net.minecraft.world.level.pathfinder.Path getPath();
+  public void tick();
+  protected double getGroundY(net.minecraft.world.phys.Vec3);
+  protected void followThePath();
+  private boolean shouldTargetNextNodeInDirection(net.minecraft.world.phys.Vec3);
+  protected void doStuckDetection(net.minecraft.world.phys.Vec3);
+  private void timeoutPath();
+  private void resetStuckTimeout();
+  public boolean isDone();
+  public boolean isInProgress();
+  public void stop();
+  protected abstract net.minecraft.world.phys.Vec3 getTempMobPos();
+  protected abstract boolean canUpdatePath();
+  protected void trimPath();
+  protected boolean canMoveDirectly(net.minecraft.world.phys.Vec3, net.minecraft.world.phys.Vec3);
+  public boolean canCutCorner(net.minecraft.world.level.pathfinder.PathType);
+  protected static boolean isClearForMovementBetween(net.minecraft.world.entity.Mob, net.minecraft.world.phys.Vec3, net.minecraft.world.phys.Vec3, boolean);
+  public boolean isStableDestination(net.minecraft.core.BlockPos);
+  public net.minecraft.world.level.pathfinder.NodeEvaluator getNodeEvaluator();
+  public void setCanFloat(boolean);
+  public boolean canFloat();
+  public boolean shouldRecomputePath(net.minecraft.core.BlockPos);
+  public float getMaxDistanceToWaypoint();
+  public float getMaxVerticalDistanceToWaypoint();
+  public boolean isStuck();
+  public abstract boolean canNavigateGround();
+  public void setCanOpenDoors(boolean);
+  private static boolean lambda$new$0(net.minecraft.util.debug.ServerDebugSubscribers);
+}
+=== net.minecraft.world.entity.ai.memory.WalkTarget
+Compiled from "WalkTarget.java"
+public class net.minecraft.world.entity.ai.memory.WalkTarget {
+  private final net.minecraft.world.entity.ai.behavior.PositionTracker target;
+  private final float speedModifier;
+  private final int closeEnoughDist;
+  public net.minecraft.world.entity.ai.memory.WalkTarget(net.minecraft.core.BlockPos, float, int);
+  public net.minecraft.world.entity.ai.memory.WalkTarget(net.minecraft.world.phys.Vec3, float, int);
+  public net.minecraft.world.entity.ai.memory.WalkTarget(net.minecraft.world.entity.Entity, float, int);
+  public net.minecraft.world.entity.ai.memory.WalkTarget(net.minecraft.world.entity.ai.behavior.PositionTracker, float, int);
+  public net.minecraft.world.entity.ai.behavior.PositionTracker getTarget();
+  public float getSpeedModifier();
+  public int getCloseEnoughDist();
+}
+=== net.minecraft.world.entity.decoration.ItemFrame
+Compiled from "ItemFrame.java"
+public class net.minecraft.world.entity.decoration.ItemFrame extends net.minecraft.world.entity.decoration.HangingEntity {
+  private static final net.minecraft.network.syncher.EntityDataAccessor<net.minecraft.world.item.ItemStack> DATA_ITEM;
+  private static final net.minecraft.network.syncher.EntityDataAccessor<java.lang.Integer> DATA_ROTATION;
+  public static final int NUM_ROTATIONS;
+  private static final float DEPTH;
+  private static final float WIDTH;
+  private static final float HEIGHT;
+  private static final byte DEFAULT_ROTATION;
+  private static final float DEFAULT_DROP_CHANCE;
+  private static final boolean DEFAULT_INVISIBLE;
+  private static final boolean DEFAULT_FIXED;
+  private float dropChance;
+  private boolean fixed;
+  public net.minecraft.world.entity.decoration.ItemFrame(net.minecraft.world.entity.EntityType<? extends net.minecraft.world.entity.decoration.ItemFrame>, net.minecraft.world.level.Level);
+  public net.minecraft.world.entity.decoration.ItemFrame(net.minecraft.world.level.Level, net.minecraft.core.BlockPos, net.minecraft.core.Direction);
+  public net.minecraft.world.entity.decoration.ItemFrame(net.minecraft.world.entity.EntityType<? extends net.minecraft.world.entity.decoration.ItemFrame>, net.minecraft.world.level.Level, net.minecraft.core.BlockPos, net.minecraft.core.Direction);
+  protected void defineSynchedData(net.minecraft.network.syncher.SynchedEntityData$Builder);
+  protected void setDirection(net.minecraft.core.Direction);
+  protected final void recalculateBoundingBox();
+  protected net.minecraft.world.phys.AABB calculateBoundingBox(net.minecraft.core.BlockPos, net.minecraft.core.Direction);
+  protected net.minecraft.world.phys.AABB getPopBox();
+  private net.minecraft.world.phys.AABB createBoundingBox(net.minecraft.core.BlockPos, net.minecraft.core.Direction, boolean);
+  public boolean survives();
+  public void move(net.minecraft.world.entity.MoverType, net.minecraft.world.phys.Vec3);
+  public void push(double, double, double);
+  public void kill(net.minecraft.server.level.ServerLevel);
+  private boolean shouldDamageDropItem(net.minecraft.world.damagesource.DamageSource);
+  private static boolean canHurtWhenFixed(net.minecraft.world.damagesource.DamageSource);
+  public boolean hurtClient(net.minecraft.world.damagesource.DamageSource);
+  public boolean hurtServer(net.minecraft.server.level.ServerLevel, net.minecraft.world.damagesource.DamageSource, float);
+  public net.minecraft.sounds.SoundEvent getRemoveItemSound();
+  public boolean shouldRenderAtSqrDistance(double);
+  public void dropItem(net.minecraft.server.level.ServerLevel, net.minecraft.world.entity.Entity);
+  public net.minecraft.sounds.SoundEvent getBreakSound();
+  public void playPlacementSound();
+  public net.minecraft.sounds.SoundEvent getPlaceSound();
+  private void dropItem(net.minecraft.server.level.ServerLevel, net.minecraft.world.entity.Entity, boolean);
+  private void removeFramedMap(net.minecraft.world.item.ItemStack);
+  public net.minecraft.world.item.ItemStack getItem();
+  public net.minecraft.world.level.saveddata.maps.MapId getFramedMapId(net.minecraft.world.item.ItemStack);
+  public boolean hasFramedMap();
+  public void setItem(net.minecraft.world.item.ItemStack);
+  public void setItem(net.minecraft.world.item.ItemStack, boolean);
+  public net.minecraft.sounds.SoundEvent getAddItemSound();
+  public net.minecraft.world.entity.SlotAccess getSlot(int);
+  public void onSyncedDataUpdated(net.minecraft.network.syncher.EntityDataAccessor<?>);
+  private void onItemChanged(net.minecraft.world.item.ItemStack);
+  public int getRotation();
+  public void setRotation(int);
+  private void setRotation(int, boolean);
+  protected void addAdditionalSaveData(net.minecraft.world.level.storage.ValueOutput);
+  protected void readAdditionalSaveData(net.minecraft.world.level.storage.ValueInput);
+  public net.minecraft.world.InteractionResult interact(net.minecraft.world.entity.player.Player, net.minecraft.world.InteractionHand, net.minecraft.world.phys.Vec3);
+  public net.minecraft.sounds.SoundEvent getRotateItemSound();
+  public int getAnalogOutput();
+  public net.minecraft.network.protocol.Packet<net.minecraft.network.protocol.game.ClientGamePacketListener> getAddEntityPacket(net.minecraft.server.level.ServerEntity);
+  public void recreateFromPacket(net.minecraft.network.protocol.game.ClientboundAddEntityPacket);
+  public net.minecraft.world.item.ItemStack getPickResult();
+  protected net.minecraft.world.item.ItemStack getFrameItemStack();
+  public float getVisualRotationYInDegrees();
+  static {};
+}
+=== net.minecraft.world.entity.decoration.HangingEntity
+Compiled from "HangingEntity.java"
+public abstract class net.minecraft.world.entity.decoration.HangingEntity extends net.minecraft.world.entity.decoration.BlockAttachedEntity {
+  private static final net.minecraft.network.syncher.EntityDataAccessor<net.minecraft.core.Direction> DATA_DIRECTION;
+  private static final net.minecraft.core.Direction DEFAULT_DIRECTION;
+  protected net.minecraft.world.entity.decoration.HangingEntity(net.minecraft.world.entity.EntityType<? extends net.minecraft.world.entity.decoration.HangingEntity>, net.minecraft.world.level.Level);
+  protected net.minecraft.world.entity.decoration.HangingEntity(net.minecraft.world.entity.EntityType<? extends net.minecraft.world.entity.decoration.HangingEntity>, net.minecraft.world.level.Level, net.minecraft.core.BlockPos);
+  protected void defineSynchedData(net.minecraft.network.syncher.SynchedEntityData$Builder);
+  public void onSyncedDataUpdated(net.minecraft.network.syncher.EntityDataAccessor<?>);
+  public net.minecraft.core.Direction getDirection();
+  protected void setDirectionRaw(net.minecraft.core.Direction);
+  protected void setDirection(net.minecraft.core.Direction);
+  protected void recalculateBoundingBox();
+  protected abstract net.minecraft.world.phys.AABB calculateBoundingBox(net.minecraft.core.BlockPos, net.minecraft.core.Direction);
+  public boolean survives();
+  protected net.minecraft.world.phys.AABB calculateSupportBox();
+  protected boolean canCoexist(boolean);
+  protected boolean hasLevelCollision(net.minecraft.world.phys.AABB);
+  protected net.minecraft.world.phys.AABB getPopBox();
+  public abstract void playPlacementSound();
+  public net.minecraft.world.entity.item.ItemEntity spawnAtLocation(net.minecraft.server.level.ServerLevel, net.minecraft.world.item.ItemStack, float);
+  public float rotate(net.minecraft.world.level.block.Rotation);
+  public float mirror(net.minecraft.world.level.block.Mirror);
+  private boolean lambda$canCoexist$0(boolean, net.minecraft.world.entity.decoration.HangingEntity);
+  private boolean lambda$survives$0(net.minecraft.core.BlockPos);
+  static {};
+}
