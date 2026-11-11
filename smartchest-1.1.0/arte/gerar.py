@@ -126,18 +126,15 @@ WOOD = ["#9c7a4c", "#8a6a40", "#a8865a", "#7c5e38"]
 
 def table_faces():
     top, front, side = (Image.new("RGBA", (16, 16)) for _ in range(3))
-    # topo: tampo de madeira com a grade 3x3 incrustada em obsidiana do End
-    noise(top, WOOD, 70, (0, 0, 16, 16), [.35, .3, .2, .15])
-    bevel(top, "#c4a06a", "#5a4228")
-    rect(top, 2, 2, 13, 13, "#14101e")
+    # topo: grade 3x3 de obsidiana do End com espaços iguais (4x4) e linhas roxas de 1 pixel
     for gx in range(3):
         for gy in range(3):
-            noise(top, OBS, 80 + gx * 3 + gy, (3 + gx * 4, 3 + gy * 4, 6 + gx * 4, 6 + gy * 4), OBS_W)
-    for i in range(2, 14):  # linhas da grade com brilho roxo
-        for k in (2, 6, 10, 13):
+            noise(top, OBS, 80 + gx * 3 + gy, (1 + gx * 5, 1 + gy * 5, 5 + gx * 5, 5 + gy * 5), OBS_W)
+    for i in range(16):
+        for k in (0, 5, 10, 15):
             top.putpixel((i, k), hx("#6a4aa8")); top.putpixel((k, i), hx("#6a4aa8"))
     rect(top, 7, 7, 8, 8, "#2fa37a"); px(top, [(7, 7)], "#a6f5d0"); px(top, [(8, 8)], "#1d6e52")
-    px(top, [(2, 2), (13, 2), (2, 13), (13, 13)], "#8d5fe0")
+    px(top, [(0, 0), (15, 0), (0, 15), (15, 15), (5, 5), (10, 5), (5, 10), (10, 10)], "#8d5fe0")
     # laterais: tábuas de madeira, faixa de obsidiana no alto e cantos roxos
     for im, seed in ((front, 90), (side, 91)):
         noise(im, WOOD, seed, (0, 0, 16, 16), [.35, .3, .2, .15])
@@ -281,6 +278,7 @@ GLYPHS = {
     "ú": ["...#.", "..#..", "#...#", "#...#", "#...#", "#...#", ".####"],
     "n": [".....", ".....", "####.", "#...#", "#...#", "#...#", "#...#"],
     "t": [".#.", ".#.", "###", ".#.", ".#.", ".#.", "..#"],
+    "c": [".....", ".....", ".####", "#....", "#....", "#....", ".####"],
     "e": [".....", ".....", ".###.", "#...#", "#####", "#....", ".####"],
     "l": ["#.", "#.", "#.", "#.", "#.", "#.", ".#"],
     "i": ["#", ".", "#", "#", "#", "#", "#"],
@@ -486,6 +484,71 @@ def search_gui(icons):
     return img
 
 
+def craft_search_gui(icons):
+    """
+    Pesquisa da mesa de trabalho ligada (a mesma bigorna da pesquisa, 176x166; ver CraftSearchMenu), no tema da tela
+    da mesa: painel roxo, a mesa no lugar da lupa, fechar (1º espaço) e limpar (2º). O espaço de resultado da bigorna
+    não é usado. Embaixo, 27 receitas; a hotbar não é usada e vira uma prateleira de madeira.
+    """
+    img = Image.new("RGBA", (176, 166), (0, 0, 0, 0))
+    noise(img, T["panel"], 8, (0, 0, 176, 166))
+    d = ImageDraw.Draw(img)
+
+    def slot(x, y, hl=None):
+        d.rectangle([x, y, x + 17, y + 17], fill=hx(T["slot"]))
+        d.line([x, y, x + 16, y], fill=hx(T["s_sh"])); d.line([x, y, x, y + 16], fill=hx(T["s_sh"]))
+        d.line([x + 1, y + 17, x + 17, y + 17], fill=hx(hl or T["s_hl"])); d.line([x + 17, y + 1, x + 17, y + 17], fill=hx(hl or T["s_hl"]))
+
+    d.rectangle([0, 0, 175, 165], outline=hx(T["edge"]))
+    d.line([1, 1, 174, 1], fill=hx(T["hi"])); d.line([1, 1, 1, 164], fill=hx(T["hi"]))
+    d.line([1, 164, 174, 164], fill=hx(T["lo"])); d.line([174, 1, 174, 164], fill=hx(T["lo"]))
+    for p in [(0, 0), (175, 0), (0, 165), (175, 165)]:
+        img.putpixel(p, (0, 0, 0, 0))
+    # topo: tampo da mesa (grade de obsidiana com linhas roxas) por trás da busca
+    d.rectangle([4, 4, 171, 67], fill=hx("#14101e"), outline=hx(T["group_line"]))
+    for x in range(5, 171, 9):
+        d.line([x, 5, x, 66], fill=hx("#1d1630"))
+    for y in range(5, 67, 9):
+        d.line([5, y, 170, y], fill=hx("#1d1630"))
+    rnd = random.Random(4)
+    for _ in range(40):
+        img.putpixel((rnd.randrange(6, 170), rnd.randrange(6, 66)), hx(rnd.choice(["#8d5fe0", "#6a4aa8", "#2fa37a", "#c77dff"])))
+    top = table_faces()[2]
+    img.alpha_composite(top, (36, 20))  # a mesa no lugar da lupa
+    d.rectangle([56, 17, 171, 38], outline=hx("#8d5fe0"))
+    for x in range(59, 169):  # caixa de texto vazada (o jogo desenha a caixa e o texto)
+        for y in range(20, 36):
+            img.putpixel((x, y), (0, 0, 0, 0))
+    slot(26, 46, "#8d5fe0")  # fechar (1º espaço da bigorna)
+    d.rectangle([25, 45, 44, 64], outline=hx("#8d5fe0"))
+    slot(75, 46, "#b84a5a")  # limpar a pesquisa (2º espaço)
+    d.rectangle([74, 45, 93, 64], outline=hx("#b84a5a"))
+    # seta do End apontando para as receitas, no lugar do espaço de resultado (não usado)
+    rect(img, 120, 50, 140, 54, "#6a4aa8"); rect(img, 120, 51, 140, 53, "#8d5fe0")
+    for i in range(6):
+        rect(img, 141 + i, 46 + i, 141 + i, 58 - i, "#8d5fe0")
+    # "Inventário" (cinza #404040 em 8,72) quase some num roxo acinzentado de brilho parecido; à direita, "Receitas"
+    d.rectangle([4, 69, 171, 81], fill=hx("#14101e"))
+    d.rectangle([5, 70, 64, 81], fill=hx("#3f3850"), outline=hx(T["group_line"]))
+    end = 170 - (sum(len(GLYPHS[c][0]) + 1 for c in "Receitas") - 1)
+    text(img, end, 72, "Receitas", T["title"])
+    d.rectangle([6, 82, 169, 136], fill=hx(T["well"]), outline=hx(T["group_line"]))
+    for r in range(3):
+        for c in range(9):
+            slot(7 + c * 18, 83 + r * 18)
+    # hotbar não usada: prateleira de madeira com cantos de obsidiana
+    side = table_faces()[1]
+    for x in range(5, 171, 16):
+        img.alpha_composite(side.crop((0, 4, min(16, 171 - x), 15)), (x, 141))
+    noise(img, WOOD, 77, (5, 141, 171, 159), [.35, .3, .2, .15])
+    for x in range(5, 171):
+        img.putpixel((x, 146), hx("#6b5030")); img.putpixel((x, 153), hx("#6b5030"))
+        img.putpixel((x, 140), hx("#6a4aa8")); img.putpixel((x, 159), hx("#251c3a"))
+    for x in range(5, 171, 18):
+        rect(img, x, 141, x + 1, 158, "#251c3a")
+    return img
+
+
 def save_png(img, rel):
     path = os.path.join(SC, "textures", rel + ".png")
     os.makedirs(os.path.dirname(path), exist_ok=True)
@@ -610,6 +673,7 @@ def main():
     save_png(gui(icons), "gui/storage")
     save_png(search_gui(icons), "gui/search")
     save_png(craft_gui(icons), "gui/crafting")
+    save_png(craft_search_gui(icons), "gui/craft_search")
 
     models = os.path.join(SC, "models/item")
     save_json(cube_model(), os.path.join(models, "chest.json"))
@@ -637,6 +701,7 @@ def main():
         {"type": "bitmap", "file": "smartchest:gui/storage.png", "ascent": 13, "height": 222, "chars": [chr(0xE000)]},
         {"type": "bitmap", "file": "smartchest:gui/search.png", "ascent": 13, "height": 166, "chars": [chr(0xE001)]},
         {"type": "bitmap", "file": "smartchest:gui/crafting.png", "ascent": 13, "height": 166, "chars": [chr(0xE002)]},
+        {"type": "bitmap", "file": "smartchest:gui/craft_search.png", "ascent": 13, "height": 166, "chars": [chr(0xE003)]},
     ]}, os.path.join(SC, "font/gui.json"))
 
     pack = os.path.join(ROOT, "src/pack")
