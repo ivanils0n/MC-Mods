@@ -22,7 +22,7 @@ SC = os.path.join(RES, "smartchest")
 # Modelos do mod; SmartChest.java usa os mesmos nomes no componente item_model ("smartchest:<nome>").
 # Abas (mesma ordem de Categories.KEYS no Java): cada uma tem o ícone normal e o "_on" (aba ativa, com moldura).
 MODELS = ["chest", "chest_base", "chest_lid", "linker", "btn_prev", "btn_next", "btn_search", "btn_sort", "btn_info", "btn_deposit", "btn_links",
-          "btn_confirm", "btn_more", "btn_clear", "btn_organize", "tab_filter"]
+          "btn_confirm", "btn_more", "btn_clear", "btn_organize", "tab_filter", "crafting_table"]
 
 
 def hx(c, a=255):
@@ -119,6 +119,49 @@ def chest_faces():
         px(t, [(7 - d, 4 + d), (8 + d, 4 + d), (7 - d, 11 - d), (8 + d, 11 - d)], "#6a4aa8")
     rect(t, 7, 7, 8, 8, "#2fa37a"); px(t, [(7, 7)], "#a6f5d0")
     return f, s, t
+
+
+# ------------------------------------------------------------------ mesa de trabalho ligada ao Baú Central
+WOOD = ["#9c7a4c", "#8a6a40", "#a8865a", "#7c5e38"]
+
+def table_faces():
+    top, front, side = (Image.new("RGBA", (16, 16)) for _ in range(3))
+    # topo: tampo de madeira com a grade 3x3 incrustada em obsidiana do End
+    noise(top, WOOD, 70, (0, 0, 16, 16), [.35, .3, .2, .15])
+    bevel(top, "#c4a06a", "#5a4228")
+    rect(top, 2, 2, 13, 13, "#14101e")
+    for gx in range(3):
+        for gy in range(3):
+            noise(top, OBS, 80 + gx * 3 + gy, (3 + gx * 4, 3 + gy * 4, 6 + gx * 4, 6 + gy * 4), OBS_W)
+    for i in range(2, 14):  # linhas da grade com brilho roxo
+        for k in (2, 6, 10, 13):
+            top.putpixel((i, k), hx("#6a4aa8")); top.putpixel((k, i), hx("#6a4aa8"))
+    rect(top, 7, 7, 8, 8, "#2fa37a"); px(top, [(7, 7)], "#a6f5d0"); px(top, [(8, 8)], "#1d6e52")
+    px(top, [(2, 2), (13, 2), (2, 13), (13, 13)], "#8d5fe0")
+    # laterais: tábuas de madeira, faixa de obsidiana no alto e cantos roxos
+    for im, seed in ((front, 90), (side, 91)):
+        noise(im, WOOD, seed, (0, 0, 16, 16), [.35, .3, .2, .15])
+        for y in (5, 10):
+            for x in range(16):
+                im.putpixel((x, y), hx("#6b5030"))
+        noise(im, OBS, seed + 5, (0, 0, 16, 4), OBS_W)
+        for x in range(16):
+            im.putpixel((x, 3), hx("#6a4aa8")); im.putpixel((x, 0), hx("#3a2b5c"))
+        for y in range(16):
+            for x in (0, 15):
+                im.putpixel((x, y), hx("#251c3a"))
+        for y in range(4, 16, 3):
+            im.putpixel((0, y), hx("#4b2f7a")); im.putpixel((15, y), hx("#4b2f7a"))
+        rect(im, 0, 15, 15, 15, "#14101e")
+    # frente: olho do End no centro, como o do Baú Central
+    rect(front, 5, 6, 10, 12, "#4b2f7a"); rect(front, 5, 12, 10, 12, "#2a1a48"); rect(front, 10, 6, 10, 12, "#2a1a48")
+    eye(front, 6, 7)
+    # lado: martelo e serrote estilizados em ferro escuro
+    rect(side, 3, 6, 3, 13, "#5a4228"); rect(side, 2, 5, 5, 6, "#8c8c9c"); px(side, [(2, 5)], "#c8c8d8")
+    for i in range(6):
+        rect(side, 8 + i // 2, 6 + i, 12, 6 + i, "#8c8c9c")
+    px(side, [(9, 7), (10, 9), (11, 11)], "#c8c8d8"); rect(side, 12, 5, 13, 6, "#5a4228")
+    return front, side, top
 
 
 # ------------------------------------------------------------------ vinculador (opção 4: Chave do End)
@@ -408,6 +451,18 @@ def cube_model():
     }
 
 
+def table_model():
+    face = lambda t: {"texture": t, "uv": [0, 0, 16, 16]}
+    return {
+        "parent": "minecraft:block/block",
+        "textures": {"particle": "smartchest:block/table_side", "front": "smartchest:block/table_front",
+                     "side": "smartchest:block/table_side", "top": "smartchest:block/table_top"},
+        "elements": [{"from": [0, 0, 0], "to": [16, 16, 16], "faces": {
+            "north": face("#front"), "south": face("#front"), "east": face("#side"), "west": face("#side"),
+            "up": face("#top"), "down": face("#side")}}],
+    }
+
+
 def lid_models():
     """
     O baú no mundo são duas peças (SmartChest.spawnVisual): o corpo e a tampa. A tampa é desenhada com a dobradiça
@@ -486,6 +541,8 @@ def main():
     f, s, t = chest_faces()
     save_png(f, "block/chest_front"); save_png(s, "block/chest_side"); save_png(t, "block/chest_top")
     save_png(linker(), "item/linker")
+    tf, ts, tt = table_faces()
+    save_png(tf, "block/table_front"); save_png(ts, "block/table_side"); save_png(tt, "block/table_top")
     icons = buttons()
     icons.update(tab_icons())
     for name, im in icons.items():
@@ -497,6 +554,7 @@ def main():
     save_json(cube_model(), os.path.join(models, "chest.json"))
     base, lid = lid_models()
     save_json(base, os.path.join(models, "chest_base.json")); save_json(lid, os.path.join(models, "chest_lid.json"))
+    save_json(table_model(), os.path.join(models, "crafting_table.json"))
     for name, im in key_textures().items():
         save_png(im, "item/" + name)
     save_json(key_model(), os.path.join(models, "linker.json"))
