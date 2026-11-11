@@ -303,10 +303,22 @@ final class SelfTest {
 		ensure(gridCount(table, Items.OAK_PLANKS) == 2 && count(chest, Items.OAK_PLANKS) == 3 && table.getSlot(0).getItem().is(Items.STICK),
 			"graveto com tábuas do baú: grade " + gridCount(table, Items.OAK_PLANKS) + ", baú " + count(chest, Items.OAK_PLANKS));
 		ensure(table.handlePlacement(true, false, stick, sl, fp.getInventory()) == none, "graveto com Shift");
-		ensure(gridCount(table, Items.OAK_PLANKS) == 4 && count(chest, Items.OAK_PLANKS) == 1 && count(fp.getInventory(), Items.OAK_PLANKS) == 0,
+		ensure(gridCount(table, Items.OAK_PLANKS) == 4 && count(chest, Items.OAK_PLANKS) == 1,
 			"graveto com Shift: grade " + gridCount(table, Items.OAK_PLANKS) + ", baú " + count(chest, Items.OAK_PLANKS));
+		table.clicked(1 + 4, 0, ContainerInput.PICKUP, fp);
+		table.clicked(1 + 4, 0, ContainerInput.QUICK_MOVE, fp);
+		ensure(gridCount(table, Items.OAK_PLANKS) == 4 && table.getCarried().isEmpty() && count(fp.getInventory(), Items.OAK_PLANKS) == 0, "tirou item da grade");
+		table.removed(fp);
+		ensure(gridCount(table, Items.OAK_PLANKS) == 0 && count(chest, Items.OAK_PLANKS) == 5 && count(fp.getInventory(), Items.OAK_PLANKS) == 0,
+			"fechar a mesa devolve aos baús: baú " + count(chest, Items.OAK_PLANKS) + ", jogador " + count(fp.getInventory(), Items.OAK_PLANKS));
+		var tableRecipe = server.getRecipeManager().getRecipes().stream().filter(r -> r.id().identifier().toString().equals("minecraft:crafting_table")).findFirst().orElseThrow();
+		chest.setItem(20, new ItemStack(Items.OAK_PLANKS, 3));
+		fp.getInventory().setItem(0, new ItemStack(Items.OAK_PLANKS, 10)); // o inventário do jogador não é usado
+		table = new TableMenu(0, fp.getInventory(), sl, tablePos, sc);
+		ensure(table.handlePlacement(false, false, tableRecipe, sl, fp.getInventory()) == none && gridCount(table, Items.OAK_PLANKS) == 3
+			&& count(chest, Items.OAK_PLANKS) == 0 && count(fp.getInventory(), Items.OAK_PLANKS) == 10, "receita incompleta: grade " + gridCount(table, Items.OAK_PLANKS));
 		ensure(table.handlePlacement(false, false, pick, sl, fp.getInventory()) == net.minecraft.world.inventory.RecipeBookMenu.PostPlaceAction.PLACE_GHOST_RECIPE
-			&& gridCount(table, Items.OAK_PLANKS) == 0 && count(fp.getInventory(), Items.OAK_PLANKS) == 4, "receita sem itens deveria virar fantasma");
+			&& gridCount(table, Items.OAK_PLANKS) == 0 && count(chest, Items.OAK_PLANKS) == 3, "receita sem itens deveria virar fantasma");
 		fp.getInventory().clearContent();
 		chest.setItem(20, ItemStack.EMPTY);
 		SmartChest.toggleTable(fp, sl, lk, tablePos);

@@ -272,6 +272,7 @@ T = dict(panel=["#1a1526", "#1d1729", "#18131f"], hi="#3d2e60", lo="#09070e", ed
 
 # Letras no estilo da fonte padrão do Minecraft (5 px de largura, 7 de altura + descendente) para o título fixo.
 GLYPHS = {
+    "M": ["#...#", "##.##", "#.#.#", "#.#.#", "#...#", "#...#", "#...#"],
     "C": [".###.", "#...#", "#....", "#....", "#....", "#...#", ".###."],
     "r": [".....", ".....", "#.##.", "##..#", "#....", "#....", "#...."],
     "B": ["####.", "#...#", "#...#", "####.", "#...#", "#...#", "####."],
@@ -367,6 +368,64 @@ def gui(icons):
     well(6, 196, 169, 215)
     for c in range(9):
         slot(7 + c * 18, 197)
+    return img
+
+
+def craft_gui():
+    """
+    Tela da mesa de trabalho ligada (a da mesa vanilla, 176x166; ver TableMenu). Grade 3x3 em 30+18c, 17+18r, resultado
+    em 124,35, inventário em 8,84 e hotbar em 8,142. O botão do livro de receitas (x 5-24, y 34-51) fica vazado: o
+    jogo o desenha.
+    """
+    img = Image.new("RGBA", (176, 166), (0, 0, 0, 0))
+    noise(img, T["panel"], 8, (0, 0, 176, 166))
+    d = ImageDraw.Draw(img)
+
+    def slot(x, y):
+        d.rectangle([x, y, x + 17, y + 17], fill=hx(T["slot"]))
+        d.line([x, y, x + 16, y], fill=hx(T["s_sh"])); d.line([x, y, x, y + 16], fill=hx(T["s_sh"]))
+        d.line([x + 1, y + 17, x + 17, y + 17], fill=hx(T["s_hl"])); d.line([x + 17, y + 1, x + 17, y + 17], fill=hx(T["s_hl"]))
+
+    def well(x0, y0, x1, y1):
+        d.rectangle([x0, y0, x1, y1], fill=hx(T["well"]))
+        d.line([x0, y0, x1, y0], fill=hx(T["lo"])); d.line([x0, y0, x0, y1], fill=hx(T["lo"]))
+        d.line([x0, y1, x1, y1], fill=hx(T["hi"])); d.line([x1, y0, x1, y1], fill=hx(T["hi"]))
+
+    d.rectangle([0, 0, 175, 165], outline=hx(T["edge"]))
+    d.line([1, 1, 174, 1], fill=hx(T["hi"])); d.line([1, 1, 1, 164], fill=hx(T["hi"]))
+    d.line([1, 164, 174, 164], fill=hx(T["lo"])); d.line([174, 1, 174, 164], fill=hx(T["lo"]))
+    for p in [(0, 0), (175, 0), (0, 165), (175, 165)]:
+        img.putpixel(p, (0, 0, 0, 0))
+    eye(img, 8, 4)
+    text(img, 16, 5, "Mesa do Baú Central", T["title"])
+    # grade 3x3 numa moldura roxa, como o topo da mesa
+    d.rectangle([28, 15, 83, 70], fill=hx("#14101e"), outline=hx(T["group_line"]))
+    for r in range(3):
+        for c in range(3):
+            slot(29 + c * 18, 16 + r * 18)
+    # seta do End (grade -> resultado)
+    rect(img, 90, 42, 104, 46, "#6a4aa8"); rect(img, 90, 43, 104, 45, "#8d5fe0")
+    for i in range(6):
+        rect(img, 105 + i, 38 + i, 105 + i, 50 - i, "#8d5fe0")
+    px(img, [(91, 43), (93, 43)], "#c77dff")
+    # resultado: moldura de portal (26x26) com o olho, como o botão de pegar da pesquisa
+    d.rectangle([119, 30, 144, 55], fill=hx("#3e6b5a"), outline=hx("#2a4a3e"))
+    rect(img, 130, 30, 133, 31, "#2fa37a")
+    d.rectangle([122, 33, 141, 52], fill=hx(T["slot"]))
+    d.line([122, 33, 141, 33], fill=hx(T["s_sh"])); d.line([122, 33, 122, 52], fill=hx(T["s_sh"]))
+    d.line([123, 52, 141, 52], fill=hx("#5fd4b8")); d.line([141, 34, 141, 52], fill=hx("#5fd4b8"))
+    # "Inventário" é escrito pelo jogo em cinza escuro (x=8, y=72): placa clara atrás
+    d.rectangle([5, 71, 75, 81], fill=hx(T["plate"]), outline=hx(T["plate_lo"]))
+    well(6, 82, 169, 136)
+    for r in range(3):
+        for c in range(9):
+            slot(7 + c * 18, 83 + r * 18)
+    well(6, 140, 169, 159)
+    for c in range(9):
+        slot(7 + c * 18, 141)
+    for x in range(5, 25):  # botão do livro de receitas (o jogo desenha)
+        for y in range(34, 52):
+            img.putpixel((x, y), (0, 0, 0, 0))
     return img
 
 
@@ -549,6 +608,7 @@ def main():
         save_png(im, "item/" + name)
     save_png(gui(icons), "gui/storage")
     save_png(search_gui(icons), "gui/search")
+    save_png(craft_gui(), "gui/crafting")
 
     models = os.path.join(SC, "models/item")
     save_json(cube_model(), os.path.join(models, "chest.json"))
@@ -568,12 +628,14 @@ def main():
 
     # Fonte da tela: U+E000 é o fundo inteiro; U+F000 volta ao canto da tela, U+F001 desfaz a largura do fundo e
     # U+F002 leva o texto do título (o filtro da pesquisa) para x=100. U+E001 é a tela da pesquisa (bigorna, título em
-    # x=60): U+F003 volta ao canto e U+F004 volta ao x=60. Ver SmartChest.title() e SearchMenu.open().
+    # x=60): U+F003 volta ao canto e U+F004 volta ao x=60. U+E002 é a mesa de trabalho ligada (título em x=29): U+F005
+    # volta ao canto. Ver SmartChest.title() e SearchMenu.open().
     save_json({"providers": [
         {"type": "space", "advances": {chr(0xF000): -8, chr(0xF001): -177, chr(0xF002): 100,
-                                           chr(0xF003): -60, chr(0xF004): 60}},
+                                           chr(0xF003): -60, chr(0xF004): 60, chr(0xF005): -29}},
         {"type": "bitmap", "file": "smartchest:gui/storage.png", "ascent": 13, "height": 222, "chars": [chr(0xE000)]},
         {"type": "bitmap", "file": "smartchest:gui/search.png", "ascent": 13, "height": 166, "chars": [chr(0xE001)]},
+        {"type": "bitmap", "file": "smartchest:gui/crafting.png", "ascent": 13, "height": 166, "chars": [chr(0xE002)]},
     ]}, os.path.join(SC, "font/gui.json"))
 
     pack = os.path.join(ROOT, "src/pack")

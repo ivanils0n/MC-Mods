@@ -7,7 +7,8 @@
     "\uf001": -177,
     "\uf002": 100,
     "\uf003": -60,
-    "\uf004": 60
+    "\uf004": 60,
+    "\uf005": -29
    }
   },
   {
@@ -26,6 +27,15 @@
    "height": 166,
    "chars": [
     "\ue001"
+   ]
+  },
+  {
+   "type": "bitmap",
+   "file": "smartchest:gui/crafting.png",
+   "ascent": 13,
+   "height": 166,
+   "chars": [
+    "\ue002"
    ]
   }
  ]
