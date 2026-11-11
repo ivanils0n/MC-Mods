@@ -530,9 +530,9 @@ def craft_search_gui(icons):
     rect(img, 120, 50, 140, 54, "#6a4aa8"); rect(img, 120, 51, 140, 53, "#8d5fe0")
     for i in range(6):
         rect(img, 141 + i, 46 + i, 141 + i, 58 - i, "#8d5fe0")
-    # "Inventário" (cinza #404040 em 8,72) some num fundo da mesma cor; à direita, "Receitas"
+    # "Inventário" (cinza #404040 em 8,72) quase some num roxo acinzentado de brilho parecido; à direita, "Receitas"
     d.rectangle([4, 69, 171, 81], fill=hx("#14101e"))
-    d.rectangle([5, 70, 64, 81], fill=hx("#404040"))
+    d.rectangle([5, 70, 64, 81], fill=hx("#3f3850"), outline=hx(T["group_line"]))
     end = 170 - (sum(len(GLYPHS[c][0]) + 1 for c in "Receitas") - 1)
     text(img, end, 72, "Receitas", T["title"])
     d.rectangle([6, 82, 169, 136], fill=hx(T["well"]), outline=hx(T["group_line"]))
