@@ -37,13 +37,29 @@ def copper_tex(seed=1, ox=0.0):
     return im
 
 
+def wood_tex():
+    rnd = random.Random(9)
+    im = Image.new("RGBA", (16, 16))
+    for y in range(16):
+        for x in range(16):
+            im.putpixel((x, y), hx(rnd.choices(["#4a2a18", "#5b3620", "#3a1f10"], [3, 3, 2])[0]))
+    return im
+
+
+def light_tex():
+    rnd = random.Random(11)
+    im = Image.new("RGBA", (16, 16))
+    for y in range(16):
+        for x in range(16):
+            im.putpixel((x, y), hx(rnd.choices(["#f8c3a0", "#f4a77d", "#fbd3b6"], [3, 4, 2])[0]))
+    return im
+
+
 def face_tex():
     im = copper_tex(5)
     d = ImageDraw.Draw(im)
     for x in (3, 11):
         d.rectangle([x, 5, x + 1, 7], fill=hx(DK))  # olhos
-    d.rectangle([7, 8, 8, 11], fill=hx(CU[3]))  # nariz
-    d.line([7, 8, 8, 8], fill=hx(CU[0]))
     return im
 
 
@@ -80,22 +96,28 @@ def icon():
 
 
 def model():
-    def box(a, b, tex, only=None):
+    def box(a, b, tex, only=None, up=None):
         faces = {f: {"texture": "#" + tex} for f in ("north", "south", "east", "west", "up", "down")}
+        if up:
+            faces["up"] = {"texture": "#" + up}
         if only:
             faces = {only: {"texture": "#" + tex}}
         return {"from": a, "to": b, "faces": faces}
     els = [
-        box([7, 0, 7], [9, 10, 9], "cu"),            # cabo fino (2x2)
-        box([6.5, 0, 6.5], [9.5, 1.5, 9.5], "cu"),   # pomo em relevo
-        box([6.5, 2.5, 6.5], [9.5, 3.25, 9.5], "cu"),
-        box([5, 10, 6], [11, 14, 10], "cu"),         # corpo
-        box([4.5, 14, 5.5], [11.5, 19, 10.5], "cu"), # cabeça
-        box([4.5, 14, 5.5], [11.5, 19, 10.5], "face", "south"),  # rosto (virado para quem segura)
-        box([7.5, 19, 7.5], [8.5, 21, 8.5], "ox"),   # ponta oxidada
+        box([6.5, 0, 6.5], [9.5, 3, 9.5], "cu"),             # pomo
+        box([7, 3, 7], [9, 4, 9], "cu"),                     # pescoço do pomo
+        box([7.25, 4, 7.25], [8.75, 10, 8.75], "wood"),      # cabo fino escuro
+        box([6.5, 10, 6.5], [9.5, 11, 9.5], "cu"),           # colar
+        box([6, 11, 6.5], [10, 15, 9.5], "cu"),              # corpo
+        box([10, 12, 7], [11.5, 15, 9], "cu"),               # braço
+        box([5, 15, 5.5], [11, 19.5, 10.5], "cu", up="light"),   # cabeça
+        box([5, 15, 5.5], [11, 19.5, 10.5], "face", "south"),    # olhos (virados para quem segura)
+        box([7.25, 15.75, 10.5], [8.75, 17.5, 12], "cu"),    # nariz
+        box([7.25, 19.5, 7.25], [8.75, 21.5, 8.75], "cu"),   # haste da cabeça
+        box([7.5, 21.5, 7.5], [8.5, 22.5, 8.5], "ox"),       # ponta oxidada
     ]
     disp = {
-        "gui": {"rotation": [20, -35, 0], "translation": [0, -1.5, 0], "scale": [0.62, 0.62, 0.62]},
+        "gui": {"rotation": [20, -35, 0], "translation": [0, -2, 0], "scale": [0.56, 0.56, 0.56]},
         "ground": {"translation": [0, 2, 0], "scale": [0.5, 0.5, 0.5]},
         "fixed": {"rotation": [0, 180, 0], "scale": [0.6, 0.6, 0.6]},
         "thirdperson_righthand": {"rotation": [0, -90, -170], "translation": [0, 4, 0.5], "scale": [0.85, 0.85, 0.85]},
@@ -104,7 +126,7 @@ def model():
         "firstperson_lefthand": {"rotation": [0, 90, -160], "translation": [1.13, 3.2, 1.13], "scale": [0.68, 0.68, 0.68]},
     }
     return {"gui_light": "front", "textures": {"particle": "coppergolem:item/wand", "cu": "coppergolem:item/wand",
-            "face": "coppergolem:item/wand_face", "ox": "coppergolem:item/wand_ox"}, "elements": els, "display": disp}
+            "face": "coppergolem:item/wand_face", "ox": "coppergolem:item/wand_ox", "wood": "coppergolem:item/wand_wood", "light": "coppergolem:item/wand_light"}, "elements": els, "display": disp}
 
 
 def gui():
@@ -152,6 +174,8 @@ def main():
     save(copper_tex(1), "textures/item/wand.png")
     save(face_tex(), "textures/item/wand_face.png")
     save(copper_tex(2, 0.9), "textures/item/wand_ox.png")
+    save(wood_tex(), "textures/item/wand_wood.png")
+    save(light_tex(), "textures/item/wand_light.png")
     save(gui(), "textures/gui/menu.png")
     save(model(), "models/item/wand.json")
     # o mesmo modelo 3D em todo lugar (inventário, mão, chão, moldura)
@@ -161,7 +185,7 @@ def main():
         {"type": "bitmap", "file": "coppergolem:gui/menu.png", "ascent": 13, "height": 168, "chars": [""]}]}, "font/gui.json")
     pack = os.path.join(ROOT, "src/pack")
     os.makedirs(pack, exist_ok=True)
-    icon().resize((64, 64), Image.NEAREST).save(os.path.join(pack, "pack.png"))
+    copper_tex(1).resize((64, 64), Image.NEAREST).save(os.path.join(pack, "pack.png"))
 
 
 main()

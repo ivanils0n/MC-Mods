@@ -4,18 +4,52 @@
   "particle": "coppergolem:item/wand",
   "cu": "coppergolem:item/wand",
   "face": "coppergolem:item/wand_face",
-  "ox": "coppergolem:item/wand_ox"
+  "ox": "coppergolem:item/wand_ox",
+  "wood": "coppergolem:item/wand_wood",
+  "light": "coppergolem:item/wand_light"
  },
  "elements": [
   {
    "from": [
-    7,
+    6.5,
     0,
+    6.5
+   ],
+   "to": [
+    9.5,
+    3,
+    9.5
+   ],
+   "faces": {
+    "north": {
+     "texture": "#cu"
+    },
+    "south": {
+     "texture": "#cu"
+    },
+    "east": {
+     "texture": "#cu"
+    },
+    "west": {
+     "texture": "#cu"
+    },
+    "up": {
+     "texture": "#cu"
+    },
+    "down": {
+     "texture": "#cu"
+    }
+   }
+  },
+  {
+   "from": [
+    7,
+    3,
     7
    ],
    "to": [
     9,
-    10,
+    4,
     9
    ],
    "faces": {
@@ -41,13 +75,45 @@
   },
   {
    "from": [
+    7.25,
+    4,
+    7.25
+   ],
+   "to": [
+    8.75,
+    10,
+    8.75
+   ],
+   "faces": {
+    "north": {
+     "texture": "#wood"
+    },
+    "south": {
+     "texture": "#wood"
+    },
+    "east": {
+     "texture": "#wood"
+    },
+    "west": {
+     "texture": "#wood"
+    },
+    "up": {
+     "texture": "#wood"
+    },
+    "down": {
+     "texture": "#wood"
+    }
+   }
+  },
+  {
+   "from": [
     6.5,
-    0,
+    10,
     6.5
    ],
    "to": [
     9.5,
-    1.5,
+    11,
     9.5
    ],
    "faces": {
@@ -73,14 +139,46 @@
   },
   {
    "from": [
-    6.5,
-    2.5,
+    6,
+    11,
     6.5
    ],
    "to": [
-    9.5,
-    3.25,
+    10,
+    15,
     9.5
+   ],
+   "faces": {
+    "north": {
+     "texture": "#cu"
+    },
+    "south": {
+     "texture": "#cu"
+    },
+    "east": {
+     "texture": "#cu"
+    },
+    "west": {
+     "texture": "#cu"
+    },
+    "up": {
+     "texture": "#cu"
+    },
+    "down": {
+     "texture": "#cu"
+    }
+   }
+  },
+  {
+   "from": [
+    10,
+    12,
+    7
+   ],
+   "to": [
+    11.5,
+    15,
+    9
    ],
    "faces": {
     "north": {
@@ -106,44 +204,12 @@
   {
    "from": [
     5,
-    10,
-    6
-   ],
-   "to": [
-    11,
-    14,
-    10
-   ],
-   "faces": {
-    "north": {
-     "texture": "#cu"
-    },
-    "south": {
-     "texture": "#cu"
-    },
-    "east": {
-     "texture": "#cu"
-    },
-    "west": {
-     "texture": "#cu"
-    },
-    "up": {
-     "texture": "#cu"
-    },
-    "down": {
-     "texture": "#cu"
-    }
-   }
-  },
-  {
-   "from": [
-    4.5,
-    14,
+    15,
     5.5
    ],
    "to": [
-    11.5,
-    19,
+    11,
+    19.5,
     10.5
    ],
    "faces": {
@@ -160,7 +226,7 @@
      "texture": "#cu"
     },
     "up": {
-     "texture": "#cu"
+     "texture": "#light"
     },
     "down": {
      "texture": "#cu"
@@ -169,13 +235,13 @@
   },
   {
    "from": [
-    4.5,
-    14,
+    5,
+    15,
     5.5
    ],
    "to": [
-    11.5,
-    19,
+    11,
+    19.5,
     10.5
    ],
    "faces": {
@@ -186,13 +252,77 @@
   },
   {
    "from": [
+    7.25,
+    15.75,
+    10.5
+   ],
+   "to": [
+    8.75,
+    17.5,
+    12
+   ],
+   "faces": {
+    "north": {
+     "texture": "#cu"
+    },
+    "south": {
+     "texture": "#cu"
+    },
+    "east": {
+     "texture": "#cu"
+    },
+    "west": {
+     "texture": "#cu"
+    },
+    "up": {
+     "texture": "#cu"
+    },
+    "down": {
+     "texture": "#cu"
+    }
+   }
+  },
+  {
+   "from": [
+    7.25,
+    19.5,
+    7.25
+   ],
+   "to": [
+    8.75,
+    21.5,
+    8.75
+   ],
+   "faces": {
+    "north": {
+     "texture": "#cu"
+    },
+    "south": {
+     "texture": "#cu"
+    },
+    "east": {
+     "texture": "#cu"
+    },
+    "west": {
+     "texture": "#cu"
+    },
+    "up": {
+     "texture": "#cu"
+    },
+    "down": {
+     "texture": "#cu"
+    }
+   }
+  },
+  {
+   "from": [
     7.5,
-    19,
+    21.5,
     7.5
    ],
    "to": [
     8.5,
-    21,
+    22.5,
     8.5
    ],
    "faces": {
@@ -226,13 +356,13 @@
    ],
    "translation": [
     0,
-    -1.5,
+    -2,
     0
    ],
    "scale": [
-    0.62,
-    0.62,
-    0.62
+    0.56,
+    0.56,
+    0.56
    ]
   },
   "ground": {
