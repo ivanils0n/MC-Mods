@@ -209,7 +209,7 @@ final class StorageMenu extends ChestMenu {
 	}
 
 	/** Tudo por onde o item pode ser achado: nome no idioma do jogador, no idioma do servidor e o id. */
-	private String haystack(Entry e) {
+	String haystack(Entry e) {
 		return haystacks.computeIfAbsent(new Key(e.proto), k -> {
 			Language base = Language.getInstance();
 			String serverName = Lang.resolve(e.proto.getHoverName(), key -> base.has(key) ? base.getOrDefault(key) : null);

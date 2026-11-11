@@ -371,11 +371,11 @@ def gui(icons):
     return img
 
 
-def craft_gui():
+def craft_gui(icons):
     """
     Tela da mesa de trabalho ligada (a da mesa vanilla, 176x166; ver TableMenu). Grade 3x3 em 30+18c, 17+18r, resultado
-    em 124,35, inventário em 8,84 e hotbar em 8,142. O botão do livro de receitas (x 5-24, y 34-51) fica vazado: o
-    jogo o desenha.
+    em 124,35, inventário em 8,84 e hotbar em 8,142. Por cima do botão do livro de receitas (x 5-24, y 34-51; o fundo
+    é desenhado depois dele) vai a seta de voltar: o clique nele volta para a pesquisa.
     """
     img = Image.new("RGBA", (176, 166), (0, 0, 0, 0))
     noise(img, T["panel"], 8, (0, 0, 176, 166))
@@ -423,9 +423,10 @@ def craft_gui():
     well(6, 140, 169, 159)
     for c in range(9):
         slot(7 + c * 18, 141)
-    for x in range(5, 25):  # botão do livro de receitas (o jogo desenha)
-        for y in range(34, 52):
-            img.putpixel((x, y), (0, 0, 0, 0))
+    d.rectangle([5, 34, 24, 51], fill=hx(T["btn"]))  # seta de voltar por cima do botão do livro
+    d.line([5, 34, 24, 34], fill=hx(T["btn_hi"])); d.line([5, 34, 5, 51], fill=hx(T["btn_hi"]))
+    d.line([5, 51, 24, 51], fill=hx(T["btn_lo"])); d.line([24, 34, 24, 51], fill=hx(T["btn_lo"]))
+    img.alpha_composite(icons["btn_prev"], (7, 35))
     return img
 
 
@@ -608,7 +609,7 @@ def main():
         save_png(im, "item/" + name)
     save_png(gui(icons), "gui/storage")
     save_png(search_gui(icons), "gui/search")
-    save_png(craft_gui(), "gui/crafting")
+    save_png(craft_gui(icons), "gui/crafting")
 
     models = os.path.join(SC, "models/item")
     save_json(cube_model(), os.path.join(models, "chest.json"))

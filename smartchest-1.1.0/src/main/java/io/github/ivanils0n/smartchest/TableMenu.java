@@ -9,9 +9,11 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.core.Holder;
 import net.minecraft.core.component.DataComponents;
 import net.minecraft.network.chat.Component;
+import net.minecraft.network.protocol.game.ClientboundRecipeBookSettingsPacket;
 import net.minecraft.recipebook.PlaceRecipeHelper;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.stats.RecipeBookSettings;
 import net.minecraft.world.Container;
 import net.minecraft.world.SimpleMenuProvider;
 import net.minecraft.world.entity.player.Inventory;
@@ -20,6 +22,7 @@ import net.minecraft.world.entity.player.StackedItemContents;
 import net.minecraft.world.inventory.ContainerInput;
 import net.minecraft.world.inventory.ContainerLevelAccess;
 import net.minecraft.world.inventory.CraftingMenu;
+import net.minecraft.world.inventory.RecipeBookType;
 import net.minecraft.world.inventory.Slot;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
@@ -28,26 +31,63 @@ import net.minecraft.world.item.crafting.Ingredient;
 import net.minecraft.world.item.crafting.RecipeHolder;
 
 /**
- * Mesa de trabalho ligada a um Baú Central: a tela vanilla da mesa, mas o livro de receitas monta a receita só com os
- * itens dos baús ligados (faltando algum, monta o que der). A grade é da mesa: o jogador não põe nem tira nada dela,
- * só pega o resultado; ao fechar ou trocar de receita, o que sobrou volta para os baús. O cliente só conhece o
- * inventário dele, então as receitas aparecem em vermelho no livro, mas clicar nelas funciona.
+ * Mesa de trabalho ligada a um Baú Central: abre pela pesquisa (CraftSearchMenu) já com a receita escolhida montada
+ * com os itens dos baús ligados (o máximo que der; faltando algum, monta o que tiver) e remonta sozinha quando acaba.
+ * A grade é da mesa: o jogador não põe nem tira nada dela, só pega o resultado; ao fechar, o que sobrou volta para
+ * os baús. O livro de receitas fica fechado, e o botão dele (coberto pela seta do fundo) volta para a pesquisa.
  */
 final class TableMenu extends CraftingMenu {
 	final Chest chest;
 	private final BlockPos pos;
+	private final String query; // a pesquisa de onde veio, para a seta de voltar
+	private RecipeHolder<?> recipe; // remontada quando o jogador usa tudo da grade
+	private boolean crafted, placing;
+	private RecipeBookSettings.TypeSettings bookBefore; // como o livro do jogador estava, para devolver ao sair
 
-	TableMenu(int id, Inventory inv, ServerLevel sl, BlockPos pos, Chest chest) {
+	TableMenu(int id, Inventory inv, ServerLevel sl, BlockPos pos, Chest chest, String query) {
 		super(id, inv, ContainerLevelAccess.create(sl, pos));
 		this.chest = chest;
 		this.pos = pos.immutable();
+		this.query = query;
 	}
 
-	static void open(ServerPlayer sp, Chest c, BlockPos pos) {
+	static void open(ServerPlayer sp, Chest c, BlockPos pos, RecipeHolder<?> recipe, String query) {
 		ServerLevel sl = sp.level();
+		RecipeBookSettings book = sp.getRecipeBook().getBookSettings();
+		RecipeBookSettings.TypeSettings before = new RecipeBookSettings.TypeSettings(book.isOpen(RecipeBookType.CRAFTING), book.isFiltering(RecipeBookType.CRAFTING));
+		RecipeBookSettings closed = book.copy(); // a tela abre com o livro fechado
+		closed.setOpen(RecipeBookType.CRAFTING, false);
+		sp.connection.send(new ClientboundRecipeBookSettingsPacket(closed));
 		Component title = SmartChest.hasPack(sp) ? SmartChest.themedTitle("\uF005\uE002", "") : Component.literal("Mesa do Baú Central");
-		sp.openMenu(new SimpleMenuProvider((id, inv, p) -> new TableMenu(id, inv, sl, pos, c), title));
-		SmartChest.warnUnloaded(sp, Storage.linked(sl, c, SmartChest.store).unloaded);
+		sp.openMenu(new SimpleMenuProvider((id, inv, p) -> new TableMenu(id, inv, sl, pos, c, query), title));
+		if (sp.containerMenu instanceof TableMenu m) {
+			m.bookBefore = before;
+			m.handlePlacement(true, false, recipe, sl, sp.getInventory());
+		}
+	}
+
+	/** O botão do livro (a seta) foi clicado: volta para a pesquisa. Chamado pelo mixin. */
+	static void bookButton(ServerPlayer sp) {
+		if (!(sp.containerMenu instanceof TableMenu m)) return;
+		sp.getRecipeBook().setBookSetting(RecipeBookType.CRAFTING, false, sp.getRecipeBook().getBookSettings().isFiltering(RecipeBookType.CRAFTING));
+		CraftSearchMenu.open(sp, m.chest, m.pos, m.query);
+	}
+
+	@Override
+	public void slotsChanged(Container container) {
+		super.slotsChanged(container);
+		if (!placing && container == craftSlots) crafted = true;
+	}
+
+	/** Roda a cada tick: se a grade acabou depois de um craft, monta a mesma receita de novo com o que tiver nos baús. */
+	@Override
+	public void broadcastChanges() {
+		if (crafted && recipe != null && resultSlots.getItem(0).isEmpty() && owner() instanceof ServerPlayer sp) {
+			crafted = false;
+			handlePlacement(true, false, recipe, sp.level(), sp.getInventory());
+		}
+		crafted = false;
+		super.broadcastChanges();
 	}
 
 	@Override
@@ -59,9 +99,11 @@ final class TableMenu extends CraftingMenu {
 	@Override
 	public PostPlaceAction handlePlacement(boolean useMax, boolean creative, RecipeHolder<?> holder, ServerLevel level, Inventory inv) {
 		if (!(holder.value() instanceof CraftingRecipe recipe)) return PostPlaceAction.NOTHING;
+		this.recipe = holder;
 		Linked linked = Storage.linked(level, chest, SmartChest.store);
 		List<Slot> grid = getInputGridSlots();
 		beginPlacingRecipe();
+		placing = true;
 		try {
 			int amount = 1;
 			if (recipe.matches(craftSlots.asCraftInput(), level)) { // a mesma receita de novo: mais 1 em cada espaço
@@ -99,6 +141,7 @@ final class TableMenu extends CraftingMenu {
 			});
 			return PostPlaceAction.NOTHING;
 		} finally {
+			placing = false;
 			@SuppressWarnings("unchecked")
 			RecipeHolder<CraftingRecipe> typed = (RecipeHolder<CraftingRecipe>) holder;
 			finishPlacingRecipe(level, typed);
@@ -119,7 +162,13 @@ final class TableMenu extends CraftingMenu {
 
 	@Override
 	public void removed(Player p) {
-		if (p instanceof ServerPlayer sp) giveBack(Storage.linked(sp.level(), chest, SmartChest.store), sp.getInventory());
+		if (p instanceof ServerPlayer sp) {
+			giveBack(Storage.linked(sp.level(), chest, SmartChest.store), sp.getInventory());
+			if (bookBefore != null) { // o livro volta a ser como o jogador deixou nas outras mesas
+				sp.getRecipeBook().setBookSetting(RecipeBookType.CRAFTING, bookBefore.open(), bookBefore.filtering());
+				sp.connection.send(new ClientboundRecipeBookSettingsPacket(sp.getRecipeBook().getBookSettings().copy()));
+			}
+		}
 		super.removed(p);
 	}
 

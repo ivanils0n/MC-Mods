@@ -214,7 +214,8 @@ public final class SmartChest implements ModInitializer {
 		Chest owner = store.tableOwner(dim(sl), pos);
 		if (owner != null && hand == InteractionHand.MAIN_HAND && !(sp.isSecondaryUseActive() && !held.isEmpty())
 			&& sl.getBlockState(pos).is(Blocks.CRAFTING_TABLE)) {
-			TableMenu.open(sp, owner, pos);
+			CraftSearchMenu.open(sp, owner, pos, "");
+			warnUnloaded(sp, Storage.linked(sl, owner, store).unloaded);
 			return InteractionResult.SUCCESS;
 		}
 		if (isChestItem(held)) {
@@ -222,6 +223,11 @@ public final class SmartChest implements ModInitializer {
 			return InteractionResult.SUCCESS; // nunca deixa a obsidiana "crua" ser colocada
 		}
 		return InteractionResult.PASS;
+	}
+
+	/** Chamado pelo mixin quando o jogador clica no botão do livro de receitas (na mesa ligada, é a seta de voltar). */
+	public static void recipeBookButton(ServerPlayer sp) {
+		TableMenu.bookButton(sp);
 	}
 
 	static void warnUnloaded(ServerPlayer sp, int n) {

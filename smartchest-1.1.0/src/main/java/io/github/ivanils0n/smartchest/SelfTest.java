@@ -297,7 +297,7 @@ final class SelfTest {
 		var pick = server.getRecipeManager().getRecipes().stream().filter(r -> r.id().identifier().toString().equals("minecraft:diamond_pickaxe")).findFirst().orElseThrow();
 		fp.getInventory().clearContent();
 		chest.setItem(20, new ItemStack(Items.OAK_PLANKS, 5));
-		TableMenu table = new TableMenu(0, fp.getInventory(), sl, tablePos, sc);
+		TableMenu table = new TableMenu(0, fp.getInventory(), sl, tablePos, sc, "");
 		var none = net.minecraft.world.inventory.RecipeBookMenu.PostPlaceAction.NOTHING;
 		ensure(table.handlePlacement(false, false, stick, sl, fp.getInventory()) == none, "receita do graveto");
 		ensure(gridCount(table, Items.OAK_PLANKS) == 2 && count(chest, Items.OAK_PLANKS) == 3 && table.getSlot(0).getItem().is(Items.STICK),
@@ -308,13 +308,22 @@ final class SelfTest {
 		table.clicked(1 + 4, 0, ContainerInput.PICKUP, fp);
 		table.clicked(1 + 4, 0, ContainerInput.QUICK_MOVE, fp);
 		ensure(gridCount(table, Items.OAK_PLANKS) == 4 && table.getCarried().isEmpty() && count(fp.getInventory(), Items.OAK_PLANKS) == 0, "tirou item da grade");
+		table.clicked(0, 0, ContainerInput.QUICK_MOVE, fp); // Shift no resultado: crafta tudo da grade
+		ensure(count(fp.getInventory(), Items.STICK) == 8 && gridCount(table, Items.OAK_PLANKS) == 0, "Shift no resultado: " + count(fp.getInventory(), Items.STICK));
+		table.broadcastChanges(); // grade acabou: remonta com o que sobrou (1 tábua, receita incompleta)
+		ensure(gridCount(table, Items.OAK_PLANKS) == 1 && count(chest, Items.OAK_PLANKS) == 0, "remontar a grade: " + gridCount(table, Items.OAK_PLANKS));
 		table.removed(fp);
-		ensure(gridCount(table, Items.OAK_PLANKS) == 0 && count(chest, Items.OAK_PLANKS) == 5 && count(fp.getInventory(), Items.OAK_PLANKS) == 0,
+		ensure(gridCount(table, Items.OAK_PLANKS) == 0 && count(chest, Items.OAK_PLANKS) == 1 && count(fp.getInventory(), Items.OAK_PLANKS) == 0,
 			"fechar a mesa devolve aos baús: baú " + count(chest, Items.OAK_PLANKS) + ", jogador " + count(fp.getInventory(), Items.OAK_PLANKS));
+		fp.getInventory().clearContent();
+		chest.setItem(20, new ItemStack(Items.OAK_PLANKS, 5));
+		ensure(CraftSearchMenu.detached(fp, sc, tablePos, "stick").found().stream().anyMatch(c -> c.result().is(Items.STICK) && c.result().getCount() == 4),
+			"pesquisa da mesa não achou o graveto");
+		ensure(CraftSearchMenu.detached(fp, sc, tablePos, "").found().stream().noneMatch(c -> c.result().is(Items.DIAMOND_PICKAXE)), "pesquisa mostrou receita sem itens");
 		var tableRecipe = server.getRecipeManager().getRecipes().stream().filter(r -> r.id().identifier().toString().equals("minecraft:crafting_table")).findFirst().orElseThrow();
 		chest.setItem(20, new ItemStack(Items.OAK_PLANKS, 3));
 		fp.getInventory().setItem(0, new ItemStack(Items.OAK_PLANKS, 10)); // o inventário do jogador não é usado
-		table = new TableMenu(0, fp.getInventory(), sl, tablePos, sc);
+		table = new TableMenu(0, fp.getInventory(), sl, tablePos, sc, "");
 		ensure(table.handlePlacement(false, false, tableRecipe, sl, fp.getInventory()) == none && gridCount(table, Items.OAK_PLANKS) == 3
 			&& count(chest, Items.OAK_PLANKS) == 0 && count(fp.getInventory(), Items.OAK_PLANKS) == 10, "receita incompleta: grade " + gridCount(table, Items.OAK_PLANKS));
 		ensure(table.handlePlacement(false, false, pick, sl, fp.getInventory()) == net.minecraft.world.inventory.RecipeBookMenu.PostPlaceAction.PLACE_GHOST_RECIPE
