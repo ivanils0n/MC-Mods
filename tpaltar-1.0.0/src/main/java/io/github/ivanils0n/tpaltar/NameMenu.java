@@ -33,6 +33,10 @@ final class NameMenu extends AnvilMenu {
 		ItemStack shown = new ItemStack(Items.ENDER_PEARL);
 		shown.set(DataComponents.CUSTOM_NAME, Component.literal(""));
 		getSlot(0).set(shown);
+		// Ocupa o 2º espaço: com ele a bigorna não calcula custo de renomear e o "Custo: 1" para de piscar.
+		ItemStack block = TpAltar.piece(Items.GLASS_PANE, "tpaltar_blank", "blank");
+		block.set(DataComponents.CUSTOM_NAME, TpAltar.plain("Digite o nome e clique na ender pearl", ChatFormatting.LIGHT_PURPLE));
+		getSlot(1).set(block);
 		setData(COST_DATA, 0);
 	}
 
@@ -49,6 +53,18 @@ final class NameMenu extends AnvilMenu {
 		setData(COST_DATA, 0);
 		sendAllDataToRemote();
 		return changed;
+	}
+
+	@Override
+	public void createResult() {
+		super.createResult(); // com o 2º espaço ocupado o vanilla deixa o resultado vazio; põe a pearl de confirmar
+		if (typed == null) return; // chamado pelo construtor da bigorna, antes dos campos existirem
+		ItemStack input = getSlot(0).getItem();
+		if (input.isEmpty()) return;
+		ItemStack out = input.copy();
+		if (!typed.isBlank()) out.set(DataComponents.CUSTOM_NAME, Component.literal(typed));
+		resultSlots.setItem(0, out);
+		setData(COST_DATA, 0);
 	}
 
 	@Override
@@ -73,7 +89,8 @@ final class NameMenu extends AnvilMenu {
 
 	@Override
 	public void removed(Player player) {
-		getSlot(0).set(ItemStack.EMPTY); // o item de exibição nunca vai para o inventário
+		getSlot(1).set(ItemStack.EMPTY);
+		getSlot(0).set(ItemStack.EMPTY); // os itens de exibição nunca vai para o inventário
 		super.removed(player);
 		if (!done) TpAltar.say(player, "Colocação cancelada.", ChatFormatting.YELLOW);
 	}

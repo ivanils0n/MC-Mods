@@ -126,7 +126,7 @@ final class AltarMenu extends ChestMenu {
 		player.openMenu(new SimpleMenuProvider((id, inv, p) -> new AltarMenu(id, inv, box, rows, from, targets), title(player, rows, from.name)));
 		if (!(player.containerMenu instanceof AltarMenu)) return;
 		TpAltar.lock(from, player); // trava até teleportar ou fechar
-		player.level().playSound(null, new BlockPos(from.x, from.y, from.z), SoundEvents.ENDER_CHEST_OPEN, SoundSource.BLOCKS, 0.6f, 1.2f);
+		player.level().playSound(null, new BlockPos(from.x, from.y, from.z), SoundEvents.PORTAL_TRIGGER, SoundSource.BLOCKS, 0.35f, 1.6f);
 	}
 
 	/** Fundo de baú com o mesmo número de fileiras (caracteres \uE000 a \uE005 da fonte tpaltar:gui). */
