@@ -37,6 +37,15 @@
    "chars": [
     "\ue002"
    ]
+  },
+  {
+   "type": "bitmap",
+   "file": "smartchest:gui/craft_search.png",
+   "ascent": 13,
+   "height": 166,
+   "chars": [
+    "\ue003"
+   ]
   }
  ]
 }
