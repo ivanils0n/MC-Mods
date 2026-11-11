@@ -119,3 +119,10 @@ jobs:
           gh release view "$tag" >/dev/null 2>&1 || gh release create "$tag" --title "$id $ver" \
             --notes "Mod $id, versão $ver. Baixe o .jar da sua versão do Minecraft (mc26.2, mc26.3...) em Assets. O arquivo $id-pack-*.zip é o resource pack: o próprio mod envia o link aos jogadores, não é preciso baixar nem configurar nada." || true
           gh release upload "$tag" "$jar" --clobber || { sleep 10; gh release upload "$tag" "$jar" --clobber; }
+          # Texturas que mudaram: com o .jar novo já no release (ele aponta para o hash atual), o zip antigo sai.
+          zip=${{ matrix.mod }}/build/pack/$id-pack.zip
+          if [ -f "$zip" ]; then
+            keep="$id-pack-$(sha1sum "$zip" | cut -d' ' -f1).zip"
+            gh release view "$tag" --json assets -q '.assets[].name' | grep -E "^$id-pack-[0-9a-f]{40}\.zip$" | grep -vxF "$keep" |
+              while read -r old; do gh release delete-asset "$tag" "$old" -y || true; done
+          fi
