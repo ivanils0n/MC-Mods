@@ -60,3 +60,14 @@ java {
 tasks.withType(JavaCompile).configureEach {
 	it.options.release = 25
 }
+
+// Prints do cliente (só CI): ./gradlew runClientGameTest com xvfb; ver src/gametest.
+fabricApi {
+	configureTests {
+		createSourceSet = true
+		modId = 'coppergolem-gametest'
+		enableGameTests = false
+		enableClientGameTests = true
+		eula = true
+	}
+}

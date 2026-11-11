@@ -1,0 +1,11 @@
+{
+	"schemaVersion": 1,
+	"id": "coppergolem-gametest",
+	"version": "1.0.0",
+	"name": "Golem de Cobre: prints do cliente (só CI)",
+	"environment": "client",
+	"entrypoints": {
+		"fabric-client-gametest": ["io.github.ivanils0n.coppergolem.ClientShots"]
+	},
+	"depends": {"coppergolem": "*"}
+}
