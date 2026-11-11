@@ -64,6 +64,10 @@ jobs:
       - run: chmod +x ./gradlew
       # --configure-on-demand: só configura o mod pedido (os outros podem não ter a versão do Minecraft da matriz).
       - run: ./gradlew --configure-on-demand ":${{ matrix.mod }}:build" "-Pminecraft_version=${{ matrix.mc }}" "-Pminecraft_dependency=${{ matrix.dep }}"
+      - name: probe
+        run: |
+          j=$(find ~/.gradle /home/runner/work -name '*.jar' -path '*minecraft*' 2>/dev/null | grep -iE 'merged|common|minecraft-[0-9]' | head -5); echo "$j"
+          for f in $j; do javap -p -cp "$f" net.minecraft.world.entity.animal.golem.CopperGolem 2>/dev/null | grep -iE 'brain|weather' ; javap -p -cp "$f" net.minecraft.world.entity.LivingEntity 2>/dev/null | grep -iE 'brain'; done
       # Um download por mod e versão do Minecraft, ex.: mc26.2-tpaltar-1.0.0
       - uses: actions/upload-artifact@v7
         with:
