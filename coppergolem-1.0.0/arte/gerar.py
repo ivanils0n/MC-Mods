@@ -25,7 +25,18 @@ OX = ["#8fe0c6", "#4fa58c", "#3d8a74"]
 DK = "#2a120b"
 
 
+def flat(c, edge):
+    im = Image.new("RGBA", (16, 16), hx(c))
+    d = ImageDraw.Draw(im)
+    d.line([0, 15, 15, 15], fill=hx(edge)); d.line([15, 0, 15, 15], fill=hx(edge))
+    return im
+
+
 def copper_tex(seed=1, ox=0.0):
+    return flat("#e07e5c" if not ox else "#4fa58c", "#c06a47" if not ox else "#3d8a74")
+
+
+def _old_copper_tex(seed=1, ox=0.0):
     rnd = random.Random(seed)
     im = Image.new("RGBA", (16, 16))
     for y in range(16):
@@ -38,6 +49,10 @@ def copper_tex(seed=1, ox=0.0):
 
 
 def wood_tex():
+    return flat("#5b3620", "#4a2a18")
+
+
+def _old_wood_tex():
     rnd = random.Random(9)
     im = Image.new("RGBA", (16, 16))
     for y in range(16):
@@ -47,6 +62,10 @@ def wood_tex():
 
 
 def light_tex():
+    return flat("#f4a77d", "#e07e5c")
+
+
+def _old_light_tex():
     rnd = random.Random(11)
     im = Image.new("RGBA", (16, 16))
     for y in range(16):
@@ -56,7 +75,7 @@ def light_tex():
 
 
 def face_tex():
-    im = copper_tex(5)
+    im = copper_tex()
     d = ImageDraw.Draw(im)
     for x in (3, 11):
         d.rectangle([x, 5, x + 1, 7], fill=hx(DK))  # olhos
