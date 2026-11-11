@@ -1,11 +1,15 @@
 package io.github.ivanils0n.coppergolem;
 
 import io.github.ivanils0n.coppergolem.Links.Link;
+import net.fabricmc.fabric.api.entity.FakePlayer;
+import net.fabricmc.fabric.api.event.player.UseEntityCallback;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.resources.Identifier;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ServerLevel;
+import net.minecraft.world.InteractionHand;
+import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.EntitySpawnReason;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.animal.golem.CopperGolem;
@@ -57,6 +61,21 @@ final class SelfTest {
 		CopperGolem g = type.spawn(sl, o.above(), EntitySpawnReason.COMMAND);
 		ensure(g != null, "golem não nasceu");
 		Link l = GolemMod.links.getOrCreate(g.getUUID(), GolemMod.dim(sl));
+		l.refill = Link.arr(refill);
+		l.sources.add(Link.arr(src));
+		l.dests.add(Link.arr(dst));
+		l.dests.add(Link.arr(dst2));
+		// Clique do jogador com o cajado no golem: tem que ligar o cajado a ele e abrir a tela.
+		FakePlayer fp = FakePlayer.get(sl);
+		fp.setItemInHand(InteractionHand.MAIN_HAND, GolemMod.wandItem());
+		InteractionResult r = UseEntityCallback.EVENT.invoker().interact(fp, sl, InteractionHand.MAIN_HAND, g, null);
+		ensure(r == InteractionResult.SUCCESS, "clique com o cajado no golem: " + r);
+		ensure(g.getUUID().equals(GolemMod.golemOf(fp.getMainHandItem())), "cajado não ficou ligado ao golem");
+		ensure(fp.containerMenu instanceof GolemMenu, "tela de vínculos não abriu: " + fp.containerMenu);
+		GolemMod.link(fp, sl, fp.getMainHandItem(), refill, true);
+		ensure(GolemMod.links.get(g.getUUID()) != null && GolemMod.links.get(g.getUUID()).refill != null, "baú de recarga não ligou pelo cajado");
+		GolemMod.links.remove(g.getUUID());
+		l = GolemMod.links.getOrCreate(g.getUUID(), GolemMod.dim(sl));
 		l.refill = Link.arr(refill);
 		l.sources.add(Link.arr(src));
 		l.dests.add(Link.arr(dst));

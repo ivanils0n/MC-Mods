@@ -123,7 +123,7 @@ final class GolemTask {
 					g.setOpenedChestPos(target);
 					sl.playSound(null, target, SoundEvents.COPPER_CHEST_OPEN, SoundSource.BLOCKS, 0.5f, 1f);
 				}
-				finish(got.isEmpty() ? 20 : 20);
+				finish(20);
 			}
 			case DEST -> {
 				ItemStack held = g.getItemBySlot(EquipmentSlot.MAINHAND);
