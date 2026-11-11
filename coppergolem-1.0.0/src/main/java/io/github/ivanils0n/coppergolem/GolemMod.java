@@ -16,6 +16,7 @@ import java.util.Set;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 import net.fabricmc.api.ModInitializer;
+import net.fabricmc.loader.api.FabricLoader;
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerEntityEvents;
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerLifecycleEvents;
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerTickEvents;
@@ -67,7 +68,7 @@ public final class GolemMod implements ModInitializer {
 	static final String WAND_TAG = "coppergolem_wand";
 	static final double USE_RANGE_SQR = 12 * 12;
 
-	private static final String PACK_URL = "https://github.com/ivanils0n/MC-Mods/releases/download/coppergolem-pack/coppergolem-pack-";
+	private static final String PACK_URL = "https://github.com/ivanils0n/MC-Mods/releases/download/coppergolem-" + modVersion() + "/coppergolem-pack-";
 	static final String PACK_SHA1 = readPackHash();
 	private static final UUID PACK_ID = UUID.nameUUIDFromBytes("coppergolem:pack".getBytes(StandardCharsets.UTF_8));
 	private static final Set<UUID> PACK_OK = ConcurrentHashMap.newKeySet();
@@ -280,6 +281,13 @@ public final class GolemMod implements ModInitializer {
 	}
 
 	// ---------- resource pack e título da tela ----------
+
+	/** Versão do mod sem o sufixo "+mc..." (a do release no GitHub, ex.: 1.0.0). */
+	private static String modVersion() {
+		String v = FabricLoader.getInstance().getModContainer("coppergolem").orElseThrow().getMetadata().getVersion().getFriendlyString();
+		int i = v.indexOf('+');
+		return i < 0 ? v : v.substring(0, i);
+	}
 
 	private static String readPackHash() {
 		try (InputStream in = GolemMod.class.getResourceAsStream("/coppergolem/pack.sha1")) {

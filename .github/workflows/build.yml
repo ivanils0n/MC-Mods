@@ -49,7 +49,7 @@ jobs:
     if: needs.mods.outputs.any == 'true'
     runs-on: ubuntu-24.04
     permissions:
-      contents: write # publicar os resource packs (releases "<mod_id>-pack")
+      contents: write # publicar os releases dos mods (.jar e resource pack)
     strategy:
       fail-fast: false
       max-parallel: 4 # com mais jobs de uma vez o GitHub tem falhado ao criar os restantes ("Internal server error")
@@ -82,7 +82,7 @@ jobs:
           grep -q "${id^^} SELFTEST OK" server.log
           ! grep -q "Serialization errors" server.log
       # Mods com resource pack (src/pack): confere que o hash dentro do .jar é o do zip e, na main, publica o zip no
-      # release "<mod_id>-pack". O nome leva o hash, então cada versão do mod aponta para o seu próprio pack.
+      # release do mod ("<mod_id>-<versão>", o mesmo do .jar). O nome leva o hash, então cada versão do mod aponta para o seu pack.
       - name: Resource pack
         env:
           GH_TOKEN: ${{ github.token }}
@@ -97,10 +97,12 @@ jobs:
           if [ "${{ github.event_name }}" = push ] && [ "${{ github.ref }}" = refs/heads/main ]; then
             name="$id-pack-$sha.zip"
             cp "$zip" "$name"
-            gh release view $id-pack >/dev/null 2>&1 || gh release create $id-pack --title "Texturas: $id" \
-              --notes "Resource pack do mod $id. O próprio mod envia o link certo aos jogadores; não é preciso configurar nada." || true
-            if ! gh release view $id-pack --json assets -q '.assets[].name' | grep -qx "$name"; then
-              gh release upload $id-pack "$name" --clobber || { sleep 10; gh release upload $id-pack "$name" --clobber; }
+            ver=$(sed -n 's/^mod_version=//p' ${{ matrix.mod }}/gradle.properties)
+            tag="$id-$ver"
+            gh release view "$tag" >/dev/null 2>&1 || gh release create "$tag" --title "$id $ver" \
+              --notes "Mod $id, versão $ver. Baixe o .jar da sua versão do Minecraft (mc26.2, mc26.3...) em Assets. O arquivo $id-pack-*.zip é o resource pack: o próprio mod envia o link aos jogadores, não é preciso baixar nem configurar nada." || true
+            if ! gh release view "$tag" --json assets -q '.assets[].name' | grep -qx "$name"; then
+              gh release upload "$tag" "$name" --clobber || { sleep 10; gh release upload "$tag" "$name" --clobber; }
             fi
           fi
       # Na main, publica o .jar no release "<mod_id>-<versão do mod>" (um release por mod e versão; o nome do .jar já
@@ -115,5 +117,5 @@ jobs:
           tag="$id-$ver"
           jar=$(ls ${{ matrix.mod }}/build/libs/*.jar | grep -v sources | head -1)
           gh release view "$tag" >/dev/null 2>&1 || gh release create "$tag" --title "$id $ver" \
-            --notes "Mod $id, versão $ver. Baixe o .jar da sua versão do Minecraft (mc26.2, mc26.3...) em Assets." || true
+            --notes "Mod $id, versão $ver. Baixe o .jar da sua versão do Minecraft (mc26.2, mc26.3...) em Assets. O arquivo $id-pack-*.zip é o resource pack: o próprio mod envia o link aos jogadores, não é preciso baixar nem configurar nada." || true
           gh release upload "$tag" "$jar" --clobber || { sleep 10; gh release upload "$tag" "$jar" --clobber; }

@@ -19,6 +19,7 @@ import java.util.Set;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 import net.fabricmc.api.ModInitializer;
+import net.fabricmc.loader.api.FabricLoader;
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerEntityEvents;
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerLifecycleEvents;
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerTickEvents;
@@ -83,9 +84,9 @@ public final class SmartChest implements ModInitializer {
 	private static final double ACTIVE_RANGE_SQR = 48 * 48; // sem jogador a essa distância o visual não é conferido
 	static final String CHEST_TAG = "smartchest_chest", LINKER_TAG = "smartchest_linker";
 
-	// Resource pack: o zip é publicado pelo CI no release "smartchest-pack" com o hash no nome, e o mesmo hash vai
+	// Resource pack: o zip é publicado pelo CI no release do mod ("smartchest-<versão>") com o hash no nome, e o mesmo hash vai
 	// dentro do .jar (smartchest/pack.sha1). Assim cada versão do mod aponta para o seu pack.
-	private static final String PACK_URL = "https://github.com/ivanils0n/MC-Mods/releases/download/smartchest-pack/smartchest-pack-";
+	private static final String PACK_URL = "https://github.com/ivanils0n/MC-Mods/releases/download/smartchest-" + modVersion() + "/smartchest-pack-";
 	static final String PACK_SHA1 = readPackHash();
 	private static final UUID PACK_ID = UUID.nameUUIDFromBytes("smartchest:pack".getBytes(StandardCharsets.UTF_8));
 	private static final Set<UUID> PACK_OK = ConcurrentHashMap.newKeySet();
@@ -597,6 +598,13 @@ public final class SmartChest implements ModInitializer {
 	}
 
 	// ---------- resource pack e título da tela ----------
+
+	/** Versão do mod sem o sufixo "+mc..." (a do release no GitHub, ex.: 1.0.0). */
+	private static String modVersion() {
+		String v = FabricLoader.getInstance().getModContainer("smartchest").orElseThrow().getMetadata().getVersion().getFriendlyString();
+		int i = v.indexOf('+');
+		return i < 0 ? v : v.substring(0, i);
+	}
 
 	private static String readPackHash() {
 		try (InputStream in = SmartChest.class.getResourceAsStream("/smartchest/pack.sha1")) {

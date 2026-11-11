@@ -10,6 +10,12 @@ Mods Fabric para Minecraft. Cada pasta `<mod>-<versão>/` é um mod independente
 | Baú Central | `smartchest-1.1.0/` | 26.2 (Fabric, servidor ou singleplayer, requer Fabric API) |
 | Golem de Cobre Inteligente | `coppergolem-1.0.0/` | 26.2 (Fabric, servidor ou singleplayer, requer Fabric API) |
 
+## Releases
+
+Cada mod e versão tem um release `<mod_id>-<versão>` (ex.: `tpaltar-1.0.0`) com o .jar de cada versão do Minecraft e, se o mod tem resource pack, o `<mod_id>-pack-<sha1>.zip`. O CI cria tudo sozinho a cada push na `main`.
+
+Mod novo: pasta `<mod>-<versão>/` com `build.gradle` e `gradle.properties` (`mod_id`, `mod_version`). Com resource pack (`src/pack/`), o link no código é `releases/download/<mod_id>-` + versão do mod (sem o `+mc...`) + `/<mod_id>-pack-<sha1>.zip`, como em `TpAltar.modVersion()`.
+
 ## Altar de Teleporte
 
 Vai na pasta `mods/` do servidor, junto com o Fabric API; os jogadores entram sem instalar nada. Em singleplayer, coloque o mesmo .jar na pasta `mods/` do jogo.

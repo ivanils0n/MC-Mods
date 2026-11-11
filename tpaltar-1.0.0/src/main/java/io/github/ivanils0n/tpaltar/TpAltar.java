@@ -17,6 +17,7 @@ import com.google.gson.JsonObject;
 import com.google.gson.JsonPrimitive;
 import com.mojang.serialization.JsonOps;
 import net.fabricmc.api.ModInitializer;
+import net.fabricmc.loader.api.FabricLoader;
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerEntityEvents;
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerLifecycleEvents;
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerTickEvents;
@@ -90,10 +91,10 @@ public final class TpAltar implements ModInitializer {
 	private static final int ANIM_TICKS = 40; // cada passo de animação (giro dos cristais, flutuar do olho) dura 2 s
 	private static final float BOB = 0.06f;
 
-	// Resource pack: o zip é publicado pelo CI no release "tpaltar-pack" com o hash no nome, e o mesmo hash vai
+	// Resource pack: o zip é publicado pelo CI no release do mod ("tpaltar-<versão>") com o hash no nome, e o mesmo hash vai
 	// dentro do .jar (tpaltar/pack.sha1). Assim cada versão do mod aponta para o seu pack e o jogo só baixa de novo
 	// quando as texturas mudam.
-	private static final String PACK_URL = "https://github.com/ivanils0n/MC-Mods/releases/download/tpaltar-pack/tpaltar-pack-";
+	private static final String PACK_URL = "https://github.com/ivanils0n/MC-Mods/releases/download/tpaltar-" + modVersion() + "/tpaltar-pack-";
 	static final String PACK_SHA1 = readPackHash();
 	private static final UUID PACK_ID = UUID.nameUUIDFromBytes("tpaltar:pack".getBytes(StandardCharsets.UTF_8));
 
@@ -625,6 +626,13 @@ public final class TpAltar implements ModInitializer {
 	/** Altar craftado (a receita dá o modelo de olho do fim) ou de versão antiga: ganha o modelo próprio no singleplayer. */
 	static void upgrade(ItemStack stack) {
 		if (isAltarItem(stack) && !model("altar").equals(stack.get(DataComponents.ITEM_MODEL))) stack.set(DataComponents.ITEM_MODEL, model("altar"));
+	}
+
+	/** Versão do mod sem o sufixo "+mc..." (a do release no GitHub, ex.: 1.0.0). */
+	private static String modVersion() {
+		String v = FabricLoader.getInstance().getModContainer("tpaltar").orElseThrow().getMetadata().getVersion().getFriendlyString();
+		int i = v.indexOf('+');
+		return i < 0 ? v : v.substring(0, i);
 	}
 
 	private static String readPackHash() {

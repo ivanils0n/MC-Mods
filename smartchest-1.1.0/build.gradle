@@ -21,7 +21,7 @@ if (project.hasProperty('selftest')) {
 }
 
 // Resource pack do servidor: as mesmas texturas de src/main/resources/assets num zip reproduzível (mesmos bytes a
-// cada build), cujo SHA-1 vai dentro do .jar em smartchest/pack.sha1. O CI publica o zip como smartchest-pack-<sha1>.zip.
+// cada build), cujo SHA-1 vai dentro do .jar em smartchest/pack.sha1. O CI publica o zip como smartchest-pack-<sha1>.zip no release do mod.
 def packZip = tasks.register('resourcePackZip', Zip) {
 	archiveFileName = 'smartchest-pack.zip'
 	destinationDirectory = layout.buildDirectory.dir('pack')
