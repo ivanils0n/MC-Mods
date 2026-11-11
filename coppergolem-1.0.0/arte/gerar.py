@@ -89,7 +89,7 @@ def icon():
 
 
 def model(tilt=True):
-    DY = -5.8  # pegada no cabo, perto do pomo: o cabo fica onde o cabo de uma espada do jogo fica na mão
+    DY = -5.8 if tilt else 2  # pegada no cabo, perto do pomo: o cabo fica onde o cabo de uma espada do jogo fica na mão
 
     def box(a, b, tex, **over):
         faces = {f: {"texture": "#" + over.get(f, tex)} for f in ("north", "south", "east", "west", "up", "down")}
@@ -122,7 +122,17 @@ def model(tilt=True):
         "firstperson_righthand": {"rotation": [0, -90, 25], "translation": [1.13, 3.2, 1.13], "scale": [0.68, 0.68, 0.68]},
         "firstperson_lefthand": {"rotation": [0, 90, -25], "translation": [1.13, 3.2, 1.13], "scale": [0.68, 0.68, 0.68]},
     }
-    if not tilt:  # 1ª pessoa: reto, rosto para a câmera (valores que já ficaram retos no jogo)
+    if not tilt:
+        # 1ª pessoa: a pose [0,-90,160] vira o item de cabeça para baixo (rosto para a câmera). Em vez de mexer na pose
+        # (o rosto viraria para trás), gira a geometria 180° no plano x-y: cabeça embaixo, que a pose desvira.
+        for e in els:
+            (fx, fy, fz), (tx, ty, tz) = e["from"], e["to"]
+            e["from"], e["to"] = [16 - tx, 16 - ty, fz], [16 - fx, 16 - fy, tz]
+            f = e["faces"]
+            f["up"], f["down"] = f["down"], f["up"]
+            for face in f.values():
+                face["rotation"] = 180
+
         disp = {
             "firstperson_righthand": {"rotation": [0, -90, 160], "translation": [1.13, 3.2, 1.13], "scale": [0.68, 0.68, 0.68]},
             "firstperson_lefthand": {"rotation": [0, 90, -160], "translation": [1.13, 3.2, 1.13], "scale": [0.68, 0.68, 0.68]},
