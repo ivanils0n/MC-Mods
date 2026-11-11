@@ -18,18 +18,19 @@ jobs:
       - name: Dump API
         run: |
           mkdir -p out
+          : > out/dump.txt
           jar=""
-          for j in $(find $HOME/.gradle . -name '*.jar' -size +5M 2>/dev/null); do
-            if unzip -l "$j" 2>/dev/null | grep -q 'net/minecraft/world/entity/animal/coppergolem/CopperGolem.class'; then jar=$j; break; fi
+          for j in $(find / -name '*.jar' -size +5M -not -path '*/proc/*' 2>/dev/null); do
+            if unzip -l "$j" 2>/dev/null | grep -q 'CopperGolem.class'; then echo "JAR $j" >> out/dump.txt; jar=$j; break; fi
           done
-          echo "JAR=$jar" | tee out/dump.txt
-          [ -n "$jar" ] || { unzip -l $(find $HOME/.gradle -name '*.jar' -size +5M | head -3) | grep -i copper | head -50 >> out/dump.txt; }
+          if [ -z "$jar" ]; then echo "SEM JAR" >> out/dump.txt; find / -name '*.jar' -size +5M -not -path '/proc/*' 2>/dev/null | head -40 >> out/dump.txt; fi
           if [ -n "$jar" ]; then
-            unzip -l "$jar" | grep -iE 'copper|Weathering' | awk '{print $4}' >> out/classes.txt
-            for c in $(grep -E 'entity/animal/coppergolem/.*\.class$' out/classes.txt | sed 's/\.class$//; s#/#.#g'); do
+            unzip -l "$jar" | awk '{print $4}' | grep -iE 'copper|Weathering' > out/classes.txt
+            cat out/classes.txt >> out/dump.txt
+            for c in $(grep -E 'CopperGolem[A-Za-z$]*\.class$|CopperChest[A-Za-z$]*\.class$|WeatheringCopper[A-Za-z$]*\.class$' out/classes.txt | sed 's/\.class$//; s#/#.#g'); do
               echo "=== $c" >> out/dump.txt; javap -p -cp "$jar" "$c" >> out/dump.txt 2>&1
             done
-            for c in net.minecraft.world.level.block.WeatheringCopper net.minecraft.world.level.block.WeatheringCopper\$WeatherState net.minecraft.world.level.block.CopperChestBlock net.minecraft.world.level.block.entity.CopperChestBlockEntity net.minecraft.world.entity.ai.behavior.TransportItemsBetweenContainers net.minecraft.world.entity.ai.memory.MemoryModuleType net.minecraft.world.entity.ai.Brain net.minecraft.world.entity.Mob net.minecraft.world.entity.EntityType net.minecraft.world.entity.ai.navigation.PathNavigation net.minecraft.world.entity.ai.memory.WalkTarget net.minecraft.world.entity.ai.behavior.BehaviorUtils; do
+            for c in net.minecraft.world.entity.ai.behavior.TransportItemsBetweenContainers net.minecraft.world.entity.ai.memory.MemoryModuleType net.minecraft.world.entity.ai.Brain net.minecraft.world.entity.ai.navigation.PathNavigation net.minecraft.world.entity.ai.memory.WalkTarget net.minecraft.world.entity.decoration.ItemFrame net.minecraft.world.entity.decoration.HangingEntity; do
               echo "=== $c" >> out/dump.txt; javap -p -cp "$jar" "$c" >> out/dump.txt 2>&1
             done
           fi
