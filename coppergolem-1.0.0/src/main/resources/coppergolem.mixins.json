@@ -3,6 +3,7 @@
 	"package": "io.github.ivanils0n.coppergolem.mixin",
 	"compatibilityLevel": "JAVA_21",
 	"mixins": [
+		"GolemInteractMixin",
 		"ResourcePackResponseMixin"
 	],
 	"injectors": {

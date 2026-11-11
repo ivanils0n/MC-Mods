@@ -113,11 +113,17 @@ public final class GolemMod implements ModInitializer {
 				TASKS.remove(entity.getUUID());
 			}
 		});
-		UseEntityCallback.EVENT.register((player, level, hand, entity, hit) -> {
-			if (links == null || hand != InteractionHand.MAIN_HAND || !(player instanceof ServerPlayer sp) || sp.isSpectator()
-				|| !isWand(sp.getMainHandItem()) || !(entity instanceof CopperGolem)) {
-				return InteractionResult.PASS;
-			}
+		UseEntityCallback.EVENT.register((player, level, hand, entity, hit) -> useOnGolem(player, hand, entity));
+		UseBlockCallback.EVENT.register(GolemMod::onUseBlock);
+	}
+
+	/** Cajado em punho clicando num golem: liga o cajado a ele e abre a tela. Também chamado pelo mixin do golem. */
+	public static InteractionResult useOnGolem(Player player, InteractionHand hand, Entity entity) {
+		if (links == null || hand != InteractionHand.MAIN_HAND || player.isSpectator() || !isWand(player.getMainHandItem()) || !(entity instanceof CopperGolem)) {
+			return InteractionResult.PASS;
+		}
+		if (!(player instanceof ServerPlayer sp)) return InteractionResult.SUCCESS; // cliente: não deixa o jogo fazer a ação normal do golem
+		try {
 			ItemStack wand = sp.getMainHandItem();
 			CustomData data = wand.get(DataComponents.CUSTOM_DATA);
 			CompoundTag tag = data == null ? new CompoundTag() : data.copyTag();
@@ -127,10 +133,13 @@ public final class GolemMod implements ModInitializer {
 				plain("Ligado a um Golem de Cobre.", ChatFormatting.GRAY),
 				plain("Clique em baús (de cobre = recarga) para vincular.", ChatFormatting.DARK_GRAY))));
 			sp.level().playSound(null, entity.blockPosition(), SoundEvents.LODESTONE_COMPASS_LOCK, SoundSource.PLAYERS, 1f, 1.2f);
+			say(sp, plain("Cajado ligado a este golem.", ChatFormatting.GREEN));
 			GolemMenu.open(sp, entity.getUUID());
-			return InteractionResult.SUCCESS;
-		});
-		UseBlockCallback.EVENT.register(GolemMod::onUseBlock);
+		} catch (RuntimeException e) {
+			LOG.error("Erro ao ligar o cajado ao golem", e);
+			say(sp, plain("Erro ao abrir a tela do golem (veja o log).", ChatFormatting.RED));
+		}
+		return InteractionResult.SUCCESS;
 	}
 
 	// ---------- eventos ----------

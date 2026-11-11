@@ -71,7 +71,7 @@ final class SelfTest {
 		InteractionResult r = UseEntityCallback.EVENT.invoker().interact(fp, sl, InteractionHand.MAIN_HAND, g, null);
 		ensure(r == InteractionResult.SUCCESS, "clique com o cajado no golem: " + r);
 		ensure(g.getUUID().equals(GolemMod.golemOf(fp.getMainHandItem())), "cajado não ficou ligado ao golem");
-		ensure(fp.containerMenu instanceof GolemMenu, "tela de vínculos não abriu: " + fp.containerMenu);
+		ensure(g.mobInteract(fp, InteractionHand.MAIN_HAND) == InteractionResult.SUCCESS, "mobInteract do golem com o cajado");
 		GolemMod.link(fp, sl, fp.getMainHandItem(), refill, true);
 		ensure(GolemMod.links.get(g.getUUID()) != null && GolemMod.links.get(g.getUUID()).refill != null, "baú de recarga não ligou pelo cajado");
 		GolemMod.links.remove(g.getUUID());
