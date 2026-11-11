@@ -126,18 +126,15 @@ WOOD = ["#9c7a4c", "#8a6a40", "#a8865a", "#7c5e38"]
 
 def table_faces():
     top, front, side = (Image.new("RGBA", (16, 16)) for _ in range(3))
-    # topo: tampo de madeira com a grade 3x3 incrustada em obsidiana do End
-    noise(top, WOOD, 70, (0, 0, 16, 16), [.35, .3, .2, .15])
-    bevel(top, "#c4a06a", "#5a4228")
-    rect(top, 2, 2, 13, 13, "#14101e")
+    # topo: grade 3x3 de obsidiana do End com espaços iguais (4x4) e linhas roxas de 1 pixel
     for gx in range(3):
         for gy in range(3):
-            noise(top, OBS, 80 + gx * 3 + gy, (3 + gx * 4, 3 + gy * 4, 6 + gx * 4, 6 + gy * 4), OBS_W)
-    for i in range(2, 14):  # linhas da grade com brilho roxo
-        for k in (2, 6, 10, 13):
+            noise(top, OBS, 80 + gx * 3 + gy, (1 + gx * 5, 1 + gy * 5, 5 + gx * 5, 5 + gy * 5), OBS_W)
+    for i in range(16):
+        for k in (0, 5, 10, 15):
             top.putpixel((i, k), hx("#6a4aa8")); top.putpixel((k, i), hx("#6a4aa8"))
     rect(top, 7, 7, 8, 8, "#2fa37a"); px(top, [(7, 7)], "#a6f5d0"); px(top, [(8, 8)], "#1d6e52")
-    px(top, [(2, 2), (13, 2), (2, 13), (13, 13)], "#8d5fe0")
+    px(top, [(0, 0), (15, 0), (0, 15), (15, 15), (5, 5), (10, 5), (5, 10), (10, 10)], "#8d5fe0")
     # laterais: tábuas de madeira, faixa de obsidiana no alto e cantos roxos
     for im, seed in ((front, 90), (side, 91)):
         noise(im, WOOD, seed, (0, 0, 16, 16), [.35, .3, .2, .15])
