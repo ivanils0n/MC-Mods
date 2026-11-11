@@ -74,6 +74,8 @@ final class SelfTest {
 		ensure(g.getUUID().equals(GolemMod.golemOf(fp.getMainHandItem())), "cajado não ficou ligado ao golem");
 		ensure(g.mobInteract(fp, InteractionHand.MAIN_HAND) == InteractionResult.SUCCESS, "mobInteract do golem com o cajado");
 		GolemMod.links.remove(g.getUUID());
+		Component far = GolemMod.link(fp, sl, fp.getMainHandItem(), src, GolemMod.Role.SOURCE);
+		ensure(GolemMod.links.get(g.getUUID()) == null || GolemMod.links.get(g.getUUID()).sources.isEmpty(), "origem sem baú de recarga: " + far.getString());
 		Component msg = GolemMod.link(fp, sl, fp.getMainHandItem(), refill, GolemMod.Role.REFILL);
 		ensure(GolemMod.links.get(g.getUUID()) != null && GolemMod.links.get(g.getUUID()).refill != null, "baú de recarga não ligou pelo cajado: " + msg.getString());
 		GolemMod.link(fp, sl, fp.getMainHandItem(), src, GolemMod.Role.SOURCE);
@@ -84,6 +86,11 @@ final class SelfTest {
 		ensure(chosen.sources.size() == 2 && chosen.dests.isEmpty(), "mudar o papel do baú");
 		GolemMod.link(fp, sl, fp.getMainHandItem(), dst, GolemMod.Role.NONE);
 		ensure(chosen.sources.size() == 1, "desligar baú");
+		BlockPos away = refill.east(40);
+		sl.setBlock(away, Blocks.CHEST.defaultBlockState(), Block.UPDATE_ALL);
+		GolemMod.link(fp, sl, fp.getMainHandItem(), away, GolemMod.Role.DEST);
+		ensure(chosen.dests.isEmpty(), "baú a mais de 33 blocos não pode ligar");
+		sl.setBlock(away, Blocks.AIR.defaultBlockState(), Block.UPDATE_ALL);
 		GolemMod.links.remove(g.getUUID());
 		l = GolemMod.links.getOrCreate(g.getUUID(), GolemMod.dim(sl));
 		l.refill = Link.arr(refill);
@@ -96,10 +103,16 @@ final class SelfTest {
 		ensure(Boxes.count(Boxes.containers(sl, dst), new ItemStack(Items.DIAMOND)) + Boxes.count(Boxes.containers(sl, dst2), new ItemStack(Items.DIAMOND)) == 5
 			&& Boxes.count(Boxes.containers(sl, src), new ItemStack(Items.DIAMOND)) == 0, "golem não moveu os diamantes");
 
-		g.setWeatherState(WeatheringCopper.WeatherState.EXPOSED);
+		g.setWeatherState(WeatheringCopper.WeatherState.WEATHERED);
 		for (int i = 0; i < 400; i++) t.step(sl, g, l);
 		ensure(g.getWeatherState() == WeatheringCopper.WeatherState.UNAFFECTED, "golem não se recarregou: " + g.getWeatherState());
-		ensure(Boxes.count(Boxes.containers(sl, refill), new ItemStack(Items.COPPER_INGOT)) < 10, "barras de cobre não foram gastas");
+		ensure(Boxes.count(Boxes.containers(sl, refill), new ItemStack(Items.COPPER_INGOT)) == 8, "2 níveis de ferrugem = 2 barras");
+
+		// barra de cobre na mão: um nível a menos por clique
+		g.setWeatherState(WeatheringCopper.WeatherState.OXIDIZED);
+		fp.setItemInHand(InteractionHand.MAIN_HAND, new ItemStack(Items.COPPER_INGOT, 5));
+		ensure(GolemMod.useOnGolem(fp, InteractionHand.MAIN_HAND, g) == InteractionResult.SUCCESS, "barra de cobre no golem");
+		ensure(g.getWeatherState() == WeatheringCopper.WeatherState.WEATHERED && fp.getMainHandItem().getCount() == 4, "barra de cobre tira um nível");
 
 		GolemMod.links.remove(g.getUUID());
 		g.discard();

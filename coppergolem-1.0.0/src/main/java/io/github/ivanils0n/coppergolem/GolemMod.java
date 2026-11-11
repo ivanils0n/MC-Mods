@@ -51,6 +51,7 @@ import net.minecraft.world.item.Items;
 import net.minecraft.world.item.component.CustomData;
 import net.minecraft.world.item.component.ItemLore;
 import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.WeatheringCopper.WeatherState;
 import net.minecraft.world.level.storage.LevelResource;
 import net.minecraft.world.phys.BlockHitResult;
 import org.slf4j.Logger;
@@ -120,6 +121,8 @@ public final class GolemMod implements ModInitializer {
 
 	/** Cajado em punho clicando num golem: liga o cajado a ele e abre a tela. Também chamado pelo mixin do golem. */
 	public static InteractionResult useOnGolem(Player player, InteractionHand hand, Entity entity) {
+		InteractionResult repaired = repair(player, hand, entity);
+		if (repaired != InteractionResult.PASS) return repaired;
 		if (links == null || hand != InteractionHand.MAIN_HAND || player.isSpectator() || !isWand(player.getMainHandItem()) || !(entity instanceof CopperGolem)) {
 			return InteractionResult.PASS;
 		}
@@ -141,6 +144,26 @@ public final class GolemMod implements ModInitializer {
 			say(sp, plain("Erro ao abrir a tela do golem (veja o log).", ChatFormatting.RED));
 		}
 		return InteractionResult.SUCCESS;
+	}
+
+	/** Barra de cobre na mão clicando num golem enferrujado: tira um nível de ferrugem (como uma passada de machado). */
+	private static InteractionResult repair(Player player, InteractionHand hand, Entity entity) {
+		ItemStack held = player.getItemInHand(hand);
+		if (!(entity instanceof CopperGolem g) || player.isSpectator() || !held.is(Items.COPPER_INGOT) || g.getWeatherState() == WeatherState.UNAFFECTED) {
+			return InteractionResult.PASS;
+		}
+		if (player.level() instanceof ServerLevel sl) {
+			scrape(sl, g);
+			held.consume(1, player);
+		}
+		return InteractionResult.SUCCESS;
+	}
+
+	/** Um nível de ferrugem a menos, com o efeito do machado. */
+	static void scrape(ServerLevel sl, CopperGolem g) {
+		g.setWeatherState(WeatherState.values()[g.getWeatherState().ordinal() - 1]);
+		sl.sendParticles(ParticleTypes.SCRAPE, g.getX(), g.getY() + 0.9, g.getZ(), 12, 0.25, 0.4, 0.25, 0.02);
+		sl.playSound(null, g.blockPosition(), SoundEvents.AXE_SCRAPE, SoundSource.NEUTRAL, 1f, 1f);
 	}
 
 	// ---------- eventos ----------
@@ -205,10 +228,20 @@ public final class GolemMod implements ModInitializer {
 				sl.playSound(null, pos, SoundEvents.CHAIN_PLACE, SoundSource.PLAYERS, 1f, 0.6f);
 				return plain("Baú de recarga desligado.", ChatFormatting.YELLOW);
 			}
+			for (List<int[]> list : List.of(l.sources, l.dests)) {
+				for (int[] b : list) {
+					if (far(pos, Link.pos(b))) return plain("Há baús ligados a mais de " + Links.RANGE + " blocos daqui. Desligue-os antes de trocar o baú de recarga.", ChatFormatting.RED);
+				}
+			}
 			l.refill = Link.arr(pos);
 			links.markDirty();
 			burst(sl, sp, pos, ParticleTypes.WAX_ON);
-			return plain("Baú de recarga ligado: ponha barras de cobre nele (1 a 3 por vez que o golem enferrujar).", ChatFormatting.GOLD);
+			return plain("Baú de recarga ligado: ponha barras de cobre nele (1 por nível de ferrugem). Origem e guardar: até " + Links.RANGE + " blocos dele.", ChatFormatting.GOLD);
+		}
+		if (role != Role.NONE) {
+			if (l.refill == null) return plain("Ligue primeiro o baú de cobre (recarga) do golem: os outros baús ficam até " + Links.RANGE + " blocos dele.", ChatFormatting.RED);
+			BlockPos anchor = Link.pos(l.refill);
+			if (far(anchor, pos)) return plain("Longe demais: " + (int) Math.sqrt(anchor.distSqr(pos)) + " blocos do baú de recarga (máximo " + Links.RANGE + ").", ChatFormatting.RED);
 		}
 		boolean had = false;
 		for (BlockPos g : group) {
@@ -235,6 +268,10 @@ public final class GolemMod implements ModInitializer {
 		links.markDirty();
 		burst(sl, sp, pos, origin ? ParticleTypes.PORTAL : ParticleTypes.HAPPY_VILLAGER);
 		return plain("Baú " + (origin ? "de origem" : "de guardar") + " ligado." + (origin ? "" : " Moldura com um item ao lado dele: só esse item entra."), ChatFormatting.GREEN);
+	}
+
+	static boolean far(BlockPos a, BlockPos b) {
+		return a.distSqr(b) > (double) Links.RANGE * Links.RANGE;
 	}
 
 	private static void burst(ServerLevel sl, ServerPlayer sp, BlockPos pos, ParticleOptions type) {

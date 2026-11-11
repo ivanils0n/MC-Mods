@@ -3,8 +3,8 @@ package io.github.ivanils0n.coppergolem;
 import io.github.ivanils0n.coppergolem.Links.Link;
 import java.util.List;
 import net.minecraft.core.BlockPos;
-import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.server.level.ServerLevel;
+import net.minecraft.sounds.SoundEvent;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.Container;
@@ -13,12 +13,16 @@ import net.minecraft.world.entity.animal.golem.CopperGolem;
 import net.minecraft.world.entity.animal.golem.CopperGolemState;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
+import net.minecraft.world.level.block.BarrelBlock;
+import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.WeatheringCopper.WeatherState;
+import net.minecraft.world.level.block.entity.ChestBlockEntity;
+import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.pathfinder.Path;
 import net.minecraft.world.phys.Vec3;
 
 /**
- * O "cérebro" de um golem vinculado: recarga com barras de cobre quando começa a enferrujar, senão pega itens nos baús
+ * O "cérebro" de um golem vinculado: recarga com barras de cobre (uma por nível de ferrugem) quando começa a enferrujar, senão pega itens nos baús
  * de origem e guarda nos baús de destino (a moldura escolhe o item; sem moldura vale a categoria do criativo).
  * O cérebro do jogo é esvaziado para o golem não voltar ao transporte entre baús de cobre; a ferrugem continua normal.
  */
@@ -32,6 +36,7 @@ final class GolemTask {
 	private BlockPos target;
 	private ItemStack want = ItemStack.EMPTY;
 	private int ticks, wait, cooldown;
+	private BlockPos opened; // baú com a tampa aberta pelo golem (fecha quando ele termina)
 	/** Para o teste: considera que o golem já chegou (o teste não espera ele andar). */
 	boolean teleportForTest;
 
@@ -43,6 +48,7 @@ final class GolemTask {
 			if (wait <= 0) {
 				g.setState(CopperGolemState.IDLE);
 				g.clearOpenedChestPos();
+				lid(sl, false);
 			}
 			return;
 		}
@@ -85,7 +91,7 @@ final class GolemTask {
 		WeatherState weather = g.getWeatherState();
 		if (weather != WeatherState.UNAFFECTED && link.refill != null && cooldown <= 0) { // começou a enferrujar: recarrega
 			BlockPos refill = Link.pos(link.refill);
-			if (Boxes.count(Boxes.containers(sl, refill), new ItemStack(Items.COPPER_INGOT)) >= weather.ordinal()) {
+			if (Boxes.count(Boxes.containers(sl, refill), new ItemStack(Items.COPPER_INGOT)) > 0) {
 				go(Phase.REFILL, refill);
 				return;
 			}
@@ -120,10 +126,9 @@ final class GolemTask {
 				if (!got.isEmpty()) {
 					g.setItemSlot(EquipmentSlot.MAINHAND, got);
 					g.setState(CopperGolemState.GETTING_ITEM);
-					g.setOpenedChestPos(target);
-					sl.playSound(null, target, SoundEvents.COPPER_CHEST_OPEN, SoundSource.BLOCKS, 0.5f, 1f);
+					open(sl, g);
 				}
-				finish(20);
+				finish(30);
 			}
 			case DEST -> {
 				ItemStack held = g.getItemBySlot(EquipmentSlot.MAINHAND);
@@ -135,27 +140,50 @@ final class GolemTask {
 				ItemStack rest = dest == null ? held : Boxes.insert(Boxes.containers(sl, target), held);
 				g.setItemSlot(EquipmentSlot.MAINHAND, rest);
 				g.setState(CopperGolemState.DROPPING_ITEM);
-				g.setOpenedChestPos(target);
-				sl.playSound(null, target, SoundEvents.COPPER_CHEST_CLOSE, SoundSource.BLOCKS, 0.5f, 1f);
-				finish(20);
+				open(sl, g);
+				finish(30);
 			}
-			case REFILL -> {
-				int need = g.getWeatherState().ordinal();
-				List<Container> boxes = Boxes.containers(sl, target);
-				ItemStack got = Boxes.take(boxes, new ItemStack(Items.COPPER_INGOT), need);
-				if (got.getCount() >= need && need > 0) {
-					g.setWeatherState(WeatherState.UNAFFECTED); // enferrujar de novo segue o tempo normal do jogo
+			case REFILL -> { // uma barra = uma passada de machado (um nível de ferrugem a menos); volta para a próxima
+				if (g.getWeatherState() != WeatherState.UNAFFECTED && !Boxes.take(Boxes.containers(sl, target), new ItemStack(Items.COPPER_INGOT), 1).isEmpty()) {
 					g.setState(CopperGolemState.GETTING_ITEM);
-					g.setOpenedChestPos(target);
-					sl.sendParticles(ParticleTypes.WAX_OFF, g.getX(), g.getY() + 0.9, g.getZ(), 12, 0.25, 0.4, 0.25, 0.02);
-					sl.playSound(null, g.blockPosition(), SoundEvents.AXE_WAX_OFF, SoundSource.NEUTRAL, 0.8f, 1.2f);
-				} else if (!got.isEmpty()) {
-					Boxes.insert(boxes, got); // faltou: devolve (não gasta nada)
+					open(sl, g);
+					GolemMod.scrape(sl, g);
 				}
-				finish(20);
+				finish(30);
 			}
 			default -> abort(20);
 		}
+	}
+
+	/** Abre a tampa do baú (ou barril) alvo para todos verem; fecha em lid(false) quando a espera acaba. */
+	private void open(ServerLevel sl, CopperGolem g) {
+		g.setOpenedChestPos(target);
+		if (opened != null) lid(sl, false);
+		opened = target;
+		lid(sl, true);
+	}
+
+	private void lid(ServerLevel sl, boolean open) {
+		if (opened == null || !sl.isLoaded(opened)) {
+			opened = null;
+			return;
+		}
+		boolean barrel = false;
+		for (BlockPos p : Boxes.group(sl, opened)) {
+			BlockState st = sl.getBlockState(p);
+			if (st.hasProperty(BarrelBlock.OPEN)) {
+				barrel = true;
+				sl.setBlock(p, st.setValue(BarrelBlock.OPEN, open), Block.UPDATE_ALL);
+			} else if (sl.getBlockEntity(p) instanceof ChestBlockEntity) {
+				// a conta de quem está olhando dentro: se um jogador está com o baú aberto, ele continua aberto
+				sl.blockEvent(p, st.getBlock(), 1, ChestBlockEntity.getOpenCount(sl, p) + (open ? 1 : 0));
+			}
+		}
+		SoundEvent sound = barrel ? (open ? SoundEvents.BARREL_OPEN : SoundEvents.BARREL_CLOSE)
+			: Boxes.isCopperChest(sl, opened) ? (open ? SoundEvents.COPPER_CHEST_OPEN : SoundEvents.COPPER_CHEST_CLOSE)
+			: open ? SoundEvents.CHEST_OPEN : SoundEvents.CHEST_CLOSE;
+		sl.playSound(null, opened, sound, SoundSource.BLOCKS, 0.5f, 1f);
+		if (!open) opened = null;
 	}
 
 	private void finish(int waitTicks) {

@@ -18,7 +18,9 @@ import net.minecraft.core.BlockPos;
 /** Vínculos de cada golem (coppergolem.json na pasta do mundo, fora do save do Minecraft). */
 final class Links {
 	private static final Gson GSON = new GsonBuilder().setPrettyPrinting().create();
-	static final int MAX_SOURCES = 3, MAX_DESTS = 18;
+	static final int MAX_SOURCES = 6, MAX_DESTS = 18;
+	/** Origem e guardar só até essa distância (em blocos) do baú de cobre de recarga do golem. */
+	static final int RANGE = 33;
 
 	/** Os baús de um golem. Cada posição é {x, y, z}; vale uma dimensão só. */
 	static final class Link {
