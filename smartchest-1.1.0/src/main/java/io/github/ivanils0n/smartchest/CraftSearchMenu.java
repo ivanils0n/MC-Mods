@@ -92,7 +92,7 @@ final class CraftSearchMenu extends AnvilMenu {
 	}
 
 	static void open(ServerPlayer sp, Chest chest, BlockPos pos, String query) {
-		Component title = SmartChest.hasPack(sp) ? SmartChest.themedTitle("\uF003\uE003\uF001\uF004", "Craftar") : Component.literal("Craftar com o Baú Central");
+		Component title = SmartChest.hasPack(sp) ? SmartChest.themedTitle("\uF003\uE003\uF001\uF004", "") : Component.literal("Craftar com o Baú Central");
 		sp.openMenu(new SimpleMenuProvider((id, inv, p) -> new CraftSearchMenu(id, inv, sp, chest, pos, query), title));
 	}
 
