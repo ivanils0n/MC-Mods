@@ -28,6 +28,12 @@ public class ClientShots implements FabricClientGameTest {
 			sp.getServer().runCommand("item replace entity @p weapon.mainhand with minecraft:warped_fungus_on_a_stick[minecraft:custom_data={coppergolem_wand:1b},minecraft:item_model=\"coppergolem:wand\"]");
 			context.waitTicks(40);
 			context.takeScreenshot("1_primeira_pessoa");
+			for (int v = 1; v <= 4; v++) { // poses de teste (src/gametest/resources)
+				sp.getServer().runCommand("item replace entity @p weapon.mainhand with minecraft:warped_fungus_on_a_stick[minecraft:item_model=\"coppergolem:wand_t" + v + "\"]");
+				context.waitTicks(10);
+				context.takeScreenshot("1_pose_" + v);
+			}
+			sp.getServer().runCommand("item replace entity @p weapon.mainhand with minecraft:warped_fungus_on_a_stick[minecraft:custom_data={coppergolem_wand:1b},minecraft:item_model=\"coppergolem:wand\"]");
 			context.runOnClient(c -> c.options.setCameraType(CameraType.THIRD_PERSON_BACK));
 			context.waitTicks(10);
 			context.takeScreenshot("2_terceira_costas");

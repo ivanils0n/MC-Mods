@@ -1,0 +1,39 @@
+{
+ "parent": "coppergolem:item/wand_fp",
+ "display": {
+  "firstperson_righthand": {
+   "rotation": [
+    0,
+    -90,
+    160
+   ],
+   "translation": [
+    1.13,
+    3.2,
+    1.13
+   ],
+   "scale": [
+    0.45,
+    0.45,
+    0.45
+   ]
+  },
+  "firstperson_lefthand": {
+   "rotation": [
+    0,
+    90,
+    -160
+   ],
+   "translation": [
+    1.13,
+    3.2,
+    1.13
+   ],
+   "scale": [
+    0.45,
+    0.45,
+    0.45
+   ]
+  }
+ }
+}
