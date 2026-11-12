@@ -134,8 +134,9 @@ def model(tilt=True):
                 face["rotation"] = 180
 
         disp = {
-            "firstperson_righthand": {"rotation": [0, -90, 160], "translation": [1.13, 3.2, 1.13], "scale": [0.68, 0.68, 0.68]},
-            "firstperson_lefthand": {"rotation": [0, 90, -160], "translation": [1.13, 3.2, 1.13], "scale": [0.68, 0.68, 0.68]},
+            # conferido no print do CI (src/gametest): reto, inteiro na tela, pomo junto da mão
+            "firstperson_righthand": {"rotation": [0, -90, 175], "translation": [0, 2, 0], "scale": [0.35, 0.35, 0.35]},
+            "firstperson_lefthand": {"rotation": [0, 90, -175], "translation": [0, 2, 0], "scale": [0.35, 0.35, 0.35]},
         }
     return {"gui_light": "front", "textures": {"particle": "coppergolem:item/wand", "cu": "coppergolem:item/wand",
             "face": "coppergolem:item/wand_face", "ox": "coppergolem:item/wand_ox", "wood": "coppergolem:item/wand_wood", "light": "coppergolem:item/wand_light"}, "elements": els, "display": disp}
