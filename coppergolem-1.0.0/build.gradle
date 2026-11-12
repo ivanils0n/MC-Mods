@@ -7,12 +7,12 @@ group = 'io.github.ivanils0n'
 base.archivesName = mod_id
 
 // Versão do Fabric API escolhida pela versão do Minecraft (ex.: fabric_api_26_2 no gradle.properties).
-def fabricApi = project.property("fabric_api_" + minecraft_version.replace('.', '_'))
+def fabricApiVersion = project.property("fabric_api_" + minecraft_version.replace('.', '_'))
 
 dependencies {
 	minecraft "com.mojang:minecraft:${minecraft_version}"
 	implementation "net.fabricmc:fabric-loader:${loader_version}"
-	implementation "net.fabricmc.fabric-api:fabric-api:${fabricApi}"
+	implementation "net.fabricmc.fabric-api:fabric-api:${fabricApiVersion}"
 }
 
 // -Pselftest: o runServer sobe um servidor real, monta um golem de teste que move itens entre baús e desliga (usado no CI).
