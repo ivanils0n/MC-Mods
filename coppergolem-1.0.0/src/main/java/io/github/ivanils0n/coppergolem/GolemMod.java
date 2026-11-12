@@ -99,7 +99,17 @@ public final class GolemMod implements ModInitializer {
 			Categories.clear();
 		});
 		ServerTickEvents.END_SERVER_TICK.register(s -> {
-			if (links != null && s.getTickCount() % 20 == 0) links.saveIfDirty();
+			if (links == null || s.getTickCount() % 20 != 0) return;
+			links.saveIfDirty();
+			// Golem que perdeu o vínculo (Desfazer, tudo desligado): volta a ser um golem comum.
+			TASKS.entrySet().removeIf(e -> {
+				Link l = links.get(e.getKey());
+				if (l != null && !l.isEmpty()) return false;
+				for (ServerLevel sl : s.getAllLevels()) {
+					if (sl.getEntity(e.getKey()) instanceof CopperGolem g) e.getValue().release(sl, g);
+				}
+				return true;
+			});
 		});
 		ServerTickEvents.END_LEVEL_TICK.register(GolemMod::onWorldTick);
 		ServerPlayConnectionEvents.JOIN.register((handler, sender, s) -> {
@@ -187,7 +197,7 @@ public final class GolemMod implements ModInitializer {
 		String dim = dim(sl);
 		for (UUID id : links.golems()) {
 			Link l = links.get(id);
-			if (l == null || !dim.equals(l.dim) || !(sl.getEntity(id) instanceof CopperGolem g) || !g.isAlive()) continue;
+			if (l == null || l.isEmpty() || !dim.equals(l.dim) || !(sl.getEntity(id) instanceof CopperGolem g) || !g.isAlive()) continue;
 			TASKS.computeIfAbsent(id, k -> new GolemTask()).step(sl, g, l);
 		}
 		// Quem segura o cajado ligado a um golem vê partículas nos baús vinculados (só ele vê).

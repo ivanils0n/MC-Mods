@@ -1,6 +1,7 @@
 package io.github.ivanils0n.coppergolem;
 
 import io.github.ivanils0n.coppergolem.Links.Link;
+import io.github.ivanils0n.coppergolem.mixin.BrainAccess;
 import java.util.List;
 import net.minecraft.core.BlockPos;
 import net.minecraft.server.level.ServerLevel;
@@ -184,6 +185,15 @@ final class GolemTask {
 			: open ? SoundEvents.CHEST_OPEN : SoundEvents.CHEST_CLOSE;
 		sl.playSound(null, opened, sound, SoundSource.BLOCKS, 0.5f, 1f);
 		if (!open) opened = null;
+	}
+
+	/** Golem desvinculado: fecha a tampa, para a animação e devolve o cérebro do jogo (volta a ser um golem comum). */
+	void release(ServerLevel sl, CopperGolem g) {
+		lid(sl, false);
+		g.setState(CopperGolemState.IDLE);
+		g.clearOpenedChestPos();
+		BrainAccess b = (BrainAccess) g;
+		b.coppergolem$setBrain(b.coppergolem$makeBrain(g.getBrain().pack()));
 	}
 
 	private void finish(int waitTicks) {

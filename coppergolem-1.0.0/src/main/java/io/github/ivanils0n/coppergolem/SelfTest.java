@@ -114,6 +114,7 @@ final class SelfTest {
 		ensure(GolemMod.useOnGolem(fp, InteractionHand.MAIN_HAND, g) == InteractionResult.SUCCESS, "barra de cobre no golem");
 		ensure(g.getWeatherState() == WeatheringCopper.WeatherState.WEATHERED && fp.getMainHandItem().getCount() == 4, "barra de cobre tira um nível");
 
+		t.release(sl, g); // devolve o cérebro do jogo sem erro
 		GolemMod.links.remove(g.getUUID());
 		g.discard();
 	}
