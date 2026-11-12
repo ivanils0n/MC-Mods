@@ -18,6 +18,7 @@ import net.minecraft.world.level.block.Blocks;
 
 /** Só no CI (runClientGameTest com xvfb): tira prints do cajado na mão e das telas, para conferir como ficam no jogo. */
 public class ClientShots implements FabricClientGameTest {
+	private static BlockPos CHEST;
 	@Override
 	public void runTest(ClientGameTestContext context) {
 		try (TestSingleplayerContext sp = context.worldBuilder().create()) {
@@ -67,6 +68,27 @@ public class ClientShots implements FabricClientGameTest {
 			});
 			context.waitTicks(20);
 			context.takeScreenshot("5_vincular_bau");
+
+			// baú de recarga oxidado com 2 barras, golem de verdade andando: tem que gastar 1 barra por nível
+			sp.getServer().runOnServer(server -> {
+				ServerPlayer p = server.getPlayerList().getPlayers().get(0);
+				p.closeContainer();
+				ServerLevel sl = p.level();
+				BlockPos c = p.blockPosition().offset(-4, 0, 2);
+				sl.setBlock(c, BuiltInRegistries.BLOCK.getValue(Identifier.fromNamespaceAndPath("minecraft", "oxidized_copper_chest")).defaultBlockState(), Block.UPDATE_ALL);
+				((net.minecraft.world.Container) sl.getBlockEntity(c)).setItem(0, new net.minecraft.world.item.ItemStack(net.minecraft.world.item.Items.COPPER_INGOT, 2));
+				@SuppressWarnings("unchecked")
+				EntityType<CopperGolem> type = (EntityType<CopperGolem>) BuiltInRegistries.ENTITY_TYPE.getValue(Identifier.fromNamespaceAndPath("minecraft", "copper_golem"));
+				CopperGolem g = type.spawn(sl, c.offset(-3, 0, 0), EntitySpawnReason.COMMAND);
+				GolemMod.links.getOrCreate(g.getUUID(), GolemMod.dim(sl)).refill = Link.arr(c);
+				CHEST = c;
+			});
+			context.waitTicks(600);
+			sp.getServer().runOnServer(server -> {
+				ServerLevel sl = server.overworld();
+				int n = Boxes.count(Boxes.containers(sl, CHEST), new net.minecraft.world.item.ItemStack(net.minecraft.world.item.Items.COPPER_INGOT));
+				GolemMod.LOG.info("COPPERGOLEM BAU {} barras={} (esperado: exposed_copper_chest e 0)", sl.getBlockState(CHEST).getBlock(), n);
+			});
 		}
 	}
 }

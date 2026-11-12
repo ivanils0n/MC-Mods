@@ -156,6 +156,7 @@ final class GolemTask {
 						lid(sl, false); // o bloco vai ser trocado: tampa fechada antes
 						g.setOpenedChestPos(target);
 						Boxes.scrape(sl, target);
+						GolemMod.LOG.debug("Golem raspou o baú de recarga em {} (1 barra)", target);
 					}
 				}
 				finish(30);
