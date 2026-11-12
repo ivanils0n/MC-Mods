@@ -108,6 +108,16 @@ final class SelfTest {
 		ensure(g.getWeatherState() == WeatheringCopper.WeatherState.UNAFFECTED, "golem não se recarregou: " + g.getWeatherState());
 		ensure(Boxes.count(Boxes.containers(sl, refill), new ItemStack(Items.COPPER_INGOT)) == 8, "2 níveis de ferrugem = 2 barras");
 
+		// baú de recarga enferrujado: o golem raspa com 1 barra, sem perder os itens
+		sl.setBlock(refill, BuiltInRegistries.BLOCK.getValue(Identifier.fromNamespaceAndPath("minecraft", "exposed_copper_chest")).defaultBlockState(), Block.UPDATE_ALL);
+		((BaseContainerBlockEntity) sl.getBlockEntity(refill)).setItem(0, new ItemStack(Items.COPPER_INGOT, 8));
+		((BaseContainerBlockEntity) sl.getBlockEntity(refill)).setItem(5, new ItemStack(Items.APPLE, 3));
+		ensure(Boxes.rusty(sl, refill), "baú de cobre exposto conta como enferrujado");
+		for (int i = 0; i < 200; i++) t.step(sl, g, l);
+		ensure(!Boxes.rusty(sl, refill) && Boxes.isCopperChest(sl, refill), "golem não raspou o baú de cobre");
+		ensure(Boxes.count(Boxes.containers(sl, refill), new ItemStack(Items.COPPER_INGOT)) == 7
+			&& Boxes.count(Boxes.containers(sl, refill), new ItemStack(Items.APPLE)) == 3, "raspar o baú: 1 barra e itens mantidos");
+
 		// barra de cobre na mão: um nível a menos por clique
 		g.setWeatherState(WeatheringCopper.WeatherState.OXIDIZED);
 		fp.setItemInHand(InteractionHand.MAIN_HAND, new ItemStack(Items.COPPER_INGOT, 5));

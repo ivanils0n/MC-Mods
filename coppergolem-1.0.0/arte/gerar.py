@@ -135,9 +135,10 @@ def model(tilt=True):
                 face["rotation"] = 180
 
         disp = {
-            # conferido no print do CI (src/gametest): reto, inteiro na tela, pomo junto da mão
-            "firstperson_righthand": {"rotation": [0, -90, 175], "translation": [0, 2, 0], "scale": [0.35, 0.35, 0.35]},
-            "firstperson_lefthand": {"rotation": [0, 90, -175], "translation": [0, 2, 0], "scale": [0.35, 0.35, 0.35]},
+            # reto, pomo junto da mão. Maior que o "certo" no jogo puro porque o resource pack Actions & Stuff (modpack
+            # Actions & Better) encolhe os itens em 1ª pessoa; 0.35 ficava pequeno lá.
+            "firstperson_righthand": {"rotation": [0, -90, 175], "translation": [0, 1.5, 0], "scale": [0.5, 0.5, 0.5]},
+            "firstperson_lefthand": {"rotation": [0, 90, -175], "translation": [0, 1.5, 0], "scale": [0.5, 0.5, 0.5]},
         }
     return {"gui_light": "front", "textures": {"particle": "coppergolem:item/wand", "cu": "coppergolem:item/wand",
             "face": "coppergolem:item/wand_face", "ox": "coppergolem:item/wand_ox", "wood": "coppergolem:item/wand_wood", "light": "coppergolem:item/wand_light"}, "elements": els, "display": disp}

@@ -18,12 +18,14 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
 
 /**
- * Tela de vínculos do golem (menu "Pátina"), um baú de 3 fileiras só de vitrine: 1ª fileira = [recarga] [até 6
- * origens] ... [ver baús] [desfazer]; 2ª e 3ª = até 18 baús de guardar. Clicar num baú da lista o desliga.
+ * Tela de vínculos do golem (menu "Pátina"), um baú de 3 fileiras só de vitrine: 1ª fileira = [recarga] [6
+ * origens] ... [ver baús] [desfazer]; 2ª e 3ª = 18 baús de guardar (os que passam viram "+N"). Clicar num baú da lista o desliga.
  * Para ligar um baú: botão direito nele com o cajado (abre a escolha origem/guardar).
  */
 final class GolemMenu extends ChestMenu {
 	static final int REFILL = 0, FIRST_SOURCE = 1, SEE = 7, CLEAR = 8, FIRST_DEST = 9;
+	/** Quantos cabem na tela; os que passam disso aparecem num ícone "+N" (sem limite de baús, só a distância). */
+	static final int SHOWN_SOURCES = 6, SHOWN_DESTS = 18;
 
 	private final ServerPlayer player;
 	private final UUID golem;
@@ -55,15 +57,19 @@ final class GolemMenu extends ChestMenu {
 		box.setItem(REFILL, l.refill == null
 			? GolemMod.icon(player, "btn_add", Items.PAPER, "Recarga: sem baú", ChatFormatting.GRAY, "Botão direito num baú de cobre com o cajado.", "As barras de cobre dele recarregam o golem.")
 			: GolemMod.icon(player, "btn_refill", Items.COPPER_INGOT, "Recarga (baú de cobre)", gold, where(l.refill), "Barras de cobre: " + coppers(sl, l.refill), "Clique para desligar."));
-		for (int i = 0; i < Links.MAX_SOURCES; i++) {
-			if (i < l.sources.size()) {
+		for (int i = 0; i < SHOWN_SOURCES; i++) {
+			if (i == SHOWN_SOURCES - 1 && l.sources.size() > SHOWN_SOURCES) {
+				box.setItem(FIRST_SOURCE + i, more(l.sources.size() - i, "origem", aqua));
+			} else if (i < l.sources.size()) {
 				box.setItem(FIRST_SOURCE + i, GolemMod.icon(player, "btn_source", Items.HOPPER, "Origem", aqua, where(l.sources.get(i)), "O golem pega itens daqui.", "Clique para desligar."));
 			} else if (i == l.sources.size()) {
 				box.setItem(FIRST_SOURCE + i, GolemMod.icon(player, "btn_add", Items.PAPER, "Origem: livre", ChatFormatting.GRAY, "Botão direito num baú ou barril com o cajado", "e escolha \"Origem\"."));
 			}
 		}
-		for (int i = 0; i < Links.MAX_DESTS; i++) {
-			if (i < l.dests.size()) {
+		for (int i = 0; i < SHOWN_DESTS; i++) {
+			if (i == SHOWN_DESTS - 1 && l.dests.size() > SHOWN_DESTS) {
+				box.setItem(FIRST_DEST + i, more(l.dests.size() - i, "guardar", green));
+			} else if (i < l.dests.size()) {
 				ItemStack f = Boxes.filter(sl, Link.pos(l.dests.get(i)));
 				box.setItem(FIRST_DEST + i, GolemMod.icon(player, "btn_dest", Items.CHEST, "Guardar", green, where(l.dests.get(i)),
 					f.isEmpty() ? "Sem moldura: qualquer item (por categoria)." : "Só: " + f.getHoverName().getString(), "Clique para desligar."));
@@ -73,6 +79,13 @@ final class GolemMenu extends ChestMenu {
 		}
 		box.setItem(SEE, GolemMod.icon(player, "btn_see", Items.ENDER_EYE, "Ver baús", ChatFormatting.LIGHT_PURPLE, "Marca os baús vinculados com partículas."));
 		box.setItem(CLEAR, GolemMod.icon(player, "btn_clear", Items.BARRIER, "Desfazer tudo", ChatFormatting.RED, "Desliga todos os baús deste golem."));
+	}
+
+	private ItemStack more(int n, String what, ChatFormatting color) {
+		ItemStack s = GolemMod.icon(player, "btn_" + (what.equals("origem") ? "source" : "dest"), what.equals("origem") ? Items.HOPPER : Items.CHEST,
+			"+" + n + " baús de " + what, color, "Não cabem todos na tela.", "Para desligar um: botão direito nele com o cajado.");
+		s.setCount(Math.min(n, 64));
+		return s;
 	}
 
 	private static String where(int[] pos) {
@@ -106,10 +119,11 @@ final class GolemMenu extends ChestMenu {
 		} else if (slot == REFILL && l.refill != null) {
 			l.refill = null;
 			changed = true;
-		} else if (slot >= FIRST_SOURCE && slot < FIRST_SOURCE + Links.MAX_SOURCES && slot - FIRST_SOURCE < l.sources.size()) {
+		} else if (slot >= FIRST_SOURCE && slot < FIRST_SOURCE + SHOWN_SOURCES && slot - FIRST_SOURCE < l.sources.size()
+			&& !(slot - FIRST_SOURCE == SHOWN_SOURCES - 1 && l.sources.size() > SHOWN_SOURCES)) {
 			l.sources.remove(slot - FIRST_SOURCE);
 			changed = true;
-		} else if (slot >= FIRST_DEST && slot - FIRST_DEST < l.dests.size()) {
+		} else if (slot >= FIRST_DEST && slot - FIRST_DEST < l.dests.size() && !(slot - FIRST_DEST == SHOWN_DESTS - 1 && l.dests.size() > SHOWN_DESTS)) {
 			l.dests.remove(slot - FIRST_DEST);
 			changed = true;
 		}

@@ -90,8 +90,9 @@ final class GolemTask {
 
 	private void decide(ServerLevel sl, CopperGolem g, Link link) {
 		WeatherState weather = g.getWeatherState();
-		if (weather != WeatherState.UNAFFECTED && link.refill != null && cooldown <= 0) { // começou a enferrujar: recarrega
-			BlockPos refill = Link.pos(link.refill);
+		BlockPos refill = link.refill == null ? null : Link.pos(link.refill);
+		// ele ou o baú de cobre dele enferrujou: vai lá raspar com uma barra de cobre
+		if (refill != null && cooldown <= 0 && (weather != WeatherState.UNAFFECTED || Boxes.rusty(sl, refill))) {
 			if (Boxes.count(Boxes.containers(sl, refill), new ItemStack(Items.COPPER_INGOT)) > 0) {
 				go(Phase.REFILL, refill);
 				return;
@@ -144,11 +145,18 @@ final class GolemTask {
 				open(sl, g);
 				finish(30);
 			}
-			case REFILL -> { // uma barra = uma passada de machado (um nível de ferrugem a menos); volta para a próxima
-				if (g.getWeatherState() != WeatherState.UNAFFECTED && !Boxes.take(Boxes.containers(sl, target), new ItemStack(Items.COPPER_INGOT), 1).isEmpty()) {
+			case REFILL -> { // uma barra = uma passada de machado (um nível de ferrugem a menos), primeiro nele, depois no baú
+				boolean golem = g.getWeatherState() != WeatherState.UNAFFECTED;
+				if ((golem || Boxes.rusty(sl, target)) && !Boxes.take(Boxes.containers(sl, target), new ItemStack(Items.COPPER_INGOT), 1).isEmpty()) {
 					g.setState(CopperGolemState.GETTING_ITEM);
-					open(sl, g);
-					GolemMod.scrape(sl, g);
+					if (golem) {
+						open(sl, g);
+						GolemMod.scrape(sl, g);
+					} else {
+						lid(sl, false); // o bloco vai ser trocado: tampa fechada antes
+						g.setOpenedChestPos(target);
+						Boxes.scrape(sl, target);
+					}
 				}
 				finish(30);
 			}

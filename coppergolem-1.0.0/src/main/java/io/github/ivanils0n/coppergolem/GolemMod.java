@@ -291,10 +291,6 @@ public final class GolemMod implements ModInitializer {
 		}
 		boolean origin = role == Role.SOURCE;
 		List<int[]> list = origin ? l.sources : l.dests;
-		if (list.size() >= (origin ? Links.MAX_SOURCES : Links.MAX_DESTS)) {
-			links.markDirty();
-			return plain("Limite de " + (origin ? Links.MAX_SOURCES + " baús de origem" : Links.MAX_DESTS + " baús de guardar") + " atingido.", ChatFormatting.RED);
-		}
 		list.add(Link.arr(group.get(0)));
 		links.markDirty();
 		burst(sl, sp, pos, origin ? ParticleTypes.PORTAL : ParticleTypes.HAPPY_VILLAGER);

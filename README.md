@@ -77,8 +77,8 @@ Crie uma pasta `<mod>-<versão>/` com `build.gradle` e `gradle.properties` (copi
 O golem de cobre do jogo passa a trabalhar sozinho entre baús que você liga com o **Cajado do Golem** (receita: 3 barras de cobre, 1 bloco de cobre e 1 palito).
 
 - Botão direito no golem com o cajado: liga o cajado e abre a tela de vínculos. Depois clique em baús ou barris (abre uma tela para escolher **origem**, **guardar** ou desligar).
-- **Baú de cobre** = recarga: guarde barras de cobre; quando o golem enferruja, ele vai lá e usa 1 barra por nível de ferrugem (como uma passada de machado). Também dá para clicar no golem com uma barra de cobre na mão. O baú abre a tampa quando o golem mexe nele.
+- **Baú de cobre** = recarga: guarde barras de cobre; quando o golem enferruja, ele vai lá e usa 1 barra por nível de ferrugem (como uma passada de machado). Também dá para clicar no golem com uma barra de cobre na mão. As barras também raspam a ferrugem do próprio baú de cobre. O baú abre a tampa quando o golem mexe nele.
 - **Shift + botão direito** no golem com o cajado: guarda o golem no inventário (com ferrugem, nome e baús vinculados). Botão direito no chão com ele: solta o mesmo golem.
-- Ligue primeiro o baú de cobre: origem e guardar só até **33 blocos** dele.
-- **Origem** (até 6): de onde ele pega itens. **Guardar** (até 18): para onde ele leva. Moldura com um item num baú de guardar: só entra esse item; sem moldura, qualquer item, agrupando por categoria do criativo.
+- Ligue primeiro o baú de cobre: origem e guardar só até **33 blocos** dele (sem limite de quantidade).
+- **Origem**: de onde ele pega itens. **Guardar**: para onde ele leva. Moldura com um item num baú de guardar: só entra esse item; sem moldura, qualquer item, agrupando por categoria do criativo.
 - Textura por resource pack (enviado a servidores dedicados), mesmo esquema dos outros mods. Dados em `<mundo>/coppergolem.json`.

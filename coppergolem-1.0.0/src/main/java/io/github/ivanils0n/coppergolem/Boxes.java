@@ -2,6 +2,12 @@ package io.github.ivanils0n.coppergolem;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
+import net.minecraft.core.particles.ParticleTypes;
+import net.minecraft.sounds.SoundEvents;
+import net.minecraft.sounds.SoundSource;
+import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.WeatheringCopper;
 import net.minecraft.core.BlockPos;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.Container;
@@ -26,6 +32,37 @@ final class Boxes {
 
 	static boolean isCopperChest(ServerLevel sl, BlockPos pos) {
 		return sl.getBlockState(pos).getBlock() instanceof CopperChestBlock;
+	}
+
+	/** Baú de cobre enferrujado (exposto, desgastado ou oxidado, sem cera): dá para raspar um nível. */
+	static boolean rusty(ServerLevel sl, BlockPos pos) {
+		return sl.isLoaded(pos) && isCopperChest(sl, pos) && WeatheringCopper.getPrevious(sl.getBlockState(pos)).isPresent();
+	}
+
+	/**
+	 * Tira um nível de ferrugem do baú de cobre (as duas metades, se duplo), como o machado. Os itens são tirados antes
+	 * e devolvidos depois da troca do bloco, para nada cair no chão nem duplicar.
+	 */
+	static boolean scrape(ServerLevel sl, BlockPos pos) {
+		boolean any = false;
+		for (BlockPos p : group(sl, pos)) {
+			Optional<BlockState> prev = WeatheringCopper.getPrevious(sl.getBlockState(p));
+			if (prev.isEmpty() || !(sl.getBlockEntity(p) instanceof Container c)) continue;
+			List<ItemStack> saved = new ArrayList<>();
+			for (int i = 0; i < c.getContainerSize(); i++) saved.add(c.removeItemNoUpdate(i));
+			sl.setBlock(p, prev.get(), Block.UPDATE_ALL);
+			Container n = sl.getBlockEntity(p) instanceof Container nc ? nc : null;
+			for (int i = 0; i < saved.size(); i++) {
+				if (saved.get(i).isEmpty()) continue;
+				if (n != null && i < n.getContainerSize()) n.setItem(i, saved.get(i));
+				else Block.popResource(sl, p, saved.get(i));
+			}
+			if (n != null) n.setChanged();
+			sl.sendParticles(ParticleTypes.SCRAPE, p.getX() + 0.5, p.getY() + 0.6, p.getZ() + 0.5, 12, 0.35, 0.3, 0.35, 0.02);
+			any = true;
+		}
+		if (any) sl.playSound(null, pos, SoundEvents.AXE_SCRAPE, SoundSource.BLOCKS, 1f, 1f);
+		return any;
 	}
 
 	/** O bloco clicado e, se for metade de um baú duplo, a outra metade. */
