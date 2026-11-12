@@ -89,12 +89,17 @@ jobs:
           [ -d ${{ matrix.mod }}/src/gametest ] || { echo "Mod sem prints."; exit 0; }
           sudo apt-get install -y -qq xvfb >/dev/null 2>&1 || true
           timeout 900 xvfb-run -a -s "-screen 0 1280x720x24" ./gradlew --configure-on-demand ":${{ matrix.mod }}:runClientGameTest" "-Pminecraft_version=${{ matrix.mc }}" "-Pminecraft_dependency=${{ matrix.dep }}" | tail -60
-      - uses: actions/upload-artifact@v7
-        if: always()
-        with:
-          name: prints-mc${{ matrix.mc }}-${{ matrix.mod }}
-          path: ${{ matrix.mod }}/**/screenshots/*.png
-          if-no-files-found: ignore
+      # Os prints vão para o branch "prints-<mod>" (só o último build), para ver sem baixar artifacts.
+      - name: Publicar prints
+        if: always() && github.event_name == 'push' && github.ref == 'refs/heads/main'
+        continue-on-error: true
+        run: |
+          files=$(find ${{ matrix.mod }} -path '*screenshots*' -name '*.png' 2>/dev/null)
+          [ -n "$files" ] || exit 0
+          d=$(mktemp -d); cp $files "$d"/
+          cd "$d" && git init -q -b prints && git add -A
+          git -c user.name=ci -c user.email=ci@localhost commit -qm "prints ${{ github.sha }}"
+          git push -qf "https://x-access-token:${{ github.token }}@github.com/${{ github.repository }}.git" prints:prints-${{ matrix.id }}
       # Mods com resource pack (src/pack): confere que o hash dentro do .jar é o do zip e, na main, publica o zip no
       # release do mod ("<mod_id>-<versão>", o mesmo do .jar). O nome leva o hash, então cada versão do mod aponta para o seu pack.
       - name: Resource pack
