@@ -48,12 +48,18 @@ public class ClientShots implements FabricClientGameTest {
 				BlockPos chest = o.offset(0, 0, 3);
 				sl.setBlock(chest, Blocks.CHEST.defaultBlockState(), Block.UPDATE_ALL);
 				l.refill = Link.arr(chest);
-				for (int i = 0; i < 4; i++) l.sources.add(Link.arr(chest));
-				for (int i = 0; i < 13; i++) l.dests.add(Link.arr(chest));
+				for (int i = 0; i < 8; i++) l.sources.add(Link.arr(chest));
+				for (int i = 0; i < 30; i++) l.dests.add(Link.arr(chest));
 				GolemMenu.open(p, g.getUUID());
 			});
 			context.waitTicks(20);
 			context.takeScreenshot("4_tela_golem");
+			sp.getServer().runOnServer(server -> {
+				ServerPlayer p = server.getPlayerList().getPlayers().get(0);
+				GolemMenu.open(p, GolemMod.links.golems().get(0), 1);
+			});
+			context.waitTicks(20);
+			context.takeScreenshot("4b_tela_golem_mais");
 			sp.getServer().runOnServer(server -> {
 				ServerPlayer p = server.getPlayerList().getPlayers().get(0);
 				p.closeContainer();

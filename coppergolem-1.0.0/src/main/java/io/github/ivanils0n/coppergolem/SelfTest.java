@@ -80,6 +80,7 @@ final class SelfTest {
 		ensure(GolemMod.links.get(g.getUUID()) != null && GolemMod.links.get(g.getUUID()).refill != null, "baú de recarga não ligou pelo cajado: " + msg.getString());
 		GolemMod.link(fp, sl, fp.getMainHandItem(), src, GolemMod.Role.SOURCE);
 		GolemMod.link(fp, sl, fp.getMainHandItem(), dst, GolemMod.Role.DEST);
+		GolemMod.link(fp, sl, fp.getMainHandItem(), dst, GolemMod.Role.DEST); // de novo: não duplica
 		Link chosen = GolemMod.links.get(g.getUUID());
 		ensure(chosen.sources.size() == 1 && chosen.dests.size() == 1, "escolha de origem/guardar");
 		GolemMod.link(fp, sl, fp.getMainHandItem(), dst, GolemMod.Role.SOURCE);

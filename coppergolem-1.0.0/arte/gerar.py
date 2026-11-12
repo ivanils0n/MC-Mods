@@ -270,6 +270,12 @@ def icons():
         for yy in (7, 8):
             im.putpixel((xx, yy), hx(CU[3]))
     out["btn_add"] = im
+    # setas de página: turquesa com contorno escuro
+    arrow = ["................", "................", "................", "......a.........", "......aa........", "......aba.......", "aaaaaabbba......", "abbbbbbbbba.....",
+             "abbbbbbbbba.....", "aaaaaabbba......", "......aba.......", "......aa........", "......a.........", "................", "................", "................"]
+    im = paint(arrow, {"a": OX[2], "b": OX[0]})
+    out["btn_next"] = outlined(im.transform((16, 16), Image.AFFINE, (1, 0, -2, 0, 1, 0)))
+    out["btn_prev"] = outlined(im.transpose(Image.FLIP_LEFT_RIGHT).transform((16, 16), Image.AFFINE, (1, 0, 2, 0, 1, 0)))
     return out
 
 

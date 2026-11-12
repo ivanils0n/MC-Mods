@@ -150,6 +150,12 @@ public final class GolemMod implements ModInitializer {
 				return InteractionResult.SUCCESS;
 			}
 			ItemStack wand = sp.getMainHandItem();
+			if (entity.getUUID().equals(golemOf(wand))) { // já é este golem: só abre a tela
+				say(sp, plain("Este cajado já está vinculado a este golem.", ChatFormatting.YELLOW));
+				GolemMenu.open(sp, entity.getUUID());
+				return InteractionResult.SUCCESS;
+			}
+			boolean other = golemOf(wand) != null;
 			CustomData data = wand.get(DataComponents.CUSTOM_DATA);
 			CompoundTag tag = data == null ? new CompoundTag() : data.copyTag();
 			tag.putString("golem", entity.getUUID().toString());
@@ -159,7 +165,7 @@ public final class GolemMod implements ModInitializer {
 				plain("Clique em baús (de cobre = recarga) para vincular.", ChatFormatting.DARK_GRAY),
 				plain("Shift + botão direito no golem: guardar no inventário.", ChatFormatting.DARK_GRAY))));
 			sp.level().playSound(null, entity.blockPosition(), SoundEvents.LODESTONE_COMPASS_LOCK, SoundSource.PLAYERS, 1f, 1.2f);
-			say(sp, plain("Cajado ligado a este golem.", ChatFormatting.GREEN));
+			say(sp, plain(other ? "Cajado trocado: agora está ligado a este golem." : "Cajado ligado a este golem.", ChatFormatting.GREEN));
 			GolemMenu.open(sp, entity.getUUID());
 		} catch (RuntimeException e) {
 			LOG.error("Erro ao ligar o cajado ao golem", e);
@@ -254,10 +260,7 @@ public final class GolemMod implements ModInitializer {
 		List<BlockPos> group = Boxes.group(sl, pos);
 		if (role == Role.REFILL) {
 			if (l.refill != null && Link.indexOf(List.of(l.refill), pos) >= 0) {
-				l.refill = null;
-				links.markDirty();
-				sl.playSound(null, pos, SoundEvents.CHAIN_PLACE, SoundSource.PLAYERS, 1f, 0.6f);
-				return plain("Baú de recarga desligado.", ChatFormatting.YELLOW);
+				return plain("Este baú de cobre já é a recarga deste golem. Para desligar, clique nele na tela do golem.", ChatFormatting.YELLOW);
 			}
 			for (List<int[]> list : List.of(l.sources, l.dests)) {
 				for (int[] b : list) {
@@ -273,6 +276,10 @@ public final class GolemMod implements ModInitializer {
 			if (l.refill == null) return plain("Ligue primeiro o baú de cobre (recarga) do golem: os outros baús ficam até " + Links.RANGE + " blocos dele.", ChatFormatting.RED);
 			BlockPos anchor = Link.pos(l.refill);
 			if (far(anchor, pos)) return plain("Longe demais: " + (int) Math.sqrt(anchor.distSqr(pos)) + " blocos do baú de recarga (máximo " + Links.RANGE + ").", ChatFormatting.RED);
+		}
+		Role now = roleOf(l, group);
+		if (role != Role.NONE && role == now) {
+			return plain("Este baú já está vinculado como " + (role == Role.SOURCE ? "origem" : "guardar") + ".", ChatFormatting.YELLOW);
 		}
 		boolean had = false;
 		for (BlockPos g : group) {
@@ -295,6 +302,16 @@ public final class GolemMod implements ModInitializer {
 		links.markDirty();
 		burst(sl, sp, pos, origin ? ParticleTypes.PORTAL : ParticleTypes.HAPPY_VILLAGER);
 		return plain("Baú " + (origin ? "de origem" : "de guardar") + " ligado." + (origin ? "" : " Moldura com um item ao lado dele: só esse item entra."), ChatFormatting.GREEN);
+	}
+
+	/** Papel atual do baú (qualquer metade, se duplo) no vínculo: SOURCE, DEST ou NONE. */
+	static Role roleOf(Link l, List<BlockPos> group) {
+		if (l == null) return Role.NONE;
+		for (BlockPos p : group) {
+			if (Link.indexOf(l.sources, p) >= 0) return Role.SOURCE;
+			if (Link.indexOf(l.dests, p) >= 0) return Role.DEST;
+		}
+		return Role.NONE;
 	}
 
 	static boolean far(BlockPos a, BlockPos b) {
