@@ -40,7 +40,7 @@ final class Stash {
 		return d != null && d.copyTag().contains(TAG);
 	}
 
-	/** Recolhe o golem: o item vai para o inventário (ou cai no chão), o que ele segurava cai no chão. */
+	/** Recolhe o golem: o item vai para o inventário (ou cai no chão), o que ele segurava cai no chão. Devolve uma cópia do item. */
 	static ItemStack collect(ServerPlayer sp, CopperGolem g) {
 		ServerLevel sl = (ServerLevel) g.level();
 		CompoundTag t = new CompoundTag();
@@ -70,8 +70,9 @@ final class Stash {
 		if (task != null) task.release(sl, g);
 		g.discard(); // o vínculo some com ele (ENTITY_UNLOAD) e volta quando for solto
 		if (GolemMod.links != null) GolemMod.links.remove(g.getUUID());
+		ItemStack copy = s.copy(); // add() esvazia a pilha que entrou no inventário
 		if (!sp.getInventory().add(s)) sp.drop(s, false);
-		return s;
+		return copy;
 	}
 
 	/** Solta o golem guardado no bloco ao lado do clicado. Devolve o golem, ou null se não deu. */
