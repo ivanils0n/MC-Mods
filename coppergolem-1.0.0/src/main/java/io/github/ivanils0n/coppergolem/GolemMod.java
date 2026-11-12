@@ -378,7 +378,7 @@ public final class GolemMod implements ModInitializer {
 		bg.addProperty("color", "white"); // o título vanilla é cinza escuro e escureceria o desenho
 		JsonObject text = new JsonObject();
 		text.addProperty("text", label);
-		text.addProperty("color", "#FFE9D8");
+		text.addProperty("color", "#E4FFF6");
 		JsonArray parts = new JsonArray();
 		parts.add(new JsonPrimitive("")); // raiz sem estilo: o texto não herda a fonte do fundo
 		parts.add(bg);

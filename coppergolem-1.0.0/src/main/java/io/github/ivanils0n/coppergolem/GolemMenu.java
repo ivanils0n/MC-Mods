@@ -18,7 +18,7 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
 
 /**
- * Tela de vínculos do golem (menu "Cobre Polido"), um baú de 3 fileiras só de vitrine: 1ª fileira = [recarga] [até 6
+ * Tela de vínculos do golem (menu "Pátina"), um baú de 3 fileiras só de vitrine: 1ª fileira = [recarga] [até 6
  * origens] ... [ver baús] [desfazer]; 2ª e 3ª = até 18 baús de guardar. Clicar num baú da lista o desliga.
  * Para ligar um baú: botão direito nele com o cajado (abre a escolha origem/guardar).
  */

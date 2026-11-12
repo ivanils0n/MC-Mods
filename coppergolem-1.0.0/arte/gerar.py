@@ -1,4 +1,4 @@
-"""Gera texturas, modelo 3D, ícone de inventário, fundo da tela (menu "Cobre Polido") e definições de item.
+"""Gera texturas, modelo 3D, ícone de inventário, fundo da tela (menu "Pátina") e definições de item.
 
 Rode da pasta coppergolem-1.0.0:  python3 arte/gerar.py
 Saída: src/main/resources/assets/coppergolem/... (vai no .jar e no zip do resource pack) e src/pack/pack.png.
@@ -6,6 +6,7 @@ O cajado é um item vanilla (cogumelo distorcido no palito) com componente item_
 Na mão: modelo 3D (mini golem num cabo fino). No inventário, chão e moldura: o ícone 2D wand_icon.png.
 """
 import json
+import math
 import os
 import random
 
@@ -143,25 +144,30 @@ def model(tilt=True):
 
 
 def gui(rows=3):
-    """176x(114+18*rows): baú de N fileiras. Slots em (7+18c, 17+18r), inventário em 30+18*rows e hotbar 58 abaixo."""
+    """Menu "Pátina": 176x(114+18*rows), cobre com oxidação turquesa nas bordas; slots verde-escuros com brilho turquesa
+    fraco no meio (é o que aparece nos espaços vazios). Slots em (7+18c, 17+18r), inventário em 30+18*rows, hotbar 58 abaixo."""
     H = 114 + 18 * rows
-    inv = 30 + 18 * rows - 1 + 1
+    inv = 30 + 18 * rows
     im = Image.new("RGBA", (176, H))
-    rnd = random.Random(7)
+    rnd = random.Random(3)
     for y in range(H):
         for x in range(176):
-            im.putpixel((x, y), hx(rnd.choices(["#b8603f", "#a95537", "#c06a47"], [3, 3, 2])[0]))
+            edge = min(x, 175 - x, y, H - 1 - y)
+            ox = max(0.0, 1 - edge / 14) * (0.55 + 0.45 * math.sin(x * 0.31 + y * 0.17) * math.cos(y * 0.23 - x * 0.07))
+            pal = (["#5fb39b", "#4fa58c", "#3d8a74"] if rnd.random() < ox else ["#c66a3f", "#b45d36", "#d07848"])
+            im.putpixel((x, y), hx(rnd.choices(pal, [2, 3, 2] if pal[0] == "#5fb39b" else [3, 3, 2])[0]))
     d = ImageDraw.Draw(im)
-    d.rectangle([0, 0, 175, H - 1], outline=hx(CU[4]))
-    d.line([1, 1, 174, 1], fill=hx(CU[0])); d.line([1, 1, 1, H - 2], fill=hx(CU[0]))
-    d.line([1, H - 2, 174, H - 2], fill=hx(CU[4])); d.line([174, 1, 174, H - 2], fill=hx(CU[4]))
+    d.rectangle([0, 0, 175, H - 1], outline=hx("#1f4a3f"))
+    d.line([1, 1, 174, 1], fill=hx(OX[0])); d.line([1, 1, 1, H - 2], fill=hx(OX[0]))
     for p in ((0, 0), (175, 0), (0, H - 1), (175, H - 1)):
         im.putpixel(p, (0, 0, 0, 0))
 
     def slot(x, y):
-        d.rectangle([x, y, x + 17, y + 17], fill=hx("#4a2216"))
-        d.line([x, y, x + 16, y], fill=hx("#2a120b")); d.line([x, y, x, y + 16], fill=hx("#2a120b"))
-        d.line([x + 1, y + 17, x + 17, y + 17], fill=hx(CU[1])); d.line([x + 17, y + 1, x + 17, y + 17], fill=hx(CU[1]))
+        d.rectangle([x, y, x + 17, y + 17], fill=hx("#1f2b27"))
+        d.line([x, y, x + 16, y], fill=hx("#101815")); d.line([x, y, x, y + 16], fill=hx("#101815"))
+        d.line([x + 1, y + 17, x + 17, y + 17], fill=hx(OX[1])); d.line([x + 17, y + 1, x + 17, y + 17], fill=hx(OX[1]))
+        for dx, dy in ((0, 0), (1, 0), (-1, 0), (0, 1), (0, -1), (2, 0), (-2, 0), (0, 2), (0, -2)):
+            im.putpixel((x + 9 + dx, y + 9 + dy), hx("#2c4a41" if abs(dx) + abs(dy) == 2 else "#35594e"))
     for r in range(rows):
         for c in range(9):
             slot(7 + 18 * c, 17 + 18 * r)
@@ -170,8 +176,8 @@ def gui(rows=3):
             slot(7 + 18 * c, inv + 18 * r)
     for c in range(9):
         slot(7 + 18 * c, inv + 58)
-    d.rectangle([5, inv - 12, 75, inv - 1], fill=hx("#d98a62"), outline=hx(CU[3]))  # placa atrás de "Inventário"
-    d.line([6, 15, 169, 15], fill=hx(CU[3]))
+    # placa clara atrás de "Inventário" (o jogo escreve esse texto em cinza escuro)
+    d.rectangle([5, inv - 12, 75, inv - 1], fill=hx("#a8e6d2"), outline=hx(OX[2]))
     return im
 
 
