@@ -186,7 +186,7 @@ final class CraftSearchMenu extends AnvilMenu {
 			else if (slot == CLEAR_SLOT) later(sp, () -> open(sp, chest, pos, ""));
 			else if (slot >= 0 && slot < slots.size() && slots.get(slot).container == shown) {
 				int index = slots.get(slot).getContainerSlot();
-				if (index < found.size() && !(index == RESULTS - 1 && found.size() > RESULTS)) {
+				if (index < RESULTS && index < found.size() && !(index == RESULTS - 1 && found.size() > RESULTS)) { // a hotbar não é usada
 					Craft c = found.get(index);
 					String q = typed.trim();
 					later(sp, () -> TableMenu.open(sp, chest, pos, c.recipe, q));
