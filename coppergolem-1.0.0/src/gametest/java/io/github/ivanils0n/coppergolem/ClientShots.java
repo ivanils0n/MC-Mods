@@ -21,7 +21,7 @@ public class ClientShots implements FabricClientGameTest {
 	@Override
 	public void runTest(ClientGameTestContext context) {
 		try (TestSingleplayerContext sp = context.worldBuilder().create()) {
-			sp.getClientLevel().waitForChunksRender();
+			sp.getClientWorld().waitForChunksRender();
 			sp.getServer().runCommand("time set 6000");
 			sp.getServer().runCommand("weather clear");
 			sp.getServer().runCommand("gamerule doDaylightCycle false");
