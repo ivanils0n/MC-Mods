@@ -22,6 +22,7 @@ import net.fabricmc.fabric.api.event.lifecycle.v1.ServerLifecycleEvents;
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerTickEvents;
 import net.fabricmc.fabric.api.event.player.UseBlockCallback;
 import net.fabricmc.fabric.api.event.player.UseEntityCallback;
+import net.fabricmc.fabric.api.event.player.UseItemCallback;
 import net.fabricmc.fabric.api.networking.v1.ServerPlayConnectionEvents;
 import net.minecraft.ChatFormatting;
 import net.minecraft.core.BlockPos;
@@ -61,7 +62,7 @@ import org.slf4j.LoggerFactory;
  * Golem de Cobre Inteligente, 100% no servidor: o Cajado do Golem é um item vanilla marcado (com modelo próprio pelo
  * resource pack). Nenhum bloco, item ou entidade nova é registrado: o golem é o do jogo, só que vinculado a baús.
  *
- * Uso: clique num golem com o cajado para ligá-lo (abre a tela). Com o cajado ligado, clique num baú de cobre (recarga),
+ * Uso: clique num golem com o cajado para ligá-lo (abre a tela); com shift, guarda o golem no inventário. Com o cajado ligado, clique num baú de cobre (recarga),
  * ou em baús e barris (guardar ou origem, conforme o modo da tela).
  */
 public final class GolemMod implements ModInitializer {
@@ -120,17 +121,21 @@ public final class GolemMod implements ModInitializer {
 		ServerPlayConnectionEvents.DISCONNECT.register((handler, s) -> PACK_OK.remove(handler.player.getUUID()));
 		// Golem morto (ou virado estátua): o vínculo some. Descarregar o chunk não conta.
 		ServerEntityEvents.ENTITY_UNLOAD.register((entity, level) -> {
-			if (links != null && entity instanceof CopperGolem && entity.getRemovalReason() != null && entity.getRemovalReason().shouldDestroy()) {
+			if (links != null && entity instanceof CopperGolem && entity.getRemovalReason() != null && entity.getRemovalReason().shouldDestroy()
+				&& (level.getEntity(entity.getUUID()) == null || level.getEntity(entity.getUUID()) == entity)) { // golem guardado e já solto de novo com o mesmo UUID: mantém
 				links.remove(entity.getUUID());
 				TASKS.remove(entity.getUUID());
 			}
 		});
 		UseEntityCallback.EVENT.register((player, level, hand, entity, hit) -> useOnGolem(player, hand, entity));
 		UseBlockCallback.EVENT.register(GolemMod::onUseBlock);
+		// golem guardado no ar (ou na água): não deixa o ovo do jogo criar um golem novo sem os dados
+		UseItemCallback.EVENT.register((player, level, hand) -> Stash.isStash(player.getItemInHand(hand)) ? InteractionResult.FAIL : InteractionResult.PASS);
 	}
 
 	/** Cajado em punho clicando num golem: liga o cajado a ele e abre a tela. Também chamado pelo mixin do golem. */
 	public static InteractionResult useOnGolem(Player player, InteractionHand hand, Entity entity) {
+		if (Stash.isStash(player.getItemInHand(hand))) return InteractionResult.SUCCESS; // golem guardado não é ovo: nada de usar em bichos
 		InteractionResult repaired = repair(player, hand, entity);
 		if (repaired != InteractionResult.PASS) return repaired;
 		if (links == null || hand != InteractionHand.MAIN_HAND || player.isSpectator() || !isWand(player.getMainHandItem()) || !(entity instanceof CopperGolem)) {
@@ -138,6 +143,12 @@ public final class GolemMod implements ModInitializer {
 		}
 		if (!(player instanceof ServerPlayer sp)) return InteractionResult.CONSUME; // cliente: não deixa o jogo fazer a ação normal do golem
 		try {
+			if (sp.isShiftKeyDown()) { // shift: recolhe o golem para o inventário
+				if (!sp.level().mayInteract(sp, entity.blockPosition())) return InteractionResult.SUCCESS;
+				Stash.collect(sp, (CopperGolem) entity);
+				say(sp, plain("Golem guardado no inventário. Botão direito no chão para soltar.", ChatFormatting.GREEN));
+				return InteractionResult.SUCCESS;
+			}
 			ItemStack wand = sp.getMainHandItem();
 			CustomData data = wand.get(DataComponents.CUSTOM_DATA);
 			CompoundTag tag = data == null ? new CompoundTag() : data.copyTag();
@@ -145,7 +156,8 @@ public final class GolemMod implements ModInitializer {
 			wand.set(DataComponents.CUSTOM_DATA, CustomData.of(tag));
 			wand.set(DataComponents.LORE, new ItemLore(List.of(
 				plain("Ligado a um Golem de Cobre.", ChatFormatting.GRAY),
-				plain("Clique em baús (de cobre = recarga) para vincular.", ChatFormatting.DARK_GRAY))));
+				plain("Clique em baús (de cobre = recarga) para vincular.", ChatFormatting.DARK_GRAY),
+				plain("Shift + botão direito no golem: guardar no inventário.", ChatFormatting.DARK_GRAY))));
 			sp.level().playSound(null, entity.blockPosition(), SoundEvents.LODESTONE_COMPASS_LOCK, SoundSource.PLAYERS, 1f, 1.2f);
 			say(sp, plain("Cajado ligado a este golem.", ChatFormatting.GREEN));
 			GolemMenu.open(sp, entity.getUUID());
@@ -179,6 +191,15 @@ public final class GolemMod implements ModInitializer {
 	// ---------- eventos ----------
 
 	private static InteractionResult onUseBlock(Player player, Level level, InteractionHand hand, BlockHitResult hit) {
+		if (Stash.isStash(player.getItemInHand(hand))) { // solta o golem guardado
+			if (level instanceof ServerLevel sl && player instanceof ServerPlayer sp && !sp.isSpectator()) {
+				BlockPos at = sl.getBlockState(hit.getBlockPos()).canBeReplaced() ? hit.getBlockPos() : hit.getBlockPos().relative(hit.getDirection());
+				if (sl.mayInteract(sp, at) && Stash.place(sp, sl, sp.getItemInHand(hand), at) == null) {
+					say(sp, plain("Não deu para soltar o golem aqui.", ChatFormatting.RED));
+				}
+			}
+			return InteractionResult.SUCCESS;
+		}
 		if (links == null || hand != InteractionHand.MAIN_HAND || !(level instanceof ServerLevel sl) || !(player instanceof ServerPlayer sp)
 			|| sp.isSpectator() || !isWand(sp.getMainHandItem())) {
 			return InteractionResult.PASS;

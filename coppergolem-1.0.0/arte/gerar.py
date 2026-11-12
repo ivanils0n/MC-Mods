@@ -143,17 +143,36 @@ def model(tilt=True):
             "face": "coppergolem:item/wand_face", "ox": "coppergolem:item/wand_ox", "wood": "coppergolem:item/wand_wood", "light": "coppergolem:item/wand_light"}, "elements": els, "display": disp}
 
 
-def gui(rows=3):
+def vnoise(w, h, cell, seed):
+    """Ruído suave (valores aleatórios numa grade, interpolados): dá manchas com borda irregular, não retas."""
+    rnd = random.Random(seed)
+    gw, gh = w // cell + 2, h // cell + 2
+    g = [[rnd.random() for _ in range(gw)] for _ in range(gh)]
+
+    def at(x, y):
+        fx, fy = x / cell, y / cell
+        ix, iy = int(fx), int(fy)
+        tx, ty = fx - ix, fy - iy
+        tx, ty = tx * tx * (3 - 2 * tx), ty * ty * (3 - 2 * ty)
+        a = g[iy][ix] + (g[iy][ix + 1] - g[iy][ix]) * tx
+        b = g[iy + 1][ix] + (g[iy + 1][ix + 1] - g[iy + 1][ix]) * tx
+        return a + (b - a) * ty
+    return at
+
+
+def gui(rows=3, covered=()):
     """Menu "Pátina": 176x(114+18*rows), cobre com oxidação turquesa nas bordas; slots verde-escuros com brilho turquesa
-    fraco no meio (é o que aparece nos espaços vazios). Slots em (7+18c, 17+18r), inventário em 30+18*rows, hotbar 58 abaixo."""
+    fraco no meio (é o que aparece nos espaços vazios). covered = slots da fileira de cima que viram painel. Slots em (7+18c, 17+18r), inventário em 30+18*rows, hotbar 58 abaixo."""
     H = 114 + 18 * rows
     inv = 30 + 18 * rows
     im = Image.new("RGBA", (176, H))
     rnd = random.Random(3)
+    big, small = vnoise(176, H, 11, 21), vnoise(176, H, 4, 22)
     for y in range(H):
         for x in range(176):
             edge = min(x, 175 - x, y, H - 1 - y)
-            ox = max(0.0, 1 - edge / 14) * (0.55 + 0.45 * math.sin(x * 0.31 + y * 0.17) * math.cos(y * 0.23 - x * 0.07))
+            n = 0.65 * big(x, y) + 0.35 * small(x, y)  # manchas soltas pelo painel todo, mais fortes nas bordas
+            ox = max(0.0, 1 - edge / 12) * (0.35 + 0.65 * n) + max(0.0, n - 0.58) * 3.0
             pal = (["#5fb39b", "#4fa58c", "#3d8a74"] if rnd.random() < ox else ["#c66a3f", "#b45d36", "#d07848"])
             im.putpixel((x, y), hx(rnd.choices(pal, [2, 3, 2] if pal[0] == "#5fb39b" else [3, 3, 2])[0]))
     d = ImageDraw.Draw(im)
@@ -170,7 +189,8 @@ def gui(rows=3):
             im.putpixel((x + 9 + dx, y + 9 + dy), hx("#2c4a41" if abs(dx) + abs(dy) == 2 else "#35594e"))
     for r in range(rows):
         for c in range(9):
-            slot(7 + 18 * c, 17 + 18 * r)
+            if 9 * r + c not in covered:  # coberto: fica o painel (a tela não usa esse espaço)
+                slot(7 + 18 * c, 17 + 18 * r)
     for r in range(3):
         for c in range(9):
             slot(7 + 18 * c, inv + 18 * r)
@@ -269,7 +289,7 @@ def main():
     save(wood_tex(), "textures/item/wand_wood.png")
     save(light_tex(), "textures/item/wand_light.png")
     save(gui(3), "textures/gui/menu.png")
-    save(gui(1), "textures/gui/menu_small.png")
+    save(gui(1, covered=(0, 1, 3, 5, 7, 8)), "textures/gui/menu_small.png")  # só os 3 botões do LinkMenu
     for name, img in icons().items():
         save(img, f"textures/item/{name}.png")
         save({"parent": "minecraft:item/generated", "textures": {"layer0": f"coppergolem:item/{name}"}}, f"models/item/{name}.json")

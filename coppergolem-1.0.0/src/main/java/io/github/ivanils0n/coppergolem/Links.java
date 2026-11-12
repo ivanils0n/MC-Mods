@@ -82,6 +82,18 @@ final class Links {
 		return l;
 	}
 
+	/** Vínculo em texto (vai dentro do item do golem guardado) e de volta. */
+	static String toJson(Link l) {
+		return GSON.toJson(l);
+	}
+
+	void put(UUID golem, String json) {
+		Link l = GSON.fromJson(json, Link.class);
+		if (l == null || l.dim == null || l.sources == null || l.dests == null) return;
+		byGolem.put(golem.toString(), l);
+		dirty = true;
+	}
+
 	void remove(UUID golem) {
 		if (byGolem.remove(golem.toString()) != null) dirty = true;
 	}

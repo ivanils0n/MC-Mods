@@ -115,6 +115,20 @@ final class SelfTest {
 		ensure(g.getWeatherState() == WeatheringCopper.WeatherState.WEATHERED && fp.getMainHandItem().getCount() == 4, "barra de cobre tira um nível");
 
 		t.release(sl, g); // devolve o cérebro do jogo sem erro
+
+		// guardar o golem no inventário e soltar de novo: mesmo golem, mesma ferrugem, mesmos baús
+		java.util.UUID id = g.getUUID();
+		GolemMod.links.remove(id);
+		Link keep = GolemMod.links.getOrCreate(id, GolemMod.dim(sl));
+		keep.refill = Link.arr(refill);
+		keep.dests.add(Link.arr(dst));
+		g.setWeatherState(WeatheringCopper.WeatherState.EXPOSED);
+		ItemStack stash = Stash.collect(fp, g);
+		ensure(Stash.isStash(stash) && g.isRemoved() && GolemMod.links.get(id) == null, "guardar o golem");
+		CopperGolem back = Stash.place(fp, sl, stash, o.above());
+		ensure(back != null && back.getUUID().equals(id) && back.getWeatherState() == WeatheringCopper.WeatherState.EXPOSED, "soltar o golem");
+		ensure(GolemMod.links.get(id) != null && GolemMod.links.get(id).dests.size() == 1 && stash.isEmpty(), "vínculos do golem solto");
+		g = back;
 		GolemMod.links.remove(g.getUUID());
 		g.discard();
 	}
