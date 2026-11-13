@@ -117,7 +117,7 @@ final class Worker {
 		}
 		double v = base + add;
 		double speed = Math.max(0.05, (v + v * mulBase) * mulTotal);
-		return Math.max(1, (int) Math.ceil(20.0 / speed - 0.5));
+		return Math.max(1, (int) Math.ceil(20.0 / speed - 0.5 - 1e-6)); // 1e-6: 4 - 2,4 dá 1,5999...
 	}
 
 	/** Mob vivo nos blocos livres à frente (até 3, parando na primeira parede). Jogadores e suportes de armadura não. */
