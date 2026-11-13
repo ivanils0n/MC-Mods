@@ -38,6 +38,7 @@ public class Mochilas implements ModInitializer {
 		Backpacks.register();
 		Equipment.init();
 		Pack.init();
+		if (Boolean.getBoolean("mochilas.selftest")) SelfTest.simulateConflict();
 		BackpackCommand.register();
 
 		ServerLifecycleEvents.SERVER_STARTED.register(s -> {

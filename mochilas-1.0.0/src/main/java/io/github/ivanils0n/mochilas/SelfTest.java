@@ -35,6 +35,16 @@ import java.util.UUID;
 final class SelfTest {
 	private SelfTest() {}
 
+	/** Autoteste: outro "mod" tenta trocar o shader e uma textura das mochilas no resource pack. */
+	static void simulateConflict() {
+		eu.pb4.polymer.resourcepack.api.PolymerResourcePackUtils.RESOURCE_PACK_CREATION_EVENT.register(b -> {
+			b.addData("assets/minecraft/shaders/core/item.vsh", "// shader de outro mod".getBytes(StandardCharsets.UTF_8));
+			b.addData("assets/mochilas/textures/item/mochila_couro.png", new byte[]{1, 2, 3});
+		});
+		eu.pb4.polymer.resourcepack.api.PolymerResourcePackUtils.RESOURCE_PACK_AFTER_INITIAL_CREATION_EVENT.register(b ->
+				b.addData("assets/minecraft/shaders/core/entity.fsh", "// outro mod depois".getBytes(StandardCharsets.UTF_8)));
+	}
+
 	static void run(MinecraftServer server) {
 		Path marker = server.getWorldPath(LevelResource.ROOT).resolve("mochilas-selftest.txt");
 		try {
@@ -151,6 +161,22 @@ final class SelfTest {
 		ensure(items.get(53).is(Items.ELYTRA), "élitro após reiniciar");
 		Files.delete(marker);
 		ok("itens da mochila voltaram depois de reiniciar o servidor");
+
+		// Resource pack gerado pelo Polymer: os arquivos das mochilas têm que vencer os de "outro mod"
+		Path zip = eu.pb4.polymer.resourcepack.api.PolymerResourcePackUtils.getMainPath();
+		for (int i = 0; i < 30 && (!Files.exists(zip) || System.currentTimeMillis() - Files.getLastModifiedTime(zip).toMillis() < 1500); i++) {
+			Thread.sleep(500); // o Polymer gera o pack em outra thread ao iniciar
+		}
+		ensure(Files.exists(zip), "resource pack gerado em " + zip);
+		try (var fs = new java.util.zip.ZipFile(zip.toFile())) {
+			String vsh = new String(fs.getInputStream(fs.getEntry("assets/minecraft/shaders/core/item.vsh")).readAllBytes(), StandardCharsets.UTF_8);
+			String fsh = new String(fs.getInputStream(fs.getEntry("assets/minecraft/shaders/core/entity.fsh")).readAllBytes(), StandardCharsets.UTF_8);
+			byte[] png = fs.getInputStream(fs.getEntry("assets/mochilas/textures/item/mochila_couro.png")).readAllBytes();
+			ensure(vsh.contains("MOCHILAS") && fsh.contains("MOCHILAS"), "shaders das mochilas venceram os de outro mod");
+			ensure(png.length > 100 && png[1] == 'P', "textura das mochilas venceu a de outro mod");
+			ensure(fs.getEntry("assets/mochilas/items/mochila_diamante_dono.json") != null, "modelo do dono no pack");
+		}
+		ok("resource pack: texturas e shaders das mochilas prevalecem sobre outros mods");
 	}
 
 	private static ItemStack craft(MinecraftServer server, ServerLevel sl, CraftingInput input) {
