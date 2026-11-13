@@ -6,7 +6,8 @@ import net.minecraft.core.Direction;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.entity.EntitySpawnReason;
-import net.minecraft.world.entity.EntityType;
+import net.minecraft.core.registries.BuiltInRegistries;
+import net.minecraft.resources.Identifier;
 import net.minecraft.world.entity.Mob;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
@@ -70,7 +71,7 @@ final class SelfTest {
 		// Espada: golpeia o porco só quando a recarga enche.
 		be.setItem(4, ItemStack.EMPTY);
 		be.setItem(0, new ItemStack(Items.DIAMOND_SWORD));
-		Mob pig = (Mob) EntityType.byString("minecraft:pig").orElseThrow().create(sl, EntitySpawnReason.COMMAND);
+		Mob pig = (Mob) BuiltInRegistries.ENTITY_TYPE.getValue(Identifier.fromNamespaceAndPath("minecraft", "pig")).create(sl, EntitySpawnReason.COMMAND);
 		ensure(pig != null, "porco não foi criado");
 		pig.setPos(pos.getX() + 1.5, pos.getY(), pos.getZ() + 0.5);
 		pig.setNoAi(true);
