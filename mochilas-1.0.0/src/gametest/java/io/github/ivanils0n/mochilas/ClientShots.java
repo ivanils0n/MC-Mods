@@ -59,6 +59,12 @@ public class ClientShots implements FabricClientGameTest {
 				view(context, sp, 3.0, -0.5, "pose_" + pose + "_lado");
 				view(context, sp, -1.6, -2.6, "pose_" + pose + "_costas");
 			}
+			// Manequins virados para outros lados: a mochila tem que acompanhar a rotação do corpo
+			for (int yaw : new int[]{90, 225}) {
+				mannequin(context, sp, Tier.OURO, "standing", yaw);
+				viewLocal(context, sp, yaw, 3.0, 0, "giro_" + yaw + "_costas");
+				viewLocal(context, sp, yaw, 0.4, 3.0, "giro_" + yaw + "_lado");
+			}
 			clearMannequin(sp);
 			cmd(sp, "gamemode creative @p");
 			cmd(sp, String.format(Locale.ROOT, "tp @p %.2f %.2f %.2f 0 0", X, Y, Z));
@@ -116,7 +122,11 @@ public class ClientShots implements FabricClientGameTest {
 			cmd(sp, String.format(Locale.ROOT, "tp @p %.2f %.2f %.2f 0 10", X, Y + 40, Z));
 			context.waitTicks(8);
 			context.getInput().pressKey(o -> o.keyJump);
-			context.waitTicks(12);
+			context.waitTicks(3);
+			sp.getServer().runOnServer(s -> {
+				if (!player(s).isFallFlying()) player(s).startFallFlying();
+			});
+			context.waitTicks(10);
 			context.takeScreenshot("pose_elitro");
 			sp.getServer().runOnServer(s -> note("MOCHILAS CLIENTE élitro: planando={}", player(s).isFallFlying()));
 			cmd(sp, "gamemode creative @p");
@@ -234,11 +244,15 @@ public class ClientShots implements FabricClientGameTest {
 
 	/** Manequim de frente para o sul, 5 blocos ao sul do jogador, com a mochila do nível. */
 	private static void mannequin(ClientGameTestContext context, TestSingleplayerContext sp, Tier t, String pose) {
+		mannequin(context, sp, t, pose, 0);
+	}
+
+	private static void mannequin(ClientGameTestContext context, TestSingleplayerContext sp, Tier t, String pose, int yaw) {
 		clearMannequin(sp);
 		MX = X;
 		MY = Y;
 		MZ = Z + 5;
-		cmd(sp, String.format(Locale.ROOT, "summon minecraft:mannequin %.2f %.2f %.2f {Rotation:[0f,0f],immovable:1b,pose:\"%s\",Tags:[\"mochila_teste\"]}", MX, MY, MZ, pose));
+		cmd(sp, String.format(Locale.ROOT, "summon minecraft:mannequin %.2f %.2f %.2f {Rotation:[%df,0f],immovable:1b,pose:\"%s\",Tags:[\"mochila_teste\"]}", MX, MY, MZ, yaw, pose));
 		context.waitTicks(5);
 		sp.getServer().runOnServer(s -> {
 			for (net.minecraft.world.entity.Entity e : player(s).level().getAllEntities()) {
@@ -259,6 +273,14 @@ public class ClientShots implements FabricClientGameTest {
 			MANNEQUIN = null;
 		});
 		cmd(sp, "kill @e[tag=mochila_teste]");
+	}
+
+	/** Vista relativa ao corpo do manequim virado para "yaw": "back" blocos atrás dele e "side" para o lado. */
+	private static void viewLocal(ClientGameTestContext context, TestSingleplayerContext sp, int yaw, double back, double side, String name) {
+		double th = Math.toRadians(yaw);
+		double bx = Math.sin(th), bz = -Math.cos(th); // para trás do corpo
+		double sx = Math.cos(th), sz = Math.sin(th);  // para um lado
+		view(context, sp, bx * back + sx * side, bz * back + sz * side, name);
 	}
 
 	/** O jogador (câmera, 1ª pessoa) vai para (dx, dz) em volta do manequim e olha para ele. */
