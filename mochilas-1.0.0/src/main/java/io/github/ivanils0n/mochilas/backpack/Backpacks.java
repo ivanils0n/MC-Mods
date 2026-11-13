@@ -75,10 +75,13 @@ public final class Backpacks {
 		return id;
 	}
 
-	/** Item que a entidade virtual mostra nas costas: papel com o modelo 3D do nível (assets/mochilas/items/mochila_*_costas.json). */
-	public static ItemStack visualStack(Tier t) {
+	/**
+	 * Item que a entidade virtual mostra nas costas: papel com o modelo 3D do nível. Os outros jogadores veem
+	 * mochila_*_costas (completa); o dono vê mochila_*_dono, sem as alças da frente, para não tapar a 1ª pessoa.
+	 */
+	public static ItemStack visualStack(Tier t, boolean owner) {
 		ItemStack s = new ItemStack(Items.PAPER);
-		s.set(DataComponents.ITEM_MODEL, Mochilas.id(t.itemPath() + "_costas"));
+		s.set(DataComponents.ITEM_MODEL, Mochilas.id(t.itemPath() + (owner ? "_dono" : "_costas")));
 		return s;
 	}
 

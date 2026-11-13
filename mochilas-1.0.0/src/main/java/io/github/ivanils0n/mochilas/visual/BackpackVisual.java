@@ -33,6 +33,11 @@ public class BackpackVisual extends ElementHolder {
 	/** Quem usa a mochila: o jogador (ou, nos testes, um manequim). */
 	final LivingEntity player;
 	final ItemDisplayElement element;
+	/**
+	 * true: cópia só para o próprio dono (sem as alças da frente, e escondida quando ele olha para baixo, senão
+	 * apareceria na 1ª pessoa). false: cópia para todos os outros jogadores.
+	 */
+	final boolean ownerCopy;
 	/** Centro do modelo (y=8) até o ombro: a alça de cima (y=11 no couro, 12 nos outros) apoia no ombro. */
 	private final float downFromShoulder;
 	private float lastYaw = Float.NaN;
@@ -40,10 +45,14 @@ public class BackpackVisual extends ElementHolder {
 	private Pose lastPose = null;
 	private boolean lastHidden;
 
-	public BackpackVisual(LivingEntity player, Tier tier) {
+	/** Olhando mais para baixo que isto o dono não vê a própria mochila (na 1ª pessoa ela entraria na tela). */
+	static final float OWNER_HIDE_PITCH = 40f;
+
+	public BackpackVisual(LivingEntity player, Tier tier, boolean ownerCopy) {
 		this.player = player;
+		this.ownerCopy = ownerCopy;
 		this.downFromShoulder = ((tier == Tier.COURO ? 11 : 12) - 8) * PX;
-		this.element = new ItemDisplayElement(Backpacks.visualStack(tier));
+		this.element = new ItemDisplayElement(Backpacks.visualStack(tier, ownerCopy));
 		this.element.setItemDisplayContext(ItemDisplayContext.NONE);
 		this.element.ignorePositionUpdates();
 		this.element.setInterpolationDuration(2);
@@ -55,6 +64,8 @@ public class BackpackVisual extends ElementHolder {
 	/** Sem o resource pack o cliente desenharia um cubo roxo e preto: quem recusou o pack não vê a mochila. */
 	@Override
 	public boolean startWatching(ServerGamePacketListenerImpl conn) {
+		boolean isOwner = conn.player == player;
+		if (isOwner != ownerCopy) return false;
 		// No singleplayer/LAN as texturas vêm do próprio mod no cliente do dono do mundo.
 		boolean dedicated = conn.player.level().getServer().isDedicatedServer();
 		if (dedicated && MochilasConfig.get().visualSoComPack && !PolymerResourcePackUtils.hasMainPack((ServerCommonPacketListenerImpl) conn)) return false;
@@ -72,6 +83,7 @@ public class BackpackVisual extends ElementHolder {
 		float yaw = player.yBodyRot;
 		boolean prone = pose == Pose.SWIMMING || pose == Pose.FALL_FLYING || player.isFallFlying() || pose == Pose.SPIN_ATTACK;
 		float pitch = prone ? player.getXRot() : 0;
+		if (ownerCopy && !prone && player.getXRot() > OWNER_HIDE_PITCH) hidden = true;
 		if (!force && pose == lastPose && hidden == lastHidden && Math.abs(Mth.wrapDegrees(yaw - lastYaw)) < 2f && Math.abs(pitch - lastPitch) < 3f) {
 			return;
 		}

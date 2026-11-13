@@ -138,6 +138,10 @@ public class ClientShots implements FabricClientGameTest {
 			context.getInput().holdKey(o -> o.keySprint);
 			context.waitTicks(30);
 			context.takeScreenshot("pose_nadando");
+			context.runOnClient(c -> c.options.setCameraType(CameraType.FIRST_PERSON));
+			context.waitTicks(3);
+			context.takeScreenshot("primeira_nadando");
+			context.runOnClient(c -> c.options.setCameraType(CameraType.THIRD_PERSON_BACK));
 			context.getInput().releaseKey(o -> o.keySprint);
 			context.getInput().releaseKey(o -> o.keyUp);
 			cmd(sp, String.format(Locale.ROOT, "fill %d %d %d %d %d %d air", (int) X - 6, (int) Y, (int) Z - 1, (int) X + 6, (int) Y + 2, (int) Z + 30));
@@ -154,6 +158,9 @@ public class ClientShots implements FabricClientGameTest {
 			});
 			context.waitTicks(10);
 			context.takeScreenshot("pose_elitro");
+			context.runOnClient(c -> c.options.setCameraType(CameraType.FIRST_PERSON));
+			context.waitTicks(2);
+			context.takeScreenshot("primeira_elitro");
 			sp.getServer().runOnServer(s -> note("MOCHILAS CLIENTE élitro: planando={}", player(s).isFallFlying()));
 			cmd(sp, "gamemode creative @p");
 			cmd(sp, "item replace entity @p armor.chest with minecraft:air");

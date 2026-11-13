@@ -20,7 +20,8 @@ import java.util.UUID;
  * adicionado à mão (o jogo não "rastreia" o próprio jogador).
  */
 public final class Visuals {
-	private static final Map<UUID, BackpackVisual> BY_PLAYER = new HashMap<>();
+	/** Por jogador: [0] cópia para os outros, [1] cópia para o próprio dono. */
+	private static final Map<UUID, BackpackVisual[]> BY_PLAYER = new HashMap<>();
 
 	private Visuals() {}
 
@@ -29,15 +30,17 @@ public final class Visuals {
 		ItemStack s = Equipment.equipped(p);
 		Tier t = Backpacks.tier(s);
 		if (t == null || p.isRemoved()) return;
-		BackpackVisual v = attach(p, t);
-		BY_PLAYER.put(p.getUUID(), v);
-		v.startWatching(p); // o próprio jogador
-		v.sendPacket(new ClientboundSetPassengersPacket(p));
+		BackpackVisual others = attach(p, t);
+		BackpackVisual own = new BackpackVisual(p, t, true);
+		EntityAttachment.ofTicking(own, p);
+		own.startWatching(p); // o jogo não "rastreia" o próprio jogador: o dono entra à mão
+		own.sendPacket(new ClientboundSetPassengersPacket(p));
+		BY_PLAYER.put(p.getUUID(), new BackpackVisual[]{others, own});
 	}
 
 	/** Monta a mochila em qualquer ser vivo com modelo de jogador e mostra para quem já o está vendo. */
 	public static BackpackVisual attach(LivingEntity e, Tier t) {
-		BackpackVisual v = new BackpackVisual(e, t);
+		BackpackVisual v = new BackpackVisual(e, t, false);
 		EntityAttachment att = EntityAttachment.ofTicking(v, e);
 		att.updateCurrentlyTracking(List.of());
 		v.sendPacket(new ClientboundSetPassengersPacket(e));
@@ -45,15 +48,15 @@ public final class Visuals {
 	}
 
 	public static void remove(ServerPlayer p) {
-		BackpackVisual v = BY_PLAYER.remove(p.getUUID());
+		BackpackVisual[] v = BY_PLAYER.remove(p.getUUID());
 		if (v != null) {
-			v.destroy();
+			for (BackpackVisual x : v) x.destroy();
 			if (!p.isRemoved() && p.connection != null) p.connection.send(new ClientboundSetPassengersPacket(p));
 		}
 	}
 
 	public static void removeAll() {
-		for (BackpackVisual v : BY_PLAYER.values()) v.destroy();
+		for (BackpackVisual[] v : BY_PLAYER.values()) for (BackpackVisual x : v) x.destroy();
 		BY_PLAYER.clear();
 	}
 
@@ -65,7 +68,7 @@ public final class Visuals {
 		return BY_PLAYER.size();
 	}
 
-	public static BackpackVisual get(ServerPlayer p) {
+	public static BackpackVisual[] get(ServerPlayer p) {
 		return BY_PLAYER.get(p.getUUID());
 	}
 }
