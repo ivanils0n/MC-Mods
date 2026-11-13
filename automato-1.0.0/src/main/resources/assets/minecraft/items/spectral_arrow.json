@@ -1,0 +1,48 @@
+{
+ "model": {
+  "type": "minecraft:select",
+  "property": "minecraft:custom_model_data",
+  "index": 0,
+  "cases": [
+   {
+    "when": "automato_range_1_on",
+    "model": {
+     "type": "minecraft:model",
+     "model": "automato:item/range_1_on"
+    }
+   },
+   {
+    "when": "automato_range_2_on",
+    "model": {
+     "type": "minecraft:model",
+     "model": "automato:item/range_2_on"
+    }
+   },
+   {
+    "when": "automato_range_3_on",
+    "model": {
+     "type": "minecraft:model",
+     "model": "automato:item/range_3_on"
+    }
+   },
+   {
+    "when": "automato_range_4_on",
+    "model": {
+     "type": "minecraft:model",
+     "model": "automato:item/range_4_on"
+    }
+   },
+   {
+    "when": "automato_range_5_on",
+    "model": {
+     "type": "minecraft:model",
+     "model": "automato:item/range_5_on"
+    }
+   }
+  ],
+  "fallback": {
+   "type": "minecraft:model",
+   "model": "minecraft:item/spectral_arrow"
+  }
+ }
+}

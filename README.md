@@ -9,6 +9,7 @@ Mods Fabric para Minecraft. Cada pasta `<mod>-<versão>/` é um mod independente
 | Altar de Teleporte | `tpaltar-1.0.0/` | 26.2 e 26.3+ (Fabric, servidor ou singleplayer, requer Fabric API) |
 | Baú Central | `smartchest-1.1.0/` | 26.2 (Fabric, servidor ou singleplayer, requer Fabric API) |
 | Golem de Cobre Inteligente | `coppergolem-1.0.0/` | 26.2 (Fabric, servidor ou singleplayer, requer Fabric API) |
+| Autômato | `automato-1.0.0/` | 26.2 (Fabric, servidor ou singleplayer, requer Fabric API) |
 
 ## Releases
 
@@ -82,3 +83,19 @@ O golem de cobre do jogo passa a trabalhar sozinho entre baús que você liga co
 - Ligue primeiro o baú de cobre: origem e guardar só até **33 blocos** dele (sem limite de quantidade).
 - **Origem**: de onde ele pega itens. **Guardar**: para onde ele leva. Moldura com um item num baú de guardar: só entra esse item; sem moldura, qualquer item, agrupando por categoria do criativo.
 - Textura por resource pack (enviado a servidores dedicados), mesmo esquema dos outros mods. Dados em `<mundo>/coppergolem.json`.
+
+## Autômato
+
+Um bloco que usa as ferramentas guardadas nele como um jogador parado na frente dele. Vai na pasta `mods/` do servidor, junto com o Fabric API; os jogadores entram sem instalar nada. Em singleplayer, coloque o mesmo .jar na pasta `mods/` do jogo.
+
+- **Receita** (bancada): barra de ferro, observador, barra de ferro em cima; barra de ferro, ejetor, barra de ferro no meio; barra de ferro, bloco de redstone, barra de ferro embaixo. Aparece no livro de receitas ao pegar um ejetor.
+- **Colocar**: a frente fica virada para onde você olha (também para cima ou para baixo).
+- **Tela** (clique no bloco): a fileira de cima tem 9 espaços que só aceitam ferramentas e armas (à mão ou por funil). A fileira de baixo escolhe o **alcance da quebra**, de 1 a 5 blocos à frente (começa em 1).
+- **Ligar**: redstone ou alavanca direto nele. Ligado, ele usa a primeira ferramenta dos 9 espaços; quando ela quebra, passa para a próxima.
+  - **Picareta, pá, enxada, tesoura**: quebram o primeiro bloco à frente dentro do alcance, na velocidade de um jogador com essa ferramenta (eficiência conta), com a rachadura aparecendo e 5 ticks de pausa entre blocos. Fortuna e toque suave valem; os drops caem no chão.
+  - **Espada, maça, tridente, lança**: golpeiam o mob à frente (até 3 blocos, como o jogador) toda vez que a recarga da arma enche (espada: a cada 0,6 s). Golpe com a barra cheia, com encantamentos.
+  - **Machado**: golpeia se houver mob à frente; se não, corta o bloco dentro do alcance.
+  - Gasta a durabilidade como um jogador. Não bate em jogadores nem em suportes de armadura. O alcance do golpe não passa de paredes.
+- **Quebrar**: as ferramentas guardadas caem no chão e, com picareta, o Autômato volta como item.
+- **Visual (Pedra e Carvalho)**: bloco de tijolos de pedra com relevo e boca em arco; ligado, a brasa no fundo tremula. A ferramenta em uso aparece de verdade saindo do arco (com o material e o brilho de encantamento dela) e dá uma batida a cada golpe ou enquanto cava. A tela ganha fundo próprio e as placas de alcance numeradas. Vem dentro do .jar (singleplayer) e, no servidor dedicado, o próprio mod envia o resource pack ao jogador. Quem recusar vê um ejetor comum, a tela de baú comum e flechas no lugar das placas (o número é a quantidade). As texturas são geradas por `arte/final.py`.
+- Por baixo é um ejetor de verdade: os dados ficam em `<mundo>/automato.json`, fora do save do Minecraft, e o visual nunca é salvo no mapa. Sem o mod, sobra um ejetor comum com as ferramentas dentro.

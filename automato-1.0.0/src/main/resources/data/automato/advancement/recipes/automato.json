@@ -1,0 +1,15 @@
+{
+	"parent": "minecraft:recipes/root",
+	"criteria": {
+		"has_dispenser": {
+			"trigger": "minecraft:inventory_changed",
+			"conditions": {
+				"items": [{"items": "minecraft:dispenser"}]
+			}
+		}
+	},
+	"requirements": [["has_dispenser"]],
+	"rewards": {
+		"recipes": ["automato:automato"]
+	}
+}

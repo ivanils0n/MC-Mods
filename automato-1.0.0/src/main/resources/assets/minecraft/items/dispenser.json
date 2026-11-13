@@ -1,0 +1,36 @@
+{
+ "model": {
+  "type": "minecraft:condition",
+  "property": "minecraft:has_component",
+  "component": "minecraft:custom_data",
+  "on_true": {
+   "type": "minecraft:model",
+   "model": "automato:item/machine"
+  },
+  "on_false": {
+   "type": "minecraft:select",
+   "property": "minecraft:custom_model_data",
+   "index": 0,
+   "cases": [
+    {
+     "when": "automato_idle",
+     "model": {
+      "type": "minecraft:model",
+      "model": "automato:item/machine"
+     }
+    },
+    {
+     "when": "automato_on",
+     "model": {
+      "type": "minecraft:model",
+      "model": "automato:item/machine_on"
+     }
+    }
+   ],
+   "fallback": {
+    "type": "minecraft:model",
+    "model": "minecraft:block/dispenser"
+   }
+  }
+ }
+}

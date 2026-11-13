@@ -1,0 +1,30 @@
+{
+	"type": "minecraft:crafting_shaped",
+	"category": "redstone",
+	"pattern": [
+		"IOI",
+		"IDI",
+		"IRI"
+	],
+	"key": {
+		"I": "minecraft:iron_ingot",
+		"O": "minecraft:observer",
+		"D": "minecraft:dispenser",
+		"R": "minecraft:redstone_block"
+	},
+	"result": {
+		"id": "minecraft:dispenser",
+		"count": 1,
+		"components": {
+			"minecraft:custom_data": {
+				"automato": true
+			},
+			"minecraft:custom_name": {
+				"text": "Autômato",
+				"color": "gold",
+				"italic": false
+			},
+			"minecraft:enchantment_glint_override": true
+		}
+	}
+}

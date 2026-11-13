@@ -1,0 +1,21 @@
+{
+ "providers": [
+  {
+   "type": "space",
+   "advances": {
+    "\uf000": -8,
+    "\uf001": -177,
+    "\uf002": 8
+   }
+  },
+  {
+   "type": "bitmap",
+   "file": "automato:gui/machine.png",
+   "ascent": 13,
+   "height": 150,
+   "chars": [
+    "\ue000"
+   ]
+  }
+ ]
+}

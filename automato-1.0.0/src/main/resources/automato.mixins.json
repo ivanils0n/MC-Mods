@@ -1,0 +1,15 @@
+{
+	"required": true,
+	"package": "io.github.ivanils0n.automato.mixin",
+	"compatibilityLevel": "JAVA_21",
+	"mixins": [
+		"AttackTickerAccess",
+		"DispenserMixin",
+		"DispenserToolsOnlyMixin",
+		"EntityMixin",
+		"ResourcePackResponseMixin"
+	],
+	"injectors": {
+		"defaultRequire": 1
+	}
+}
