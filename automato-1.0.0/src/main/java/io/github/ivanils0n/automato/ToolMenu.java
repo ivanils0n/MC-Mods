@@ -12,7 +12,7 @@ import net.minecraft.world.SimpleContainer;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.inventory.AbstractContainerMenu;
-import net.minecraft.world.inventory.ClickType;
+import net.minecraft.world.inventory.ContainerInput;
 import net.minecraft.world.inventory.MenuType;
 import net.minecraft.world.inventory.Slot;
 import net.minecraft.world.item.Item;
@@ -100,10 +100,10 @@ final class ToolMenu extends AbstractContainerMenu {
 	}
 
 	@Override
-	public void clicked(int slotId, int button, ClickType clickType, Player player) {
+	public void clicked(int slotId, int button, ContainerInput clickType, Player player) {
 		if (slotId >= 9 && slotId < 18) { // fileira de controle: nunca pega nem põe item
 			int n = slotId - FIRST_BUTTON + 1;
-			if (n >= 1 && n <= Worker.MAX_RANGE && n != machine.range && clickType == ClickType.PICKUP) {
+			if (n >= 1 && n <= Worker.MAX_RANGE && n != machine.range && clickType == ContainerInput.PICKUP) {
 				machine.range = n;
 				Automato.store.markDirty();
 				if (player instanceof ServerPlayer sp) {

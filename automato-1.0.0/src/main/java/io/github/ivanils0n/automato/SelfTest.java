@@ -70,7 +70,7 @@ final class SelfTest {
 		// Espada: golpeia o porco só quando a recarga enche.
 		be.setItem(4, ItemStack.EMPTY);
 		be.setItem(0, new ItemStack(Items.DIAMOND_SWORD));
-		Mob pig = EntityType.PIG.create(sl, EntitySpawnReason.COMMAND);
+		Mob pig = (Mob) EntityType.byString("minecraft:pig").orElseThrow().create(sl, EntitySpawnReason.COMMAND);
 		ensure(pig != null, "porco não foi criado");
 		pig.setPos(pos.getX() + 1.5, pos.getY(), pos.getZ() + 0.5);
 		pig.setNoAi(true);
