@@ -38,6 +38,7 @@ final class MachineStore {
 		transient boolean shownOn;
 		transient Item shownItem; // ferramenta mostrada saindo do arco (null = nenhuma)
 		transient boolean shownFoil;
+		transient int light = -1; // luz fixada no visual (bloco << 4 | céu); -1 = ainda não fixada
 		transient int poke; // "batida" da ferramenta: 4 = avança, 1 = volta
 
 		Machine() {}

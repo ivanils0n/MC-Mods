@@ -50,6 +50,7 @@ import net.minecraft.world.item.Items;
 import net.minecraft.world.item.component.CustomData;
 import net.minecraft.world.item.component.CustomModelData;
 import net.minecraft.world.level.Level;
+import net.minecraft.world.level.LightLayer;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.DispenserBlock;
@@ -189,7 +190,10 @@ public final class Automato implements ModInitializer {
 			boolean powered = sl.hasNeighborSignal(pos);
 			Worker.tick(sl, m, state, be, facing, powered);
 			boolean on = powered && m.slot >= 0;
-			if (second && anyPlayerNear(sl, pos)) ensureVisual(sl, m, facing, on);
+			if (second && anyPlayerNear(sl, pos)) {
+				ensureVisual(sl, m, facing, on);
+				updateLight(sl, m);
+			}
 			updateVisual(sl, m, facing, on, m.slot >= 0 ? be.getItem(m.slot) : null);
 		}
 	}
@@ -262,6 +266,27 @@ public final class Automato implements ModInitializer {
 		m.shownItem = null;
 		m.shownFoil = false;
 		m.poke = 0;
+		m.light = -1;
+		updateLight(sl, m);
+	}
+
+	/**
+	 * A entidade do visual pega a luz do bloco onde está; encostada em blocos sólidos ficaria preta. Por isso a luz é
+	 * fixada na maior luz (de bloco e de céu) entre os 6 vizinhos, e conferida a cada segundo (dia e noite seguem
+	 * normais, porque a luz do céu continua sendo luz do céu).
+	 */
+	private static void updateLight(ServerLevel sl, Machine m) {
+		BlockPos pos = m.pos();
+		int block = 0, sky = 0;
+		for (Direction d : Direction.values()) {
+			BlockPos p = pos.relative(d);
+			block = Math.max(block, sl.getBrightness(LightLayer.BLOCK, p));
+			sky = Math.max(sky, sl.getBrightness(LightLayer.SKY, p));
+		}
+		int packed = block << 4 | sky;
+		if (packed == m.light) return;
+		m.light = packed;
+		command(sl, pos, "data merge entity @e[type=minecraft:item_display,tag=" + tag(pos) + ",limit=2] {brightness:{block:" + block + ",sky:" + sky + "}}");
 	}
 
 	/** Ponto do meio da ferramenta: um pouco à frente do arco (a luz é a do bloco à frente, normalmente ar). */
