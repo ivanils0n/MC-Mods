@@ -47,6 +47,7 @@ public class ClientShots implements FabricClientGameTest {
 
 			// Manequim (avatar com modelo de jogador) usando a mochila; a câmera é o jogador, então é a mochila
 			// "vista por outro jogador" (o caminho do rastreio do Polymer, não o do dono).
+			cmd(sp, "gamemode spectator @p");
 			for (Tier t : Tier.values()) {
 				mannequin(context, sp, t, "standing");
 				view(context, sp, 0, -3.0, t.id + "_1_costas");
@@ -59,6 +60,7 @@ public class ClientShots implements FabricClientGameTest {
 				view(context, sp, -1.6, -2.6, "pose_" + pose + "_costas");
 			}
 			clearMannequin(sp);
+			cmd(sp, "gamemode creative @p");
 			cmd(sp, String.format(Locale.ROOT, "tp @p %.2f %.2f %.2f 0 0", X, Y, Z));
 
 			// O próprio jogador com a mochila (visão do dono, 3ª pessoa): andando, correndo, pulando...
@@ -261,7 +263,10 @@ public class ClientShots implements FabricClientGameTest {
 
 	/** O jogador (câmera, 1ª pessoa) vai para (dx, dz) em volta do manequim e olha para ele. */
 	private static void view(ClientGameTestContext context, TestSingleplayerContext sp, double dx, double dz, String name) {
-		cmd(sp, String.format(Locale.ROOT, "tp @p %.2f %.2f %.2f facing %.2f %.2f %.2f", MX + dx, MY + 0.2, MZ + dz, MX, MY + 1.0, MZ));
+		double cx = MX + dx, cz = MZ + dz, feet = MY + 0.8, eye = feet + 1.62, ty = MY + 0.9;
+		float yaw = (float) Math.toDegrees(Math.atan2(-(MX - cx), MZ - cz));
+		float pitch = (float) Math.toDegrees(Math.atan2(eye - ty, Math.hypot(dx, dz)));
+		cmd(sp, String.format(Locale.ROOT, "tp @p %.2f %.2f %.2f %.1f %.1f", cx, feet, cz, yaw, pitch));
 		context.waitTicks(8);
 		context.takeScreenshot(name);
 	}
