@@ -63,7 +63,7 @@ final class CraftSearchMenu extends AnvilMenu {
 		this.pos = pos.immutable();
 		this.typed = query;
 		this.names = StorageMenu.detached(player, chest, "");
-		this.all = craftable(player.level(), Storage.linked(player.level(), chest, SmartChest.store));
+		this.all = craftable(player.level(), Storage.linked(player.level(), chest, SmartChest.store), player.getInventory());
 		all.sort(Comparator.comparing(c -> Lang.normalize(names.name(c.result))));
 		for (int i = 0; i < slots.size(); i++) { // o inventário da tela vira a vitrine
 			Slot old = slots.get(i);
@@ -106,9 +106,10 @@ final class CraftSearchMenu extends AnvilMenu {
 	}
 
 	/** Receitas de mesa que os itens dos baús fazem pelo menos uma vez, uma por resultado. */
-	static List<Craft> craftable(ServerLevel sl, Linked linked) {
+	static List<Craft> craftable(ServerLevel sl, Linked linked, Inventory inv) {
 		StackedItemContents have = new StackedItemContents();
 		for (Container c : linked.containers) for (int i = 0; i < c.getContainerSize(); i++) have.accountSimpleStack(c.getItem(i));
+		inv.fillStackedContents(have);
 		Map<Key, Craft> out = new LinkedHashMap<>();
 		for (RecipeHolder<?> h : sl.getServer().getRecipeManager().getRecipes()) {
 			if (!(h.value() instanceof CraftingRecipe r) || r.placementInfo().isImpossibleToPlace()) continue;

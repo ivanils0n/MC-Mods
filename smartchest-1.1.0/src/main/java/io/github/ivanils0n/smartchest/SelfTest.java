@@ -322,12 +322,16 @@ final class SelfTest {
 		ensure(CraftSearchMenu.detached(fp, sc, tablePos, "").found().stream().noneMatch(c -> c.result().is(Items.DIAMOND_PICKAXE)), "pesquisa mostrou receita sem itens");
 		var tableRecipe = server.getRecipeManager().getRecipes().stream().filter(r -> r.id().identifier().toString().equals("minecraft:crafting_table")).findFirst().orElseThrow();
 		chest.setItem(20, new ItemStack(Items.OAK_PLANKS, 3));
-		fp.getInventory().setItem(0, new ItemStack(Items.OAK_PLANKS, 10)); // o inventário do jogador não é usado
 		table = new TableMenu(0, fp.getInventory(), sl, tablePos, sc, "");
 		ensure(table.handlePlacement(false, false, tableRecipe, sl, fp.getInventory()) == none && gridCount(table, Items.OAK_PLANKS) == 3
-			&& count(chest, Items.OAK_PLANKS) == 0 && count(fp.getInventory(), Items.OAK_PLANKS) == 10, "receita incompleta: grade " + gridCount(table, Items.OAK_PLANKS));
+			&& count(chest, Items.OAK_PLANKS) == 0, "receita incompleta: grade " + gridCount(table, Items.OAK_PLANKS));
+		fp.getInventory().setItem(0, new ItemStack(Items.OAK_PLANKS, 10)); // faltando nos baús, completa com o inventário
+		ensure(table.handlePlacement(false, false, tableRecipe, sl, fp.getInventory()) == none && gridCount(table, Items.OAK_PLANKS) == 4
+			&& count(chest, Items.OAK_PLANKS) == 0 && count(fp.getInventory(), Items.OAK_PLANKS) == 9,
+			"baú + inventário: grade " + gridCount(table, Items.OAK_PLANKS) + ", jogador " + count(fp.getInventory(), Items.OAK_PLANKS));
+		fp.getInventory().clearContent();
 		ensure(table.handlePlacement(false, false, pick, sl, fp.getInventory()) == net.minecraft.world.inventory.RecipeBookMenu.PostPlaceAction.PLACE_GHOST_RECIPE
-			&& gridCount(table, Items.OAK_PLANKS) == 0 && count(chest, Items.OAK_PLANKS) == 3, "receita sem itens deveria virar fantasma");
+			&& gridCount(table, Items.OAK_PLANKS) == 0 && count(chest, Items.OAK_PLANKS) == 4, "receita sem itens deveria virar fantasma");
 		fp.getInventory().clearContent();
 		chest.setItem(20, ItemStack.EMPTY);
 		SmartChest.toggleTable(fp, sl, lk, tablePos);

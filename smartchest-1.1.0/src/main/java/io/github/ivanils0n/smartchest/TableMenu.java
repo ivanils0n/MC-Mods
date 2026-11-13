@@ -114,13 +114,14 @@ final class TableMenu extends CraftingMenu {
 
 			StackedItemContents have = new StackedItemContents();
 			for (Container c : linked.containers) for (int i = 0; i < c.getContainerSize(); i++) have.accountSimpleStack(c.getItem(i));
+			inv.fillStackedContents(have); // e o inventário do jogador
 			int biggest = have.getBiggestCraftableStack(recipe, null);
 			if (biggest <= 0) { // falta item: monta o que tiver (1 em cada espaço); sem nada, mostra a receita fantasma
 				List<Ingredient> ingredients = recipe.placementInfo().ingredients();
 				boolean[] any = {false};
 				PlaceRecipeHelper.placeRecipe(3, 3, recipe, recipe.placementInfo().slotsToIngredientIndex(), (ingredient, slot, x, y) -> {
 					if (ingredient == -1) return;
-					ItemStack got = take(linked, ingredients.get(ingredient)::test, 1);
+					ItemStack got = take(linked, inv, ingredients.get(ingredient)::test, 1);
 					grid.get(slot).set(got);
 					any[0] |= !got.isEmpty();
 				});
@@ -137,7 +138,7 @@ final class TableMenu extends CraftingMenu {
 			}
 			int n = clamped;
 			PlaceRecipeHelper.placeRecipe(3, 3, recipe, recipe.placementInfo().slotsToIngredientIndex(), (ingredient, slot, x, y) -> {
-				if (ingredient != -1) grid.get(slot).set(take(linked, st -> st.is(used.get(ingredient)), n));
+				if (ingredient != -1) grid.get(slot).set(take(linked, inv, st -> st.is(used.get(ingredient)), n));
 			});
 			return PostPlaceAction.NOTHING;
 		} finally {
@@ -200,7 +201,7 @@ final class TableMenu extends CraftingMenu {
 	}
 
 	/** Tira {@code n} itens que passam no teste dos baús ligados (só os que o livro aceita: sem dano, encanto ou nome). */
-	private static ItemStack take(Linked linked, Predicate<ItemStack> item, int n) {
+	private static ItemStack take(Linked linked, Inventory inv, Predicate<ItemStack> item, int n) {
 		ItemStack[] got = {ItemStack.EMPTY};
 		for (Container c : linked.containers) {
 			if (n == 0) break;
@@ -210,6 +211,7 @@ final class TableMenu extends CraftingMenu {
 			n = takeFrom(stacks, item, got, n);
 			if (n != before) c.setChanged();
 		}
+		if (n > 0 && takeFrom(inv.getNonEquipmentItems(), item, got, n) != n) inv.setChanged(); // faltou nos baús: do inventário
 		return got[0];
 	}
 
