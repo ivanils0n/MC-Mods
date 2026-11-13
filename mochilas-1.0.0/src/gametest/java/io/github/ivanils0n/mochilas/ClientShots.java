@@ -88,6 +88,32 @@ public class ClientShots implements FabricClientGameTest {
 			context.getInput().releaseKey(o -> o.keyShift);
 			context.waitTicks(5);
 
+			// 1ª pessoa com a mochila de diamante (a maior): a mochila não pode aparecer na tela
+			context.runOnClient(c -> c.options.setCameraType(CameraType.FIRST_PERSON));
+			cmd(sp, "item replace entity @p weapon.mainhand with minecraft:air");
+			float[][] looks = {{0, 0}, {0, 45}, {0, 90}, {0, -90}};
+			String[] lookNames = {"frente", "baixo45", "baixo90", "cima90"};
+			for (int fov : new int[]{70, 110}) {
+				context.runOnClient(c -> c.options.fov().set(fov));
+				for (int i = 0; i < looks.length; i++) {
+					context.getInput().lookAt(looks[i][0], looks[i][1]);
+					context.waitTicks(6);
+					context.takeScreenshot("primeira_fov" + fov + "_" + lookNames[i]);
+				}
+			}
+			context.getInput().holdKey(o -> o.keyShift);
+			context.getInput().lookAt(0, 90);
+			context.waitTicks(10);
+			context.takeScreenshot("primeira_fov110_agachado_baixo90");
+			context.getInput().releaseKey(o -> o.keyShift);
+			// cabeça virada para o lado (o corpo fica para trás até 50 graus) e olhando para baixo
+			context.getInput().lookAt(75, 60);
+			context.waitTicks(3);
+			context.takeScreenshot("primeira_fov110_virando_baixo60");
+			context.getInput().lookAt(0, 0);
+			context.runOnClient(c -> c.options.fov().set(70));
+			context.waitTicks(10);
+
 			context.runOnClient(c -> c.options.setCameraType(CameraType.THIRD_PERSON_BACK));
 			context.getInput().holdKey(o -> o.keyUp);
 			context.waitTicks(12);
