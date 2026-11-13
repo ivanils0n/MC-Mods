@@ -242,7 +242,7 @@ public final class Automato implements ModInitializer {
 	}
 
 	/**
-	 * Duas peças: o bloco (um cubo um pouco maior que o ejetor, girado para a frente dele, no topo do bloco porque a luz
+	 * Duas peças: o bloco (o modelo cobre o ejetor e todo o relevo fica para fora dele, senão o ejetor o esconderia, girado para a frente dele, no topo do bloco porque a luz
 	 * da entidade é a do bloco onde ela está) e a ferramenta guardada, o próprio item, saindo do arco da frente.
 	 */
 	static void spawnVisual(ServerLevel sl, Machine m, Direction facing, boolean on) {
@@ -252,7 +252,7 @@ public final class Automato implements ModInitializer {
 		String tags = "Tags:[\"automato\",\"" + tag(pos) + "\",\"" + RUN_TAG + "\",";
 		String nbt = tags + "\"automato_block\"],item:" + displayItem(on)
 			+ String.format(Locale.ROOT, ",transformation:{left_rotation:[%.5ff,%.5ff,%.5ff,%.5ff],right_rotation:[0f,0f,0f,1f],"
-				+ "translation:[0f,-0.5f,0f],scale:[1.002f,1.002f,1.002f]}", q[0], q[1], q[2], q[3]);
+				+ "translation:[0f,-0.5f,0f],scale:[1.004f,1.004f,1.004f]}", q[0], q[1], q[2], q[3]);
 		command(sl, pos, String.format(Locale.ROOT, "summon minecraft:item_display %.4f %.4f %.4f {%s}",
 			pos.getX() + 0.5, pos.getY() + 1.0, pos.getZ() + 0.5, nbt));
 		Vec3 at = toolSpot(pos, facing);
@@ -266,7 +266,7 @@ public final class Automato implements ModInitializer {
 
 	/** Ponto do meio da ferramenta: um pouco à frente do arco (a luz é a do bloco à frente, normalmente ar). */
 	private static Vec3 toolSpot(BlockPos pos, Direction f) {
-		return Vec3.atCenterOf(pos).add(f.getStepX() * 0.55, f.getStepY() * 0.55 + (f.getAxis().isHorizontal() ? 0.03 : 0), f.getStepZ() * 0.55);
+		return Vec3.atCenterOf(pos).add(f.getStepX() * 0.62, f.getStepY() * 0.62 + (f.getAxis().isHorizontal() ? 0.03 : 0), f.getStepZ() * 0.62);
 	}
 
 	/**
@@ -399,7 +399,6 @@ public final class Automato implements ModInitializer {
 		tag.putBoolean(ITEM_TAG, true);
 		s.set(DataComponents.CUSTOM_DATA, CustomData.of(tag));
 		s.set(DataComponents.CUSTOM_NAME, Component.literal(NAME).withStyle(st -> st.withItalic(false).withColor(ChatFormatting.GOLD)));
-		s.set(DataComponents.ENCHANTMENT_GLINT_OVERRIDE, true);
 		return s;
 	}
 

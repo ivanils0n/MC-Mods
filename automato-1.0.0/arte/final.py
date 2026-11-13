@@ -61,7 +61,7 @@ def model(wall):
             "textures": {"particle": "automato:block/side", "side": "automato:block/side", "top": "automato:block/top",
                          "back": "automato:block/back", "inner": "automato:block/inner", "smooth": "automato:block/smooth",
                          "wall": "automato:block/" + wall},
-            "elements": relevo.elements(5)}
+            "elements": relevo.elements_out(5)}
 
 
 def main():

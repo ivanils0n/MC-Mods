@@ -82,11 +82,12 @@ def render(elements, tex, view=(-1.0, 1.1, -1.4), scale=22, size=640):
             if u1 == u0 or v1 == v0:
                 continue
             ctr = face_world(name, a, b, (u0 + u1) / 2, (v0 + v1) / 2)
-            faces.append((dot(ctr, V), name, a, b, (u0, v0, u1, v1), fd["texture"][1:], rot))
+            off = (fd["uv"][0] - u0, fd["uv"][1] - v0) if "uv" in fd else (0, 0)
+            faces.append((dot(ctr, V), name, a, b, (u0, v0, u1, v1), fd["texture"][1:], rot, off))
     out = np.zeros((size, size, 4), np.uint8)
     zbuf = np.full((size, size), -1e9)
     ys, xs = np.mgrid[0:size, 0:size] + 0.5
-    for _, name, a, b, (u0, v0, u1, v1), tk, rot in faces:
+    for _, name, a, b, (u0, v0, u1, v1), tk, rot, off in faces:
         fw = lambda u, v: rot(face_world(name, a, b, u, v))
         A = proj(fw(u0, v0))
         B = proj(fw(u1, v0))
@@ -97,6 +98,7 @@ def render(elements, tex, view=(-1.0, 1.1, -1.4), scale=22, size=640):
         det = eu[0] * ev[1] - eu[1] * ev[0]
         ia, ib, ic, id_ = ev[1] / det, -ev[0] / det, -eu[1] / det, eu[0] / det
         coef = (ia, ib, u0 - ia * A[0] - ib * A[1], ic, id_, v0 - ic * A[0] - id_ * A[1])
+        coef = (coef[0], coef[1], coef[2] + off[0], coef[3], coef[4], coef[5] + off[1])
         src = tex[tk].convert("RGBA")
         k = SHADE[name]
         src = Image.merge("RGBA", [ch.point(lambda x: int(x * k)) for ch in src.split()[:3]] + [src.split()[3]])
@@ -104,6 +106,8 @@ def render(elements, tex, view=(-1.0, 1.1, -1.4), scale=22, size=640):
         # profundidade de cada pixel (no plano da face) e máscara do paralelogramo
         uu = coef[0] * xs + coef[1] * ys + coef[2]
         vv = coef[3] * xs + coef[4] * ys + coef[5]
+        uu = uu - off[0]
+        vv = vv - off[1]
         inside = (uu >= min(u0, u1)) & (uu <= max(u0, u1)) & (vv >= min(v0, v1)) & (vv <= max(v0, v1))
         p0 = np.array(fw(u0, v0))
         du = (np.array(fw(u1, v0)) - p0) / (u1 - u0)

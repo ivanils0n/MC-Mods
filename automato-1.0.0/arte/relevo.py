@@ -161,6 +161,8 @@ def front(design):
 
 
 def finish(depth, tex, extra):
+    global FRONT_MAP
+    FRONT_MAP = (depth, tex)
     els = []
     grid = [[(depth[v][u], tex[v][u]) if depth[v][u] < 3 else None for u in range(16)] for v in range(16)]
     for u0, v0, u1, v1, (d, t) in rects(grid):
@@ -181,6 +183,50 @@ def elements(design, wall="#wall"):
     for f, t in (("east", "#side"), ("west", "#side"), ("up", "#top"), ("down", "#top"), ("south", "#back")):
         out += side_bricks(f, t)
     return out
+
+
+def elements_out(design, wall="#wall", shift=2.5):
+    """Igual a elements(), mas todo o relevo para FORA do cubo 0..16.
+
+    No jogo o modelo cobre um ejetor de verdade (cubo cheio): o que fica para dentro do cubo (rejunte, fundo do arco)
+    é escondido pelo próprio ejetor e o bloco parece liso. Aqui o núcleo é o cubo inteiro, os tijolos saltam 0,5 px
+    dos lados e a frente sai {shift} px (o fundo do arco fica na face do cubo, então ainda aparece fundo).
+    """
+    core = {"from": [0, 0, 0], "to": [16, 16, 16],
+            "faces": {"north": {"texture": wall}, "south": {"texture": "#back"}, "east": {"texture": "#side"},
+                      "west": {"texture": "#side"}, "up": {"texture": "#top"}, "down": {"texture": "#top"}}}
+    out = [core]
+    old = front(design)  # recalcula o mapa da frente
+    depth, tex = FRONT_MAP
+    grid = [[(depth[v][u], tex[v][u]) if depth[v][u] < 3 else None for u in range(16)] for v in range(16)]
+    for u0, v0, u1, v1, (d, t) in rects(grid):
+        a, b = box("north", u0, v0, u1, v1, d - shift, 0)
+        faces = {f: {"texture": "#side" if t == "#side" else "#inner"} for f in FACES}
+        faces["north"] = {"texture": t}
+        out.append({"from": a, "to": b, "faces": faces})
+    for f, t in (("east", "#side"), ("west", "#side"), ("up", "#top"), ("down", "#top"), ("south", "#back")):
+        grid = [[None if mortar(u, v) else "b" for u in range(16)] for v in range(16)]
+        for u0, v0, u1, v1, _ in rects(grid):
+            a, b = box(f, u0, v0, u1, v1, -0.5, 0)
+            out.append({"from": a, "to": b, "faces": {k: {"texture": t} for k in FACES}})
+    return fix_uv(out)
+
+
+FRONT_MAP = None
+
+
+def fix_uv(elements):
+    """O Minecraft só aceita UV de 0 a 16: faces fora do cubo ganham UV explícito, deslocado para dentro."""
+    from render3d import auto_uv
+    for e in elements:
+        for name, f in e["faces"].items():
+            u0, v0, u1, v1 = auto_uv(name, e["from"], e["to"])
+            du = -16 * ((min(u0, u1)) // 16) if not 0 <= min(u0, u1) and max(u0, u1) <= 16 or min(u0, u1) < 0 or max(u0, u1) > 16 else 0
+            dv = -16 * ((min(v0, v1)) // 16) if min(v0, v1) < 0 or max(v0, v1) > 16 else 0
+            if du or dv:
+                uv = [u0 + du, v0 + dv, u1 + du, v1 + dv]
+                f["uv"] = [round(min(16, max(0, c)), 4) for c in uv]
+    return elements
 
 
 def textures():
