@@ -83,7 +83,9 @@ public class BackpackVisual extends ElementHolder {
 		float yaw = player.yBodyRot;
 		boolean prone = pose == Pose.SWIMMING || pose == Pose.FALL_FLYING || player.isFallFlying() || pose == Pose.SPIN_ATTACK;
 		float pitch = prone ? player.getXRot() : 0;
-		if (ownerCopy && !prone && player.getXRot() > OWNER_HIDE_PITCH) hidden = true;
+		// Cópia do dono: some quando ele olha para baixo e nas poses deitadas (nadando, planando), em que a câmera
+		// fica colada na mochila; os outros jogadores continuam vendo a mochila nessas poses.
+		if (ownerCopy && (prone || player.getXRot() > OWNER_HIDE_PITCH)) hidden = true;
 		if (!force && pose == lastPose && hidden == lastHidden && Math.abs(Mth.wrapDegrees(yaw - lastYaw)) < 2f && Math.abs(pitch - lastPitch) < 3f) {
 			return;
 		}
@@ -118,7 +120,7 @@ public class BackpackVisual extends ElementHolder {
 		Vector3f torsoBack = new Vector3f(back).mul(c).add(new Vector3f(up).mul(s));
 		Vector3f translation = new Vector3f(shoulder)
 				.add(new Vector3f(torsoUp).mul(-downFromShoulder))
-				.add(new Vector3f(torsoBack).mul(BACK_FROM_CENTER));
+				.add(new Vector3f(torsoBack).mul(BACK_FROM_CENTER + (ownerCopy ? 0.04f : 0f)));
 		// O item_display já gira o item 180° em Y; o +z do modelo (frente da mochila) deve apontar para "costas".
 		Quaternionf rot = new Quaternionf().rotateY((float) Math.PI - th).rotateX(-tilt).rotateY((float) -Math.PI);
 
