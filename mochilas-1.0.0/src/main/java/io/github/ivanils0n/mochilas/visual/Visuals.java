@@ -6,6 +6,7 @@ import io.github.ivanils0n.mochilas.backpack.Tier;
 import io.github.ivanils0n.mochilas.equipment.Equipment;
 import net.minecraft.network.protocol.game.ClientboundSetPassengersPacket;
 import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.item.ItemStack;
 
 import java.util.HashMap;
@@ -28,13 +29,19 @@ public final class Visuals {
 		ItemStack s = Equipment.equipped(p);
 		Tier t = Backpacks.tier(s);
 		if (t == null || p.isRemoved()) return;
-		BackpackVisual v = new BackpackVisual(p, t);
-		EntityAttachment att = EntityAttachment.ofTicking(v, p);
+		BackpackVisual v = attach(p, t);
 		BY_PLAYER.put(p.getUUID(), v);
-		// quem já está vendo o jogador + o próprio jogador
-		att.updateCurrentlyTracking(List.of());
-		v.startWatching(p);
+		v.startWatching(p); // o próprio jogador
 		v.sendPacket(new ClientboundSetPassengersPacket(p));
+	}
+
+	/** Monta a mochila em qualquer ser vivo com modelo de jogador e mostra para quem já o está vendo. */
+	public static BackpackVisual attach(LivingEntity e, Tier t) {
+		BackpackVisual v = new BackpackVisual(e, t);
+		EntityAttachment att = EntityAttachment.ofTicking(v, e);
+		att.updateCurrentlyTracking(List.of());
+		v.sendPacket(new ClientboundSetPassengersPacket(e));
+		return v;
 	}
 
 	public static void remove(ServerPlayer p) {

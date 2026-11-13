@@ -6,10 +6,10 @@ import eu.pb4.polymer.resourcepack.api.PolymerResourcePackUtils;
 import io.github.ivanils0n.mochilas.backpack.Backpacks;
 import io.github.ivanils0n.mochilas.config.MochilasConfig;
 import io.github.ivanils0n.mochilas.backpack.Tier;
-import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.server.network.ServerCommonPacketListenerImpl;
 import net.minecraft.server.network.ServerGamePacketListenerImpl;
 import net.minecraft.util.Mth;
+import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.Pose;
 import net.minecraft.world.item.ItemDisplayContext;
 import org.joml.Quaternionf;
@@ -30,7 +30,8 @@ public class BackpackVisual extends ElementHolder {
 	/** Centro do modelo (z=8) até o centro do corpo: o fundo da mochila (z=6) encosta nas costas (2 px atrás). */
 	private static final float BACK_FROM_CENTER = 4 * PX + 0.012f;
 
-	final ServerPlayer player;
+	/** Quem usa a mochila: o jogador (ou, nos testes, um manequim). */
+	final LivingEntity player;
 	final ItemDisplayElement element;
 	/** Centro do modelo (y=8) até o ombro: a alça de cima (y=11 no couro, 12 nos outros) apoia no ombro. */
 	private final float downFromShoulder;
@@ -39,7 +40,7 @@ public class BackpackVisual extends ElementHolder {
 	private Pose lastPose = null;
 	private boolean lastHidden;
 
-	public BackpackVisual(ServerPlayer player, Tier tier) {
+	public BackpackVisual(LivingEntity player, Tier tier) {
 		this.player = player;
 		this.downFromShoulder = ((tier == Tier.COURO ? 11 : 12) - 8) * PX;
 		this.element = new ItemDisplayElement(Backpacks.visualStack(tier));
