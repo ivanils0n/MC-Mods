@@ -286,7 +286,10 @@ public final class Automato implements ModInitializer {
 		int packed = block << 4 | sky;
 		if (packed == m.light) return;
 		m.light = packed;
-		command(sl, pos, "data merge entity @e[type=minecraft:item_display,tag=" + tag(pos) + ",limit=2] {brightness:{block:" + block + ",sky:" + sky + "}}");
+		// "data merge entity" só aceita uma entidade por vez: uma chamada para cada peça (bloco e ferramenta), pelo UUID.
+		for (Entity e : visuals(sl, pos)) {
+			command(sl, pos, "data merge entity " + e.getStringUUID() + " {brightness:{block:" + block + ",sky:" + sky + "}}");
+		}
 	}
 
 	/** Ponto do meio da ferramenta: um pouco à frente do arco (a luz é a do bloco à frente, normalmente ar). */
