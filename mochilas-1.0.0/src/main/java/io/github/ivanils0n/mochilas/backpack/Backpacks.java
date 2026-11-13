@@ -77,7 +77,7 @@ public final class Backpacks {
 
 	/**
 	 * Item que a entidade virtual mostra nas costas: papel com o modelo 3D do nível. Os outros jogadores veem
-	 * mochila_*_costas (completa); o dono vê mochila_*_dono, sem as alças da frente, para não tapar a 1ª pessoa.
+	 * mochila_*_costas (completa); o dono vê mochila_*_dono (mesmo modelo com a cor-marca que some na 1ª pessoa).
 	 */
 	public static ItemStack visualStack(Tier t, boolean owner) {
 		ItemStack s = new ItemStack(Items.PAPER);

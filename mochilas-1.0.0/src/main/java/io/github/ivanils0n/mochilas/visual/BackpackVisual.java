@@ -34,8 +34,8 @@ public class BackpackVisual extends ElementHolder {
 	final LivingEntity player;
 	final ItemDisplayElement element;
 	/**
-	 * true: cópia só para o próprio dono (sem as alças da frente, e escondida quando ele olha para baixo, senão
-	 * apareceria na 1ª pessoa). false: cópia para todos os outros jogadores.
+	 * true: cópia só para o próprio dono, com a cor-marca que os shaders do resource pack escondem quando a câmera
+	 * está a menos de 1,6 bloco (1ª pessoa); na 3ª pessoa ela aparece. false: cópia para todos os outros jogadores.
 	 */
 	final boolean ownerCopy;
 	/** Centro do modelo (y=8) até o ombro: a alça de cima (y=11 no couro, 12 nos outros) apoia no ombro. */
@@ -44,9 +44,6 @@ public class BackpackVisual extends ElementHolder {
 	private float lastPitch = Float.NaN;
 	private Pose lastPose = null;
 	private boolean lastHidden;
-
-	/** Olhando mais para baixo que isto o dono não vê a própria mochila (na 1ª pessoa ela entraria na tela). */
-	static final float OWNER_HIDE_PITCH = 40f;
 
 	public BackpackVisual(LivingEntity player, Tier tier, boolean ownerCopy) {
 		this.player = player;
@@ -83,9 +80,6 @@ public class BackpackVisual extends ElementHolder {
 		float yaw = player.yBodyRot;
 		boolean prone = pose == Pose.SWIMMING || pose == Pose.FALL_FLYING || player.isFallFlying() || pose == Pose.SPIN_ATTACK;
 		float pitch = prone ? player.getXRot() : 0;
-		// Cópia do dono: some quando ele olha para baixo e nas poses deitadas (nadando, planando), em que a câmera
-		// fica colada na mochila; os outros jogadores continuam vendo a mochila nessas poses.
-		if (ownerCopy && (prone || player.getXRot() > OWNER_HIDE_PITCH)) hidden = true;
 		if (!force && pose == lastPose && hidden == lastHidden && Math.abs(Mth.wrapDegrees(yaw - lastYaw)) < 2f && Math.abs(pitch - lastPitch) < 3f) {
 			return;
 		}
@@ -120,7 +114,7 @@ public class BackpackVisual extends ElementHolder {
 		Vector3f torsoBack = new Vector3f(back).mul(c).add(new Vector3f(up).mul(s));
 		Vector3f translation = new Vector3f(shoulder)
 				.add(new Vector3f(torsoUp).mul(-downFromShoulder))
-				.add(new Vector3f(torsoBack).mul(BACK_FROM_CENTER + (ownerCopy ? 0.04f : 0f)));
+				.add(new Vector3f(torsoBack).mul(BACK_FROM_CENTER));
 		// O item_display já gira o item 180° em Y; o +z do modelo (frente da mochila) deve apontar para "costas".
 		Quaternionf rot = new Quaternionf().rotateY((float) Math.PI - th).rotateX(-tilt).rotateY((float) -Math.PI);
 

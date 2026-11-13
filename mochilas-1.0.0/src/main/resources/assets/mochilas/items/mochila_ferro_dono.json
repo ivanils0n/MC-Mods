@@ -1,6 +1,12 @@
 {
  "model": {
   "type": "minecraft:model",
-  "model": "mochilas:item/mochila_ferro_dono"
+  "model": "mochilas:item/mochila_ferro_dono",
+  "tints": [
+   {
+    "type": "minecraft:constant",
+    "value": 16711164
+   }
+  ]
  }
 }

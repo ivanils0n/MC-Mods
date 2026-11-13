@@ -73,18 +73,18 @@ def pinta_face(img, x0, y0, tw, th, parte, pal, semente, w, h):
             img.putpixel((x0 + i, y0 + j), c)
 
 
-def so_costas(modelo):
-    """Versao que o proprio dono ve: sem as alcas que passam pelo ombro e descem pelo peito (na 1a pessoa elas
-    ficariam na frente da camera). Fica so o que esta atras das costas (z >= 6), com as mesmas UVs."""
+# Cor-marca (quase branca) da cópia que o próprio dono vê. Os shaders item/entity do resource pack escondem
+# o que tem essa cor quando está a menos de 1,6 bloco da câmera: na 1ª pessoa a câmera fica dentro do jogador,
+# então a mochila some; na 3ª pessoa (câmera a 4 blocos) ela aparece. Sem os shaders (ex.: Iris) fica normal.
+MARCA = (254, 253, 252)
+
+
+def do_dono(modelo):
+    """Mesmo modelo, com tintindex 0 em todas as faces para receber a cor-marca."""
     out = json.loads(json.dumps(modelo))
-    elems = []
     for e in out["elements"]:
-        if e["name"] == "alca" and e["from"][2] < 5.9:
-            if e["to"][2] <= 6:
-                continue
-            e["from"][2] = 6
-        elems.append(e)
-    out["elements"] = elems
+        for f in e["faces"].values():
+            f["tintindex"] = 0
     return out
 
 
@@ -178,11 +178,11 @@ def main():
             "type": "minecraft:select", "property": "minecraft:display_context",
             "cases": [{"when": ["gui"], "model": {"type": "minecraft:model", "model": f"mochilas:item/{nome}_icone"}}],
             "fallback": {"type": "minecraft:model", "model": f"mochilas:item/{nome}"}}})
-        # Versao do dono (sem alcas na frente): mesma textura, mesmas UVs das partes que sobraram.
-        dono = so_costas(modelo)
-        escreve(os.path.join(AS, f"models/item/{nome}_dono.json"), dono)
-        escreve(os.path.join(AS, f"items/{nome}_dono.json"),
-                {"model": {"type": "minecraft:model", "model": f"mochilas:item/{nome}_dono"}})
+        # Versao do dono: igual, com a cor-marca (some na 1a pessoa pelos shaders).
+        escreve(os.path.join(AS, f"models/item/{nome}_dono.json"), do_dono(modelo))
+        escreve(os.path.join(AS, f"items/{nome}_dono.json"), {"model": {
+            "type": "minecraft:model", "model": f"mochilas:item/{nome}_dono",
+            "tints": [{"type": "minecraft:constant", "value": (MARCA[0] << 16) | (MARCA[1] << 8) | MARCA[2]}]}})
         # Modelo usado pela entidade virtual nas costas (sempre 3D).
         escreve(os.path.join(AS, f"items/{nome}_costas.json"),
                 {"model": {"type": "minecraft:model", "model": f"mochilas:item/{nome}"}})
