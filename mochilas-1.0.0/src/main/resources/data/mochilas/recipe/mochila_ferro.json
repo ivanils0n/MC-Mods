@@ -1,0 +1,9 @@
+{
+	"type": "minecraft:crafting_transmute",
+	"category": "equipment",
+	"input": "mochilas:mochila_couro",
+	"material": "minecraft:iron_block",
+	"result": {
+		"id": "mochilas:mochila_ferro"
+	}
+}

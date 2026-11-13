@@ -10,6 +10,7 @@ Mods Fabric para Minecraft. Cada pasta `<mod>-<versão>/` é um mod independente
 | Baú Central | `smartchest-1.1.0/` | 26.2 (Fabric, servidor ou singleplayer, requer Fabric API) |
 | Golem de Cobre Inteligente | `coppergolem-1.0.0/` | 26.2 (Fabric, servidor ou singleplayer, requer Fabric API) |
 | Autômato | `automato-1.0.0/` | 26.2 (Fabric, servidor ou singleplayer, requer Fabric API) |
+| Mochilas | `mochilas-1.0.0/` | 26.2 (Fabric, servidor ou singleplayer, requer Fabric API; Polymer e SGUI já vêm dentro) |
 
 ## Releases
 
@@ -99,3 +100,21 @@ Um bloco que usa as ferramentas guardadas nele como um jogador parado na frente 
 - **Quebrar**: as ferramentas guardadas caem no chão e, com picareta, o Autômato volta como item.
 - **Visual (Pedra e Carvalho)**: bloco de tijolos de pedra com relevo e boca em arco; ligado, a brasa no fundo tremula. A ferramenta em uso aparece de verdade saindo do arco (com o material e o brilho de encantamento dela) e dá uma batida a cada golpe ou enquanto cava. A tela ganha fundo próprio e as placas de alcance numeradas. Vem dentro do .jar (singleplayer) e, no servidor dedicado, o próprio mod envia o resource pack ao jogador. Quem recusar vê um ejetor comum, a tela de baú comum e flechas no lugar das placas (o número é a quantidade). As texturas são geradas por `arte/final.py`.
 - Por baixo é um ejetor de verdade: os dados ficam em `<mundo>/automato.json`, fora do save do Minecraft, e o visual nunca é salvo no mapa. Sem o mod, sobra um ejetor comum com as ferramentas dentro.
+
+## Mochilas
+
+Mochilas de couro (9 espaços), ferro (18), ouro (27) e diamante (54), com inventário próprio, que aparecem em 3D nas costas do jogador para todo mundo. Só no servidor: os jogadores entram com o Minecraft sem mods.
+
+- **Instalar (servidor)**: coloque o `.jar` em `mods/` junto com o Fabric API (o Polymer e o SGUI já vêm dentro do .jar). Na primeira vez o mod liga o envio automático do resource pack do Polymer (`config/polymer/auto-host.json`, `"enabled": true`): o pack é montado ao iniciar o servidor e enviado pela mesma porta do jogo a quem entra. Atrás de proxy/Docker com outro endereço, preencha `"forced_address"` nesse arquivo (ex.: `"http://seu.servidor:25565"`).
+- **Instalar (singleplayer)**: o mesmo `.jar` + Fabric API em `mods/` do jogo. As texturas carregam direto, sem resource pack.
+- **Resource pack**: é gerado sozinho a cada início do servidor. Para atualizar depois de trocar texturas, reinicie o servidor. O arquivo fica em `polymer/resource_pack.zip`. As texturas e modelos são gerados por `mochilas-1.0.0/arte/gerar.py` (`python3 arte/gerar.py`).
+- **Receitas** (bancada):
+  - Couro: couro, linha, couro / couro, baú, couro / couro, couro, couro.
+  - Melhorias (mochila + 1 bloco em qualquer lugar da grade): couro + bloco de ferro = ferro; ferro + bloco de ouro = ouro; ouro + bloco de diamante = diamante. Os itens guardados e o nome dado na bigorna continuam.
+- **Usar**: segure a mochila e clique com o botão direito para colocá-la nas costas (não ocupa o peitoral; se já houver uma, as duas trocam). `/backpack` (ou `/mochila`) abre, `/backpack unequip` tira e devolve ao inventário com os itens dentro, `/backpack info` mostra nível, espaços usados e ID.
+- **Admin** (op nível 2): `/backpack give <jogador> <couro|ferro|ouro|diamante>`, `/backpack reload` (relê `config/mochilas.json`).
+- **Tela**: igual à de um baú, com exatamente a capacidade do nível. Shift-clique, arrastar e teclas numéricas funcionam; tudo é validado no servidor. Mochilas não entram em mochilas. Uma mochila só pode estar aberta por uma pessoa de cada vez.
+- **Config** (`config/mochilas.json`): `capacidades` (múltiplos de 9, de 9 a 54; se diminuir, o que passar do limite volta para o jogador ao abrir), `soltar_ao_morrer` (padrão `true`: a mochila equipada cai no chão ao morrer, com os itens; com keepInventory ela fica) e `ativar_autohost`.
+- **Onde fica salvo**: cada mochila tem um ID próprio (no item) e o inventário fica em `<mundo>/mochilas/<id>.dat`, gravado só quando muda. A mochila equipada fica salva nos dados do jogador. Cópias de um mesmo item (criativo) abrem o mesmo inventário, então não duplicam itens.
+- **Visual**: um `item_display` virtual (Polymer Virtual Entity) montado no jogador; o cliente o carrega junto, sem pacotes de posição. O servidor só manda a rotação quando o corpo vira ou a pose muda (agachar, nadar, planar), e some com invisibilidade, espectador ou dormindo.
+

@@ -1,0 +1,22 @@
+{
+	"schemaVersion": 1,
+	"id": "mochilas",
+	"version": "${version}",
+	"name": "Mochilas",
+	"description": "Mochilas de couro, ferro, ouro e diamante com inventário próprio, que aparecem nas costas do jogador. Só no servidor: os jogadores não precisam instalar nada (o resource pack é enviado sozinho). Também funciona no singleplayer.",
+	"authors": ["ivanils0n"],
+	"contact": {
+		"sources": "https://github.com/ivanils0n/MC-Mods"
+	},
+	"license": "MIT",
+	"environment": "*",
+	"entrypoints": {
+		"main": ["io.github.ivanils0n.mochilas.Mochilas"]
+	},
+	"depends": {
+		"fabricloader": ">=0.19.0",
+		"fabric-api": "*",
+		"minecraft": "${minecraft_dependency}",
+		"java": ">=25"
+	}
+}

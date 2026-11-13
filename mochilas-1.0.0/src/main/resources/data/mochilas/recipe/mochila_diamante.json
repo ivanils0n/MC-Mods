@@ -1,0 +1,9 @@
+{
+	"type": "minecraft:crafting_transmute",
+	"category": "equipment",
+	"input": "mochilas:mochila_ouro",
+	"material": "minecraft:diamond_block",
+	"result": {
+		"id": "mochilas:mochila_diamante"
+	}
+}

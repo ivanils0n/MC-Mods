@@ -1,0 +1,11 @@
+{
+	"schemaVersion": 1,
+	"id": "mochilas-gametest",
+	"version": "1.0.0",
+	"name": "Mochilas: prints do cliente (só CI)",
+	"environment": "client",
+	"entrypoints": {
+		"fabric-client-gametest": ["io.github.ivanils0n.mochilas.ClientShots"]
+	},
+	"depends": {"mochilas": "*"}
+}

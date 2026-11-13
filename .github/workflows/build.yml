@@ -79,6 +79,11 @@ jobs:
           echo "eula=true" > ${{ matrix.mod }}/run/eula.txt
           printf 'level-type=minecraft\\:flat\nonline-mode=false\nspawn-protection=0\n' > ${{ matrix.mod }}/run/server.properties
           timeout 900 ./gradlew --configure-on-demand ":${{ matrix.mod }}:runServer" -Pselftest "-Pminecraft_version=${{ matrix.mc }}" "-Pminecraft_dependency=${{ matrix.dep }}" | tee server.log
+          # O autoteste pode pedir um reinício de verdade (ex.: conferir o que foi salvo no disco): sobe o servidor de novo.
+          if grep -q "${id^^} SELFTEST RESTART" server.log; then
+            echo "Reiniciando o servidor para o teste de persistência"
+            timeout 900 ./gradlew --configure-on-demand ":${{ matrix.mod }}:runServer" -Pselftest "-Pminecraft_version=${{ matrix.mc }}" "-Pminecraft_dependency=${{ matrix.dep }}" | tee -a server.log
+          fi
           grep -q "${id^^} SELFTEST OK" server.log
           ! grep -q "Serialization errors" server.log
       # Mods com src/gametest: abre o jogo de verdade (tela virtual) e tira prints (cajado na mão, telas). Só informativo.
