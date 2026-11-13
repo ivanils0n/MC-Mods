@@ -38,7 +38,9 @@ public class BackpackGui extends SimpleGui {
 		super(type(tier.capacidade()), player, false);
 		this.id = id;
 		this.container = new BackpackContainer(items, tier.capacidade(), () -> Mochilas.storage().markDirty(id));
-		this.setTitle(Component.empty().append(name).append(Component.literal(" (" + tier.nome + ")").withStyle(ChatFormatting.DARK_GRAY)));
+		// Nome (o da bigorna, se houver) e nível: "Mochila de Ouro · 27 espaços" ou "Minha bolsa · Ouro, 27 espaços".
+		String info = name.getString().equals("Mochila de " + tier.nome) ? tier.capacidade() + " espaços" : tier.nome + ", " + tier.capacidade() + " espaços";
+		this.setTitle(Component.empty().append(name).append(Component.literal(" · " + info).withStyle(ChatFormatting.DARK_GRAY)));
 		for (int i = 0; i < tier.capacidade(); i++) {
 			this.setSlot(i, new BackpackSlot(container, i));
 		}

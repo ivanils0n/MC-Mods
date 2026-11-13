@@ -36,6 +36,7 @@ public class ClientShots implements FabricClientGameTest {
 		try (TestSingleplayerContext sp = context.worldBuilder().create()) {
 			save = sp.getWorldSave();
 			context.waitTicks(100);
+			context.runOnClient(c -> c.options.hideGui = true);
 			cmd(sp, "time set 6000");
 			cmd(sp, "weather clear");
 			sp.getServer().runOnServer(s -> {
@@ -85,6 +86,17 @@ public class ClientShots implements FabricClientGameTest {
 			context.getInput().releaseKey(o -> o.keyJump);
 			context.waitTicks(20);
 
+			// Rastejando sob um teto de 1 bloco: mesma pose de nadar, parado, para ver de lado
+			cmd(sp, String.format(Locale.ROOT, "fill %d %d %d %d %d %d minecraft:glass", (int) X - 1, (int) Y + 1, (int) Z - 1, (int) X + 1, (int) Y + 1, (int) Z + 1));
+			context.waitTicks(30);
+			setCam(context, sp, 3.4, -0.6, "side");
+			context.takeScreenshot("pose_rastejando_lado");
+			setCam(context, sp, 0, -3.4, "back");
+			context.takeScreenshot("pose_rastejando_costas");
+			freeCam(context);
+			cmd(sp, String.format(Locale.ROOT, "fill %d %d %d %d %d %d air", (int) X - 1, (int) Y + 1, (int) Z - 1, (int) X + 1, (int) Y + 1, (int) Z + 1));
+			context.waitTicks(20);
+
 			// Nadando: piscina e correr dentro da água
 			cmd(sp, String.format(Locale.ROOT, "fill %d %d %d %d %d %d water", (int) X - 6, (int) Y, (int) Z - 1, (int) X + 6, (int) Y + 2, (int) Z + 30));
 			cmd(sp, String.format(Locale.ROOT, "tp @p %.2f %.2f %.2f 0 0", X, Y + 0.2, Z));
@@ -98,12 +110,15 @@ public class ClientShots implements FabricClientGameTest {
 			cmd(sp, String.format(Locale.ROOT, "fill %d %d %d %d %d %d air", (int) X - 6, (int) Y, (int) Z - 1, (int) X + 6, (int) Y + 2, (int) Z + 30));
 
 			// Élitro: sobe, cai e aperta pular no ar
+			cmd(sp, "gamemode survival @p");
 			cmd(sp, "item replace entity @p armor.chest with minecraft:elytra");
 			cmd(sp, String.format(Locale.ROOT, "tp @p %.2f %.2f %.2f 0 10", X, Y + 40, Z));
 			context.waitTicks(8);
 			context.getInput().pressKey(o -> o.keyJump);
 			context.waitTicks(12);
 			context.takeScreenshot("pose_elitro");
+			sp.getServer().runOnServer(s -> Mochilas.LOG.info("MOCHILAS CLIENTE élitro: planando={}", player(s).isFallFlying()));
+			cmd(sp, "gamemode creative @p");
 			cmd(sp, "item replace entity @p armor.chest with minecraft:air");
 			cmd(sp, String.format(Locale.ROOT, "tp @p %.2f %.2f %.2f 0 0", X, Y, Z));
 			context.runOnClient(c -> c.options.setCameraType(CameraType.FIRST_PERSON));
@@ -160,8 +175,10 @@ public class ClientShots implements FabricClientGameTest {
 			context.waitTicks(10);
 
 			// Troca de dimensão
-			cmd(sp, "execute in minecraft:the_nether run fill -4 99 -4 4 104 4 air");
-			cmd(sp, "execute in minecraft:the_nether run fill -4 98 -4 4 98 4 minecraft:glass");
+			cmd(sp, "execute in minecraft:the_nether run forceload add -16 -16 16 16");
+			context.waitTicks(60);
+			cmd(sp, "execute in minecraft:the_nether run fill -6 97 -6 6 104 6 air");
+			cmd(sp, "execute in minecraft:the_nether run fill -6 98 -6 6 98 6 minecraft:glass");
 			cmd(sp, "execute in minecraft:the_nether run tp @p 0.5 99 0.5 0 0");
 			context.waitTicks(100);
 			context.runOnClient(c -> c.options.setCameraType(CameraType.THIRD_PERSON_BACK));
@@ -201,21 +218,28 @@ public class ClientShots implements FabricClientGameTest {
 
 	/** Três vistas com câmera fixa (suporte de armadura invisível) olhando para o jogador. */
 	private static void shots(ClientGameTestContext context, TestSingleplayerContext sp, String name) {
-		setCam(context, sp, 0, -3.2, "back");
+		setCam(context, sp, 0, -3.4, "back");
 		context.takeScreenshot(name + "_1_costas");
-		setCam(context, sp, 3.2, 0, "side");
+		setCam(context, sp, 3.4, -0.6, "side");
 		context.takeScreenshot(name + "_2_lado");
-		setCam(context, sp, 2.3, 2.3, "front");
+		setCam(context, sp, 2.4, 2.4, "front");
 		context.takeScreenshot(name + "_3_frente");
 		freeCam(context);
 	}
 
+	/**
+	 * Câmera fixa: suporte de armadura invisível e a câmera de 3ª pessoa dele (que fica 4 blocos atrás do olho, na
+	 * direção oposta ao olhar). Assim o próprio jogador aparece no print, visto de onde quisermos.
+	 */
 	private static void setCam(ClientGameTestContext context, TestSingleplayerContext sp, double dx, double dz, String tag) {
-		double cx = X + dx, cz = Z + dz, cy = Y + 1.9;
-		float yaw = (float) Math.toDegrees(Math.atan2(-(X - cx), Z - cz));
+		double len = Math.sqrt(dx * dx + dz * dz), ux = dx / len, uz = dz / len;
+		float pitch = 15f;
+		double back = 4 * Math.cos(Math.toRadians(pitch)); // quanto a câmera recua na horizontal
+		double sx = X + ux * (len - back), sz = Z + uz * (len - back), sy = Y + 1.0;
+		float yaw = (float) Math.toDegrees(Math.atan2(ux, -uz));
 		cmd(sp, "kill @e[type=minecraft:armor_stand,name=cam]");
-		cmd(sp, String.format(Locale.ROOT, "summon minecraft:armor_stand %.2f %.2f %.2f {Invisible:1b,Marker:1b,NoGravity:1b,CustomName:\"cam\",Rotation:[%.1ff,18f]}",
-				cx, cy, cz, yaw));
+		cmd(sp, String.format(Locale.ROOT, "summon minecraft:armor_stand %.3f %.3f %.3f {Invisible:1b,Marker:1b,NoGravity:1b,CustomName:\"cam\",Rotation:[%.1ff,%.1ff]}",
+				sx, sy, sz, yaw, pitch));
 		context.waitTicks(10);
 		context.runOnClient(c -> {
 			Entity cam = null;
@@ -223,14 +247,19 @@ public class ClientShots implements FabricClientGameTest {
 				if (e.getCustomName() != null && "cam".equals(e.getCustomName().getString())) cam = e;
 			}
 			if (cam != null) {
-				c.options.setCameraType(CameraType.FIRST_PERSON);
+				c.options.setCameraType(CameraType.THIRD_PERSON_BACK);
 				c.setCameraEntity(cam);
+			} else {
+				Mochilas.LOG.warn("MOCHILAS CLIENTE câmera {} não encontrada", tag);
 			}
 		});
 		context.waitTicks(5);
 	}
 
 	private static void freeCam(ClientGameTestContext context) {
-		context.runOnClient((Minecraft c) -> c.setCameraEntity(c.player));
+		context.runOnClient((Minecraft c) -> {
+			c.setCameraEntity(c.player);
+			c.options.setCameraType(CameraType.FIRST_PERSON);
+		});
 	}
 }
