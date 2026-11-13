@@ -2,9 +2,13 @@ package io.github.ivanils0n.mochilas.visual;
 
 import eu.pb4.polymer.virtualentity.api.ElementHolder;
 import eu.pb4.polymer.virtualentity.api.elements.ItemDisplayElement;
+import eu.pb4.polymer.resourcepack.api.PolymerResourcePackUtils;
 import io.github.ivanils0n.mochilas.backpack.Backpacks;
+import io.github.ivanils0n.mochilas.config.MochilasConfig;
 import io.github.ivanils0n.mochilas.backpack.Tier;
 import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.server.network.ServerCommonPacketListenerImpl;
+import net.minecraft.server.network.ServerGamePacketListenerImpl;
 import net.minecraft.util.Mth;
 import net.minecraft.world.entity.Pose;
 import net.minecraft.world.item.ItemDisplayContext;
@@ -45,6 +49,15 @@ public class BackpackVisual extends ElementHolder {
 		this.element.setViewRange(1.5f);
 		this.update(true);
 		this.addPassengerElement(this.element);
+	}
+
+	/** Sem o resource pack o cliente desenharia um cubo roxo e preto: quem recusou o pack não vê a mochila. */
+	@Override
+	public boolean startWatching(ServerGamePacketListenerImpl conn) {
+		// No singleplayer/LAN as texturas vêm do próprio mod no cliente do dono do mundo.
+		boolean dedicated = conn.player.level().getServer().isDedicatedServer();
+		if (dedicated && MochilasConfig.get().visualSoComPack && !PolymerResourcePackUtils.hasMainPack((ServerCommonPacketListenerImpl) conn)) return false;
+		return super.startWatching(conn);
 	}
 
 	@Override

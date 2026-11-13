@@ -36,7 +36,6 @@ public class ClientShots implements FabricClientGameTest {
 		try (TestSingleplayerContext sp = context.worldBuilder().create()) {
 			save = sp.getWorldSave();
 			context.waitTicks(100);
-			context.runOnClient(c -> c.options.hideGui = true);
 			cmd(sp, "time set 6000");
 			cmd(sp, "weather clear");
 			sp.getServer().runOnServer(s -> {

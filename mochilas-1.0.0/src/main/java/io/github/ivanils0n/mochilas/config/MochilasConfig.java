@@ -26,6 +26,10 @@ public final class MochilasConfig {
 	public String notaMorte = "true: a mochila equipada cai no chão quando o jogador morre (os itens continuam guardados nela). Com keepInventory ela fica.";
 	@SerializedName("soltar_ao_morrer")
 	public boolean soltarAoMorrer = true;
+	@SerializedName("_visual_so_com_pack")
+	public String notaVisual = "true: quem recusou o resource pack não vê as mochilas nas costas (sem ele apareceria um cubo roxo e preto).";
+	@SerializedName("visual_so_com_pack")
+	public boolean visualSoComPack = true;
 	@SerializedName("_ativar_autohost")
 	public String notaAutohost = "true: liga o envio automático do resource pack do Polymer (config/polymer/auto-host.json) ao iniciar o servidor.";
 	@SerializedName("ativar_autohost")
