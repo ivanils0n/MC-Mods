@@ -123,7 +123,7 @@ final class SearchMenu extends AnvilMenu {
 
 	private void refresh() {
 		storage = StorageMenu.detached(player, chest, typed);
-		found = storage.view();
+		found = storage.view().stream().filter(e -> e.total - picked(e.proto) > 0).toList(); // separou tudo: some da lista
 		int visible = found.size() > RESULTS ? RESULTS - 1 : found.size();
 		for (int i = 0; i < RESULTS; i++) shown.setItem(i, i < visible ? resultItem(found.get(i)) : ItemStack.EMPTY);
 		if (found.size() > RESULTS) {
