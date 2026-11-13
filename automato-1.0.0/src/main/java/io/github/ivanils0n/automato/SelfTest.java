@@ -36,7 +36,8 @@ final class SelfTest {
 		ensure(!Automato.isMachineItem(new ItemStack(Items.DISPENSER)), "ejetor comum foi aceito como Autômato");
 		ensure(Worker.attackDelay(new ItemStack(Items.DIAMOND_SWORD)) == 12, "recarga da espada: " + Worker.attackDelay(new ItemStack(Items.DIAMOND_SWORD)));
 		ensure(Worker.attackDelay(new ItemStack(Items.IRON_AXE)) == 22, "recarga do machado: " + Worker.attackDelay(new ItemStack(Items.IRON_AXE)));
-		ensure(Worker.isWeapon(new ItemStack(Items.DIAMOND_SWORD)) && Worker.isWeapon(new ItemStack(Items.MACE)), "espada/maça não são armas");
+		ensure(Worker.isWeapon(new ItemStack(Items.DIAMOND_SWORD)), "espada não é arma");
+		ensure(Worker.isWeapon(new ItemStack(Items.MACE)), "maça não é arma");
 		ensure(!Worker.isWeapon(new ItemStack(Items.DIAMOND_PICKAXE)) && Worker.isUsable(new ItemStack(Items.DIAMOND_PICKAXE)), "picareta");
 		ensure(!Worker.isUsable(new ItemStack(Items.DIRT)), "terra foi aceita como ferramenta");
 		ensure(Automato.PACK_SHA1 != null, "hash do resource pack não está no .jar");

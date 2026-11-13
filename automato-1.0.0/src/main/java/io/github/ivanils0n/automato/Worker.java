@@ -9,6 +9,7 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.Holder;
 import net.minecraft.core.component.DataComponents;
+import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.sounds.SoundSource;
@@ -21,6 +22,7 @@ import net.minecraft.world.entity.ai.attributes.Attributes;
 import net.minecraft.world.entity.decoration.ArmorStand;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.Items;
 import net.minecraft.world.item.component.ItemAttributeModifiers;
 import net.minecraft.world.item.enchantment.Enchantment;
 import net.minecraft.world.item.enchantment.EnchantmentHelper;
@@ -47,7 +49,9 @@ final class Worker {
 
 	static boolean isWeapon(ItemStack s) {
 		// Espada, maça, tridente, lança: arma que não é ferramenta de quebrar (a espada tem "tool" só para teia).
-		return s.is(ItemTags.SWORDS) || (s.has(DataComponents.WEAPON) && !s.has(DataComponents.TOOL));
+		if (s.is(ItemTags.SWORDS) || s.is(Items.MACE) || s.is(Items.TRIDENT)) return true;
+		String id = BuiltInRegistries.ITEM.getKey(s.getItem()).getPath();
+		return id.endsWith("_sword") || id.endsWith("_spear") || (s.has(DataComponents.WEAPON) && !s.has(DataComponents.TOOL));
 	}
 
 	static boolean isUsable(ItemStack s) {
