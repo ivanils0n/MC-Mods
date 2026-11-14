@@ -79,11 +79,13 @@ final class Worker {
 			m.slot = slot;
 			m.item = tool.getItem();
 			m.charge = 0;
+			m.seen = 0;
 			stopMining(sl, m);
 		}
 		if (m.charge < 10_000) m.charge++;
 		if (!powered) {
 			stopMining(sl, m);
+			m.seen = 0;
 			return;
 		}
 		boolean weapon = isWeapon(tool);
@@ -91,13 +93,17 @@ final class Worker {
 			LivingEntity target = findTarget(sl, m.pos(), facing);
 			if (target != null) {
 				stopMining(sl, m);
-				if (m.charge >= attackDelay(tool)) {
+				// Espera escolhida na tela (1 a 5 s) com o mob à frente, e a barra de recarga cheia: só então golpeia.
+				if (m.seen < 10_000) m.seen++;
+				if (m.seen >= m.delay * 20 && m.charge >= attackDelay(tool)) {
 					attack(sl, m, be, slot, facing, target);
 					m.charge = 0;
+					m.seen = 0;
 					m.poke = 4;
 				}
 				return;
 			}
+			m.seen = 0;
 			if (weapon) return;
 		}
 		mine(sl, m, be, slot, facing);

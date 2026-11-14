@@ -12,10 +12,24 @@
     }
    },
    {
+    "when": "automato_delay_1",
+    "model": {
+     "type": "minecraft:model",
+     "model": "automato:item/delay_1"
+    }
+   },
+   {
     "when": "automato_range_2",
     "model": {
      "type": "minecraft:model",
      "model": "automato:item/range_2"
+    }
+   },
+   {
+    "when": "automato_delay_2",
+    "model": {
+     "type": "minecraft:model",
+     "model": "automato:item/delay_2"
     }
    },
    {
@@ -26,6 +40,13 @@
     }
    },
    {
+    "when": "automato_delay_3",
+    "model": {
+     "type": "minecraft:model",
+     "model": "automato:item/delay_3"
+    }
+   },
+   {
     "when": "automato_range_4",
     "model": {
      "type": "minecraft:model",
@@ -33,10 +54,24 @@
     }
    },
    {
+    "when": "automato_delay_4",
+    "model": {
+     "type": "minecraft:model",
+     "model": "automato:item/delay_4"
+    }
+   },
+   {
     "when": "automato_range_5",
     "model": {
      "type": "minecraft:model",
      "model": "automato:item/range_5"
+    }
+   },
+   {
+    "when": "automato_delay_5",
+    "model": {
+     "type": "minecraft:model",
+     "model": "automato:item/delay_5"
     }
    }
   ],

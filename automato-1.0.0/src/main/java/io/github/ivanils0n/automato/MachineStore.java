@@ -25,12 +25,14 @@ final class MachineStore {
 		String dim;
 		int x, y, z;
 		int xp; // pontos de XP guardados (dos mobs mortos e dos blocos quebrados à frente), até Xp.MAX
+		int delay = 1; // com arma: segundos (1 a 5) que espera com o mob à frente antes de cada golpe
 		int range = 1; // alcance da quebra, de 1 a 5 blocos à frente (golpe de arma: sempre 3, como o jogador)
 
 		// Estado de trabalho: só na memória (recomeça do zero ao reiniciar, como um jogador que acabou de entrar).
 		transient int slot = -1;
 		transient Item item;
-		transient int charge; // ticks desde o último golpe ou troca de ferramenta (a barra de recarga da arma)
+		transient int charge;
+		transient int seen; // ticks seguidos com um alvo à frente (para a espera da arma) // ticks desde o último golpe ou troca de ferramenta (a barra de recarga da arma)
 		transient BlockPos breaking;
 		transient Object breakingState;
 		transient float progress;
@@ -114,6 +116,7 @@ final class MachineStore {
 					m.slot = -1;
 					m.crack = -1;
 					m.range = Math.clamp(m.range, 1, Worker.MAX_RANGE);
+					m.delay = Math.clamp(m.delay, 1, Worker.MAX_RANGE);
 					m.xp = Math.clamp(m.xp, 0, Xp.MAX);
 					store.byKey.put(m.key(), m);
 				}

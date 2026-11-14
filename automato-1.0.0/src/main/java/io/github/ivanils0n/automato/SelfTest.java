@@ -86,8 +86,9 @@ final class SelfTest {
 		pig.setNoAi(true);
 		sl.addFreshEntity(pig);
 		ensure(Worker.findTarget(sl, pos, Direction.EAST) == pig, "não achou o porco à frente");
-		for (int t = 0; t < 11; t++) Worker.tick(sl, m, sl.getBlockState(pos), be, Direction.EAST, true);
-		ensure(pig.getHealth() == pig.getMaxHealth(), "golpeou antes da recarga");
+		ensure(m.delay == 1, "espera inicial: " + m.delay);
+		for (int t = 0; t < 19; t++) Worker.tick(sl, m, sl.getBlockState(pos), be, Direction.EAST, true);
+		ensure(pig.getHealth() == pig.getMaxHealth(), "golpeou antes de 1 s de espera");
 		for (int t = 0; t < 3; t++) Worker.tick(sl, m, sl.getBlockState(pos), be, Direction.EAST, true);
 		ensure(pig.getHealth() < pig.getMaxHealth() || !pig.isAlive(), "o porco não levou o golpe");
 		ensure(be.getItem(0).getDamageValue() == 1, "durabilidade da espada: " + be.getItem(0));

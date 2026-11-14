@@ -91,11 +91,11 @@ Um bloco que usa as ferramentas guardadas nele como um jogador parado na frente 
 
 - **Receita** (bancada): barra de ferro, observador, barra de ferro em cima; barra de ferro, ejetor, barra de ferro no meio; barra de ferro, bloco de redstone, barra de ferro embaixo. Aparece no livro de receitas ao pegar um ejetor.
 - **Colocar**: a frente fica virada para onde você olha (também para cima ou para baixo).
-- **Tela** (clique no bloco): a fileira de cima tem 9 espaços que só aceitam ferramentas e armas (à mão ou por funil). A fileira de baixo escolhe o **alcance da quebra**, de 1 a 5 blocos à frente (começa em 1).
+- **Tela** (clique no bloco): a fileira de cima tem 9 espaços que só aceitam ferramentas e armas (à mão ou por funil). A fileira de baixo escolhe o **alcance da quebra**, de 1 a 5 blocos à frente (começa em 1); com uma arma em uso, os mesmos botões escolhem a **espera do golpe**, de 1 a 5 segundos (começa em 1).
 - **Ligar**: redstone ou alavanca direto nele. Ligado, ele usa a primeira ferramenta dos 9 espaços; quando ela quebra, passa para a próxima.
   - **Picareta, pá, enxada, tesoura**: quebram o primeiro bloco à frente dentro do alcance, na velocidade de um jogador com essa ferramenta (eficiência conta), com a rachadura aparecendo e 5 ticks de pausa entre blocos. Fortuna e toque suave valem; os drops caem no chão.
-  - **Espada, maça, tridente, lança**: golpeiam o mob à frente (até 3 blocos, como o jogador) toda vez que a recarga da arma enche (espada: a cada 0,6 s). Golpe com a barra cheia, com encantamentos.
-  - **Machado**: golpeia se houver mob à frente; se não, corta o bloco dentro do alcance.
+  - **Espada, maça, tridente, lança**: golpeiam o mob à frente (até 3 blocos, como o jogador): com um mob à frente, esperam o tempo escolhido (1 a 5 s) e, se ele ainda estiver lá, golpeiam; a espera recomeça a cada golpe (e nunca é menor que a recarga da arma). Golpe com a barra cheia, com encantamentos.
+  - **Machado**: golpeia se houver mob à frente (com a mesma espera da arma); se não, corta o bloco dentro do alcance.
   - **Encantamentos** da ferramenta valem como num jogador: Eficiência, Fortuna, Toque Suave, Inquebrável, Afiação, Aspecto Flamejante, Repulsão, Corte Arrebatador e Pilhagem. Com Remendo, o XP coletado conserta a ferramenta antes de ir para o pote.
   - Gasta a durabilidade como um jogador. Não bate em jogadores nem em suportes de armadura. O alcance do golpe não passa de paredes.
 - **XP**: as bolinhas de XP que aparecem à frente dele (dos mobs que ele mata e dos blocos que ele quebra) vão para o pote da tela, até o equivalente a 100 níveis (cheio, ficam no chão). O pote mostra quantos níveis tem (os pontos exatos aparecem ao passar o mouse) e o botão **Recolher** passa todo o XP para você.

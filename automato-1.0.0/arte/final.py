@@ -100,6 +100,26 @@ def xp_button():
     return im
 
 
+S_SMALL = [".##", "#..", ".#.", "..#", "##."]
+
+
+def plate_delay(n, on):
+    """Placa da espera da arma: o número e um "s" pequeno (segundos)."""
+    im = Image.new("RGBA", (16, 16), (0, 0, 0, 0))
+    tela.button(im, 0, 0, on)
+    for y, row in enumerate(DIGITS[n]):
+        for x, ch in enumerate(row):
+            if ch == "#":
+                im.putpixel((4 + x, 5 + y), hx("#1A1410"))
+                im.putpixel((3 + x, 4 + y), hx("#FFC060" if on else "#D8C8A8"))
+    for y, row in enumerate(S_SMALL):
+        for x, ch in enumerate(row):
+            if ch == "#":
+                im.putpixel((11 + x, 7 + y), hx("#1A1410"))
+                im.putpixel((10 + x, 6 + y), hx("#FFC060" if on else "#D8C8A8"))
+    return im
+
+
 def model(wall):
     return {"parent": "minecraft:block/block",
             "textures": {"particle": "automato:block/side", "side": "automato:block/side", "top": "automato:block/top",
@@ -136,6 +156,11 @@ def main():
             save_json({"parent": "minecraft:item/generated", "textures": {"layer0": "automato:item/" + name}},
                       os.path.join(AU, "models/item", name + ".json"))
             cases.append({"when": "automato_" + name, "model": m(name)})
+            dname = f"delay_{n}" + ("_on" if on else "")
+            save_png(plate_delay(n, on), os.path.join(AU, "textures/item", dname + ".png"))
+            save_json({"parent": "minecraft:item/generated", "textures": {"layer0": "automato:item/" + dname}},
+                      os.path.join(AU, "models/item", dname + ".json"))
+            cases.append({"when": "automato_" + dname, "model": m(dname)})
         save_json({"model": {"type": "minecraft:select", "property": "minecraft:custom_model_data", "index": 0, "cases": cases,
                              "fallback": {"type": "minecraft:model", "model": "minecraft:item/" + vanilla}}},
                   os.path.join(RES, "minecraft/items", vanilla + ".json"))

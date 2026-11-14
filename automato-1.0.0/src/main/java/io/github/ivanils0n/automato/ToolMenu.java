@@ -36,6 +36,7 @@ final class ToolMenu extends AbstractContainerMenu {
 	private final SimpleContainer controls = new SimpleContainer(9);
 	private final boolean pack;
 	private int shownXp = -1;
+	private Boolean shownWeapon; // a fileira escolhe a espera (arma) ou o alcance (ferramenta)
 
 	/** {@code pack}: o jogador tem o resource pack (placas com o número desenhado; sem ele, o número é a quantidade). */
 	ToolMenu(int id, Inventory inv, DispenserBlockEntity be, Machine machine, boolean pack) {
@@ -76,15 +77,23 @@ final class ToolMenu extends AbstractContainerMenu {
 	private void refreshControls() {
 		controls.setItem(9 - 9, ItemStack.EMPTY);
 		controls.setItem(10 - 9, ItemStack.EMPTY);
+		boolean weapon = weaponInUse();
+		shownWeapon = weapon;
+		int chosen = weapon ? machine.delay : machine.range;
 		for (int n = 1; n <= Worker.MAX_RANGE; n++) {
-			boolean on = n == machine.range;
-			ItemStack b = piece(on ? Items.SPECTRAL_ARROW : Items.ARROW, "automato_range_" + n + (on ? "_on" : ""), pack ? 1 : n);
-			b.set(DataComponents.CUSTOM_NAME, plain("Alcance: " + n + (n == 1 ? " bloco" : " blocos"), on ? ChatFormatting.GOLD : ChatFormatting.WHITE));
-			b.set(DataComponents.LORE, new ItemLore(List.of(
+			boolean on = n == chosen;
+			ItemStack b = piece(on ? Items.SPECTRAL_ARROW : Items.ARROW, "automato_" + (weapon ? "delay_" : "range_") + n + (on ? "_on" : ""), pack ? 1 : n);
+			String title = weapon ? "Espera: " + n + (n == 1 ? " segundo" : " segundos") : "Alcance: " + n + (n == 1 ? " bloco" : " blocos");
+			b.set(DataComponents.CUSTOM_NAME, plain(title, on ? ChatFormatting.GOLD : ChatFormatting.WHITE));
+			b.set(DataComponents.LORE, new ItemLore(weapon ? List.of(
+				plain(on ? "Escolhido" : "Clique para escolher", on ? ChatFormatting.GREEN : ChatFormatting.YELLOW),
+				plain("Com um mob à frente, espera esse tempo", ChatFormatting.GRAY),
+				plain("antes de cada golpe; se ele ainda estiver", ChatFormatting.GRAY),
+				plain("lá, golpeia (alcance de 3 blocos).", ChatFormatting.GRAY)) : List.of(
 				plain(on ? "Escolhido" : "Clique para escolher", on ? ChatFormatting.GREEN : ChatFormatting.YELLOW),
 				plain("Até onde picareta, pá, machado e enxada", ChatFormatting.GRAY),
 				plain("procuram o bloco à frente.", ChatFormatting.GRAY),
-				plain("Espada e outras armas: 3 blocos, como o jogador.", ChatFormatting.GRAY))));
+				plain("Com espada, estes botões viram a espera do golpe.", ChatFormatting.GRAY))));
 			controls.setItem(FIRST_BUTTON - 9 + n - 1, b);
 		}
 		controls.setItem(XP_JAR - 9, jar());
@@ -114,9 +123,19 @@ final class ToolMenu extends AbstractContainerMenu {
 		return s;
 	}
 
+	/** A primeira ferramenta dos 9 espaços (a que o Autômato usa) é uma arma? */
+	private boolean weaponInUse() {
+		for (int i = 0; i < be.getContainerSize(); i++) {
+			ItemStack s = be.getItem(i);
+			if (Worker.isUsable(s)) return Worker.isWeapon(s);
+		}
+		return false;
+	}
+
 	@Override
 	public void broadcastChanges() {
-		if (machine.xp != shownXp) refreshControls(); // o pote enche com a tela aberta
+		// o pote enche com a tela aberta, e trocar espada por picareta troca o que a fileira escolhe
+		if (machine.xp != shownXp || shownWeapon == null || weaponInUse() != shownWeapon) refreshControls();
 		super.broadcastChanges();
 	}
 
@@ -135,8 +154,10 @@ final class ToolMenu extends AbstractContainerMenu {
 		if (slotId >= 9 && slotId < 18) { // fileira de controle: nunca pega nem põe item
 			if (slotId == XP_COLLECT && clickType == ContainerInput.PICKUP && player instanceof ServerPlayer sp) Xp.giveTo(sp, machine);
 			int n = slotId - FIRST_BUTTON + 1;
-			if (n >= 1 && n <= Worker.MAX_RANGE && n != machine.range && clickType == ContainerInput.PICKUP) {
-				machine.range = n;
+			boolean weapon = weaponInUse();
+			if (n >= 1 && n <= Worker.MAX_RANGE && n != (weapon ? machine.delay : machine.range) && clickType == ContainerInput.PICKUP) {
+				if (weapon) machine.delay = n;
+				else machine.range = n;
 				Automato.store.markDirty();
 				if (player instanceof ServerPlayer sp) {
 					sp.level().playSound(null, sp.blockPosition(), SoundEvents.UI_BUTTON_CLICK.value(), SoundSource.PLAYERS, 0.4f, 1.2f);
