@@ -90,9 +90,11 @@ def draw(preview=True):
     for i in range(1 if preview else 0, 9):
         ghost(img, 8 + i * 18, 18, PICK)
     # fileira do alcance
-    for i in (9, 10, 16, 17):
+    for i in (9, 10):
         x = 8 + (i - 9) * 18
         bricks(img, (x - 1, 35, x + 17, 53), 3 + i, ("#7A7A7A", "#727272"))
+    for i in (16, 17):  # pote de XP e botão Recolher (itens por cima)
+        ImageDraw.Draw(img).rectangle([8 + (i - 9) * 18 - 1, 35, 8 + (i - 9) * 18 + 16, 52], fill=hx("#1A1410"))
     for k in range(5):
         if preview:
             button(img, 8 + (2 + k) * 18, 36, k == 1)

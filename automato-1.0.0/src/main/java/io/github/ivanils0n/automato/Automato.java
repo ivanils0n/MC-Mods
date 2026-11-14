@@ -96,6 +96,9 @@ public final class Automato implements ModInitializer {
 			LOG.info("{} autômatos carregados", store.size());
 			if (Boolean.getBoolean("automato.selftest")) SelfTest.run(s);
 		});
+		ServerLifecycleEvents.SERVER_STOPPING.register(s -> {
+			if (store != null) store.flush();
+		});
 		ServerLifecycleEvents.SERVER_STOPPED.register(s -> {
 			server = null;
 			store = null;
@@ -176,6 +179,7 @@ public final class Automato implements ModInitializer {
 	private static void onWorldTick(ServerLevel sl) {
 		if (store == null) return;
 		boolean second = sl.getGameTime() % 20 == 0;
+		if (sl.getGameTime() % 100 == 0 && sl == server.overworld()) store.flush();
 		for (Machine m : store.inDim(dim(sl))) {
 			BlockPos pos = m.pos();
 			if (!sl.isLoaded(pos) || !sl.isPositionEntityTicking(pos)) continue;
@@ -189,6 +193,7 @@ public final class Automato implements ModInitializer {
 			Direction facing = state.getValue(DispenserBlock.FACING);
 			boolean powered = sl.hasNeighborSignal(pos);
 			Worker.tick(sl, m, state, be, facing, powered);
+			if (sl.getGameTime() % 5 == 0) Xp.collectOrbs(sl, m, facing);
 			boolean on = powered && m.slot >= 0;
 			if (second && anyPlayerNear(sl, pos)) {
 				ensureVisual(sl, m, facing, on);

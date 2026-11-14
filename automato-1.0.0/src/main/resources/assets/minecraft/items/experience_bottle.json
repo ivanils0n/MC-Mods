@@ -1,0 +1,76 @@
+{
+ "model": {
+  "type": "minecraft:select",
+  "property": "minecraft:custom_model_data",
+  "index": 0,
+  "cases": [
+   {
+    "when": "automato_xp_0",
+    "model": {
+     "type": "minecraft:model",
+     "model": "automato:item/xp_0"
+    }
+   },
+   {
+    "when": "automato_xp_1",
+    "model": {
+     "type": "minecraft:model",
+     "model": "automato:item/xp_1"
+    }
+   },
+   {
+    "when": "automato_xp_2",
+    "model": {
+     "type": "minecraft:model",
+     "model": "automato:item/xp_2"
+    }
+   },
+   {
+    "when": "automato_xp_3",
+    "model": {
+     "type": "minecraft:model",
+     "model": "automato:item/xp_3"
+    }
+   },
+   {
+    "when": "automato_xp_4",
+    "model": {
+     "type": "minecraft:model",
+     "model": "automato:item/xp_4"
+    }
+   },
+   {
+    "when": "automato_xp_5",
+    "model": {
+     "type": "minecraft:model",
+     "model": "automato:item/xp_5"
+    }
+   },
+   {
+    "when": "automato_xp_6",
+    "model": {
+     "type": "minecraft:model",
+     "model": "automato:item/xp_6"
+    }
+   },
+   {
+    "when": "automato_xp_7",
+    "model": {
+     "type": "minecraft:model",
+     "model": "automato:item/xp_7"
+    }
+   },
+   {
+    "when": "automato_xp_8",
+    "model": {
+     "type": "minecraft:model",
+     "model": "automato:item/xp_8"
+    }
+   }
+  ],
+  "fallback": {
+   "type": "minecraft:model",
+   "model": "minecraft:item/experience_bottle"
+  }
+ }
+}

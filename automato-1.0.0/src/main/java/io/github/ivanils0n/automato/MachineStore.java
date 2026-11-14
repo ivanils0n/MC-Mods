@@ -24,6 +24,7 @@ final class MachineStore {
 	static final class Machine {
 		String dim;
 		int x, y, z;
+		int xp; // pontos de XP guardados (dos mobs mortos e dos blocos quebrados à frente), até Xp.MAX
 		int range = 1; // alcance da quebra, de 1 a 5 blocos à frente (golpe de arma: sempre 3, como o jogador)
 
 		// Estado de trabalho: só na memória (recomeça do zero ao reiniciar, como um jogador que acabou de entrar).
@@ -113,6 +114,7 @@ final class MachineStore {
 					m.slot = -1;
 					m.crack = -1;
 					m.range = Math.clamp(m.range, 1, Worker.MAX_RANGE);
+					m.xp = Math.clamp(m.xp, 0, Xp.MAX);
 					store.byKey.put(m.key(), m);
 				}
 			}
@@ -127,12 +129,20 @@ final class MachineStore {
 		return store;
 	}
 
+	private boolean dirty;
+
+	/** Mudança pequena (alcance, XP): grava junto, no próximo flush (a cada 5 s e ao desligar o servidor). */
 	void markDirty() {
-		save();
+		dirty = true;
+	}
+
+	void flush() {
+		if (dirty) save();
 	}
 
 	/** Grava num .tmp e troca de uma vez, para nunca deixar o arquivo pela metade se o servidor cair. */
 	void save() {
+		dirty = false;
 		Path tmp = file.resolveSibling(file.getFileName() + ".tmp");
 		try {
 			Files.writeString(tmp, GSON.toJson(byKey.values()), StandardCharsets.UTF_8);

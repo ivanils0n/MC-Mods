@@ -56,6 +56,50 @@ def plate(n, on):
     return im
 
 
+def xp_jar(stage):
+    """Pote de vidro com XP verde; stage 0 (vazio) a 8 (cheio)."""
+    im = Image.new("RGBA", (16, 16), (0, 0, 0, 0))
+    for y in range(3, 15):
+        for x in range(3, 13):
+            im.putpixel((x, y), hx("#2A3A3E"))
+    lvl = round(11 * stage / 8)
+    for y in range(15 - lvl, 15):
+        for x in range(4, 12):
+            im.putpixel((x, y), hx("#7CFC3A" if (x + y) % 3 else "#C8FF6A"))
+    for x in range(3, 13):
+        im.putpixel((x, 3), hx("#BFE8F0"))
+        im.putpixel((x, 15), hx("#BFE8F0"))
+    for y in range(3, 16):
+        im.putpixel((3, y), hx("#BFE8F0"))
+        im.putpixel((12, y), hx("#BFE8F0"))
+    for y in range(1, 3):
+        for x in range(5, 11):
+            im.putpixel((x, y), hx("#8A6A3E"))
+    im.putpixel((5, 6), hx("#FFFFFF"))
+    im.putpixel((5, 7), hx("#FFFFFF"))
+    return im
+
+
+def xp_button():
+    im = Image.new("RGBA", (16, 16), hx("#3E7A1E"))
+    for i in range(16):
+        im.putpixel((i, 0), hx("#7CFC3A"))
+        im.putpixel((0, i), hx("#7CFC3A"))
+        im.putpixel((i, 15), hx("#244A10"))
+        im.putpixel((15, i), hx("#244A10"))
+    for y in range(2, 10):
+        for x in range(4, 12):
+            if (x - 7.5) ** 2 + (y - 5.5) ** 2 <= 13:
+                im.putpixel((x, y), hx("#C8FF6A" if (x - 6) ** 2 + (y - 4) ** 2 > 2 else "#F0FFD0"))
+    for y in range(10, 15):
+        w = 14 - y
+        for x in range(8 - w, 8 + w):
+            im.putpixel((x, y), hx("#FFE27A"))
+    for c in ((1, 1), (14, 1), (1, 14), (14, 14)):
+        im.putpixel(c, hx("#FFD27A"))
+    return im
+
+
 def model(wall):
     return {"parent": "minecraft:block/block",
             "textures": {"particle": "automato:block/side", "side": "automato:block/side", "top": "automato:block/top",
@@ -95,6 +139,23 @@ def main():
         save_json({"model": {"type": "minecraft:select", "property": "minecraft:custom_model_data", "index": 0, "cases": cases,
                              "fallback": {"type": "minecraft:model", "model": "minecraft:item/" + vanilla}}},
                   os.path.join(RES, "minecraft/items", vanilla + ".json"))
+
+    # Pote de XP (garrafa de XP marcada) e botão Recolher (corante verde-limão marcado).
+    cases = []
+    for st in range(9):
+        name = f"xp_{st}"
+        save_png(xp_jar(st), os.path.join(AU, "textures/item", name + ".png"))
+        save_json({"parent": "minecraft:item/generated", "textures": {"layer0": "automato:item/" + name}}, os.path.join(AU, "models/item", name + ".json"))
+        cases.append({"when": "automato_" + name, "model": m(name)})
+    save_json({"model": {"type": "minecraft:select", "property": "minecraft:custom_model_data", "index": 0, "cases": cases,
+                         "fallback": {"type": "minecraft:model", "model": "minecraft:item/experience_bottle"}}},
+              os.path.join(RES, "minecraft/items/experience_bottle.json"))
+    save_png(xp_button(), os.path.join(AU, "textures/item/xp_collect.png"))
+    save_json({"parent": "minecraft:item/generated", "textures": {"layer0": "automato:item/xp_collect"}}, os.path.join(AU, "models/item/xp_collect.json"))
+    save_json({"model": {"type": "minecraft:select", "property": "minecraft:custom_model_data", "index": 0,
+                         "cases": [{"when": "automato_xp_collect", "model": m("xp_collect")}],
+                         "fallback": {"type": "minecraft:model", "model": "minecraft:item/lime_dye"}}},
+              os.path.join(RES, "minecraft/items/lime_dye.json"))
 
     # Fonte da tela: U+F000 volta 8 px (do x do título ao canto), U+E000 é o fundo inteiro, U+F001 desfaz a largura
     # dele (176 + 1) e U+F002 avança até o x=8 do título. Ver Automato.title().

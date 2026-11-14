@@ -6,6 +6,7 @@ import net.minecraft.core.Direction;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.entity.EntitySpawnReason;
+import net.minecraft.world.entity.ExperienceOrb;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.resources.Identifier;
 import net.minecraft.world.entity.Mob;
@@ -85,6 +86,18 @@ final class SelfTest {
 		ensure(be.getItem(0).getDamageValue() == 1, "durabilidade da espada: " + be.getItem(0));
 		pig.discard();
 
+		// Pote de XP: bolinha à frente vai para o pote; fora da área fica no chão.
+		ensure(Xp.levels(Xp.pointsForLevel(30)) == 30 && Xp.MAX == Xp.pointsForLevel(100), "conta de níveis");
+		ExperienceOrb near = new ExperienceOrb(sl, pos.getX() + 2.5, pos.getY() + 0.5, pos.getZ() + 0.5, 7);
+		ExperienceOrb far = new ExperienceOrb(sl, pos.getX() - 4.5, pos.getY() + 0.5, pos.getZ() + 0.5, 5);
+		sl.addFreshEntity(near);
+		sl.addFreshEntity(far);
+		int before = m.xp;
+		Xp.collectOrbs(sl, m, Direction.EAST);
+		ensure(m.xp == before + 7 && near.isRemoved() && !far.isRemoved(), "pote de XP: " + m.xp + " (antes " + before + ")");
+		far.discard();
+
+		Automato.store.save();
 		MachineStore reloaded = MachineStore.load(server.getWorldPath(LevelResource.ROOT).resolve("automato.json"));
 		ensure(reloaded.get(Automato.dim(sl), pos) != null, "Autômato não foi salvo no arquivo");
 

@@ -29,11 +29,13 @@ import net.minecraft.world.level.block.entity.DispenserBlockEntity;
  */
 final class ToolMenu extends AbstractContainerMenu {
 	static final int FIRST_BUTTON = 11; // espaços 11..15 da tela = alcance 1..5
+	static final int XP_JAR = 16, XP_COLLECT = 17;
 
 	private final DispenserBlockEntity be;
 	private final Machine machine;
 	private final SimpleContainer controls = new SimpleContainer(9);
 	private final boolean pack;
+	private int shownXp = -1;
 
 	/** {@code pack}: o jogador tem o resource pack (placas com o número desenhado; sem ele, o número é a quantidade). */
 	ToolMenu(int id, Inventory inv, DispenserBlockEntity be, Machine machine, boolean pack) {
@@ -85,8 +87,37 @@ final class ToolMenu extends AbstractContainerMenu {
 				plain("Espada e outras armas: 3 blocos, como o jogador.", ChatFormatting.GRAY))));
 			controls.setItem(FIRST_BUTTON - 9 + n - 1, b);
 		}
-		controls.setItem(16 - 9, ItemStack.EMPTY);
-		controls.setItem(17 - 9, ItemStack.EMPTY);
+		controls.setItem(XP_JAR - 9, jar());
+		controls.setItem(XP_COLLECT - 9, collectButton());
+		shownXp = machine.xp;
+	}
+
+	/** Pote: enche em 9 etapas; a quantidade do item é o número de níveis guardados (1 a 99). */
+	private ItemStack jar() {
+		int levels = Xp.levels(machine.xp);
+		int stage = machine.xp <= 0 ? 0 : Math.max(1, (int) Math.round(8.0 * machine.xp / Xp.MAX));
+		ItemStack s = piece(Items.EXPERIENCE_BOTTLE, "automato_xp_" + stage, Math.clamp(levels, 1, 99));
+		s.set(DataComponents.ENCHANTMENT_GLINT_OVERRIDE, false);
+		s.set(DataComponents.CUSTOM_NAME, plain("XP guardado: " + levels + (levels == 1 ? " nível" : " níveis"), ChatFormatting.GREEN));
+		s.set(DataComponents.LORE, new ItemLore(List.of(
+			plain("(" + machine.xp + " pontos" + (machine.xp >= Xp.MAX ? ", pote cheio" : "") + ")", ChatFormatting.GRAY),
+			plain("O XP dos mobs e blocos à frente vem para cá.", ChatFormatting.GRAY),
+			plain("Clique em Recolher para pegar.", ChatFormatting.GRAY))));
+		return s;
+	}
+
+	private ItemStack collectButton() {
+		ItemStack s = piece(Items.LIME_DYE, "automato_xp_collect", 1);
+		s.set(DataComponents.CUSTOM_NAME, plain("Recolher XP", ChatFormatting.GREEN));
+		s.set(DataComponents.LORE, new ItemLore(List.of(plain(machine.xp > 0
+			? "Passa " + Xp.levels(machine.xp) + " níveis (" + machine.xp + " pontos) para você." : "O pote está vazio.", ChatFormatting.GRAY))));
+		return s;
+	}
+
+	@Override
+	public void broadcastChanges() {
+		if (machine.xp != shownXp) refreshControls(); // o pote enche com a tela aberta
+		super.broadcastChanges();
 	}
 
 	private static ItemStack piece(Item item, String cmd, int count) {
@@ -102,6 +133,7 @@ final class ToolMenu extends AbstractContainerMenu {
 	@Override
 	public void clicked(int slotId, int button, ContainerInput clickType, Player player) {
 		if (slotId >= 9 && slotId < 18) { // fileira de controle: nunca pega nem põe item
+			if (slotId == XP_COLLECT && clickType == ContainerInput.PICKUP && player instanceof ServerPlayer sp) Xp.giveTo(sp, machine);
 			int n = slotId - FIRST_BUTTON + 1;
 			if (n >= 1 && n <= Worker.MAX_RANGE && n != machine.range && clickType == ContainerInput.PICKUP) {
 				machine.range = n;
