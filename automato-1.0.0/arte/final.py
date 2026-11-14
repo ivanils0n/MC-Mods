@@ -140,7 +140,7 @@ def main():
                              "fallback": {"type": "minecraft:model", "model": "minecraft:item/" + vanilla}}},
                   os.path.join(RES, "minecraft/items", vanilla + ".json"))
 
-    # Pote de XP (garrafa de XP marcada) e botão Recolher (corante verde-limão marcado).
+    # Pote de XP (garrafa de XP marcada) e botão Recolher (esmeralda marcada).
     cases = []
     for st in range(9):
         name = f"xp_{st}"
@@ -154,8 +154,8 @@ def main():
     save_json({"parent": "minecraft:item/generated", "textures": {"layer0": "automato:item/xp_collect"}}, os.path.join(AU, "models/item/xp_collect.json"))
     save_json({"model": {"type": "minecraft:select", "property": "minecraft:custom_model_data", "index": 0,
                          "cases": [{"when": "automato_xp_collect", "model": m("xp_collect")}],
-                         "fallback": {"type": "minecraft:model", "model": "minecraft:item/lime_dye"}}},
-              os.path.join(RES, "minecraft/items/lime_dye.json"))
+                         "fallback": {"type": "minecraft:model", "model": "minecraft:item/emerald"}}},
+              os.path.join(RES, "minecraft/items/emerald.json"))
 
     # Fonte da tela: U+F000 volta 8 px (do x do título ao canto), U+E000 é o fundo inteiro, U+F001 desfaz a largura
     # dele (176 + 1) e U+F002 avança até o x=8 do título. Ver Automato.title().

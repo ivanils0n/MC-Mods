@@ -14,7 +14,7 @@
   ],
   "fallback": {
    "type": "minecraft:model",
-   "model": "minecraft:item/lime_dye"
+   "model": "minecraft:item/emerald"
   }
  }
 }

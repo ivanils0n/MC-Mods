@@ -39,8 +39,9 @@ import net.minecraft.world.phys.Vec3;
  * picareta, pá, enxada e tesoura quebram o primeiro bloco à frente (até o alcance escolhido na tela, de 1 a 5 blocos),
  * na velocidade de um jogador com essa ferramenta; espada, maça, tridente e lança golpeiam o mob à frente (até 3
  * blocos) cada vez que a recarga da arma enche; o machado golpeia se houver mob e, se não, corta o bloco à frente.
- * A quebra e o golpe são feitos por um jogador falso, então valem encantamentos, gasto de durabilidade e drops de
- * jogador. Usa a primeira ferramenta dos 9 espaços; quando ela quebra, passa para a próxima.
+ * A quebra e o golpe são feitos por um jogador falso segurando a própria ferramenta, então valem os encantamentos
+ * dela: Eficiência (velocidade), Fortuna e Toque Suave (drops), Inquebrável (durabilidade), Afiação, Aspecto Flamejante,
+ * Repulsão e Corte Arrebatador (golpe) e Pilhagem (drops do mob, que morre na hora do golpe). Remendo: ver Xp. Usa a primeira ferramenta dos 9 espaços; quando ela quebra, passa para a próxima.
  */
 final class Worker {
 	static final int MAX_RANGE = 5, ATTACK_REACH = 3;

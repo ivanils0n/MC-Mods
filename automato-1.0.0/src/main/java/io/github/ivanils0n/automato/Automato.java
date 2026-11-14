@@ -193,7 +193,7 @@ public final class Automato implements ModInitializer {
 			Direction facing = state.getValue(DispenserBlock.FACING);
 			boolean powered = sl.hasNeighborSignal(pos);
 			Worker.tick(sl, m, state, be, facing, powered);
-			if (sl.getGameTime() % 5 == 0) Xp.collectOrbs(sl, m, facing);
+			if (sl.getGameTime() % 5 == 0) Xp.collectOrbs(sl, m, facing, be);
 			boolean on = powered && m.slot >= 0;
 			if (second && anyPlayerNear(sl, pos)) {
 				ensureVisual(sl, m, facing, on);

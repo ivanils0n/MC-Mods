@@ -96,6 +96,7 @@ Um bloco que usa as ferramentas guardadas nele como um jogador parado na frente 
   - **Picareta, pá, enxada, tesoura**: quebram o primeiro bloco à frente dentro do alcance, na velocidade de um jogador com essa ferramenta (eficiência conta), com a rachadura aparecendo e 5 ticks de pausa entre blocos. Fortuna e toque suave valem; os drops caem no chão.
   - **Espada, maça, tridente, lança**: golpeiam o mob à frente (até 3 blocos, como o jogador) toda vez que a recarga da arma enche (espada: a cada 0,6 s). Golpe com a barra cheia, com encantamentos.
   - **Machado**: golpeia se houver mob à frente; se não, corta o bloco dentro do alcance.
+  - **Encantamentos** da ferramenta valem como num jogador: Eficiência, Fortuna, Toque Suave, Inquebrável, Afiação, Aspecto Flamejante, Repulsão, Corte Arrebatador e Pilhagem. Com Remendo, o XP coletado conserta a ferramenta antes de ir para o pote.
   - Gasta a durabilidade como um jogador. Não bate em jogadores nem em suportes de armadura. O alcance do golpe não passa de paredes.
 - **XP**: as bolinhas de XP que aparecem à frente dele (dos mobs que ele mata e dos blocos que ele quebra) vão para o pote da tela, até o equivalente a 100 níveis (cheio, ficam no chão). O pote mostra quantos níveis tem (os pontos exatos aparecem ao passar o mouse) e o botão **Recolher** passa todo o XP para você.
 - **Quebrar**: as ferramentas guardadas caem no chão e, com picareta, o Autômato volta como item.

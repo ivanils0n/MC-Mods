@@ -107,7 +107,7 @@ final class ToolMenu extends AbstractContainerMenu {
 	}
 
 	private ItemStack collectButton() {
-		ItemStack s = piece(Items.LIME_DYE, "automato_xp_collect", 1);
+		ItemStack s = piece(Items.EMERALD, "automato_xp_collect", 1);
 		s.set(DataComponents.CUSTOM_NAME, plain("Recolher XP", ChatFormatting.GREEN));
 		s.set(DataComponents.LORE, new ItemLore(List.of(plain(machine.xp > 0
 			? "Passa " + Xp.levels(machine.xp) + " níveis (" + machine.xp + " pontos) para você." : "O pote está vazio.", ChatFormatting.GRAY))));

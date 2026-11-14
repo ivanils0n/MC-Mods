@@ -9,11 +9,17 @@ import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.entity.ExperienceOrb;
+import net.minecraft.core.registries.Registries;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.enchantment.EnchantmentHelper;
+import net.minecraft.world.item.enchantment.Enchantments;
+import net.minecraft.world.level.block.entity.DispenserBlockEntity;
 import net.minecraft.world.phys.AABB;
 
 /**
  * Pote de XP do Autômato: as bolinhas de XP que aparecem à frente dele (dos mobs que ele mata e dos blocos que ele
  * quebra) vão para o pote, até o equivalente a 100 níveis; cheio, elas ficam no chão. O jogador recolhe pela tela.
+ * Se a ferramenta em uso tiver Remendo, o XP conserta ela primeiro, como faria com um jogador.
  */
 final class Xp {
 	static final int MAX = pointsForLevel(100);
@@ -42,8 +48,11 @@ final class Xp {
 	}
 
 	/** Recolhe as bolinhas na área de trabalho à frente (até o maior alcance, de quebra ou de golpe, com folga). */
-	static void collectOrbs(ServerLevel sl, Machine m, Direction f) {
-		if (m.xp >= MAX) return;
+	static void collectOrbs(ServerLevel sl, Machine m, Direction f, DispenserBlockEntity be) {
+		ItemStack tool = m.slot >= 0 ? be.getItem(m.slot) : ItemStack.EMPTY;
+		boolean mending = !tool.isEmpty() && tool.isDamaged() && EnchantmentHelper.getItemEnchantmentLevel(
+			sl.registryAccess().lookupOrThrow(Registries.ENCHANTMENT).getOrThrow(Enchantments.MENDING), tool) > 0;
+		if (m.xp >= MAX && !mending) return;
 		int reach = Math.max(m.range, Worker.ATTACK_REACH);
 		BlockPos pos = m.pos();
 		AABB box = new AABB(pos.relative(f)).expandTowards(f.getStepX() * (reach - 1), f.getStepY() * (reach - 1), f.getStepZ() * (reach - 1)).inflate(1.5);
@@ -51,6 +60,12 @@ final class Xp {
 		for (ExperienceOrb orb : sl.getEntitiesOfClass(ExperienceOrb.class, box, ExperienceOrb::isAlive)) {
 			int count = Math.max(1, ((ExperienceOrbAccess) orb).automato$getCount());
 			long value = (long) orb.getValue() * count;
+			if (mending && tool.isDamaged()) { // Remendo: como no jogador, cada ponto conserta 2 de durabilidade antes
+				int fix = (int) Math.min(tool.getDamageValue(), value * 2);
+				tool.setDamageValue(tool.getDamageValue() - fix);
+				value -= (fix + 1) / 2;
+				be.setChanged();
+			}
 			if (m.xp + value > MAX) break; // não cabe inteira: fica no chão
 			m.xp += (int) value;
 			orb.discard();

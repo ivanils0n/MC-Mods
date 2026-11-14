@@ -8,6 +8,8 @@ import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.entity.EntitySpawnReason;
 import net.minecraft.world.entity.ExperienceOrb;
 import net.minecraft.core.registries.BuiltInRegistries;
+import net.minecraft.core.registries.Registries;
+import net.minecraft.world.item.enchantment.Enchantments;
 import net.minecraft.resources.Identifier;
 import net.minecraft.world.entity.Mob;
 import net.minecraft.world.item.ItemStack;
@@ -41,6 +43,11 @@ final class SelfTest {
 		ensure(Worker.isWeapon(new ItemStack(Items.MACE)), "maça não é arma");
 		ensure(!Worker.isWeapon(new ItemStack(Items.DIAMOND_PICKAXE)) && Worker.isUsable(new ItemStack(Items.DIAMOND_PICKAXE)), "picareta");
 		ensure(!Worker.isUsable(new ItemStack(Items.DIRT)), "terra foi aceita como ferramenta");
+		// Eficiência acelera a quebra (Fortuna, Pilhagem etc. vêm do próprio jogo, pelo jogador falso com a ferramenta).
+		ItemStack fast = new ItemStack(Items.DIAMOND_PICKAXE);
+		fast.enchant(server.registryAccess().lookupOrThrow(Registries.ENCHANTMENT).getOrThrow(Enchantments.EFFICIENCY), 5);
+		float slow = Worker.progressPerTick(server.overworld(), new ItemStack(Items.DIAMOND_PICKAXE), Blocks.STONE.defaultBlockState(), BlockPos.ZERO);
+		ensure(Worker.progressPerTick(server.overworld(), fast, Blocks.STONE.defaultBlockState(), BlockPos.ZERO) > slow * 3, "Eficiência não acelera");
 		ensure(Automato.PACK_SHA1 != null, "hash do resource pack não está no .jar");
 
 		ServerLevel sl = server.overworld();
@@ -93,7 +100,7 @@ final class SelfTest {
 		sl.addFreshEntity(near);
 		sl.addFreshEntity(far);
 		int before = m.xp;
-		Xp.collectOrbs(sl, m, Direction.EAST);
+		Xp.collectOrbs(sl, m, Direction.EAST, be);
 		ensure(m.xp == before + 7 && near.isRemoved() && !far.isRemoved(), "pote de XP: " + m.xp + " (antes " + before + ")");
 		far.discard();
 
