@@ -1,0 +1,54 @@
+name: probe-chunkmap
+on:
+  push:
+    branches: [probe-chunkmap]
+jobs:
+  probe:
+    runs-on: ubuntu-24.04
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v6
+      - uses: actions/setup-java@v5
+        with:
+          java-version: '25'
+          distribution: 'microsoft'
+      - run: chmod +x ./gradlew
+      - run: ./gradlew --configure-on-demand ":mochilas-1.0.0:compileGametestJava" "-Pminecraft_version=26.2" "-Pminecraft_dependency=~26.2" || ./gradlew --configure-on-demand ":coletor-1.0.0:build" "-Pminecraft_version=26.2" "-Pminecraft_dependency=~26.2"
+      - name: Dump API
+        run: |
+          set +e
+          mkdir -p out
+          jar=""
+          for j in $(find ~/.gradle /home/runner -name '*.jar' -size +5M 2>/dev/null); do
+            if unzip -l "$j" 2>/dev/null | grep -q 'net/minecraft/client/Minecraft.class'; then jar=$j; break; fi
+          done
+          echo "JAR $jar" > out/jar.txt
+          unzip -l "$jar" | awk '{print $4}' | grep '\.class$' | grep -v '\$[0-9]' > out/classes.txt
+          P=out/mc.txt; : > $P
+          while read -r c; do
+            [ -z "$c" ] && continue
+            echo "=== $c" >> $P; javap -p -cp "$jar" "$c" >> $P 2>&1
+          done < .github/probe-classes.txt
+          C=out/code.txt; : > $C
+          for c in net.minecraft.world.level.chunk.ChunkGenerator net.minecraft.world.level.levelgen.structure.placement.RandomSpreadStructurePlacement net.minecraft.world.level.levelgen.structure.placement.StructurePlacement net.minecraft.client.gui.components.PlayerFaceRenderer net.minecraft.world.level.levelgen.presets.WorldPresets net.minecraft.server.WorldLoader net.minecraft.client.gui.Gui; do
+            echo "=== $c" >> $C; javap -c -p -cp "$jar" "$c" >> $C 2>&1
+          done
+          # Fabric API (cliente)
+          F=out/fabric.txt; : > $F
+          for fj in $(find ~/.gradle -name 'fabric-*.jar' -path '*26.2*' 2>/dev/null | sort -u); do
+            for c in $(unzip -l "$fj" 2>/dev/null | awk '{print $4}' | grep -E 'net/fabricmc/fabric/api/client/(rendering|keymapping|keybinding|event|screen|gametest)/.*\.class$|net/fabricmc/fabric/api/client/networking/v1/ClientPlayConnectionEvents' | grep -v '\$[0-9]' ); do
+              cn=$(echo "$c" | sed 's/\.class$//; s#/#.#g')
+              grep -qx "=== $cn" $F && continue
+              echo "=== $cn" >> $F; javap -cp "$fj" "$cn" >> $F 2>&1
+            done
+          done
+          find ~/.gradle -name 'fabric-*.jar' -path '*26.2*' | sed 's#.*/##' | sort -u > out/fabricjars.txt
+          wc -c out/*
+      - name: Publicar dump
+        run: |
+          git config user.name ci; git config user.email ci@example.com
+          git checkout -B probe-chunkmap-out
+          git add -f out
+          git commit -qm "dump da API (chunkmap)"
+          git push -qf origin probe-chunkmap-out
