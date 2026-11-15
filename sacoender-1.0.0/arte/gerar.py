@@ -1,7 +1,7 @@
 """Saco do Ender: gera texturas, modelo 3D, definição do item e ícone do resource pack.
 
 Uso: python3 arte/gerar.py [preview.png]
-Modelo escolhido: saco preto (laterais com a mesma textura do topo), cordão roxo escuro, sem placas e sem olho.
+Modelo escolhido: saco preto (laterais com a mesma textura do topo), cordão lilás, sem placas e sem olho.
 O item é um papel do jogo marcado com custom_model_data "sacoender"; assets/minecraft/items/paper.json troca o
 modelo só desse papel (qualquer outro papel continua igual ao do jogo).
 """
@@ -145,7 +145,7 @@ RES = ROOT + '/src/main/resources/assets'
 TEX = dict(
     cloth=cloth(['#120d1a', '#1c1528', '#271d38', '#33274a'], 31, folds=False),
     top=cloth(['#120d1a', '#1c1528', '#271d38', '#33274a'], 32, folds=False),
-    cord=solid_noise(['#241838', '#2e1f48', '#382657'], 33),
+    cord=solid_noise(['#6a4296', '#8456b8', '#a06fd6'], 33),
 )
 
 def plate_set():
