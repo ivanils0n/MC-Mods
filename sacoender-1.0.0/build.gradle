@@ -61,3 +61,14 @@ tasks.withType(JavaCompile).configureEach {
 	it.options.release = 25
 	it.options.encoding = 'UTF-8'
 }
+
+// Prints do cliente (só CI): ./gradlew runClientGameTest com xvfb; ver src/gametest.
+fabricApi {
+	configureTests {
+		createSourceSet = true
+		modId = 'sacoender-gametest'
+		enableGameTests = false
+		enableClientGameTests = true
+		eula = true
+	}
+}

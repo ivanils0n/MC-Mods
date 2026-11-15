@@ -1,0 +1,11 @@
+{
+	"schemaVersion": 1,
+	"id": "sacoender-gametest",
+	"version": "1.0.0",
+	"name": "Saco do Ender: prints do cliente (só CI)",
+	"environment": "client",
+	"entrypoints": {
+		"fabric-client-gametest": ["io.github.ivanils0n.sacoender.ClientShots"]
+	},
+	"depends": {"sacoender": "*"}
+}

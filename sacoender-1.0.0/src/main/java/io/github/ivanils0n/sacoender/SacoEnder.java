@@ -67,19 +67,19 @@ public final class SacoEnder implements ModInitializer {
 		return InteractionResult.SUCCESS;
 	}
 
-	static void open(ServerPlayer player) {
+	public static void open(ServerPlayer player) {
 		player.openMenu(new SimpleMenuProvider((id, inv, p) -> new BagMenu(id, inv, player), Component.literal(NAME)));
 		player.level().playSound(null, player.getX(), player.getY(), player.getZ(), SoundEvents.ENDER_CHEST_OPEN, SoundSource.PLAYERS, 0.5f, 1.2f);
 	}
 
-	static boolean isBag(ItemStack stack) {
+	public static boolean isBag(ItemStack stack) {
 		if (!stack.is(Items.PAPER)) return false;
 		CustomData data = stack.get(DataComponents.CUSTOM_DATA);
 		return data != null && data.copyTag().contains(TAG);
 	}
 
 	/** O mesmo item da receita (data/sacoender/recipe/saco.json). Só componentes do jogo: nada some sem o mod. */
-	static ItemStack bagItem() {
+	public static ItemStack bagItem() {
 		ItemStack s = new ItemStack(Items.PAPER);
 		s.set(DataComponents.MAX_STACK_SIZE, 1);
 		s.set(DataComponents.ITEM_NAME, Component.literal(NAME).withStyle(ChatFormatting.LIGHT_PURPLE));
