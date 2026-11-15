@@ -127,7 +127,8 @@ public class ClientShots implements FabricClientGameTest {
 			sp.getServer().runCommand("execute at @p run setblock ~ ~2 ~ glowstone");
 			context.waitTicks(80);
 			boolean cave = context.computeOnClient(mc -> ChunkMap.session().caveActive);
-			log("modo caverna automático debaixo da terra=" + cave);
+			String where = context.computeOnClient(mc -> mc.player.blockPosition().toShortString() + " água=" + mc.player.isInWater());
+			log("modo caverna automático debaixo da terra=" + cave + " (" + where + ")");
 			context.takeScreenshot("14_modo_caverna_hud");
 			BlockPos under = context.computeOnClient(mc -> mc.player.blockPosition());
 			mapShot(context, Level.OVERWORLD, under.getX(), under.getZ(), 2f, "15_mapa_cavernas", 60);

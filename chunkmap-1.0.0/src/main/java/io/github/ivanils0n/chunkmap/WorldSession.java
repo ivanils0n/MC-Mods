@@ -262,8 +262,11 @@ public final class WorldSession {
 	private void cave(Minecraft mc, ClientLevel level) {
 		var player = mc.player;
 		BlockPos p = player.blockPosition();
+		// Debaixo da terra: abaixo do chão daquela coluna e sem céu acima (o céu "através da água" conta, para mergulhar no
+		// mar não virar caverna; um lago dentro da caverna continua caverna).
 		boolean under = level.dimensionType().hasCeiling()
-				|| p.getY() < level.getHeight(Heightmap.Types.MOTION_BLOCKING_NO_LEAVES, p.getX(), p.getZ()) - 3 && !player.isInWater();
+				|| p.getY() < level.getHeight(Heightmap.Types.MOTION_BLOCKING_NO_LEAVES, p.getX(), p.getZ()) - 3
+				&& !level.canSeeSkyFromBelowWater(BlockPos.containing(player.getEyePosition()));
 		caveActive = switch (Config.global.caveMode) {
 			case OFF -> false;
 			case ALWAYS -> true;
