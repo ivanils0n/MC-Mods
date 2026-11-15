@@ -31,19 +31,20 @@ jobs:
             echo "=== $c" >> $P; javap -p -cp "$jar" "$c" >> $P 2>&1
           done < .github/probe-classes.txt
           C=out/code.txt; : > $C
-          for c in net.minecraft.world.level.chunk.ChunkGenerator net.minecraft.world.level.levelgen.structure.placement.RandomSpreadStructurePlacement net.minecraft.world.level.levelgen.structure.placement.StructurePlacement net.minecraft.client.gui.components.PlayerFaceRenderer net.minecraft.world.level.levelgen.presets.WorldPresets net.minecraft.server.WorldLoader net.minecraft.client.gui.Gui; do
+          for c in net.minecraft.world.level.chunk.ChunkGeneratorStructureState net.minecraft.client.gui.components.PlayerFaceExtractor net.minecraft.world.level.levelgen.structure.Structure net.minecraft.client.gui.Gui; do
             echo "=== $c" >> $C; javap -c -p -cp "$jar" "$c" >> $C 2>&1
           done
-          # Fabric API (cliente)
+          # Fabric API: os módulos vêm dentro do fabric-api.jar (META-INF/jars)
           F=out/fabric.txt; : > $F
-          for fj in $(find ~/.gradle -name 'fabric-*.jar' -path '*26.2*' 2>/dev/null | sort -u); do
-            for c in $(unzip -l "$fj" 2>/dev/null | awk '{print $4}' | grep -E 'net/fabricmc/fabric/api/client/(rendering|keymapping|keybinding|event|screen|gametest)/.*\.class$|net/fabricmc/fabric/api/client/networking/v1/ClientPlayConnectionEvents' | grep -v '\$[0-9]' ); do
+          fa=$(find ~/.gradle -name 'fabric-api-0.161.0+26.2.jar' | head -1)
+          mkdir -p fapi && cd fapi && unzip -q -o "$fa" 'META-INF/jars/*' && cd ..
+          ls fapi/META-INF/jars > out/fabricjars.txt
+          for fj in fapi/META-INF/jars/*.jar; do
+            for c in $(unzip -l "$fj" 2>/dev/null | awk '{print $4}' | grep -E 'net/fabricmc/fabric/api/client/(rendering|keymapping|keybinding|event|screen|gametest|networking)/.*\.class$' | grep -v '\$[0-9]' ); do
               cn=$(echo "$c" | sed 's/\.class$//; s#/#.#g')
-              grep -qx "=== $cn" $F && continue
               echo "=== $cn" >> $F; javap -cp "$fj" "$cn" >> $F 2>&1
             done
           done
-          find ~/.gradle -name 'fabric-*.jar' -path '*26.2*' | sed 's#.*/##' | sort -u > out/fabricjars.txt
           wc -c out/*
       - name: Publicar dump
         run: |
