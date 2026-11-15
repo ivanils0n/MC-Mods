@@ -216,8 +216,7 @@ def bundle_def(c):
         'fallback': vanilla_bundle(c),
     }}
 
-# Tela do baú do Ender: os 9 últimos espaços (os do saco, a 3ª fileira) com a cor B2 (Pedra Lavanda) e o saco no canto do
-# título. É um caractere da fonte sacoender:gui (176x72, do canto da tela) que o mod põe antes do título do baú do
+# Tela do baú do Ender: os 9 últimos espaços (os do saco, a 3ª fileira) com a cor B2 (Pedra Lavanda). É um caractere da fonte sacoender:gui (176x72, do canto da tela) que o mod põe antes do título do baú do
 # Ender: a textura do baú (generic_54) não é trocada, então o resto da tela segue o resource pack do jogador.
 def ender_row():
     import random
@@ -235,9 +234,6 @@ def ender_row():
             d.point((cx, cy), fill=c('#b88ee6'))
         for pt in [(x + 1, y), (x, y + 1), (x + 16, y + 17), (x + 17, y + 16)]:
             d.point(pt, fill=c('#a283cc'))
-    icon = render(ELEMENTS, TEX, 13, scale=0.85)
-    icon = icon.crop(icon.getbbox())
-    im.alpha_composite(icon, (168 - icon.width, 4 + (11 - icon.height) // 2 if icon.height < 11 else 4))
     return im
 
 FONT = {'providers': [
