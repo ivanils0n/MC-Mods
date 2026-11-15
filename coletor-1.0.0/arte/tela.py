@@ -178,8 +178,8 @@ def full_icon():
 
 
 def icones():
-    out = {"status_working": status_icon(), "status_waiting": SEEDS, "status_paused": REDSTONE, "status_full": full_icon(),
-           "meal_on": toggle_icon(True), "meal_off": toggle_icon(False)}
+    # "esperando crescer" e a farinha de osso usam os itens do jogo (seguem o resource pack do jogador)
+    out = {"status_working": status_icon(), "status_paused": REDSTONE, "status_full": full_icon()}
     for n in (3, 5, 7, 9, 11):
         out["area_%d" % n] = plate(str(n), False)
         out["area_%d_on" % n] = plate(str(n), True)
@@ -231,7 +231,7 @@ def previa(bg, scale=4):
     put(status_icon(), 0, ROW4 + 1)
     for i, n in enumerate(("3", "5", "7", "9", "11")):
         put(plate(n, n == "9"), 2 + i, ROW4 + 1)
-    put(toggle_icon(True), 8, ROW4 + 1)
+    put(MEAL, 8, ROW4 + 1)
     counts.append(put(SEEDS, 2, 162, 5))
     big = img.resize((W * scale, H * scale), Image.NEAREST)
     d = ImageDraw.Draw(big)

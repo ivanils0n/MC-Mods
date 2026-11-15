@@ -81,8 +81,9 @@ final class ColetorMenu extends AbstractContainerMenu {
 				plain("da altura dele, 1 abaixo e 1 acima.", ChatFormatting.GRAY))));
 			controls.setItem(FIRST_AREA - BOX + r - 1, b);
 		}
-		ItemStack meal = icon(new ItemStack(machine.boneMeal ? Items.BONE_MEAL : Items.BONE), machine.boneMeal ? "meal_on" : "meal_off");
-		meal.set(DataComponents.ENCHANTMENT_GLINT_OVERRIDE, machine.boneMeal && !pack);
+		// Itens do jogo (farinha de osso / osso), sem ícone próprio: seguem o resource pack do jogador.
+		ItemStack meal = new ItemStack(machine.boneMeal ? Items.BONE_MEAL : Items.BONE);
+		meal.set(DataComponents.ENCHANTMENT_GLINT_OVERRIDE, machine.boneMeal);
 		meal.set(DataComponents.CUSTOM_NAME, plain("Farinha de osso: " + (machine.boneMeal ? "usar" : "não usar"),
 			machine.boneMeal ? ChatFormatting.GREEN : ChatFormatting.RED));
 		meal.set(DataComponents.LORE, new ItemLore(List.of(
@@ -102,7 +103,8 @@ final class ColetorMenu extends AbstractContainerMenu {
 			case FULL -> { item = Items.BARREL; title = "Cheio"; line = "A colheita não cabe: tire itens ou ligue um funil embaixo."; color = ChatFormatting.GOLD; }
 			default -> { item = Items.WHEAT_SEEDS; title = "Esperando crescer"; line = "Nada maduro na área agora."; color = ChatFormatting.YELLOW; }
 		}
-		ItemStack s = icon(new ItemStack(item), model);
+		// "Esperando crescer" é a semente do jogo (segue o resource pack do jogador); os outros têm ícone próprio.
+		ItemStack s = machine.status == ColetorStore.Status.WAITING ? new ItemStack(item) : icon(new ItemStack(item), model);
 		s.set(DataComponents.CUSTOM_NAME, plain(title, color));
 		s.set(DataComponents.LORE, new ItemLore(List.of(plain(line, ChatFormatting.GRAY))));
 		return s;
