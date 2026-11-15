@@ -319,12 +319,6 @@ public final class TerrainLayer {
 		return t.texture.ready() ? t.texture.id : null;
 	}
 
-	/** Já existe terreno conhecido nesse bloco? */
-	public boolean known(int blockX, int blockZ) {
-		Region r = regions.get(rkey(Math.floorDiv(blockX, REGION), Math.floorDiv(blockZ, REGION)));
-		return r != null && r.argb[Math.floorMod(blockZ, REGION) * REGION + Math.floorMod(blockX, REGION)] != 0;
-	}
-
 	private void trimTiles() {
 		if (tiles.size() <= MAX_TILES) return;
 		Iterator<Map.Entry<Long, Tile>> it = tiles.entrySet().iterator();

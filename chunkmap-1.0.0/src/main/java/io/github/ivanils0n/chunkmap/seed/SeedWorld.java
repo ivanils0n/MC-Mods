@@ -179,7 +179,8 @@ public final class SeedWorld {
 	}
 
 	/**
-	 * Algum bioma da estrutura perto de onde ela começaria? Normais: 3x3 "quarts" em volta do meio do chunk. Quebra-cabeça:
+	 * Algum bioma da estrutura perto de onde ela começaria? Normais: os 4x4 "quarts" do chunk (umas começam no meio,
+	 * outras no canto, como o portal em ruínas). Quebra-cabeça:
 	 * a peça inicial gira em volta do canto do chunk e pode passar dele, então uma grade 5x5 a cada 8 blocos em volta do
 	 * canto (de -12 a +20).
 	 */
@@ -194,9 +195,9 @@ public final class SeedWorld {
 			}
 			return false;
 		}
-		int qx = QuartPos.fromBlock(chunk.getMiddleBlockX()), qz = QuartPos.fromBlock(chunk.getMiddleBlockZ());
-		for (int dx = -1; dx <= 1; dx++) {
-			for (int dz = -1; dz <= 1; dz++) {
+		int qx = QuartPos.fromBlock(chunk.getMinBlockX()), qz = QuartPos.fromBlock(chunk.getMinBlockZ());
+		for (int dx = 0; dx < 4; dx++) {
+			for (int dz = 0; dz < 4; dz++) {
 				if (structure.biomes().contains(biomeSource.getNoiseBiome(qx + dx, qy, qz + dz, sampler))) return true;
 			}
 		}
