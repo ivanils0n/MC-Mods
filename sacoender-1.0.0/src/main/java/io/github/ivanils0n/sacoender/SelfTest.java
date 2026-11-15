@@ -20,7 +20,7 @@ import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.player.Inventory;
-import net.minecraft.world.inventory.ClickType;
+import net.minecraft.world.inventory.ContainerInput;
 import net.minecraft.world.inventory.PlayerEnderChestContainer;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
@@ -71,7 +71,7 @@ final class SelfTest {
 		// O saco não serve de trouxa para a própria receita (não tem o espaço vazio de trouxa).
 		ensure(server.getRecipeManager().getRecipeFor(RecipeType.CRAFTING, CraftingInput.of(3, 3, List.of(o2, o2, o2, o2, bag.copy(), o2, o2, o2, o2)), sl).isEmpty(), "saco virou saco de novo");
 		// Saco tingido continua sendo o saco (sem espaço de trouxa).
-		ItemStack dyed = craft(server, sl, CraftingInput.of(2, 1, List.of(bag.copy(), new ItemStack(Items.PURPLE_DYE))));
+		ItemStack dyed = craft(server, sl, CraftingInput.of(2, 1, List.of(bag.copy(), new ItemStack(BuiltInRegistries.ITEM.getValue(Identifier.withDefaultNamespace("purple_dye"))))));
 		ensure(SacoEnder.isBag(dyed) && !dyed.is(Items.BUNDLE) && !dyed.has(DataComponents.BUNDLE_CONTENTS), "saco tingido: " + dyed);
 		ok("receita (trouxa vazia + 8 obsidianas; " + colors + " cores de trouxa; saco tingido continua saco)");
 
@@ -142,10 +142,10 @@ final class SelfTest {
 		inv.setItem(1, new ItemStack(Items.DIRT, 10));
 		var im = fp.inventoryMenu;
 		im.setCarried(new ItemStack(Items.DIAMOND, 4));
-		im.clicked(36, 0, ClickType.PICKUP, fp);
+		im.clicked(36, 0, ContainerInput.PICKUP, fp);
 		ensure(!im.getCarried().isEmpty() && SacoEnder.isBag(im.getCarried()) && !im.getCarried().has(DataComponents.BUNDLE_CONTENTS), "item foi posto dentro do saco: " + im.getCarried());
 		ensure(inv.getItem(0).is(Items.DIAMOND) && inv.getItem(0).getCount() == 4, "o clique não trocou o saco pelo diamante");
-		im.clicked(37, 1, ClickType.PICKUP, fp);
+		im.clicked(37, 1, ContainerInput.PICKUP, fp);
 		ensure(inv.getItem(1).is(Items.DIRT) && inv.getItem(1).getCount() == 10, "o saco puxou a terra para dentro: " + inv.getItem(1));
 		im.setCarried(ItemStack.EMPTY);
 		ok("o saco não guarda itens como trouxa");
