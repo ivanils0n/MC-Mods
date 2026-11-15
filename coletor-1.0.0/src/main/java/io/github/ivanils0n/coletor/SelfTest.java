@@ -45,7 +45,13 @@ final class SelfTest {
 
 		Machine m = Coletor.placeMachine(sl, c, Coletor.machineItem());
 		ensure(m != null && Coletor.isMachine(sl, c), "Coletor não foi colocado");
-		ensure(Coletor.visuals(sl, c).size() == 1, "visual: " + Coletor.visuals(sl, c).size());
+		if (Coletor.visuals(sl, c).size() != 1) {
+			StringBuilder sb = new StringBuilder();
+			for (net.minecraft.world.entity.Entity e : sl.getAllEntities()) {
+				if (e.entityTags().stream().anyMatch(t -> t.startsWith("coletor"))) sb.append(e).append(e.entityTags()).append(' ');
+			}
+			throw new IllegalStateException("visual: " + Coletor.visuals(sl, c).size() + " entidades: " + sb);
+		}
 		ensure(!Coletor.visuals(sl, c).get(0).shouldBeSaved(), "visual seria salvo no mapa");
 		BarrelBlockEntity be = (BarrelBlockEntity) sl.getBlockEntity(c);
 		ensure(m.radius == 4 && m.boneMeal, "padrão: área 9x9 e farinha ligada");

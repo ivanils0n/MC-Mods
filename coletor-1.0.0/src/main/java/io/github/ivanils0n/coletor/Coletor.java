@@ -284,6 +284,7 @@ public final class Coletor implements ModInitializer {
 		CommandSourceStack source = server.createCommandSourceStack().withLevel(sl).withPosition(Vec3.atCenterOf(pos))
 			.withSuppressedOutput().withCallback((success, result) -> ok[0] = success);
 		server.getCommands().performPrefixedCommand(source, cmd);
+		if (Boolean.getBoolean("coletor.selftest")) LOG.info("comando {} -> {}", cmd, ok[0]);
 		if (!ok[0]) LOG.warn("Comando do Coletor falhou: {}", cmd);
 		return ok[0];
 	}
