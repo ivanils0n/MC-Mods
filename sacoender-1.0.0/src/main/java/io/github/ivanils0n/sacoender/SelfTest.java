@@ -2,6 +2,13 @@ package io.github.ivanils0n.sacoender;
 
 import java.util.ArrayList;
 import java.util.List;
+import com.google.gson.JsonParser;
+import com.mojang.serialization.JsonOps;
+import net.minecraft.core.Holder;
+import net.minecraft.core.registries.Registries;
+import net.minecraft.resources.Identifier;
+import net.minecraft.tags.TagKey;
+import net.minecraft.world.item.Item;
 import net.fabricmc.fabric.api.entity.FakePlayer;
 import net.minecraft.core.component.DataComponents;
 import net.minecraft.core.component.TypedDataComponent;
@@ -16,7 +23,6 @@ import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.inventory.PlayerEnderChestContainer;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
-import net.minecraft.world.item.component.BundleContents;
 import net.minecraft.world.item.crafting.CraftingInput;
 import net.minecraft.world.item.crafting.RecipeType;
 
@@ -45,16 +51,22 @@ final class SelfTest {
 		ensure(ItemStack.isSameItemSameComponents(bag, SacoEnder.bagItem()), "item da receita diferente do item do código: " + bag.getComponentsPatch() + " / " + SacoEnder.bagItem().getComponentsPatch());
 		ensure(bag.getMaxStackSize() == 1, "o saco empilha");
 		ensure(bag.getHoverName().getString().equals(SacoEnder.NAME), "nome: " + bag.getHoverName().getString());
-		ensure(SacoEnder.isBag(craft(server, sl, CraftingInput.of(3, 3, List.of(e, e, e, e, new ItemStack(Items.PURPLE_BUNDLE), e, e, e, e)))), "trouxa colorida não serve");
+		int colors = 0;
+		for (Holder<Item> h : BuiltInRegistries.ITEM.getTagOrEmpty(TagKey.create(Registries.ITEM, Identifier.withDefaultNamespace("bundles")))) {
+			ensure(SacoEnder.isBag(craft(server, sl, CraftingInput.of(3, 3, List.of(e, e, e, e, new ItemStack(h), e, e, e, e)))), "trouxa não serve: " + h);
+			colors++;
+		}
+		ensure(colors >= 1, "nenhuma trouxa na tag minecraft:bundles");
 		// Trouxa com itens dentro não serve (os itens se perderiam no craft).
-		ItemStack full = new ItemStack(Items.BUNDLE);
-		full.set(DataComponents.BUNDLE_CONTENTS, new BundleContents(List.of(new ItemStack(Items.DIAMOND, 3))));
+		ItemStack full = ItemStack.CODEC.parse(server.registryAccess().createSerializationContext(JsonOps.INSTANCE), JsonParser.parseString(
+			"{\"id\":\"minecraft:bundle\",\"components\":{\"minecraft:bundle_contents\":[{\"id\":\"minecraft:diamond\",\"count\":3}]}}")).getOrThrow();
+		ensure(!full.isEmpty() && full.has(DataComponents.BUNDLE_CONTENTS), "trouxa cheia do teste: " + full);
 		ensure(server.getRecipeManager().getRecipeFor(RecipeType.CRAFTING, CraftingInput.of(3, 3, List.of(e, e, e, e, full, e, e, e, e)), sl).isEmpty(), "trouxa com itens dentro virou saco");
 		ItemStack o = new ItemStack(Items.OBSIDIAN);
 		ItemStack chest = craft(server, sl, CraftingInput.of(3, 3, List.of(o, o, o, o, e, o, o, o, o)));
 		ensure(chest.is(Items.ENDER_CHEST), "a receita do baú do fim mudou: " + chest);
 		ensure(!SacoEnder.isBag(new ItemStack(Items.PAPER)), "papel comum foi aceito como saco");
-		ok("receita (trouxa vazia + 8 olhos do Ender)");
+		ok("receita (trouxa vazia + 8 olhos do Ender; " + colors + " cores de trouxa)");
 
 		// 2. Sem o mod: o saco só tem componentes do jogo, é salvo como papel e volta igual.
 		for (TypedDataComponent<?> c : bag.getComponents()) {
@@ -141,7 +153,7 @@ final class SelfTest {
 		return true;
 	}
 
-	private static int count(Inventory inv, net.minecraft.world.item.Item item) {
+	private static int count(Inventory inv, Item item) {
 		int n = 0;
 		for (int i = 0; i < inv.getContainerSize(); i++) if (inv.getItem(i).is(item)) n += inv.getItem(i).getCount();
 		return n;
