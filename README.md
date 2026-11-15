@@ -10,6 +10,7 @@ Mods Fabric para Minecraft. Cada pasta `<mod>-<versão>/` é um mod independente
 | Baú Central | `smartchest-1.1.0/` | 26.2 (Fabric, servidor ou singleplayer, requer Fabric API) |
 | Golem de Cobre Inteligente | `coppergolem-1.0.0/` | 26.2 (Fabric, servidor ou singleplayer, requer Fabric API) |
 | Autômato | `automato-1.0.0/` | 26.2 (Fabric, servidor ou singleplayer, requer Fabric API) |
+| Saco do Ender | `sacoender-1.0.0/` | 26.2 (Fabric, servidor ou singleplayer, requer Fabric API) |
 | Mochilas | `mochilas-1.0.0/` | 26.2 (Fabric, servidor ou singleplayer, requer Fabric API; Polymer e SGUI já vêm dentro) |
 
 ## Releases
@@ -120,3 +121,11 @@ Mochilas de couro (9 espaços), ferro (18), ouro (27) e diamante (54), com inven
 - **Onde fica salvo**: cada mochila tem um ID próprio (no item) e o inventário fica em `<mundo>/mochilas/<id>.dat`, gravado só quando muda. A mochila equipada fica salva nos dados do jogador. Cópias de um mesmo item (criativo) abrem o mesmo inventário, então não duplicam itens.
 - **Visual**: um `item_display` virtual (Polymer Virtual Entity) montado no jogador; o cliente o carrega junto, sem pacotes de posição. O servidor só manda a rotação quando o corpo vira ou a pose muda (agachar, nadar, planar), e some com invisibilidade, espectador ou dormindo. O próprio dono recebe uma cópia marcada com uma cor quase branca; os shaders `item` e `entity` do resource pack (`assets/minecraft/shaders/core`, cópias dos do 26.2 com um trecho a mais) escondem essa cópia quando a câmera está a menos de 1,6 bloco: na 1ª pessoa a mochila some da tela e, ao apertar F5 (3ª pessoa), aparece de novo. Os outros jogadores sempre a veem. Com shaders do Iris a cópia do dono aparece também na 1ª pessoa. Na montagem do resource pack, os arquivos das mochilas (texturas, modelos e os shaders `item`/`entity`) são gravados por último, por cima dos de qualquer outro mod Polymer; o log avisa quando outro mod tentou trocar algum deles.
 
+## Saco do Ender
+
+Um saquinho que abre os **9 primeiros espaços do seu baú do fim** de qualquer lugar. Só no servidor: os jogadores entram sem instalar nada. Vai na pasta `mods/` do servidor junto com o Fabric API; em singleplayer, o mesmo .jar na pasta `mods/` do jogo.
+
+- **Receita** (bancada): 8 obsidianas em volta de uma pérola do Ender (o baú do fim usa olho do Ender, então as duas receitas não se misturam). Aparece no livro de receitas ao pegar obsidiana ou pérola do Ender.
+- **Usar**: segure o saco e clique com o botão direito (mão principal ou secundária). Abre uma tela de baú de 1 fileira com os espaços 1 a 9 do baú do fim de **quem está usando** (cada jogador vê o próprio baú). Shift+clique, arrastar e teclas numéricas funcionam como num baú. Os espaços 10 a 27 do baú do fim só aparecem no baú do fim de verdade.
+- **Seguro sem o mod**: o mod não guarda nada. A tela mexe direto no baú do fim do jogador, que o próprio jogo salva junto com o jogador, então o que você põe no saco já está no baú do fim. O saco é um papel do jogo marcado (nome "Saco do Ender", não empilha): se o mod for removido, ele vira esse papel e nada se perde nem quebra o mundo; ao instalar o mod de novo, volta a funcionar. Como é um papel, não o use em receitas que pedem papel (livro, mapa...).
+- **Visual (Obsidiana Rebitada)**: saco preto amarrado com cordão roxo e placas de obsidiana com rebites nos quatro lados. Vem dentro do .jar (singleplayer) e, no servidor dedicado, o próprio mod envia o resource pack ao jogador. Quem recusar vê um papel comum. As texturas e o modelo são gerados por `arte/gerar.py`.

@@ -1,0 +1,112 @@
+package io.github.ivanils0n.sacoender;
+
+import java.io.IOException;
+import java.io.InputStream;
+import java.nio.charset.StandardCharsets;
+import java.util.List;
+import java.util.Optional;
+import java.util.UUID;
+import net.fabricmc.api.ModInitializer;
+import net.fabricmc.fabric.api.event.lifecycle.v1.ServerLifecycleEvents;
+import net.fabricmc.fabric.api.event.player.UseItemCallback;
+import net.fabricmc.fabric.api.networking.v1.ServerPlayConnectionEvents;
+import net.fabricmc.loader.api.FabricLoader;
+import net.minecraft.ChatFormatting;
+import net.minecraft.core.component.DataComponents;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.network.chat.Component;
+import net.minecraft.network.protocol.common.ClientboundResourcePackPushPacket;
+import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.sounds.SoundEvents;
+import net.minecraft.sounds.SoundSource;
+import net.minecraft.world.InteractionHand;
+import net.minecraft.world.InteractionResult;
+import net.minecraft.world.SimpleMenuProvider;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.Items;
+import net.minecraft.world.item.component.CustomData;
+import net.minecraft.world.item.component.CustomModelData;
+import net.minecraft.world.item.component.ItemLore;
+import net.minecraft.world.level.Level;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+/**
+ * Saco do Ender: um papel do jogo marcado (custom_data "sacoender") que, com o botão direito, abre os 9 primeiros
+ * espaços do baú do fim de quem o usa. O mod não guarda nada: a tela mexe direto no baú do fim do jogador, que o
+ * próprio jogo salva. Sem o mod, o saco vira um papel chamado "Saco do Ender" e os itens continuam no baú do fim.
+ */
+public final class SacoEnder implements ModInitializer {
+	static final Logger LOG = LoggerFactory.getLogger("sacoender");
+	static final String NAME = "Saco do Ender";
+	static final String LORE = "Abre os 9 primeiros espaços do seu baú do fim";
+	static final String TAG = "sacoender";
+
+	private static final String PACK_URL = "https://github.com/ivanils0n/MC-Mods/releases/download/sacoender-" + modVersion() + "/sacoender-pack-";
+	static final String PACK_SHA1 = readPackHash();
+	private static final UUID PACK_ID = UUID.nameUUIDFromBytes("sacoender:pack".getBytes(StandardCharsets.UTF_8));
+
+	@Override
+	public void onInitialize() {
+		UseItemCallback.EVENT.register(SacoEnder::onUse);
+		ServerPlayConnectionEvents.JOIN.register((handler, sender, s) -> {
+			if (PACK_SHA1 == null || !s.isDedicatedServer()) return; // singleplayer: as texturas vêm do .jar
+			sender.sendPacket(new ClientboundResourcePackPushPacket(PACK_ID, PACK_URL + PACK_SHA1 + ".zip", PACK_SHA1, false,
+				Optional.of(Component.literal("Texturas do Saco do Ender"))));
+		});
+		ServerLifecycleEvents.SERVER_STARTED.register(s -> {
+			if (Boolean.getBoolean("sacoender.selftest")) SelfTest.run(s);
+		});
+	}
+
+	/** Botão direito com o saco (na mão principal ou secundária): abre a tela. */
+	static InteractionResult onUse(Player player, Level level, InteractionHand hand) {
+		if (!isBag(player.getItemInHand(hand))) return InteractionResult.PASS;
+		if (player instanceof ServerPlayer sp && !sp.isSpectator()) open(sp);
+		return InteractionResult.SUCCESS;
+	}
+
+	static void open(ServerPlayer player) {
+		player.openMenu(new SimpleMenuProvider((id, inv, p) -> new BagMenu(id, inv, player), Component.literal(NAME)));
+		player.level().playSound(null, player.getX(), player.getY(), player.getZ(), SoundEvents.ENDER_CHEST_OPEN, SoundSource.PLAYERS, 0.5f, 1.2f);
+	}
+
+	static boolean isBag(ItemStack stack) {
+		if (!stack.is(Items.PAPER)) return false;
+		CustomData data = stack.get(DataComponents.CUSTOM_DATA);
+		return data != null && data.copyTag().contains(TAG);
+	}
+
+	/** O mesmo item da receita (data/sacoender/recipe/saco.json). Só componentes do jogo: nada some sem o mod. */
+	static ItemStack bagItem() {
+		ItemStack s = new ItemStack(Items.PAPER);
+		s.set(DataComponents.MAX_STACK_SIZE, 1);
+		s.set(DataComponents.ITEM_NAME, Component.literal(NAME).withStyle(ChatFormatting.LIGHT_PURPLE));
+		s.set(DataComponents.LORE, new ItemLore(List.of(Component.literal(LORE).withStyle(st -> st.withItalic(false).withColor(ChatFormatting.GRAY)))));
+		s.set(DataComponents.CUSTOM_MODEL_DATA, new CustomModelData(List.of(), List.of(), List.of(TAG), List.of()));
+		CompoundTag tag = new CompoundTag();
+		tag.putBoolean(TAG, true);
+		s.set(DataComponents.CUSTOM_DATA, CustomData.of(tag));
+		return s;
+	}
+
+	// ---------- resource pack ----------
+
+	/** Versão do mod sem o sufixo "+mc..." (a do release no GitHub, ex.: 1.0.0). */
+	private static String modVersion() {
+		String v = FabricLoader.getInstance().getModContainer("sacoender").orElseThrow().getMetadata().getVersion().getFriendlyString();
+		int i = v.indexOf('+');
+		return i < 0 ? v : v.substring(0, i);
+	}
+
+	private static String readPackHash() {
+		try (InputStream in = SacoEnder.class.getResourceAsStream("/sacoender/pack.sha1")) {
+			if (in == null) return null;
+			String sha = new String(in.readAllBytes(), StandardCharsets.UTF_8).trim();
+			return sha.matches("[0-9a-f]{40}") ? sha : null;
+		} catch (IOException e) {
+			return null;
+		}
+	}
+}
