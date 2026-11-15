@@ -1,20 +1,20 @@
 {
 	"parent": "minecraft:recipes/root",
 	"criteria": {
-		"has_ender_pearl": {
+		"has_ender_eye": {
 			"trigger": "minecraft:inventory_changed",
 			"conditions": {
-				"items": [{"items": "minecraft:ender_pearl"}]
+				"items": [{"items": "minecraft:ender_eye"}]
 			}
 		},
-		"has_obsidian": {
+		"has_bundle": {
 			"trigger": "minecraft:inventory_changed",
 			"conditions": {
-				"items": [{"items": "minecraft:obsidian"}]
+				"items": [{"items": "#minecraft:bundles"}]
 			}
 		}
 	},
-	"requirements": [["has_ender_pearl", "has_obsidian"]],
+	"requirements": [["has_ender_eye", "has_bundle"]],
 	"rewards": {
 		"recipes": ["sacoender:saco"]
 	}

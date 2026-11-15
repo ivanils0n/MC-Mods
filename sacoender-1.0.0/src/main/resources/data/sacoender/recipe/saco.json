@@ -2,13 +2,19 @@
 	"type": "minecraft:crafting_shaped",
 	"category": "equipment",
 	"pattern": [
-		"OOO",
-		"OPO",
-		"OOO"
+		"EEE",
+		"EBE",
+		"EEE"
 	],
 	"key": {
-		"O": "minecraft:obsidian",
-		"P": "minecraft:ender_pearl"
+		"E": "minecraft:ender_eye",
+		"B": {
+			"fabric:type": "fabric:components",
+			"base": "#minecraft:bundles",
+			"components": {
+				"minecraft:bundle_contents": []
+			}
+		}
 	},
 	"result": {
 		"id": "minecraft:paper",

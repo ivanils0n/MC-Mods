@@ -3,6 +3,7 @@ package io.github.ivanils0n.sacoender;
 import java.util.ArrayList;
 import java.util.List;
 import net.fabricmc.fabric.api.entity.FakePlayer;
+import net.minecraft.core.component.DataComponents;
 import net.minecraft.core.component.TypedDataComponent;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.nbt.NbtOps;
@@ -15,6 +16,7 @@ import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.inventory.PlayerEnderChestContainer;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
+import net.minecraft.world.item.component.BundleContents;
 import net.minecraft.world.item.crafting.CraftingInput;
 import net.minecraft.world.item.crafting.RecipeType;
 
@@ -35,18 +37,24 @@ final class SelfTest {
 	private static void check(MinecraftServer server) {
 		ServerLevel sl = server.overworld();
 
-		// 1. Receita: 8 obsidianas em volta de uma pérola = o saco (igual ao item do código). Com olho do Ender continua o baú do fim.
+		// 1. Receita: trouxa vazia (de qualquer cor) no centro e 8 olhos do Ender em volta = o saco (igual ao item do código).
 		ensure(server.getRecipeManager().getRecipes().stream().anyMatch(r -> r.id().toString().contains("sacoender:saco")), "receita não carregou");
-		ItemStack o = new ItemStack(Items.OBSIDIAN);
-		ItemStack bag = craft(server, sl, CraftingInput.of(3, 3, List.of(o, o, o, o, new ItemStack(Items.ENDER_PEARL), o, o, o, o)));
+		ItemStack e = new ItemStack(Items.ENDER_EYE);
+		ItemStack bag = craft(server, sl, CraftingInput.of(3, 3, List.of(e, e, e, e, new ItemStack(Items.BUNDLE), e, e, e, e)));
 		ensure(SacoEnder.isBag(bag), "o craft não deu o saco: " + bag);
 		ensure(ItemStack.isSameItemSameComponents(bag, SacoEnder.bagItem()), "item da receita diferente do item do código: " + bag.getComponentsPatch() + " / " + SacoEnder.bagItem().getComponentsPatch());
 		ensure(bag.getMaxStackSize() == 1, "o saco empilha");
 		ensure(bag.getHoverName().getString().equals(SacoEnder.NAME), "nome: " + bag.getHoverName().getString());
-		ItemStack chest = craft(server, sl, CraftingInput.of(3, 3, List.of(o, o, o, o, new ItemStack(Items.ENDER_EYE), o, o, o, o)));
+		ensure(SacoEnder.isBag(craft(server, sl, CraftingInput.of(3, 3, List.of(e, e, e, e, new ItemStack(Items.PURPLE_BUNDLE), e, e, e, e)))), "trouxa colorida não serve");
+		// Trouxa com itens dentro não serve (os itens se perderiam no craft).
+		ItemStack full = new ItemStack(Items.BUNDLE);
+		full.set(DataComponents.BUNDLE_CONTENTS, new BundleContents(List.of(new ItemStack(Items.DIAMOND, 3))));
+		ensure(server.getRecipeManager().getRecipeFor(RecipeType.CRAFTING, CraftingInput.of(3, 3, List.of(e, e, e, e, full, e, e, e, e)), sl).isEmpty(), "trouxa com itens dentro virou saco");
+		ItemStack o = new ItemStack(Items.OBSIDIAN);
+		ItemStack chest = craft(server, sl, CraftingInput.of(3, 3, List.of(o, o, o, o, e, o, o, o, o)));
 		ensure(chest.is(Items.ENDER_CHEST), "a receita do baú do fim mudou: " + chest);
 		ensure(!SacoEnder.isBag(new ItemStack(Items.PAPER)), "papel comum foi aceito como saco");
-		ok("receita (8 obsidianas + pérola do Ender)");
+		ok("receita (trouxa vazia + 8 olhos do Ender)");
 
 		// 2. Sem o mod: o saco só tem componentes do jogo, é salvo como papel e volta igual.
 		for (TypedDataComponent<?> c : bag.getComponents()) {
