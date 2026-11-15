@@ -305,9 +305,6 @@ final class SelfTest {
 		ensure(table.handlePlacement(true, false, stick, sl, fp.getInventory()) == none, "graveto com Shift");
 		ensure(gridCount(table, Items.OAK_PLANKS) == 4 && count(chest, Items.OAK_PLANKS) == 1,
 			"graveto com Shift: grade " + gridCount(table, Items.OAK_PLANKS) + ", baú " + count(chest, Items.OAK_PLANKS));
-		table.clicked(1 + 4, 0, ContainerInput.PICKUP, fp);
-		table.clicked(1 + 4, 0, ContainerInput.QUICK_MOVE, fp);
-		ensure(gridCount(table, Items.OAK_PLANKS) == 4 && table.getCarried().isEmpty() && count(fp.getInventory(), Items.OAK_PLANKS) == 0, "tirou item da grade");
 		table.clicked(0, 0, ContainerInput.QUICK_MOVE, fp); // Shift no resultado: crafta tudo da grade
 		ensure(count(fp.getInventory(), Items.STICK) == 8 && gridCount(table, Items.OAK_PLANKS) == 0, "Shift no resultado: " + count(fp.getInventory(), Items.STICK));
 		table.broadcastChanges(); // grade acabou: remonta com o que sobrou (1 tábua, receita incompleta)
@@ -329,9 +326,14 @@ final class SelfTest {
 		ensure(table.handlePlacement(false, false, tableRecipe, sl, fp.getInventory()) == none && gridCount(table, Items.OAK_PLANKS) == 4
 			&& count(chest, Items.OAK_PLANKS) == 0 && count(fp.getInventory(), Items.OAK_PLANKS) == 9,
 			"baú + inventário: grade " + gridCount(table, Items.OAK_PLANKS) + ", jogador " + count(fp.getInventory(), Items.OAK_PLANKS));
-		fp.getInventory().clearContent();
+		int filled = 1;
+		while (!table.getSlot(filled).hasItem()) filled++;
+		table.clicked(filled, 0, ContainerInput.PICKUP, fp); // clique na grade: tira 1, que volta para o baú
+		ensure(gridCount(table, Items.OAK_PLANKS) == 3 && count(chest, Items.OAK_PLANKS) == 1 && table.getCarried().isEmpty()
+			&& count(fp.getInventory(), Items.OAK_PLANKS) == 9, "tirar da grade: grade " + gridCount(table, Items.OAK_PLANKS) + ", baú " + count(chest, Items.OAK_PLANKS));
 		ensure(table.handlePlacement(false, false, pick, sl, fp.getInventory()) == net.minecraft.world.inventory.RecipeBookMenu.PostPlaceAction.PLACE_GHOST_RECIPE
-			&& gridCount(table, Items.OAK_PLANKS) == 0 && count(chest, Items.OAK_PLANKS) == 4, "receita sem itens deveria virar fantasma");
+			&& gridCount(table, Items.OAK_PLANKS) == 0 && count(chest, Items.OAK_PLANKS) == 3 && count(fp.getInventory(), Items.OAK_PLANKS) == 10,
+			"sobras voltam de onde vieram: baú " + count(chest, Items.OAK_PLANKS) + ", jogador " + count(fp.getInventory(), Items.OAK_PLANKS));
 		fp.getInventory().clearContent();
 		chest.setItem(20, ItemStack.EMPTY);
 		SmartChest.toggleTable(fp, sl, lk, tablePos);

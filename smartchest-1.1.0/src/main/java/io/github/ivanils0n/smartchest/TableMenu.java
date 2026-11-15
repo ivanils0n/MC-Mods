@@ -1,9 +1,12 @@
 package io.github.ivanils0n.smartchest;
 
 import io.github.ivanils0n.smartchest.ChestStore.Chest;
+import io.github.ivanils0n.smartchest.Storage.Key;
 import io.github.ivanils0n.smartchest.Storage.Linked;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.function.Predicate;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Holder;
@@ -42,7 +45,8 @@ final class TableMenu extends CraftingMenu {
 	private final String query; // a pesquisa de onde veio, para a seta de voltar
 	private RecipeHolder<?> recipe; // remontada quando o jogador usa tudo da grade
 	private boolean crafted, placing;
-	private RecipeBookSettings.TypeSettings bookBefore; // como o livro do jogador estava, para devolver ao sair
+	private RecipeBookSettings.TypeSettings bookBefore;
+	private final Map<Key, Integer> fromInv = new HashMap<>(); // quanto de cada item da grade saiu do inventário // como o livro do jogador estava, para devolver ao sair
 
 	TableMenu(int id, Inventory inv, ServerLevel sl, BlockPos pos, Chest chest, String query) {
 		super(id, inv, ContainerLevelAccess.create(sl, pos));
@@ -149,16 +153,25 @@ final class TableMenu extends CraftingMenu {
 		}
 	}
 
-	/** O que sobrou na grade volta para os baús (o que não couber, para o jogador). */
+	/** O que sobrou na grade volta de onde veio: o que saiu do inventário volta para ele, o resto para os baús. */
 	private void giveBack(Linked linked, Inventory inv) {
 		for (Slot s : getInputGridSlots()) {
 			ItemStack st = s.getItem().copy();
 			s.set(ItemStack.EMPTY);
-			if (st.isEmpty()) continue;
-			Storage.insert(linked.targets(st), st);
-			if (!st.isEmpty()) inv.placeItemBackInInventory(st);
+			if (!st.isEmpty()) back(st, Math.min(fromInv.getOrDefault(new Key(st), 0), st.getCount()), linked, inv);
 		}
+		fromInv.clear();
 		resultSlots.clearContent();
+	}
+
+	/** Devolve {@code st}: {@code toInv} itens para o inventário, o resto para os baús (o que não couber vai para o outro). */
+	private void back(ItemStack st, int toInv, Linked linked, Inventory inv) {
+		fromInv.computeIfPresent(new Key(st), (k, v) -> v - toInv > 0 ? v - toInv : null);
+		ItemStack mine = st.split(toInv);
+		inv.add(mine);
+		st.grow(mine.getCount()); // não coube no inventário: vai para os baús
+		Storage.insert(linked.targets(st), st);
+		if (!st.isEmpty()) inv.placeItemBackInInventory(st); // nem nos baús: inventário ou chão, nunca some
 	}
 
 	@Override
@@ -173,10 +186,29 @@ final class TableMenu extends CraftingMenu {
 		super.removed(p);
 	}
 
-	/** Na grade não se põe nem se tira nada (nem com Shift, números, arrastar ou clique duplo): só o resultado sai. */
+	/**
+	 * Na grade não se põe nada e nada vai para a mão: clique tira 1, botão direito metade e Shift tudo do espaço, e
+	 * isso volta direto para os baús (o que tinha saído do inventário, só depois do que veio dos baús).
+	 */
 	@Override
 	public void clicked(int slot, int button, ContainerInput input, Player p) {
 		if (slot >= 1 && slot < 10) {
+			Slot s = slots.get(slot);
+			if (p instanceof ServerPlayer sp && s.hasItem() && (input == ContainerInput.PICKUP || input == ContainerInput.QUICK_MOVE)) {
+				ItemStack st = s.getItem();
+				Key k = new Key(st);
+				int total = 0;
+				for (Slot g : getInputGridSlots()) if (g.hasItem() && new Key(g.getItem()).equals(k)) total += g.getItem().getCount();
+				int n = input == ContainerInput.QUICK_MOVE ? st.getCount() : button == 1 ? (st.getCount() + 1) / 2 : 1;
+				int fromChests = Math.max(0, total - fromInv.getOrDefault(k, 0));
+				placing = true; // tirar não é craftar: a grade não remonta sozinha
+				try {
+					ItemStack out = s.remove(n);
+					back(out, Math.max(0, out.getCount() - fromChests), Storage.linked(sp.level(), chest, SmartChest.store), sp.getInventory());
+				} finally {
+					placing = false;
+				}
+			}
 			sendAllDataToRemote();
 			return;
 		}
@@ -200,8 +232,11 @@ final class TableMenu extends CraftingMenu {
 		return before;
 	}
 
-	/** Tira {@code n} itens que passam no teste dos baús ligados (só os que o livro aceita: sem dano, encanto ou nome). */
-	private static ItemStack take(Linked linked, Inventory inv, Predicate<ItemStack> item, int n) {
+	/**
+	 * Tira {@code n} itens que passam no teste: dos baús ligados e, faltando, do inventário (anotado em fromInv para
+	 * voltar para ele). Só os que o livro aceita: sem dano, encanto ou nome.
+	 */
+	private ItemStack take(Linked linked, Inventory inv, Predicate<ItemStack> item, int n) {
 		ItemStack[] got = {ItemStack.EMPTY};
 		for (Container c : linked.containers) {
 			if (n == 0) break;
@@ -211,7 +246,11 @@ final class TableMenu extends CraftingMenu {
 			n = takeFrom(stacks, item, got, n);
 			if (n != before) c.setChanged();
 		}
-		if (n > 0 && takeFrom(inv.getNonEquipmentItems(), item, got, n) != n) inv.setChanged(); // faltou nos baús: do inventário
+		int left = n > 0 ? takeFrom(inv.getNonEquipmentItems(), item, got, n) : 0; // faltou nos baús: do inventário
+		if (left != n) {
+			inv.setChanged();
+			fromInv.merge(new Key(got[0]), n - left, Integer::sum);
+		}
 		return got[0];
 	}
 
