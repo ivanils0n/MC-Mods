@@ -228,59 +228,25 @@ public class ClientShots implements FabricClientGameTest {
 			long ms = (System.nanoTime() - ti) / 1_000_000;
 			Set<Long> pv = chunks(fv.computeNow(icon, -RADIUS, -RADIUS, RADIUS, RADIUS));
 			Set<Long> truth = sp.getServer().computeOnServer(s -> generated(s, icon));
-			log(String.format(Locale.ROOT, "%-16s reais %3d | sp: certos %3d, a mais %2d, faltando %2d | mp: certos %3d, a mais %2d, faltando %2d | %d ms",
-					icon.id, truth.size(), inter(ps, truth), minus(ps, truth), minus(truth, ps), inter(pv, truth), minus(pv, truth), minus(truth, pv), ms));
+			// O /locate do jogo a partir de (0, 0) tem que cair num chunk previsto.
+			Long located = sp.getServer().computeOnServer(s -> locate(s, icon));
+			String loc = located == null ? "-" : (ps.contains(located) ? "ok" : "FORA") + "/" + (pv.contains(located) ? "ok" : "FORA");
+			log(String.format(Locale.ROOT, "%-16s reais %3d | sp: certos %3d, a mais %2d, faltando %2d | mp: certos %3d, a mais %2d, faltando %2d | locate %s | %d ms",
+					icon.id, truth.size(), inter(ps, truth), minus(ps, truth), minus(truth, ps), inter(pv, truth), minus(pv, truth), minus(truth, pv), loc, ms));
 		}
 		fs.close();
 		fv.close();
-		// Diagnóstico: o /locate do jogo para alguns tipos, a partir de (0, 0).
-		for (StructureIcon icon : new StructureIcon[]{StructureIcon.SHIPWRECK, StructureIcon.VILLAGE, StructureIcon.PILLAGER_OUTPOST, StructureIcon.DESERT_PYRAMID}) {
-			String loc = sp.getServer().computeOnServer(s -> {
-				ServerLevel level = s.overworld();
-				var reg = level.registryAccess().lookupOrThrow(Registries.STRUCTURE);
-				List<Holder<Structure>> list = new ArrayList<>();
-				reg.listElements().forEach(h -> {
-					if (StructureIcon.forStructure(SeedWorld.id(h)) == icon) list.add(h);
-				});
-				var found = level.getChunkSource().getGenerator().findNearestMapStructure(level, net.minecraft.core.HolderSet.direct(list), BlockPos.ZERO, 100, false);
-				return found == null ? "nada" : found.getFirst().toShortString();
-			});
-			log("locate " + icon.id + " -> " + loc);
-		}
-		// Diagnóstico: quantos candidatos passam em cada etapa (navios).
-		int[] c = new int[3];
-		for (Holder<StructureSet> set : server.state.possibleStructureSets()) {
-			if (!SeedWorld.id(set).contains("shipwreck")) continue;
-			var spread = (RandomSpreadStructurePlacement) set.value().placement();
-			int rb = spread.spacing() * 16;
-			for (int rx = Math.floorDiv(-RADIUS, rb); rx <= Math.floorDiv(RADIUS, rb); rx++) {
-				for (int rz = Math.floorDiv(-RADIUS, rb); rz <= Math.floorDiv(RADIUS, rb); rz++) {
-					ChunkPos cp = spread.getPotentialStructureChunk(server.state.getLevelSeed(), rx, rz);
-					c[0]++;
-					if (spread.isStructureChunk(server.state, cp.x(), cp.z())) c[1]++;
-					if (server.check(set, cp.x(), cp.z()) != null) c[2]++;
-				}
-			}
-		}
-		// O navio do /locate: é candidato? o servidor tem início lá? o que o mod acha?
-		for (Holder<StructureSet> set : server.state.possibleStructureSets()) {
-			if (!SeedWorld.id(set).contains("shipwreck")) continue;
-			var spread = (RandomSpreadStructurePlacement) set.value().placement();
-			ChunkPos lc = new ChunkPos(-752 >> 4, -656 >> 4);
-			ChunkPos cand = spread.getPotentialStructureChunk(server.state.getLevelSeed(), Math.floorDiv(lc.x(), spread.spacing()), Math.floorDiv(lc.z(), spread.spacing()));
-			String starts = sp.getServer().computeOnServer(s -> {
-				ServerLevel level = s.overworld();
-				ChunkAccess ch = level.getChunk(lc.x(), lc.z(), ChunkStatus.STRUCTURE_STARTS, true);
-				StringBuilder b = new StringBuilder(ch.getPersistedStatus() + " ");
-				ch.getAllStarts().forEach((k, v) -> b.append(level.registryAccess().lookupOrThrow(Registries.STRUCTURE).getKey(k)).append(v.isValid() ? "+" : "-").append(' '));
-				return b.toString();
-			});
-			var biome = server.biomeAt(lc.getMiddleBlockX(), lc.getMiddleBlockZ(), false);
-			boolean inSet = set.value().structures().getFirst().structure().value().biomes().contains(biome);
-			log("navio do locate: chunk " + lc + " candidato " + cand + " inícios: " + starts + " | mod: " + server.check(set, lc.x(), lc.z())
-					+ " | bioma " + SeedWorld.id(biome) + " serve=" + inSet + " spacing " + spread.spacing() + "/" + spread.separation());
-		}
-		log("navios: candidatos " + c[0] + ", na grade " + c[1] + ", aceitos " + c[2] + "; conjuntos: " + server.state.possibleStructureSets().size());
+	}
+
+	private static Long locate(MinecraftServer s, StructureIcon icon) {
+		ServerLevel level = s.overworld();
+		var reg = level.registryAccess().lookupOrThrow(Registries.STRUCTURE);
+		List<Holder<Structure>> list = new ArrayList<>();
+		reg.listElements().forEach(h -> {
+			if (StructureIcon.forStructure(SeedWorld.id(h)) == icon) list.add(h);
+		});
+		var found = level.getChunkSource().getGenerator().findNearestMapStructure(level, net.minecraft.core.HolderSet.direct(list), BlockPos.ZERO, 50, false);
+		return found == null ? null : ChunkPos.containing(found.getFirst()).pack();
 	}
 
 	private static Set<Long> chunks(List<SeedWorld.Found> list) {
@@ -315,7 +281,7 @@ public class ClientShots implements FabricClientGameTest {
 			int rb = spread.spacing() * 16;
 			for (int rx = Math.floorDiv(-RADIUS, rb); rx <= Math.floorDiv(RADIUS, rb); rx++) {
 				for (int rz = Math.floorDiv(-RADIUS, rb); rz <= Math.floorDiv(RADIUS, rb); rz++) {
-					ChunkPos c = spread.getPotentialStructureChunk(state.getLevelSeed(), rx, rz);
+					ChunkPos c = spread.getPotentialStructureChunk(state.getLevelSeed(), rx * spread.spacing(), rz * spread.spacing());
 					ChunkAccess chunk = level.getChunk(c.x(), c.z(), ChunkStatus.STRUCTURE_STARTS, true);
 					for (Map.Entry<Structure, StructureStart> e : chunk.getAllStarts().entrySet()) {
 						String id = level.registryAccess().lookupOrThrow(Registries.STRUCTURE).getKey(e.getKey()).toString();

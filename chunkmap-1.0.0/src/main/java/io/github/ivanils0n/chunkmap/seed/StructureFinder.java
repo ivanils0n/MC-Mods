@@ -166,7 +166,7 @@ public final class StructureFinder {
 				int b = s.block;
 				for (int rx = bx * b; rx < bx * b + b; rx++) {
 					for (int rz = bz * b; rz < bz * b + b; rz++) {
-						ChunkPos c = s.placement.getPotentialStructureChunk(world.state.getLevelSeed(), rx, rz);
+						ChunkPos c = s.placement.getPotentialStructureChunk(world.state.getLevelSeed(), rx * s.placement.spacing(), rz * s.placement.spacing());
 						SeedWorld.Found f = world.check(s.set, c.x(), c.z());
 						if (f != null && f.icon() != null) list.add(f);
 					}
@@ -194,7 +194,7 @@ public final class StructureFinder {
 			int rb = s.placement.spacing() * 16;
 			for (int rx = Math.floorDiv(minX, rb); rx <= Math.floorDiv(maxX, rb); rx++) {
 				for (int rz = Math.floorDiv(minZ, rb); rz <= Math.floorDiv(maxZ, rb); rz++) {
-					ChunkPos c = s.placement.getPotentialStructureChunk(world.state.getLevelSeed(), rx, rz);
+					ChunkPos c = s.placement.getPotentialStructureChunk(world.state.getLevelSeed(), rx * s.placement.spacing(), rz * s.placement.spacing());
 					SeedWorld.Found f = world.check(s.set, c.x(), c.z());
 					if (f != null && f.icon() == icon) out.add(f);
 				}
