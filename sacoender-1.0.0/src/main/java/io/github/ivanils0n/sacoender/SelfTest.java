@@ -43,9 +43,9 @@ final class SelfTest {
 	private static void check(MinecraftServer server) {
 		ServerLevel sl = server.overworld();
 
-		// 1. Receita: trouxa vazia (de qualquer cor) no centro e 8 olhos do Ender em volta = o saco (igual ao item do código).
+		// 1. Receita: trouxa vazia (de qualquer cor) no centro e 8 obsidianas em volta = o saco (igual ao item do código).
 		ensure(server.getRecipeManager().getRecipes().stream().anyMatch(r -> r.id().toString().contains("sacoender:saco")), "receita não carregou");
-		ItemStack e = new ItemStack(Items.ENDER_EYE);
+		ItemStack e = new ItemStack(Items.OBSIDIAN);
 		ItemStack bag = craft(server, sl, CraftingInput.of(3, 3, List.of(e, e, e, e, new ItemStack(Items.BUNDLE), e, e, e, e)));
 		ensure(SacoEnder.isBag(bag), "o craft não deu o saco: " + bag);
 		ensure(ItemStack.isSameItemSameComponents(bag, SacoEnder.bagItem()), "item da receita diferente do item do código: " + bag.getComponentsPatch() + " / " + SacoEnder.bagItem().getComponentsPatch());
@@ -63,10 +63,10 @@ final class SelfTest {
 		ensure(!full.isEmpty() && full.has(DataComponents.BUNDLE_CONTENTS), "trouxa cheia do teste: " + full);
 		ensure(server.getRecipeManager().getRecipeFor(RecipeType.CRAFTING, CraftingInput.of(3, 3, List.of(e, e, e, e, full, e, e, e, e)), sl).isEmpty(), "trouxa com itens dentro virou saco");
 		ItemStack o = new ItemStack(Items.OBSIDIAN);
-		ItemStack chest = craft(server, sl, CraftingInput.of(3, 3, List.of(o, o, o, o, e, o, o, o, o)));
+		ItemStack chest = craft(server, sl, CraftingInput.of(3, 3, List.of(o, o, o, o, new ItemStack(Items.ENDER_EYE), o, o, o, o)));
 		ensure(chest.is(Items.ENDER_CHEST), "a receita do baú do fim mudou: " + chest);
 		ensure(!SacoEnder.isBag(new ItemStack(Items.PAPER)), "papel comum foi aceito como saco");
-		ok("receita (trouxa vazia + 8 olhos do Ender; " + colors + " cores de trouxa)");
+		ok("receita (trouxa vazia + 8 obsidianas; " + colors + " cores de trouxa)");
 
 		// 2. Sem o mod: o saco só tem componentes do jogo, é salvo como papel e volta igual.
 		for (TypedDataComponent<?> c : bag.getComponents()) {

@@ -1,10 +1,10 @@
 {
 	"parent": "minecraft:recipes/root",
 	"criteria": {
-		"has_ender_eye": {
+		"has_obsidian": {
 			"trigger": "minecraft:inventory_changed",
 			"conditions": {
-				"items": [{"items": "minecraft:ender_eye"}]
+				"items": [{"items": "minecraft:obsidian"}]
 			}
 		},
 		"has_bundle": {
@@ -14,7 +14,7 @@
 			}
 		}
 	},
-	"requirements": [["has_ender_eye", "has_bundle"]],
+	"requirements": [["has_obsidian", "has_bundle"]],
 	"rewards": {
 		"recipes": ["sacoender:saco"]
 	}
