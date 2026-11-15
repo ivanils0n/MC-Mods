@@ -46,6 +46,8 @@ final class GraveStore {
 					o.get("name").getAsString(), o.get("dim").getAsString(), o.get("x").getAsDouble(), o.get("y").getAsDouble(),
 					o.get("z").getAsDouble(), o.get("yaw").getAsFloat(), o.get("expires").getAsLong());
 				g.mainhand = o.has("mainhand") ? o.get("mainhand").getAsInt() : -1;
+				g.skin = o.has("skin") ? o.get("skin").getAsString() : null;
+				g.skinSig = o.has("skin_sig") ? o.get("skin_sig").getAsString() : null;
 				for (JsonElement it : o.getAsJsonArray("items")) {
 					JsonObject io = it.getAsJsonObject();
 					int slot = io.get("slot").getAsInt();
@@ -106,6 +108,8 @@ final class GraveStore {
 			o.addProperty("yaw", g.yaw);
 			o.addProperty("expires", g.expires);
 			o.addProperty("mainhand", g.mainhand);
+			if (g.skin != null) o.addProperty("skin", g.skin);
+			if (g.skinSig != null) o.addProperty("skin_sig", g.skinSig);
 			JsonArray items = new JsonArray();
 			for (int i = 0; i < Grave.SIZE; i++) {
 				ItemStack st = g.items.getItem(i);

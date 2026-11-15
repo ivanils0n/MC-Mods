@@ -70,7 +70,9 @@ final class SelfTest {
 		ensure(body.getItemBySlot(EquipmentSlot.HEAD).is(Items.DIAMOND_HELMET) && body.getItemBySlot(EquipmentSlot.MAINHAND).is(Items.DIAMOND_SWORD), "armadura do corpo");
 		ensure(body.isInvulnerable() && body.isNoGravity(), "corpo pode apanhar ou cair");
 		ensure(body.getCustomName() != null && body.getCustomName().getString().startsWith("Túmulo de "), "nome: " + body.getCustomName());
-		ensure(Tumulo.click(g.id) instanceof Interaction, "área clicável não apareceu");
+		ensure(Tumulo.clicks(g.id).size() == 3 && Tumulo.clicks(g.id).stream().allMatch(e -> e instanceof Interaction), "área clicável: " + Tumulo.clicks(g.id));
+		ensure(g.yaw % 90f == 0f, "corpo fora do alinhamento: " + g.yaw);
+		for (Entity c : Tumulo.clicks(g.id)) ensure(c.getBbWidth() < 0.7f && c.distanceToSqr(g.x, g.y, g.z) < 1.6 * 1.6 + 0.01, "caixa clicável fora do corpo");
 		ok("corpo deitado (" + body.getType() + ")");
 
 		// 3. Arquivo: gravado e lido de volta igual.
@@ -84,7 +86,7 @@ final class SelfTest {
 		FakePlayer looter = FakePlayer.get(sl, new GameProfile(UUID.randomUUID(), "Saqueador"));
 		looter.snapTo(3.5, 151, 5.5, 180f, 0f);
 		looter.getInventory().clearContent();
-		InteractionResult res = UseEntityCallback.EVENT.invoker().interact(looter, sl, InteractionHand.MAIN_HAND, Tumulo.click(g.id), null);
+		InteractionResult res = UseEntityCallback.EVENT.invoker().interact(looter, sl, InteractionHand.MAIN_HAND, Tumulo.clicks(g.id).get(2), null);
 		ensure(res == InteractionResult.SUCCESS, "clique no corpo: " + res);
 		GraveMenu menu = new GraveMenu(1, looter.getInventory(), g);
 		ensure(menu.slots.size() == 54 + 36 && menu.stillValid(looter), "tela");
@@ -129,7 +131,18 @@ final class SelfTest {
 		for (ItemEntity e : dropped) e.discard();
 		ok("/kill no corpo");
 
-		// 7. Sem itens: nenhum túmulo.
+		// 7. Skin: o perfil com as textures de quem morreu vai para o corpo.
+		String skin = java.util.Base64.getEncoder().encodeToString("{\"textures\":{\"SKIN\":{\"url\":\"http://textures.minecraft.net/texture/1a4af718455d4aab528e7a61f86fa25e6a369d1768dcb13f7df319a713eb810b\"}}}".getBytes());
+		ItemStack[] its = new ItemStack[Grave.SIZE];
+		java.util.Arrays.fill(its, ItemStack.EMPTY);
+		its[0] = new ItemStack(Items.DIRT);
+		Grave sk = Tumulo.create(server, new Tumulo.Pending(sl, UUID.randomUUID(), "Skin_Teste", skin, null, new net.minecraft.world.phys.Vec3(3.5, 151, 3.5), 37f, its, -1));
+		ensure(sk != null && Tumulo.body(sk.id) != null, "corpo com skin não apareceu (perfil recusado?)");
+		ensure(GraveStore.load(server.getWorldPath(LevelResource.ROOT).resolve("tumulo.json"), server.registryAccess()).get(sk.id).skin.equals(skin), "skin não foi gravada");
+		Tumulo.removeGrave(sl, sk);
+		ok("skin no corpo");
+
+		// 8. Sem itens: nenhum túmulo.
 		int before = Tumulo.store.all().size();
 		fp.getInventory().clearContent();
 		fp.setHealth(0f);

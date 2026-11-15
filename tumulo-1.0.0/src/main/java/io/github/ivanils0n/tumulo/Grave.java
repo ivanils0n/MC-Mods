@@ -22,6 +22,7 @@ final class Grave {
 	final double x, y, z;
 	final float yaw;
 	long expires; // tempo do mundo (overworld) em que some
+	String skin, skinSig; // textures do perfil de quem morreu (base64 da Mojang), pode ser null
 	int mainhand = -1; // espaço da tela com o item que estava na mão (para o corpo segurar)
 	final SimpleContainer items = new SimpleContainer(SIZE) {
 		@Override

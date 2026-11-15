@@ -17,6 +17,7 @@ import net.fabricmc.fabric.api.event.lifecycle.v1.ServerLifecycleEvents;
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerTickEvents;
 import net.fabricmc.fabric.api.event.player.UseEntityCallback;
 import net.fabricmc.fabric.api.networking.v1.ServerPlayConnectionEvents;
+import com.mojang.authlib.properties.Property;
 import net.minecraft.ChatFormatting;
 import net.minecraft.commands.CommandSourceStack;
 import net.minecraft.core.BlockPos;
@@ -66,14 +67,16 @@ public final class Tumulo implements ModInitializer {
 	/** Mortes deste tick: o túmulo é montado no fim do tick (assim entram também itens que outros mods soltam na morte). */
 	private static final List<Pending> PENDING = new ArrayList<>();
 	private static final Map<UUID, Entity> BODIES = new HashMap<>();
-	private static final Map<UUID, Entity> CLICKS = new HashMap<>();
+	private static final Map<UUID, List<Entity>> CLICKS = new HashMap<>();
+	/** Caixas clicáveis ao longo do corpo deitado (a interação do jogo é sempre um quadrado, então são várias pequenas). */
+	static final double[] CLICK_AT = {0.3, 0.9, 1.5};
 	private static final List<Entity> LEFTOVERS = new ArrayList<>();
 	private static final Set<UUID> CHANGED = new LinkedHashSet<>();
 	/** Último lugar com chão de cada jogador (para quem cai no vazio). */
 	private static final Map<UUID, Spot> GROUND = new HashMap<>();
 	private static final Map<UUID, Integer> LAST_USE = new HashMap<>();
 
-	record Pending(ServerLevel level, UUID owner, String name, Vec3 pos, float yaw, ItemStack[] items, int mainhand) {}
+	record Pending(ServerLevel level, UUID owner, String name, String skin, String skinSig, Vec3 pos, float yaw, ItemStack[] items, int mainhand) {}
 
 	record Spot(String dim, Vec3 pos) {}
 
@@ -110,7 +113,8 @@ public final class Tumulo implements ModInitializer {
 			UUID id = entity.entityTags().contains(TAG) ? idOf(entity) : null;
 			if (id == null) return;
 			BODIES.remove(id, entity);
-			CLICKS.remove(id, entity);
+			List<Entity> cl = CLICKS.get(id);
+			if (cl != null) cl.remove(entity);
 		});
 		UseEntityCallback.EVENT.register(Tumulo::onUse);
 		// /kill no corpo: os itens caem no chão em vez de sumir.
@@ -148,7 +152,12 @@ public final class Tumulo implements ModInitializer {
 			inv.setItem(i, ItemStack.EMPTY);
 			items[Grave.slotFor(i)] = s;
 		}
-		PENDING.add(new Pending((ServerLevel) sp.level(), sp.getUUID(), sp.getScoreboardName(), sp.position(), sp.getYRot(), items, main));
+		String skin = null, sig = null;
+		for (Property prop : sp.getGameProfile().properties().get("textures")) {
+			skin = prop.value();
+			sig = prop.signature();
+		}
+		PENDING.add(new Pending((ServerLevel) sp.level(), sp.getUUID(), sp.getScoreboardName(), skin, sig, sp.position(), sp.getYRot(), items, main));
 		return true;
 	}
 
@@ -184,7 +193,9 @@ public final class Tumulo implements ModInitializer {
 			at = last != null && last.dim().equals(dim(sl)) ? last.pos() : new Vec3(p.pos().x, Math.max(p.pos().y, sl.getMinY() + 1), p.pos().z);
 		}
 		long now = s.overworld().getGameTime();
-		Grave g = new Grave(UUID.randomUUID(), p.owner(), p.name(), dim(sl), at.x, at.y, at.z, freeYaw(sl, at, p.yaw()), now + config.minutos * 1200L);
+		Grave g = new Grave(UUID.randomUUID(), p.owner(), p.name(), dim(sl), at.x, at.y, at.z, freeYaw(sl, at, Math.round(p.yaw() / 90f) * 90f), now + config.minutos * 1200L);
+		g.skin = p.skin();
+		g.skinSig = p.skinSig();
 		for (int i = 0; i < Grave.SIZE; i++) if (!p.items()[i].isEmpty()) g.items.setItem(i, p.items()[i]);
 		g.mainhand = p.mainhand();
 		// Itens que caíram junto com o jogador neste tick (ex.: a mochila equipada de outro mod) também vão para o túmulo.
@@ -246,7 +257,9 @@ public final class Tumulo implements ModInitializer {
 		String uuid = String.format(Locale.ROOT, "[I;%d,%d,%d,%d]", (int) (hi >> 32), (int) hi, (int) (lo >> 32), (int) lo);
 		String name = g.name.replaceAll("[^A-Za-z0-9_]", "");
 		if (name.isEmpty() || name.length() > 16) name = "Steve";
-		summon(sl, "mannequin", g.x, g.y, g.z, tags + ",profile:{name:\"" + name + "\",id:" + uuid + "},pose:\"sleeping\",immovable:1b,"
+		// A skin vai junto (textures do perfil de quem morreu): aparece mesmo sem o cliente buscar na Mojang.
+		String props = g.skin == null ? "" : ",properties:[{name:\"textures\",value:\"" + g.skin + "\"" + (g.skinSig == null ? "" : ",signature:\"" + g.skinSig + "\"") + "}]";
+		summon(sl, "mannequin", g.x, g.y, g.z, tags + ",profile:{name:\"" + name + "\",id:" + uuid + props + "},pose:\"sleeping\",immovable:1b,"
 			+ "hide_description:1b,Invulnerable:1b,NoGravity:1b,Silent:1b,CustomNameVisible:1b,"
 			+ String.format(Locale.ROOT, "Rotation:[%.1ff,0f]", g.yaw));
 		summonClick(sl, g);
@@ -258,8 +271,11 @@ public final class Tumulo implements ModInitializer {
 	private static void summonClick(ServerLevel sl, Grave g) {
 		String tags = "Tags:[\"" + TAG + "\",\"" + g.tag() + "\"]";
 		Vec3 d = headDir(g.yaw);
-		summon(sl, "interaction", g.x + d.x * 0.9, g.y, g.z + d.z * 0.9, tags + ",width:1.9f,height:0.6f,response:1b");
-		for (Entity e : find(sl, g)) if (e instanceof Interaction) register(g.id, e);
+		List<Entity> old = CLICKS.remove(g.id);
+		if (old != null) old.forEach(Entity::discard);
+		for (Entity e : find(sl, g)) if (e instanceof Interaction) e.discard();
+		for (double t : CLICK_AT) summon(sl, "interaction", g.x + d.x * t, g.y, g.z + d.z * t, tags + ",width:0.62f,height:0.45f,response:1b");
+		for (Entity e : find(sl, g)) if (e instanceof Interaction && e.isAlive()) register(g.id, e);
 	}
 
 	private static List<Entity> find(ServerLevel sl, Grave g) {
@@ -268,14 +284,18 @@ public final class Tumulo implements ModInitializer {
 	}
 
 	private static void killVisuals(ServerLevel sl, Grave g) {
-		Entity b = BODIES.remove(g.id), c = CLICKS.remove(g.id);
+		Entity b = BODIES.remove(g.id);
+		List<Entity> c = CLICKS.remove(g.id);
 		if (b != null) b.discard();
-		if (c != null) c.discard();
+		if (c != null) c.forEach(Entity::discard);
 		if (sl != null) for (Entity e : find(sl, g)) e.discard();
 	}
 
 	private static void register(UUID id, Entity e) {
-		if (e instanceof Interaction) CLICKS.put(id, e);
+		if (e instanceof Interaction) {
+			List<Entity> l = CLICKS.computeIfAbsent(id, k -> new ArrayList<>());
+			if (!l.contains(e)) l.add(e);
+		}
 		else BODIES.put(id, e);
 		Grave g = store == null ? null : store.get(id);
 		if (g != null && !(e instanceof Interaction)) CHANGED.add(id); // atualiza armadura e nome ao carregar
@@ -398,8 +418,8 @@ public final class Tumulo implements ModInitializer {
 				continue;
 			}
 			if (!loaded) continue;
-			Entity click = CLICKS.get(g.id);
-			if (click == null || click.isRemoved()) summonClick(sl, g);
+			List<Entity> clicks = CLICKS.get(g.id);
+			if (clicks == null || clicks.size() < CLICK_AT.length || clicks.stream().anyMatch(Entity::isRemoved)) summonClick(sl, g);
 			if (sl.getNearestPlayer(g.x, g.y, g.z, 24, false) != null) body.setCustomName(label(g, now));
 		}
 	}
@@ -438,8 +458,8 @@ public final class Tumulo implements ModInitializer {
 		return BODIES.get(id);
 	}
 
-	static Entity click(UUID id) {
-		return CLICKS.get(id);
+	static List<Entity> clicks(UUID id) {
+		return CLICKS.getOrDefault(id, List.of());
 	}
 
 	static String dim(Level level) {
