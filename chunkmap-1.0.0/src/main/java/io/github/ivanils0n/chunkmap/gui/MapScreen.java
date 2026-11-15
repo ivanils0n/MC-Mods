@@ -50,6 +50,8 @@ public final class MapScreen extends Screen {
 	private boolean dragging;
 	private double mouseX, mouseY;
 	private boolean biomePanel;
+	/** Mostra o mapa das cavernas (começa ligado se o modo caverna estiver valendo). */
+	private boolean caveMap;
 	private int biomeScroll;
 	private List<Holder<Biome>> biomeList = List.of();
 
@@ -64,6 +66,8 @@ public final class MapScreen extends Screen {
 			view.cz = mc.player.getZ();
 		}
 		view.scale = lastScale;
+		WorldSession s = ChunkMap.session();
+		caveMap = s != null && s.caveActive;
 	}
 
 	/** Abre numa dimensão, centro e zoom escolhidos (usado pelo teste de prints). */
@@ -136,7 +140,9 @@ public final class MapScreen extends Screen {
 					s.data.showTerrain = v;
 					s.markDirty();
 				}).build();
-		groups.add(List.of(item(dimButton), item(grid), item(terrain)));
+		Checkbox caves = Checkbox.builder(Component.translatable("chunkmap.map.caves"), font).selected(caveMap)
+				.onValueChange((c, v) -> caveMap = v).build();
+		groups.add(List.of(item(dimButton), item(grid), item(terrain), item(caves)));
 		Button wp = Button.builder(Component.translatable("chunkmap.map.add_waypoint"), b -> newWaypoint(false)).size(100, 20).build();
 		groups.add(List.of(item(wp)));
 
@@ -404,6 +410,7 @@ public final class MapScreen extends Screen {
 		view.grid = s.data.showGrid;
 		view.terrain = s.data.showTerrain;
 		view.biomes = true;
+		view.caveMap = caveMap;
 		view.caves = "caves".equals(s.data.biomeDepth);
 		view.filters = s.filters();
 		hits.clear();

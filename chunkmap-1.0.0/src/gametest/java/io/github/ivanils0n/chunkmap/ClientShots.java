@@ -113,6 +113,29 @@ public class ClientShots implements FabricClientGameTest {
 			mapShot(context, Level.NETHER, p.getX() / 8, p.getZ() / 8, 1 / 4f, "08_mapa_nether", 300);
 			mapShot(context, Level.END, 0, 0, 1 / 16f, "09_mapa_end", 300);
 
+			// Modo caverna: uma sala e um túnel 30 blocos abaixo, com mobs parados; o minimapa mostra as cavernas.
+			context.setScreen(() -> null);
+			sp.getServer().runCommand("execute at @p run fill ~-12 ~-31 ~-12 ~12 ~-28 ~12 air");
+			sp.getServer().runCommand("execute at @p run fill ~-2 ~-31 ~-40 ~2 ~-29 ~-13 air");
+			sp.getServer().runCommand("execute at @p run fill ~13 ~-31 ~-1 ~40 ~-29 ~1 air");
+			sp.getServer().runCommand("execute at @p run tp @p ~ ~-31 ~");
+			sp.getServer().runCommand("execute at @p run summon zombie ~5 ~ ~4 {NoAI:1b,PersistenceRequired:1b}");
+			sp.getServer().runCommand("execute at @p run summon skeleton ~-6 ~ ~-3 {NoAI:1b,PersistenceRequired:1b}");
+			sp.getServer().runCommand("execute at @p run summon cow ~2 ~ ~-8 {NoAI:1b,PersistenceRequired:1b}");
+			sp.getServer().runCommand("execute at @p run setblock ~ ~2 ~ glowstone");
+			context.waitTicks(80);
+			boolean cave = context.computeOnClient(mc -> ChunkMap.session().caveActive);
+			log("modo caverna automático debaixo da terra=" + cave);
+			context.takeScreenshot("14_modo_caverna_hud");
+			BlockPos under = context.computeOnClient(mc -> mc.player.blockPosition());
+			mapShot(context, Level.OVERWORLD, under.getX(), under.getZ(), 2f, "15_mapa_cavernas", 60);
+			context.setScreen(() -> null);
+			sp.getServer().runCommand("kill @e[type=!player]");
+			sp.getServer().runCommand("execute at @p run tp @p ~ ~31 ~");
+			context.waitTicks(40);
+			boolean surface = context.computeOnClient(mc -> !ChunkMap.session().caveActive);
+			log("modo caverna desliga na superfície=" + surface);
+
 			// Teclas de verdade: M abre o mapa, M fecha; B abre o novo waypoint.
 			context.setScreen(() -> null);
 			context.getInput().pressKey(Keys.OPEN_MAP);

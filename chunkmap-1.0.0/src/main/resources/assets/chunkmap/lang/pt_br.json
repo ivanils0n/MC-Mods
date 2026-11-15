@@ -83,5 +83,12 @@
 	"chunkmap.options.preset.tip_sp": "No singleplayer, com a seed do próprio mundo, vale o tipo do mundo de verdade; isto só muda uma seed digitada.",
 	"chunkmap.options.depth": "Biomas de: %s",
 	"chunkmap.options.depth.surface": "superfície",
-	"chunkmap.options.depth.caves": "cavernas (Y 0)"
+	"chunkmap.options.depth.caves": "cavernas (Y 0)",
+	"key.chunkmap.cave_mode": "Modo caverna (desligado/automático/sempre)",
+	"chunkmap.hud.cave": "Modo caverna",
+	"chunkmap.map.caves": "Cavernas",
+	"chunkmap.options.cave": "Modo caverna: %s",
+	"chunkmap.options.cave.off": "desligado",
+	"chunkmap.options.cave.auto": "automático",
+	"chunkmap.options.cave.always": "sempre"
 }

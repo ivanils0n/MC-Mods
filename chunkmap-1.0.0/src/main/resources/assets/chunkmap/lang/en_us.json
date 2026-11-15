@@ -83,5 +83,12 @@
 	"chunkmap.options.preset.tip_sp": "In singleplayer with the world's own seed the real world type is used; this only affects a typed seed.",
 	"chunkmap.options.depth": "Biomes at: %s",
 	"chunkmap.options.depth.surface": "surface",
-	"chunkmap.options.depth.caves": "caves (Y 0)"
+	"chunkmap.options.depth.caves": "caves (Y 0)",
+	"key.chunkmap.cave_mode": "Cave mode (off/auto/always)",
+	"chunkmap.hud.cave": "Cave mode",
+	"chunkmap.map.caves": "Caves",
+	"chunkmap.options.cave": "Cave mode: %s",
+	"chunkmap.options.cave.off": "off",
+	"chunkmap.options.cave.auto": "automatic",
+	"chunkmap.options.cave.always": "always"
 }

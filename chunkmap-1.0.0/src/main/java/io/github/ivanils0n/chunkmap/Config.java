@@ -21,6 +21,9 @@ public final class Config {
 
 	public enum Layer {AUTO, BIOMES, TERRAIN}
 
+	/** Modo caverna: desligado, sozinho quando o jogador está debaixo da terra (e no Nether) ou sempre. */
+	public enum CaveMode {OFF, AUTO, ALWAYS}
+
 	/** Opções gerais, iguais em todos os mundos. */
 	public static final class Global {
 		public boolean minimap = true;
@@ -33,11 +36,13 @@ public final class Config {
 		public boolean showTime = true;
 		public boolean showMobs = true;
 		public boolean inWorldWaypoints = true;
+		public CaveMode caveMode = CaveMode.AUTO;
 
 		void sanitize() {
 			minimapSize = Math.clamp(minimapSize, 64, 160);
 			if (!(minimapZoom >= 0.25f && minimapZoom <= 4f)) minimapZoom = 1f;
 			if (minimapLayer == null) minimapLayer = Layer.AUTO;
+			if (caveMode == null) caveMode = CaveMode.AUTO;
 		}
 	}
 

@@ -218,6 +218,54 @@ public final class TerrainLayer {
 			}
 		}
 		if (!any) return;
+		write(bx, bz, colors, heights);
+	}
+
+	/**
+	 * Modo caverna: em cada coluna, a partir de 2 blocos acima do jogador, desce pela rocha até o primeiro vão e mostra o
+	 * chão dele (até 24 blocos abaixo). Quanto mais fundo em relação ao jogador, mais escuro; rocha maciça fica cinza
+	 * bem escuro. Assim o mapa mostra as cavernas na altura em que o jogador está, conforme ele desce.
+	 */
+	public void updateCave(ClientLevel level, LevelChunk chunk, int refY) {
+		ChunkPos cp = chunk.getPos();
+		int bx = cp.getMinBlockX(), bz = cp.getMinBlockZ();
+		int minY = level.getMinY(), maxY = minY + level.getHeight() - 1;
+		int top = Math.min(refY + 2, maxY), bottom = Math.max(minY, refY - 24);
+		BlockPos.MutableBlockPos pos = new BlockPos.MutableBlockPos();
+		int[] colors = new int[256];
+		int[] heights = new int[256];
+		for (int z = 0; z < 16; z++) {
+			for (int x = 0; x < 16; x++) {
+				int i = z * 16 + x;
+				int y = top;
+				BlockState st = chunk.getBlockState(pos.set(bx + x, y, bz + z));
+				while (y > bottom && !open(st, level, pos)) st = chunk.getBlockState(pos.set(bx + x, --y, bz + z));
+				if (y <= bottom) {
+					colors[i] = 0xFF16191E; // rocha
+					heights[i] = Integer.MIN_VALUE;
+					continue;
+				}
+				while (y > bottom && open(st, level, pos)) st = chunk.getBlockState(pos.set(bx + x, --y, bz + z));
+				MapColor color = st.getMapColor(level, pos);
+				if (y <= bottom || color == MapColor.NONE) {
+					colors[i] = 0xFF050608; // buraco fundo
+					heights[i] = Integer.MIN_VALUE;
+					continue;
+				}
+				float f = Math.clamp(1.08f - (refY - y) * 0.035f, 0.35f, 1.1f);
+				colors[i] = shade(color.calculateARGBColor(MapColor.Brightness.NORMAL) | 0xFF000000, f);
+				heights[i] = y;
+			}
+		}
+		write(bx, bz, colors, heights);
+	}
+
+	/** Espaço por onde se anda (ar, tochas, plantas finas...). Água e lava contam como chão. */
+	private static boolean open(BlockState st, ClientLevel level, BlockPos pos) {
+		return st.getFluidState().isEmpty() && (st.isAir() || st.getMapColor(level, pos) == MapColor.NONE);
+	}
+
+	private void write(int bx, int bz, int[] colors, int[] heights) {
 		// Relevo: mais alto que o vizinho de cima (norte) fica claro, mais baixo fica escuro.
 		for (int z = 1; z < 16; z++) {
 			for (int x = 0; x < 16; x++) {

@@ -50,7 +50,49 @@ def icon(name):
         for x, ch in enumerate(r):
             if ch != ".": im.putpixel((x + 2, y + 2), hx(PAL[ch]))
     return im
-for n in ICONS: icon(n).save(f"{OUT}/icons/{n}.png")
+
+def shade(c, f):
+    return tuple(max(0, min(255, int(v * f))) for v in c[:3]) + (c[3],)
+
+def icon_hd(name):
+    """Versão 32x32 (o jogo desenha em 16 pixels de interface = 32 pixels de tela na escala 2): ladrilho com degradê,
+    borda clara dupla, desenho 2x com contorno escuro e relevo (luz em cima, sombra embaixo)."""
+    rows = ICONS[name].split("|")
+    S = 32
+    im = Image.new("RGBA", (S, S), (0, 0, 0, 0)); d = ImageDraw.Draw(im)
+    d.rounded_rectangle([0, 0, S - 1, S - 1], 6, fill=hx("#0d1520"))
+    d.rounded_rectangle([1, 1, S - 2, S - 2], 5, fill=hx("#f2f6fb"))
+    bg = Image.new("RGBA", (S, S), (0, 0, 0, 0)); bd = ImageDraw.Draw(bg)
+    for y in range(3, S - 3):
+        t = (y - 3) / (S - 6)
+        bd.line([(3, y), (S - 4, y)], fill=(int(46 - 16 * t), int(60 - 20 * t), int(80 - 26 * t), 255))
+    mask = Image.new("L", (S, S), 0); ImageDraw.Draw(mask).rounded_rectangle([3, 3, S - 4, S - 4], 4, fill=255)
+    im.paste(bg, (0, 0), mask)
+    g = [[PAL[ch] if ch != "." else None for ch in r] for r in rows]
+    n = len(g)
+    glyph = Image.new("RGBA", (S, S), (0, 0, 0, 0))
+    for y in range(n):
+        for x in range(n):
+            if not g[y][x]: continue
+            c = hx(g[y][x])
+            up_empty = y == 0 or not g[y - 1][x]
+            down_empty = y == n - 1 or not g[y + 1][x]
+            for sy in range(2):
+                for sx in range(2):
+                    cc = c
+                    if up_empty and sy == 0: cc = shade(c, 1.25)
+                    elif down_empty and sy == 1: cc = shade(c, 0.72)
+                    glyph.putpixel((4 + x * 2 + sx, 4 + y * 2 + sy), cc)
+    a = np.array(glyph)[..., 3] > 0
+    ring = np.zeros_like(a)
+    for dx, dy in ((1,0),(-1,0),(0,1),(0,-1),(1,1),(-1,-1),(1,-1),(-1,1)):
+        ring |= np.roll(np.roll(a, dy, 0), dx, 1)
+    ol = Image.new("RGBA", (S, S), (0, 0, 0, 0))
+    for y, x in zip(*np.nonzero(ring & ~a)): ol.putpixel((int(x), int(y)), (8, 10, 14, 200))
+    im.alpha_composite(ol); im.alpha_composite(glyph)
+    return im
+
+for n in ICONS: icon_hd(n).save(f"{OUT}/icons/{n}.png")
 
 def outline(im, col="#1a1a1a"):
     a = np.array(im)[..., 3] > 0
@@ -63,13 +105,26 @@ def outline(im, col="#1a1a1a"):
 
 # seta do jogador (aponta para cima; o mod gira conforme o yaw)
 arrow = Image.new("RGBA", (16, 16)); ImageDraw.Draw(arrow).polygon([(8,1),(14,14),(8,10),(2,14)], fill=hx("#ffffff"))
-arrow = outline(arrow); arrow.save(f"{OUT}/player_arrow.png")
+arrow = outline(arrow)
+# Seta 32x32: metade esquerda branca, direita cinza-azulada (dá volume), contorno escuro de 2 px.
+a32 = Image.new("RGBA", (32, 32), (0, 0, 0, 0)); ad = ImageDraw.Draw(a32)
+ad.polygon([(16, 2), (28, 29), (16, 22), (4, 29)], fill=hx("#14181e"))
+ad.polygon([(16, 6), (25, 26), (16, 20)], fill=hx("#c9d6e6"))
+ad.polygon([(16, 6), (16, 20), (7, 26)], fill=hx("#ffffff"))
+a32.save(f"{OUT}/player_arrow.png")
 # outros jogadores
 dot = Image.new("RGBA", (8, 8)); ImageDraw.Draw(dot).ellipse([1,1,6,6], fill=hx("#ffffff"))
 # waypoint (tingido em runtime)
 pin = Image.new("RGBA", (16, 16)); dp = ImageDraw.Draw(pin)
 dp.ellipse([3,1,12,10], fill=hx("#ffffff")); dp.polygon([(4,8),(11,8),(7.5,15)], fill=hx("#ffffff"))
-dp.ellipse([6,4,9,7], fill=hx("#9a9a9a")); pin = outline(pin); pin.save(f"{OUT}/waypoint.png")
+dp.ellipse([6,4,9,7], fill=hx("#9a9a9a")); pin = outline(pin)
+# Alfinete 32x32 (tingido pela cor do waypoint no jogo): cabeça redonda com brilho, ponta fina, contorno escuro.
+p32 = Image.new("RGBA", (32, 32), (0, 0, 0, 0)); pd = ImageDraw.Draw(p32)
+pd.ellipse([5, 1, 26, 22], fill=hx("#20242a")); pd.polygon([(8, 16), (23, 16), (15.5, 31)], fill=hx("#20242a"))
+pd.ellipse([7, 3, 24, 20], fill=hx("#ffffff")); pd.polygon([(10, 16), (21, 16), (15.5, 28)], fill=hx("#ffffff"))
+pd.ellipse([9, 13, 24, 21], fill=hx("#c8c8c8")); pd.ellipse([7, 3, 24, 18], fill=hx("#ffffff"))
+pd.ellipse([12, 8, 19, 15], fill=hx("#5a5f66")); pd.ellipse([10, 5, 14, 9], fill=hx("#ffffff"))
+p32.save(f"{OUT}/waypoint.png")
 
 # moldura do minimapa: 136x136, centro transparente 128x128
 S = 96; F = S + 8
@@ -81,7 +136,13 @@ fd.rectangle([4,4,F-5,F-5], fill=(0,0,0,0))
 # aba da bússola (N)
 tab = Image.new("RGBA", (12, 10)); td = ImageDraw.Draw(tab)
 td.rounded_rectangle([0,0,11,9], 2, fill=hx("#cfe0f2"), outline=hx("#3d6fa8"))
-tab.save(f"{OUT}/compass_tab.png")
+# Aba do N em 24x20: degradê claro e borda azul de 2 px.
+t24 = Image.new("RGBA", (24, 20), (0, 0, 0, 0)); tdd = ImageDraw.Draw(t24)
+tdd.rounded_rectangle([0, 0, 23, 19], 4, fill=hx("#3d6fa8"))
+for y in range(2, 18):
+    t = (y - 2) / 15
+    tdd.line([(2, y), (21, y)], fill=(int(236 - 30 * t), int(244 - 24 * t), 255, 255))
+t24.save(f"{OUT}/compass_tab.png")
 
 # ---------------- mapa de biomas falso para a prévia ----------------
 rng = np.random.default_rng(7)
@@ -273,3 +334,13 @@ d.rectangle([3, 3, 60, 60], fill=hx("#8fb3d9")); ic.paste(ic_map, (4, 4))
 ic.alpha_composite(up(arrow, 1), (24, 24))
 ic.alpha_composite(icon("village"), (10, 8)); ic.alpha_composite(icon("desert_pyramid"), (38, 40))
 ic.save(os.path.join(BASE, "../src/main/resources/assets/chunkmap/icon.png"))
+
+# folha de comparação das texturas finais (vai para previas/)
+final = [Image.open(f"{OUT}/icons/{n}.png") for n in order]
+sh = Image.new("RGBA", (len(final) * 36 + 8, 120), hx("#cfe0f2"))
+for i, im in enumerate(final): sh.alpha_composite(im, (8 + i * 36, 6))
+for i, f in enumerate(["player_arrow", "waypoint"]):
+    sh.alpha_composite(Image.open(f"{OUT}/{f}.png"), (8 + i * 40, 46))
+tinted = Image.open(f"{OUT}/waypoint.png"); arr = np.array(tinted).astype(float); arr[..., :3] *= np.array([0.88, 0.28, 0.28]); sh.alpha_composite(Image.fromarray(arr.astype(np.uint8)), (88, 46))
+sh.alpha_composite(Image.open(f"{OUT}/compass_tab.png"), (128, 52))
+up(sh, 3).convert("RGB").save(f"{PREV}/texturas_finais.png")

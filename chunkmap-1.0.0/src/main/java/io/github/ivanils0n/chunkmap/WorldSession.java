@@ -16,7 +16,9 @@ import net.minecraft.resources.ResourceKey;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.level.ChunkPos;
 import net.minecraft.world.level.Level;
+import net.minecraft.core.BlockPos;
 import net.minecraft.world.level.LevelHeightAccessor;
+import net.minecraft.world.level.levelgen.Heightmap;
 import net.minecraft.world.level.chunk.LevelChunk;
 import net.minecraft.world.level.dimension.DimensionType;
 import net.minecraft.world.level.dimension.LevelStem;
@@ -45,6 +47,20 @@ public final class WorldSession {
 	public final Config.WorldData data;
 	public final boolean singleplayer;
 	private final Map<String, TerrainLayer> terrain = new HashMap<>();
+	private final Map<String, TerrainLayer> caves = new HashMap<>();
+	/** Modo caverna valendo agora (calculado a cada tick). */
+	public boolean caveActive;
+	private int caveCursor, caveY = Integer.MIN_VALUE;
+	private long caveChunk = Long.MIN_VALUE;
+	/** Chunks em volta do jogador, do mais perto para o mais longe (raio 6). */
+	private static final int[][] SPIRAL;
+
+	static {
+		java.util.List<int[]> l = new java.util.ArrayList<>();
+		for (int dx = -6; dx <= 6; dx++) for (int dz = -6; dz <= 6; dz++) if (dx * dx + dz * dz <= 40) l.add(new int[]{dx, dz});
+		l.sort(java.util.Comparator.comparingInt(a -> a[0] * a[0] + a[1] * a[1]));
+		SPIRAL = l.toArray(new int[0][]);
+	}
 	private final Map<String, SeedLayers> seeds = new HashMap<>();
 	/** Biomas destacados no mapa (ids). */
 	public final Set<String> highlight = new HashSet<>();
@@ -125,6 +141,11 @@ public final class WorldSession {
 
 	public TerrainLayer terrain(ResourceKey<Level> dim) {
 		return terrain.computeIfAbsent(dimId(dim), id -> new TerrainLayer(dir.resolve("terreno").resolve(safe(id.replace(':', '_')))));
+	}
+
+	/** Mapa das cavernas (o que o modo caverna já viu), separado do terreno da superfície. */
+	public TerrainLayer caves(ResourceKey<Level> dim) {
+		return caves.computeIfAbsent(dimId(dim), id -> new TerrainLayer(dir.resolve("cavernas").resolve(safe(id.replace(':', '_')))));
 	}
 
 	// ---------------------------------------------------------------- seed
@@ -229,11 +250,41 @@ public final class WorldSession {
 				}
 			}
 		}
+		cave(mc, level);
 		// Ponto de morte: um por dimensão, trocado a cada morte.
 		boolean dead = mc.player.isDeadOrDying();
 		if (dead && !wasDead) addDeathPoint(mc);
 		wasDead = dead;
 		if (ticks % 1200 == 0) save();
+	}
+
+	/** Liga/desliga o modo caverna e lê as cavernas em volta: 6 chunks por tick, do mais perto para o mais longe. */
+	private void cave(Minecraft mc, ClientLevel level) {
+		var player = mc.player;
+		BlockPos p = player.blockPosition();
+		boolean under = level.dimensionType().hasCeiling()
+				|| p.getY() < level.getHeight(Heightmap.Types.MOTION_BLOCKING_NO_LEAVES, p.getX(), p.getZ()) - 3 && !player.isInWater();
+		caveActive = switch (Config.global.caveMode) {
+			case OFF -> false;
+			case ALWAYS -> true;
+			case AUTO -> under;
+		};
+		if (!caveActive) return;
+		long chunk = ChunkPos.containing(p).pack();
+		// Mudou de chunk ou de altura: recomeça pelos chunks mais perto.
+		if (chunk != caveChunk || Math.abs(p.getY() - caveY) >= 3) {
+			caveChunk = chunk;
+			caveY = p.getY();
+			caveCursor = 0;
+		}
+		TerrainLayer t = caves(level.dimension());
+		int cx = ChunkPos.getX(chunk), cz = ChunkPos.getZ(chunk);
+		for (int n = 0; n < 6; n++) {
+			int[] o = SPIRAL[caveCursor];
+			caveCursor = (caveCursor + 1) % SPIRAL.length;
+			LevelChunk c = level.getChunkSource().getChunk(cx + o[0], cz + o[1], false);
+			if (c != null) t.updateCave(level, c, caveY);
+		}
 	}
 
 	private void addDeathPoint(Minecraft mc) {
@@ -251,6 +302,7 @@ public final class WorldSession {
 
 	public void save() {
 		for (TerrainLayer t : terrain.values()) t.save();
+		for (TerrainLayer t : caves.values()) t.save();
 		if (dirty) {
 			dirty = false;
 			Config.WorldData snapshot = Config.GSON.fromJson(Config.GSON.toJson(data), Config.WorldData.class);
@@ -262,6 +314,8 @@ public final class WorldSession {
 		save();
 		for (TerrainLayer t : terrain.values()) t.close();
 		terrain.clear();
+		for (TerrainLayer t : caves.values()) t.close();
+		caves.clear();
 		for (SeedLayers l : seeds.values()) l.close();
 		seeds.clear();
 	}

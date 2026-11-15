@@ -80,6 +80,13 @@ public final class ChunkMap implements ClientModInitializer {
 		}
 		while (Keys.ZOOM_IN.consumeClick()) zoom(2f);
 		while (Keys.ZOOM_OUT.consumeClick()) zoom(0.5f);
+		while (Keys.CAVE.consumeClick()) {
+			Config.CaveMode[] modes = Config.CaveMode.values();
+			Config.global.caveMode = modes[(Config.global.caveMode.ordinal() + 1) % modes.length];
+			Config.saveGlobal();
+			if (mc.player != null) mc.player.sendOverlayMessage(net.minecraft.network.chat.Component.translatable("chunkmap.options.cave",
+					net.minecraft.network.chat.Component.translatable("chunkmap.options.cave." + Config.global.caveMode.name().toLowerCase(java.util.Locale.ROOT))));
+		}
 		while (Keys.TOGGLE.consumeClick()) {
 			Config.global.minimap = !Config.global.minimap;
 			Config.saveGlobal();

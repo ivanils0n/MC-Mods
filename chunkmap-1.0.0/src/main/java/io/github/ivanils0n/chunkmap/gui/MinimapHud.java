@@ -67,6 +67,7 @@ public final class MinimapHud {
 				v.terrain = !seed;
 			}
 		}
+		v.caveMap = session.caveActive;
 		MapRenderer.draw(g, v, null);
 
 		// "N" (norte) em cima, no meio.
@@ -100,6 +101,10 @@ public final class MinimapHud {
 					.map(k -> (Component) Component.translatable("biome." + k.identifier().getNamespace() + "." + k.identifier().getPath()))
 					.orElse(Component.literal("?")));
 			colors.add(0xFF8DE07A);
+		}
+		if (session.caveActive) {
+			lines.add(Component.translatable("chunkmap.hud.cave"));
+			colors.add(0xFFF0A040);
 		}
 		if (Config.global.showTime) {
 			long t = mc.level.getOverworldClockTime();

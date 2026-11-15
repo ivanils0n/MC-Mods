@@ -55,6 +55,8 @@ public final class MapRenderer {
 		public boolean minimap;
 		public ResourceKey<Level> dim;
 		public boolean biomes = true, terrain, grid, caves;
+		/** Mostrar o mapa das cavernas (no lugar dos biomas e do terreno). */
+		public boolean caveMap;
 		public Set<StructureIcon> filters = Set.of();
 		public float partialTick;
 		/** Saídas: a área ficou grande demais para alguns filtros / ainda calculando. */
@@ -94,7 +96,7 @@ public final class MapRenderer {
 		ClientLevel level = mc.level;
 		if (session == null || level == null || v.dim == null) return;
 		frame++;
-		g.fill(v.x, v.y, v.x + v.w, v.y + v.h, 0xFF1B1F27);
+		g.fill(v.x, v.y, v.x + v.w, v.y + v.h, v.caveMap ? 0xFF0B0C0F : 0xFF1B1F27);
 		g.enableScissor(v.x, v.y, v.x + v.w, v.y + v.h);
 		try {
 			double bpp = 1.0 / v.scale; // blocos por pixel
@@ -102,13 +104,19 @@ public final class MapRenderer {
 
 			WorldSession.SeedLayers seed = session.seedLayers(v.dim);
 			SeedWorld world = seed == null ? null : seed.world();
-			if (v.biomes && world != null) {
+			if (v.caveMap) {
+				if (z <= TerrainLayer.MAX_Z) {
+					TerrainLayer t = session.caves(v.dim);
+					t.beginFrame(frame);
+					drawTiles(g, v, z, z, (zz, tx, tz, req) -> req ? t.texture(zz, tx, tz) : null);
+				}
+			} else if (v.biomes && world != null) {
 				BiomeLayer layer = seed.biomes(v.caves);
 				layer.beginFrame(frame, session.highlight);
 				int bz = Math.clamp(z, BiomeLayer.MIN_Z, BiomeLayer.MAX_Z);
 				drawTiles(g, v, bz, BiomeLayer.MAX_Z, (zz, tx, tz, req) -> layer.texture(zz, tx, tz, req));
 			}
-			boolean terrain = v.terrain || world == null || !v.biomes;
+			boolean terrain = !v.caveMap && (v.terrain || world == null || !v.biomes);
 			if (terrain && z <= TerrainLayer.MAX_Z) {
 				TerrainLayer t = session.terrain(v.dim);
 				t.beginFrame(frame);
@@ -385,7 +393,7 @@ public final class MapRenderer {
 		float sx = v.screenX(px), sy = v.screenY(pz);
 		if (!v.inside(sx, sy, 0)) return;
 		float yaw = self.getViewYRot(pt);
-		int s = v.minimap ? 12 : 16;
+		int s = v.minimap ? 9 : 12;
 		g.pose().pushMatrix();
 		g.pose().translate(sx, sy);
 		g.pose().rotate((float) Math.toRadians(yaw) + (float) Math.PI);
