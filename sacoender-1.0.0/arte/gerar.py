@@ -1,7 +1,7 @@
 """Saco do Ender: gera texturas, modelo 3D, definição do item e ícone do resource pack.
 
 Uso: python3 arte/gerar.py [preview.png]
-Modelo: formato da trouxa do jogo (corpo largo de boca aberta, gola por cima e alça), nas cores escuras com cordão lilás.
+Modelo T1 (Trouxa Redonda): bolsinha redonda, boca franzida com babado e laço lilás, em tons escuros.
 O item é um papel do jogo marcado com custom_model_data "sacoender"; assets/minecraft/items/paper.json troca o
 modelo só desse papel (qualquer outro papel continua igual ao do jogo).
 """
@@ -149,36 +149,21 @@ TEX = dict(
     inner=solid_noise(['#06040a', '#0b0812', '#100b19'], 35),
 )
 
-def hollow(x1, y1, z1, x2, y2, z2, t, tex, inner):
-    """Moldura oca (paredes de espessura t) com fundo escuro: a boca aberta da trouxa."""
+def ring(x1, y1, z1, x2, y2, z2, t, tex):
+    """Moldura oca (paredes de espessura t): o babado da boca do saco."""
     return [F([x1, y1, z1], [x2, y2, z1 + t], tex), F([x1, y1, z2 - t], [x2, y2, z2], tex),
-            F([x1, y1, z1 + t], [x1 + t, y2, z2 - t], tex), F([x2 - t, y1, z1 + t], [x2, y2, z2 - t], tex),
-            F([x1 + t, y1, z1 + t], [x2 - t, y1 + 0.25, z2 - t], inner)]
+            F([x1, y1, z1 + t], [x1 + t, y2, z2 - t], tex), F([x2 - t, y1, z1 + t], [x2, y2, z2 - t], tex)]
 
-BUNDLE = [
-    F([3, 0, 5], [13, 1, 11], 'cloth'),                      # fundo
-    F([2, 1, 4], [14, 7, 12], 'cloth'),                      # corpo
-] + hollow(2, 7, 4, 14, 8.5, 12, 1, 'top', 'inner') + [   # boca do corpo
-    F([4.5, 7, 6], [11.5, 9.5, 10], 'top'),                  # pescoço franzido
-] + hollow(3.5, 9.5, 5, 12.5, 11.5, 11, 1, 'top', 'inner') + [  # gola
-    F([5, 8.5, 7.5], [6, 13, 8.5], 'cord'),                  # alça
-    F([10, 8.5, 7.5], [11, 13, 8.5], 'cord'),
-    F([5, 13, 7.5], [11, 14, 8.5], 'cord'),
-]
+# T1 (Trouxa Redonda): camadas que arredondam o corpo, pescoço franzido com laço lilás e babado de boca aberta
+T1 = [F([5, 0, 5], [11, 1, 11], 'cloth'), F([4, 1, 4], [12, 2, 12], 'cloth'),
+      F([3, 2, 3.5], [13, 6, 12.5], 'cloth'), F([3.5, 2, 3], [12.5, 6, 13], 'cloth'),
+      F([4, 6, 4], [12, 7.5, 12], 'cloth'), F([5, 7.5, 5], [11, 8.5, 11], 'cloth'),
+      F([6, 8.5, 6], [10, 10, 10], 'cloth'),
+      F([5.5, 8.75, 5.5], [10.5, 9.75, 10.5], 'cord')] + ring(4.5, 10, 4.5, 11.5, 11.5, 11.5, 1, 'top') + [
+      F([5.5, 10, 5.5], [10.5, 10.25, 10.5], 'inner'),
+      F([7.3, 7.0, 4.6], [8.0, 9.0, 5.1], 'cord'), F([8.2, 6.6, 4.6], [8.9, 9.0, 5.1], 'cord')]
 
-def plate_set():
-    """Placa de obsidiana com 4 rebites, igual nos quatro lados."""
-    out = []
-    # (placa) frente z-, trás z+, oeste x-, leste x+
-    out += [F([4.5, 1.5, 2.6], [11.5, 4.5, 3], 'plate', uv=FULL), F([4.5, 1.5, 13], [11.5, 4.5, 13.4], 'plate', uv=FULL),
-            F([2.6, 1.5, 4.5], [3, 4.5, 11.5], 'plate', uv=FULL), F([13, 1.5, 4.5], [13.4, 4.5, 11.5], 'plate', uv=FULL)]
-    for y in (1.7, 3.7):
-        for a in (4.7, 10.7):
-            out += [F([a, y, 2.3], [a + .6, y + .6, 2.6], 'cord'), F([a, y, 13.4], [a + .6, y + .6, 13.7], 'cord'),
-                    F([2.3, y, a], [2.6, y + .6, a + .6], 'cord'), F([13.4, y, a], [13.7, y + .6, a + .6], 'cord')]
-    return out
-
-ELEMENTS = BUNDLE
+ELEMENTS = T1
 
 def model_json():
     els = []
@@ -197,10 +182,10 @@ def model_json():
             'ground': {'translation': [0, 2, 0], 'scale': [0.5, 0.5, 0.5]},
             'fixed': {'translation': [0, 1, 0], 'scale': [0.75, 0.75, 0.75]},
             'head': {'translation': [0, 13, 0], 'scale': [0.8, 0.8, 0.8]},
-            'thirdperson_righthand': {'rotation': [0, 45, 0], 'translation': [0, 2.5, 1], 'scale': [0.5, 0.5, 0.5]},
-            'thirdperson_lefthand': {'rotation': [0, 45, 0], 'translation': [0, 2.5, 1], 'scale': [0.5, 0.5, 0.5]},
-            'firstperson_righthand': {'rotation': [0, 45, 0], 'translation': [0, 3, 0], 'scale': [0.5, 0.5, 0.5]},
-            'firstperson_lefthand': {'rotation': [0, 45, 0], 'translation': [0, 3, 0], 'scale': [0.5, 0.5, 0.5]},
+            'thirdperson_righthand': {'rotation': [0, 45, 0], 'translation': [0, 2, 1], 'scale': [0.4, 0.4, 0.4]},
+            'thirdperson_lefthand': {'rotation': [0, 45, 0], 'translation': [0, 2, 1], 'scale': [0.4, 0.4, 0.4]},
+            'firstperson_righthand': {'rotation': [0, 45, 0], 'translation': [1, 2, 0], 'scale': [0.35, 0.35, 0.35]},
+            'firstperson_lefthand': {'rotation': [0, 45, 0], 'translation': [1, 2, 0], 'scale': [0.35, 0.35, 0.35]},
         }}
 
 PAPER = {'model': {
