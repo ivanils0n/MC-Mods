@@ -60,7 +60,7 @@ final class BagMenu extends AbstractContainerMenu {
 		super.removed(player);
 		if (player == owner) {
 			owner.getEnderChestInventory().setChanged();
-			owner.level().playSound(null, owner.getX(), owner.getY(), owner.getZ(), SoundEvents.ENDER_CHEST_CLOSE, SoundSource.PLAYERS, 0.5f, 1.2f);
+			owner.level().playSound(null, owner.getX(), owner.getY(), owner.getZ(), SoundEvents.BUNDLE_INSERT, SoundSource.PLAYERS, 1.0f, 0.9f);
 		}
 	}
 }

@@ -17,17 +17,17 @@
 		}
 	},
 	"result": {
-		"id": "minecraft:paper",
+		"id": "minecraft:bundle",
 		"count": 1,
 		"components": {
-			"minecraft:max_stack_size": 1,
+			"!minecraft:bundle_contents": {},
 			"minecraft:item_name": {
 				"text": "Saco do Ender",
 				"color": "light_purple"
 			},
 			"minecraft:lore": [
 				{
-					"text": "Abre os 9 primeiros espaços do seu baú do fim",
+					"text": "Espaço compartilhado com o baú do Ender",
 					"color": "gray",
 					"italic": false
 				}

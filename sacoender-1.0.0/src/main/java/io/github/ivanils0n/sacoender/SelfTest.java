@@ -20,6 +20,7 @@ import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.player.Inventory;
+import net.minecraft.world.inventory.ClickType;
 import net.minecraft.world.inventory.PlayerEnderChestContainer;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
@@ -45,7 +46,7 @@ final class SelfTest {
 
 		// 1. Receita: trouxa vazia (de qualquer cor) no centro e 8 obsidianas em volta = o saco (igual ao item do código).
 		ensure(server.getRecipeManager().getRecipes().stream().anyMatch(r -> r.id().toString().contains("sacoender:saco")), "receita não carregou");
-		ItemStack e = new ItemStack(Items.OBSIDIAN);
+		ItemStack e = new ItemStack(Items.OBSIDIAN), o2 = e;
 		ItemStack bag = craft(server, sl, CraftingInput.of(3, 3, List.of(e, e, e, e, new ItemStack(Items.BUNDLE), e, e, e, e)));
 		ensure(SacoEnder.isBag(bag), "o craft não deu o saco: " + bag);
 		ensure(ItemStack.isSameItemSameComponents(bag, SacoEnder.bagItem()), "item da receita diferente do item do código: " + bag.getComponentsPatch() + " / " + SacoEnder.bagItem().getComponentsPatch());
@@ -65,27 +66,33 @@ final class SelfTest {
 		ItemStack o = new ItemStack(Items.OBSIDIAN);
 		ItemStack chest = craft(server, sl, CraftingInput.of(3, 3, List.of(o, o, o, o, new ItemStack(Items.ENDER_EYE), o, o, o, o)));
 		ensure(chest.is(Items.ENDER_CHEST), "a receita do baú do fim mudou: " + chest);
-		ensure(!SacoEnder.isBag(new ItemStack(Items.PAPER)), "papel comum foi aceito como saco");
-		ok("receita (trouxa vazia + 8 obsidianas; " + colors + " cores de trouxa)");
+		ensure(!SacoEnder.isBag(new ItemStack(Items.BUNDLE)) && !SacoEnder.isBag(new ItemStack(Items.PAPER)), "trouxa comum foi aceita como saco");
+		ensure(!bag.has(DataComponents.BUNDLE_CONTENTS), "o saco tem espaço de trouxa");
+		// O saco não serve de trouxa para a própria receita (não tem o espaço vazio de trouxa).
+		ensure(server.getRecipeManager().getRecipeFor(RecipeType.CRAFTING, CraftingInput.of(3, 3, List.of(o2, o2, o2, o2, bag.copy(), o2, o2, o2, o2)), sl).isEmpty(), "saco virou saco de novo");
+		// Saco tingido continua sendo o saco (sem espaço de trouxa).
+		ItemStack dyed = craft(server, sl, CraftingInput.of(2, 1, List.of(bag.copy(), new ItemStack(Items.PURPLE_DYE))));
+		ensure(SacoEnder.isBag(dyed) && !dyed.is(Items.BUNDLE) && !dyed.has(DataComponents.BUNDLE_CONTENTS), "saco tingido: " + dyed);
+		ok("receita (trouxa vazia + 8 obsidianas; " + colors + " cores de trouxa; saco tingido continua saco)");
 
-		// 2. Sem o mod: o saco só tem componentes do jogo, é salvo como papel e volta igual.
+		// 2. Sem o mod: o saco só tem componentes do jogo, é salvo como trouxa e volta igual.
 		for (TypedDataComponent<?> c : bag.getComponents()) {
 			var key = BuiltInRegistries.DATA_COMPONENT_TYPE.getKey(c.type());
 			ensure(key != null && key.getNamespace().equals("minecraft"), "componente fora do jogo: " + key);
 		}
 		var ops = server.registryAccess().createSerializationContext(NbtOps.INSTANCE);
 		Tag saved = ItemStack.CODEC.encodeStart(ops, bag).getOrThrow();
-		ensure(saved.toString().contains("minecraft:paper"), "salvo como: " + saved);
+		ensure(saved.toString().contains("minecraft:bundle"), "salvo como: " + saved);
 		ItemStack loaded = ItemStack.CODEC.parse(ops, saved).getOrThrow();
 		ensure(ItemStack.isSameItemSameComponents(loaded, bag) && SacoEnder.isBag(loaded), "não voltou igual depois de salvo: " + loaded);
-		ok("item salvo só com dados do jogo (papel)");
+		ok("item salvo só com dados do jogo (trouxa)");
 
-		// 3. Botão direito: o saco abre, papel comum não.
+		// 3. Botão direito: o saco abre, trouxa comum não.
 		FakePlayer fp = FakePlayer.get(sl);
 		fp.setItemInHand(InteractionHand.MAIN_HAND, bag.copy());
 		ensure(SacoEnder.onUse(fp, sl, InteractionHand.MAIN_HAND) == InteractionResult.SUCCESS, "botão direito com o saco");
-		fp.setItemInHand(InteractionHand.OFF_HAND, new ItemStack(Items.PAPER));
-		ensure(SacoEnder.onUse(fp, sl, InteractionHand.OFF_HAND) == InteractionResult.PASS, "papel comum abriu a tela");
+		fp.setItemInHand(InteractionHand.OFF_HAND, new ItemStack(Items.BUNDLE));
+		ensure(SacoEnder.onUse(fp, sl, InteractionHand.OFF_HAND) == InteractionResult.PASS, "trouxa comum abriu a tela");
 		fp.setItemInHand(InteractionHand.MAIN_HAND, ItemStack.EMPTY);
 		fp.setItemInHand(InteractionHand.OFF_HAND, ItemStack.EMPTY);
 		ok("botão direito");
@@ -129,12 +136,26 @@ final class SelfTest {
 		menu.removed(fp);
 		ok("tela ligada aos 9 primeiros espaços do baú do fim");
 
+		// 4b. Clicar com um item em cima do saco (e o saco em cima de um item) não guarda nada dentro dele.
+		inv.clearContent();
+		inv.setItem(0, bag.copy());
+		inv.setItem(1, new ItemStack(Items.DIRT, 10));
+		var im = fp.inventoryMenu;
+		im.setCarried(new ItemStack(Items.DIAMOND, 4));
+		im.clicked(36, 0, ClickType.PICKUP, fp);
+		ensure(!im.getCarried().isEmpty() && SacoEnder.isBag(im.getCarried()) && !im.getCarried().has(DataComponents.BUNDLE_CONTENTS), "item foi posto dentro do saco: " + im.getCarried());
+		ensure(inv.getItem(0).is(Items.DIAMOND) && inv.getItem(0).getCount() == 4, "o clique não trocou o saco pelo diamante");
+		im.clicked(37, 1, ClickType.PICKUP, fp);
+		ensure(inv.getItem(1).is(Items.DIRT) && inv.getItem(1).getCount() == 10, "o saco puxou a terra para dentro: " + inv.getItem(1));
+		im.setCarried(ItemStack.EMPTY);
+		ok("o saco não guarda itens como trouxa");
+
 		ender.clearContent();
 		inv.clearContent();
 
 		// 5. Resource pack: hash no .jar, modelo do saco e o papel do jogo continua papel quando não é o saco.
 		ensure(SacoEnder.PACK_SHA1 != null, "hash do resource pack não está no .jar");
-		ensure(SacoEnder.class.getResource("/assets/minecraft/items/paper.json") != null, "assets/minecraft/items/paper.json");
+		ensure(SacoEnder.class.getResource("/assets/minecraft/items/bundle.json") != null && SacoEnder.class.getResource("/assets/minecraft/items/purple_bundle.json") != null, "definições das trouxas");
 		ensure(SacoEnder.class.getResource("/assets/sacoender/models/item/saco.json") != null, "modelo do saco");
 		ok("resource pack");
 	}

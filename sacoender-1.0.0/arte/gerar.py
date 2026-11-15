@@ -2,8 +2,8 @@
 
 Uso: python3 arte/gerar.py [preview.png]
 Modelo T1 (Trouxa Redonda): bolsinha redonda, boca franzida com babado e laço lilás, em tons escuros.
-O item é um papel do jogo marcado com custom_model_data "sacoender"; assets/minecraft/items/paper.json troca o
-modelo só desse papel (qualquer outro papel continua igual ao do jogo).
+O item é uma trouxa do jogo marcada com custom_model_data "sacoender"; assets/minecraft/items/*bundle.json trocam o
+modelo só dessa trouxa (qualquer outra trouxa continua igual à do jogo).
 """
 import json, math, os
 import numpy as np
@@ -188,13 +188,33 @@ def model_json():
             'firstperson_lefthand': {'rotation': [0, 45, 0], 'translation': [1, 2, 0], 'scale': [0.35, 0.35, 0.35]},
         }}
 
-PAPER = {'model': {
-    'type': 'minecraft:select',
-    'property': 'minecraft:custom_model_data',
-    'index': 0,
-    'cases': [{'when': 'sacoender', 'model': {'type': 'minecraft:model', 'model': 'sacoender:item/saco'}}],
-    'fallback': {'type': 'minecraft:model', 'model': 'minecraft:item/paper'},
-}}
+# Trouxas do jogo (a comum e as 16 cores): a definição de cada uma é a do 26.2 (igual byte a byte em conteúdo),
+# só que com um caso a mais: a trouxa marcada com custom_model_data "sacoender" usa o modelo do saco. A trouxa
+# tingida continua sendo o saco (o tingimento copia os dados).
+COLORS = ['', 'white', 'orange', 'magenta', 'light_blue', 'yellow', 'lime', 'pink', 'gray', 'light_gray', 'cyan',
+          'purple', 'blue', 'brown', 'green', 'red', 'black']
+
+def vanilla_bundle(c):
+    p = (c + '_') if c else ''
+    return {'type': 'minecraft:select', 'cases': [{'model': {
+        'type': 'minecraft:condition',
+        'on_false': {'type': 'minecraft:model', 'model': f'minecraft:item/{p}bundle'},
+        'on_true': {'type': 'minecraft:composite', 'models': [
+            {'type': 'minecraft:model', 'model': f'minecraft:item/{p}bundle_open_back'},
+            {'type': 'minecraft:bundle/selected_item'},
+            {'type': 'minecraft:model', 'model': f'minecraft:item/{p}bundle_open_front'}]},
+        'property': 'minecraft:bundle/has_selected_item'}, 'when': 'gui'}],
+        'fallback': {'type': 'minecraft:model', 'model': f'minecraft:item/{p}bundle'},
+        'property': 'minecraft:display_context'}
+
+def bundle_def(c):
+    return {'model': {
+        'type': 'minecraft:select',
+        'property': 'minecraft:custom_model_data',
+        'index': 0,
+        'cases': [{'when': 'sacoender', 'model': {'type': 'minecraft:model', 'model': 'sacoender:item/saco'}}],
+        'fallback': vanilla_bundle(c),
+    }}
 
 def dump(path, obj):
     os.makedirs(os.path.dirname(path), exist_ok=True)
@@ -208,7 +228,8 @@ if __name__ == '__main__':
     for t, arr in TEX.items():
         Image.fromarray(arr).save(f'{RES}/sacoender/textures/item/saco_{t}.png', optimize=True)
     dump(RES + '/sacoender/models/item/saco.json', model_json())
-    dump(RES + '/minecraft/items/paper.json', PAPER)
+    for c in COLORS:
+        dump(RES + f"/minecraft/items/{(c + '_') if c else ''}bundle.json", bundle_def(c))
     os.makedirs(ROOT + '/src/pack', exist_ok=True)
     icon = render(ELEMENTS, TEX, 64, scale=0.7)
     bg = Image.new('RGBA', (64, 64), (24, 16, 36, 255)); bg.alpha_composite(icon)

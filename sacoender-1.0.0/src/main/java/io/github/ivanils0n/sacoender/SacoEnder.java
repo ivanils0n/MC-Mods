@@ -13,6 +13,9 @@ import net.fabricmc.fabric.api.networking.v1.ServerPlayConnectionEvents;
 import net.fabricmc.loader.api.FabricLoader;
 import net.minecraft.ChatFormatting;
 import net.minecraft.core.component.DataComponents;
+import net.minecraft.core.registries.Registries;
+import net.minecraft.resources.Identifier;
+import net.minecraft.tags.TagKey;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.protocol.common.ClientboundResourcePackPushPacket;
@@ -23,6 +26,7 @@ import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.SimpleMenuProvider;
 import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.item.component.CustomData;
@@ -33,15 +37,17 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * Saco do Ender: um papel do jogo marcado (custom_data "sacoender") que, com o botão direito, abre os 9 primeiros
- * espaços do baú do fim de quem o usa. O mod não guarda nada: a tela mexe direto no baú do fim do jogador, que o
- * próprio jogo salva. Sem o mod, o saco vira um papel chamado "Saco do Ender" e os itens continuam no baú do fim.
+ * Saco do Ender: uma trouxa do jogo marcada (custom_data "sacoender") e sem espaço próprio (sem bundle_contents, então
+ * o jogo não deixa pôr itens nela nem a esvazia) que, com o botão direito, abre os 9 primeiros espaços do baú do fim de
+ * quem o usa. O mod não guarda nada: a tela mexe direto no baú do fim do jogador, que o próprio jogo salva. Sem o mod,
+ * o saco vira uma trouxa chamada "Saco do Ender" que não guarda nada, e os itens continuam no baú do fim.
  */
 public final class SacoEnder implements ModInitializer {
 	static final Logger LOG = LoggerFactory.getLogger("sacoender");
 	static final String NAME = "Saco do Ender";
-	static final String LORE = "Abre os 9 primeiros espaços do seu baú do fim";
+	static final String LORE = "Espaço compartilhado com o baú do Ender";
 	static final String TAG = "sacoender";
+	static final TagKey<Item> BUNDLES = TagKey.create(Registries.ITEM, Identifier.withDefaultNamespace("bundles"));
 
 	private static final String PACK_URL = "https://github.com/ivanils0n/MC-Mods/releases/download/sacoender-" + modVersion() + "/sacoender-pack-";
 	static final String PACK_SHA1 = readPackHash();
@@ -69,19 +75,20 @@ public final class SacoEnder implements ModInitializer {
 
 	public static void open(ServerPlayer player) {
 		player.openMenu(new SimpleMenuProvider((id, inv, p) -> new BagMenu(id, inv, player), Component.literal(NAME)));
-		player.level().playSound(null, player.getX(), player.getY(), player.getZ(), SoundEvents.ENDER_CHEST_OPEN, SoundSource.PLAYERS, 0.5f, 1.2f);
+		player.level().playSound(null, player.getX(), player.getY(), player.getZ(), SoundEvents.BUNDLE_REMOVE_ONE, SoundSource.PLAYERS, 1.0f, 0.9f);
 	}
 
+	/** Qualquer trouxa (a tingida continua sendo o saco) com a marca do mod. */
 	public static boolean isBag(ItemStack stack) {
-		if (!stack.is(Items.PAPER)) return false;
+		if (!stack.is(BUNDLES)) return false;
 		CustomData data = stack.get(DataComponents.CUSTOM_DATA);
 		return data != null && data.copyTag().contains(TAG);
 	}
 
 	/** O mesmo item da receita (data/sacoender/recipe/saco.json). Só componentes do jogo: nada some sem o mod. */
 	public static ItemStack bagItem() {
-		ItemStack s = new ItemStack(Items.PAPER);
-		s.set(DataComponents.MAX_STACK_SIZE, 1);
+		ItemStack s = new ItemStack(Items.BUNDLE);
+		s.remove(DataComponents.BUNDLE_CONTENTS);
 		s.set(DataComponents.ITEM_NAME, Component.literal(NAME).withStyle(ChatFormatting.LIGHT_PURPLE));
 		s.set(DataComponents.LORE, new ItemLore(List.of(Component.literal(LORE).withStyle(st -> st.withItalic(false).withColor(ChatFormatting.GRAY)))));
 		s.set(DataComponents.CUSTOM_MODEL_DATA, new CustomModelData(List.of(), List.of(), List.of(TAG), List.of()));
