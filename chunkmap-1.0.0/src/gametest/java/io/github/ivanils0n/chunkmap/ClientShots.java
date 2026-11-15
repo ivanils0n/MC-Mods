@@ -116,6 +116,7 @@ public class ClientShots implements FabricClientGameTest {
 
 			// Modo caverna: uma sala e um túnel 30 blocos abaixo, com mobs parados; o minimapa mostra as cavernas.
 			context.setScreen(() -> null);
+			sp.getServer().runCommand("gamemode creative @a");
 			Vec3 top = context.computeOnClient(mc -> mc.player.position());
 			sp.getServer().runCommand("execute at @p run fill ~-12 ~-31 ~-12 ~12 ~-28 ~12 air");
 			sp.getServer().runCommand("execute at @p run fill ~-2 ~-31 ~-40 ~2 ~-29 ~-13 air");
