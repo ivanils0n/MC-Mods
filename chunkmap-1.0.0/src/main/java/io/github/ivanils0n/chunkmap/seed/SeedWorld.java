@@ -20,6 +20,7 @@ import net.minecraft.world.level.levelgen.WorldgenRandom;
 import net.minecraft.world.level.levelgen.structure.Structure;
 import net.minecraft.world.level.levelgen.structure.StructureSet;
 import net.minecraft.world.level.levelgen.structure.structures.JigsawStructure;
+import net.minecraft.world.level.levelgen.structure.templatesystem.StructureTemplateManager;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -40,6 +41,8 @@ public final class SeedWorld {
 	public final ChunkGeneratorStructureState state;
 	public final long seed;
 	public final LevelHeightAccessor height;
+	/** Moldes das estruturas (servidor no singleplayer, jogo no multiplayer); null = só biomas nas de quebra-cabeça. */
+	private final StructureTemplateManager templates;
 	private final int surfaceQuart;
 	private final int caveQuart;
 
@@ -50,7 +53,7 @@ public final class SeedWorld {
 	private final List<Holder<Biome>> biomes = new CopyOnWriteArrayList<>();
 
 	private SeedWorld(RegistryAccess access, ChunkGenerator generator, RandomState randomState, ChunkGeneratorStructureState state,
-			long seed, LevelHeightAccessor height) {
+			long seed, LevelHeightAccessor height, StructureTemplateManager templates) {
 		this.access = access;
 		this.generator = generator;
 		this.biomeSource = generator.getBiomeSource();
@@ -59,6 +62,7 @@ public final class SeedWorld {
 		this.state = state;
 		this.seed = seed;
 		this.height = height;
+		this.templates = templates;
 		int top = height.getMinY() + height.getHeight() - 1;
 		// Bem acima do chão o "depth" do clima é negativo: dá o bioma da superfície (sem cavernas), o mesmo que o
 		// jogo usa no chão, sem precisar calcular a altura do terreno em cada ponto.
@@ -70,15 +74,16 @@ public final class SeedWorld {
 	public static SeedWorld fromServer(ServerLevel level) {
 		var source = level.getChunkSource();
 		return new SeedWorld(level.registryAccess(), source.getGenerator(), source.randomState(), source.getGeneratorState(),
-				level.getSeed(), LevelHeightAccessor.create(level.getMinY(), level.getHeight()));
+				level.getSeed(), LevelHeightAccessor.create(level.getMinY(), level.getHeight()), level.getServer().getStructureManager());
 	}
 
 	/** Outra seed com uma geração conhecida. Null se a dimensão não usa a geração por ruído (ex.: mundo plano). */
-	public static SeedWorld create(RegistryAccess access, ChunkGenerator generator, long seed, LevelHeightAccessor height) {
+	public static SeedWorld create(RegistryAccess access, ChunkGenerator generator, long seed, LevelHeightAccessor height,
+			StructureTemplateManager templates) {
 		if (!(generator instanceof NoiseBasedChunkGenerator noise)) return null;
 		RandomState rs = RandomState.create(noise.generatorSettings().value(), access.lookupOrThrow(Registries.NOISE), seed);
 		ChunkGeneratorStructureState st = generator.createState(access.lookupOrThrow(Registries.STRUCTURE_SET), rs, seed);
-		return new SeedWorld(access, generator, rs, st, seed, height);
+		return new SeedWorld(access, generator, rs, st, seed, height, templates);
 	}
 
 	public Holder<Biome> biomeAt(int blockX, int blockZ, boolean caves) {
@@ -149,22 +154,22 @@ public final class SeedWorld {
 		StructureIcon icon = StructureIcon.forStructure(id);
 		Structure structure = holder.value();
 		ChunkPos chunk = new ChunkPos(chunkX, chunkZ);
-		// As de quebra-cabeça (vilas, postos, cidades...) precisariam montar todas as peças para achar o lugar exato: lento
-		// demais para um mapa, e o teste no CI mostra que conferir só o bioma dá o mesmo resultado. As outras passam
-		// pela conferência completa do jogo (terreno e bioma).
-		if (!(structure instanceof JigsawStructure)) {
-			// Filtro rápido antes da conferência completa (que calcula a altura do terreno e é ~100x mais lenta): se
-			// nenhum bioma em volta do meio do chunk serve, a estrutura não nasce ali.
-			if (!biomeNear(structure, chunk)) return null;
+		boolean jigsaw = structure instanceof JigsawStructure;
+		// Filtro rápido (só biomas) antes da conferência do jogo, que calcula a altura do terreno e é ~100x mais lenta:
+		// se nenhum bioma em volta do lugar onde a estrutura começaria serve, ela não nasce ali.
+		if (!biomeNear(structure, chunk, jigsaw, startY(id))) return null;
+		// A conferência do próprio jogo: terreno, bioma no ponto exato e, nas de quebra-cabeça (vilas, postos, cidades...),
+		// a peça inicial (precisa dos moldes, que vêm do servidor no singleplayer e do jogo no multiplayer).
+		if (templates != null || !jigsaw) {
 			try {
 				Structure.GenerationContext ctx = new Structure.GenerationContext(access, generator, biomeSource, randomState,
-						null, seed, chunk, height, structure.biomes()::contains);
+						templates, seed, chunk, height, structure.biomes()::contains);
 				Optional<Structure.GenerationStub> stub = structure.findValidGenerationPoint(ctx);
 				if (stub.isEmpty()) return null;
 				BlockPos p = stub.get().position();
 				return new Found(icon, id, p.getX(), p.getZ(), chunkX, chunkZ);
 			} catch (RuntimeException e) {
-				// Precisa de algo que não temos aqui (ex.: moldes): fica só a conferência do bioma. Avisa uma vez por tipo.
+				// Faltou algo (ex.: um molde): fica só a conferência do bioma. Avisa uma vez por tipo.
 				if (WARNED.add(id)) io.github.ivanils0n.chunkmap.ChunkMap.LOG.info("ChunkMap: {} conferida só pelo bioma ({})", id, e.toString());
 			}
 		}
@@ -173,12 +178,26 @@ public final class SeedWorld {
 		return structure.biomes().contains(biome) ? new Found(icon, id, x, z, chunkX, chunkZ) : null;
 	}
 
-	/** Algum bioma da estrutura nos 3x3 "quarts" (12x12 blocos) em volta do meio do chunk, na superfície? */
-	private boolean biomeNear(Structure structure, ChunkPos chunk) {
+	/**
+	 * Algum bioma da estrutura perto de onde ela começaria? Normais: 3x3 "quarts" em volta do meio do chunk. Quebra-cabeça:
+	 * a peça inicial gira em volta do canto do chunk e pode passar dele, então uma grade 5x5 a cada 8 blocos em volta do
+	 * canto (de -12 a +20).
+	 */
+	private boolean biomeNear(Structure structure, ChunkPos chunk, boolean jigsaw, int y) {
+		int qy = QuartPos.fromBlock(y);
+		if (jigsaw) {
+			for (int dx = -12; dx <= 20; dx += 8) {
+				for (int dz = -12; dz <= 20; dz += 8) {
+					int qx = QuartPos.fromBlock(chunk.getMinBlockX() + dx), qz = QuartPos.fromBlock(chunk.getMinBlockZ() + dz);
+					if (structure.biomes().contains(biomeSource.getNoiseBiome(qx, qy, qz, sampler))) return true;
+				}
+			}
+			return false;
+		}
 		int qx = QuartPos.fromBlock(chunk.getMiddleBlockX()), qz = QuartPos.fromBlock(chunk.getMiddleBlockZ());
 		for (int dx = -1; dx <= 1; dx++) {
 			for (int dz = -1; dz <= 1; dz++) {
-				if (structure.biomes().contains(biomeSource.getNoiseBiome(qx + dx, surfaceQuart, qz + dz, sampler))) return true;
+				if (structure.biomes().contains(biomeSource.getNoiseBiome(qx + dx, qy, qz + dz, sampler))) return true;
 			}
 		}
 		return false;

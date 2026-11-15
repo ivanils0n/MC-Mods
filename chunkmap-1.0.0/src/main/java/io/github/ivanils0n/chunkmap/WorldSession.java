@@ -169,15 +169,16 @@ public final class WorldSession {
 			if (data.autoSeed) return CompletableFuture.supplyAsync(() -> SeedWorld.fromServer(level), Workers.SLOW);
 			long s = seed.orElseThrow();
 			return CompletableFuture.supplyAsync(() -> SeedWorld.create(level.registryAccess(), level.getChunkSource().getGenerator(), s,
-					LevelHeightAccessor.create(level.getMinY(), level.getHeight())), Workers.SLOW);
+					LevelHeightAccessor.create(level.getMinY(), level.getHeight()), server.getStructureManager()), Workers.SLOW);
 		}
 		long s = seed.orElseThrow();
 		String preset = data.preset;
-		return VanillaWorldgen.get().thenApplyAsync(access -> vanilla(access, preset, dim, s), Workers.SLOW);
+		return VanillaWorldgen.get().thenApplyAsync(data -> vanilla(data, preset, dim, s), Workers.SLOW);
 	}
 
 	/** A geração vanilla (sem servidor) de uma dimensão para a seed: o caminho do multiplayer. */
-	public static SeedWorld vanilla(RegistryAccess access, String preset, ResourceKey<Level> dim, long seed) {
+	public static SeedWorld vanilla(VanillaWorldgen.Data data, String preset, ResourceKey<Level> dim, long seed) {
+		RegistryAccess access = data.access();
 		ResourceKey<WorldPreset> key = switch (preset) {
 			case "large_biomes" -> WorldPresets.LARGE_BIOMES;
 			case "amplified" -> WorldPresets.AMPLIFIED;
@@ -187,7 +188,7 @@ public final class WorldSession {
 		LevelStem stem = dims.dimensions().get(ResourceKey.create(Registries.LEVEL_STEM, dim.identifier()));
 		if (stem == null) return null;
 		DimensionType type = stem.type().value();
-		return SeedWorld.create(access, stem.generator(), seed, LevelHeightAccessor.create(type.minY(), type.height()));
+		return SeedWorld.create(access, stem.generator(), seed, LevelHeightAccessor.create(type.minY(), type.height()), data.templates());
 	}
 
 	public Set<StructureIcon> filters() {

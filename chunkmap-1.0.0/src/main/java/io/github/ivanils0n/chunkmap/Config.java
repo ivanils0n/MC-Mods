@@ -56,7 +56,7 @@ public final class Config {
 		public boolean showGrid = false;
 		public Set<String> filters = new LinkedHashSet<>(List.of(
 				"village", "desert_pyramid", "jungle_temple", "swamp_hut", "igloo", "ocean_monument", "mansion",
-				"stronghold", "ancient_city", "trial_chambers", "pillager_outpost", "spawn", "nether_fortress",
+				"stronghold", "ancient_city", "pillager_outpost", "spawn", "nether_fortress",
 				"bastion", "end_city"));
 		public List<Waypoint> waypoints = new ArrayList<>();
 
