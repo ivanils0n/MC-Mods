@@ -40,6 +40,8 @@ import java.util.Set;
 public final class MapRenderer {
 	public static final Identifier ARROW = tex("player_arrow");
 	public static final Identifier PIN = tex("waypoint");
+	/** Ponto de morte: caveira (sem tingir). */
+	public static final Identifier SKULL = tex("skull");
 	public static final Identifier COMPASS = tex("compass_tab");
 
 	private static long frame;
@@ -343,7 +345,8 @@ public final class MapRenderer {
 			g.pose().pushMatrix();
 			g.pose().translate(sx - size / 2f, sy - size);
 			g.pose().scale(size / 16f, size / 16f);
-			g.blit(RenderPipelines.GUI_TEXTURED, PIN, 0, 0, 0f, 0f, 16, 16, 16, 16, w.color | 0xFF000000);
+			if (w.death) g.blit(RenderPipelines.GUI_TEXTURED, SKULL, 0, 0, 0f, 0f, 16, 16, 16, 16);
+			else g.blit(RenderPipelines.GUI_TEXTURED, PIN, 0, 0, 0f, 0f, 16, 16, 16, 16, w.color | 0xFF000000);
 			g.pose().popMatrix();
 			if (!v.minimap) {
 				int tw = font.width(w.name);

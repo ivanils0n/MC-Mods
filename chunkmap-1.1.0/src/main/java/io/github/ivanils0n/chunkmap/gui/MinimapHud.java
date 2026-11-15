@@ -105,10 +105,6 @@ public final class MinimapHud {
 					.orElse(Component.literal("?")));
 			colors.add(0xFF8DE07A);
 		}
-		if (session.caveActive) {
-			lines.add(Component.translatable("chunkmap.hud.cave"));
-			colors.add(0xFFF0A040);
-		}
 		if (Config.global.showTime) {
 			long t = mc.level.getOverworldClockTime();
 			long day = t / 24000L + 1;
