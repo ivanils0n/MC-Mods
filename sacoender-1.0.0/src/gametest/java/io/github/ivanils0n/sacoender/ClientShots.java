@@ -5,11 +5,12 @@ import net.fabricmc.fabric.api.client.gametest.v1.FabricClientGameTest;
 import net.fabricmc.fabric.api.client.gametest.v1.context.ClientGameTestContext;
 import net.fabricmc.fabric.api.client.gametest.v1.context.TestSingleplayerContext;
 import net.minecraft.client.CameraType;
-import net.minecraft.client.gui.screens.inventory.ContainerScreen;
+import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.screens.inventory.InventoryScreen;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.item.ItemEntity;
+import net.minecraft.world.inventory.ChestMenu;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
 
@@ -59,7 +60,7 @@ public class ClientShots implements FabricClientGameTest {
 			context.waitTicks(2);
 			context.getInput().releaseKey(o -> o.keyUse);
 			context.waitTicks(10);
-			boolean screen = context.computeOnClient(c -> c.screen instanceof ContainerScreen);
+			boolean screen = context.computeOnClient(c -> c.player.containerMenu instanceof ChestMenu);
 			String menu = sp.getServer().computeOnServer(s -> player(s).containerMenu.getClass().getSimpleName());
 			context.takeScreenshot("3_tela_do_saco");
 			if (!screen || !menu.equals("BagMenu")) throw new AssertionError("a tela do saco não abriu (tela " + screen + ", menu " + menu + ")");
@@ -71,10 +72,10 @@ public class ClientShots implements FabricClientGameTest {
 			context.runOnClient(c -> c.player.closeContainer());
 			context.waitTicks(5);
 
-			context.runOnClient(c -> c.setScreen(new InventoryScreen(c.player)));
+			context.setScreen(() -> new InventoryScreen(Minecraft.getInstance().player));
 			context.waitTicks(5);
 			context.takeScreenshot("5_inventario");
-			context.runOnClient(c -> c.setScreen(null));
+			context.setScreen(() -> null);
 			context.waitTicks(5);
 		}
 	}

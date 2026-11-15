@@ -1,7 +1,7 @@
 """Saco do Ender: gera texturas, modelo 3D, definição do item e ícone do resource pack.
 
 Uso: python3 arte/gerar.py [preview.png]
-Modelo escolhido: B2 (Obsidiana Rebitada) sem olho, com os quatro lados iguais.
+Modelo escolhido: saco preto (laterais com a mesma textura do topo), cordão roxo escuro, sem placas e sem olho.
 O item é um papel do jogo marcado com custom_model_data "sacoender"; assets/minecraft/items/paper.json troca o
 modelo só desse papel (qualquer outro papel continua igual ao do jogo).
 """
@@ -143,10 +143,9 @@ ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 RES = ROOT + '/src/main/resources/assets'
 
 TEX = dict(
-    cloth=cloth(['#08060c', '#120d1a', '#1c1528', '#271d38'], 31, specks=(['#4d3778'], 6)),
+    cloth=cloth(['#120d1a', '#1c1528', '#271d38', '#33274a'], 31, folds=False),
     top=cloth(['#120d1a', '#1c1528', '#271d38', '#33274a'], 32, folds=False),
-    cord=solid_noise(['#6a4296', '#8456b8', '#a06fd6'], 33),
-    plate=obsidian_patch(34),
+    cord=solid_noise(['#241838', '#2e1f48', '#382657'], 33),
 )
 
 def plate_set():
@@ -161,7 +160,7 @@ def plate_set():
                     F([2.3, y, a], [2.6, y + .6, a + .6], 'cord'), F([13.4, y, a], [13.7, y + .6, a + .6], 'cord')]
     return out
 
-ELEMENTS = BODY + plate_set()
+ELEMENTS = BODY
 
 def model_json():
     els = []
@@ -222,6 +221,6 @@ if __name__ == '__main__':
         d.rectangle([20, 440, 124, 544], fill=(139, 139, 139, 255), outline=(55, 55, 55, 255), width=3)
         sheet.alpha_composite(slot, (24, 444))
         fnt = ImageFont.truetype('/usr/share/fonts/truetype/dejavu/DejaVuSans-Bold.ttf', 24)
-        d.text((150, 470), 'Saco do Ender (B2 sem olho) - frente e costas', font=fnt, fill=(235, 235, 235, 255))
+        d.text((150, 470), 'Saco do Ender - frente e costas', font=fnt, fill=(235, 235, 235, 255))
         sheet.save(sys.argv[1])
     print('ok')
