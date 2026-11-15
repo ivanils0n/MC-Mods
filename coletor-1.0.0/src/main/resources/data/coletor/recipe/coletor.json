@@ -1,0 +1,29 @@
+{
+	"type": "minecraft:crafting_shaped",
+	"category": "misc",
+	"pattern": [
+		"IHI",
+		"CBC",
+		"III"
+	],
+	"key": {
+		"I": "minecraft:iron_ingot",
+		"H": "minecraft:iron_hoe",
+		"C": "minecraft:composter",
+		"B": "minecraft:barrel"
+	},
+	"result": {
+		"id": "minecraft:barrel",
+		"count": 1,
+		"components": {
+			"minecraft:custom_data": {
+				"coletor": true
+			},
+			"minecraft:custom_name": {
+				"text": "Coletor",
+				"color": "green",
+				"italic": false
+			}
+		}
+	}
+}

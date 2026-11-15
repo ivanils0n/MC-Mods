@@ -1,0 +1,8 @@
+{
+	"parent": "minecraft:block/cube_bottom_top",
+	"textures": {
+		"top": "coletor:block/top",
+		"side": "coletor:block/side",
+		"bottom": "coletor:block/bottom"
+	}
+}

@@ -1,0 +1,23 @@
+{
+	"schemaVersion": 1,
+	"id": "coletor",
+	"version": "${version}",
+	"name": "Coletor",
+	"description": "Um bloco que colhe as plantações maduras em volta, guarda a colheita, replanta com as próprias sementes e usa a farinha de osso guardada nele para acelerar o crescimento. Só no servidor: os jogadores não precisam instalar nada.",
+	"authors": ["ivanils0n"],
+	"contact": {
+		"sources": "https://github.com/ivanils0n/MC-Mods"
+	},
+	"license": "MIT",
+	"environment": "*",
+	"mixins": ["coletor.mixins.json"],
+	"entrypoints": {
+		"main": ["io.github.ivanils0n.coletor.Coletor"]
+	},
+	"depends": {
+		"fabricloader": ">=0.19.0",
+		"fabric-api": "*",
+		"minecraft": "${minecraft_dependency}",
+		"java": ">=25"
+	}
+}

@@ -11,6 +11,7 @@ Mods Fabric para Minecraft. Cada pasta `<mod>-<versão>/` é um mod independente
 | Golem de Cobre Inteligente | `coppergolem-1.0.0/` | 26.2 (Fabric, servidor ou singleplayer, requer Fabric API) |
 | Autômato | `automato-1.0.0/` | 26.2 (Fabric, servidor ou singleplayer, requer Fabric API) |
 | Saco do Ender | `sacoender-1.0.0/` | 26.2 (Fabric, servidor ou singleplayer, requer Fabric API) |
+| Coletor | `coletor-1.0.0/` | 26.2 (Fabric, servidor ou singleplayer, requer Fabric API) |
 | Mochilas | `mochilas-1.0.0/` | 26.2 (Fabric, servidor ou singleplayer, requer Fabric API; Polymer e SGUI já vêm dentro) |
 
 ## Releases
@@ -57,6 +58,20 @@ Vai na pasta `mods/` do servidor, junto com o Fabric API; os jogadores entram se
   - **1.1.0** (26.2): o mod passa a se chamar **Baú Central** (itens antigos mudam de nome ao serem segurados), aceita até **512 baús ligados** (antes 64), a **tampa abre** enquanto alguém usa o baú, o texto de cada item mostra total, baús e **categoria**, e clicar no baú com comida, escudo ou pérola na mão não usa mais o item.
 - **Desempenho**: os baús só são lidos enquanto alguém está com a tela aberta (1 vez por segundo) e nunca carregam chunks; baús ligados longe demais para estarem carregados aparecem como "longe demais agora".
 - Os dados ficam em `<mundo>/smartchest.json`, fora do save do Minecraft. Sem o mod, sobra só uma obsidiana comum e os itens continuam nos baús.
+
+## Coletor
+
+Vai na pasta `mods/` do servidor, junto com o Fabric API; os jogadores entram sem instalar nada. Em singleplayer, coloque o mesmo .jar na pasta `mods/` do jogo.
+
+- **Receita** (bancada): ferro, enxada de ferro, ferro em cima; composteira, barril, composteira no meio; 3 ferros embaixo.
+- **Colher**: a cada meio segundo procura plantas maduras na área (quadrado em volta do Coletor, da altura dele, 1 abaixo e 1 acima), guarda tudo o que elas soltariam e replanta com uma das sementes colhidas (sem semente na colheita, usa uma guardada). Trigo, cenoura, batata, beterraba, fungo do Nether e cacau são replantados; frutas silvestres são colhidas como pela mão (o arbusto fica); abóbora e melancia só as ligadas a um caule; cana e cacto acima da base.
+- **Farinha de osso**: guardada no Coletor, ele aduba uma planta da área ainda crescendo a cada meio segundo (dá para desligar na tela).
+- **Cheio**: se a colheita não couber, a planta fica no pé (nada cai no chão). Por baixo é um barril de verdade: funis tiram a colheita e põem farinha.
+- **Redstone**: com sinal (alavanca, botão...) ele pausa.
+- **Tela**: 27 espaços do barril e uma fileira com a situação (colhendo, esperando crescer, pausado, cheio), a área (3×3, 5×5, 7×7, 9×9 padrão, 11×11) e a farinha de osso liga/desliga.
+- **Quebrar**: volta o Coletor e tudo o que estava guardado.
+- **Visual (Ferro e Enxada)**: pedra com faixas de ferro e uma enxada, grade de ferro sobre a terra no topo; a tela ganha fundo de pedra e ferro com a fileira de controle sobre terra e botões próprios. Vem dentro do .jar (singleplayer) e, no servidor dedicado, o próprio mod envia o resource pack. Quem recusar vê um barril e a tela de baú comum (vidros e itens do jogo como botões). As texturas são geradas por `arte/gerar.py` e `arte/tela.py`.
+- Os dados ficam em `<mundo>/coletor.json`, fora do save do Minecraft. Sem o mod, sobra um barril comum com a colheita dentro.
 
 ## Item Despawn Timer
 
