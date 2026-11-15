@@ -125,6 +125,26 @@ pd.ellipse([7, 3, 24, 20], fill=hx("#ffffff")); pd.polygon([(10, 16), (21, 16), 
 pd.ellipse([9, 13, 24, 21], fill=hx("#c8c8c8")); pd.ellipse([7, 3, 24, 18], fill=hx("#ffffff"))
 pd.ellipse([12, 8, 19, 15], fill=hx("#5a5f66")); pd.ellipse([10, 5, 14, 9], fill=hx("#ffffff"))
 p32.save(f"{OUT}/waypoint.png")
+# Caveira 32x32 do ponto de morte (não é tingida): osso claro com relevo, olhos e nariz escuros, contorno.
+SKULL = ["....XXXXXXXX....","..XXXXXXXXXXXX..",".XXXXXXXXXXXXXX.",".XXXXXXXXXXXXXX.","XXXXXXXXXXXXXXXX",
+         "XXX....XX....XXX","XXX....XX....XXX","XXX....XX....XXX","XXXXXXX..XXXXXXX",".XXXXXX..XXXXXX.",
+         "..XXXXXXXXXXXX..","...XXXXXXXXXX...","...X.X.XX.X.X...","...XXXXXXXXXX...","....XXXXXXXX....","................"]
+sk = Image.new("RGBA", (34, 34), (0, 0, 0, 0))  # 1 px de folga para o contorno
+for y, row in enumerate(SKULL):
+    for x, ch in enumerate(row):
+        inside = 1 <= y <= 14 and 0 <= x <= 15 and (row[x] == "." and any(r[x] == "X" for r in SKULL[:y]) and any(r[x] == "X" for r in SKULL[y + 1:]) and "X" in row[:x] and "X" in row[x + 1:])
+        if ch == "X":
+            light = y < 3 or (y < 5 and x < 6)
+            dark = y >= 11 or x >= 13
+            c = (250, 246, 236, 255) if light else (176, 168, 152, 255) if dark else (232, 226, 210, 255)
+        elif inside:
+            c = (34, 22, 22, 255)
+        else:
+            continue
+        for sy in range(2):
+            for sx in range(2): sk.putpixel((1 + x * 2 + sx, 1 + y * 2 + sy), c)
+sk = outline(sk, "#0e0a0a")
+sk.save(f"{OUT}/skull.png")
 
 # moldura do minimapa: 136x136, centro transparente 128x128
 S = 96; F = S + 8
@@ -343,4 +363,5 @@ for i, f in enumerate(["player_arrow", "waypoint"]):
     sh.alpha_composite(Image.open(f"{OUT}/{f}.png"), (8 + i * 40, 46))
 tinted = Image.open(f"{OUT}/waypoint.png"); arr = np.array(tinted).astype(float); arr[..., :3] *= np.array([0.88, 0.28, 0.28]); sh.alpha_composite(Image.fromarray(arr.astype(np.uint8)), (88, 46))
 sh.alpha_composite(Image.open(f"{OUT}/compass_tab.png"), (128, 52))
+sh.alpha_composite(Image.open(f"{OUT}/skull.png"), (168, 46))
 up(sh, 3).convert("RGB").save(f"{PREV}/texturas_finais.png")
