@@ -136,8 +136,26 @@ final class SelfTest {
 		ensure(ender.getItem(F).isEmpty(), "shift+clique para o inventário não tirou do baú do fim");
 		ensure(count(inv, Items.DIAMOND) == 3, "diamantes no inventário: " + count(inv, Items.DIAMOND));
 		ensure(same(hidden, snapshot(ender, 0, 18)), "o saco mexeu nos espaços 0-17 do baú do fim");
+		// O próprio saco não entra nos espaços do saco (nem com shift+clique, nem clicando, nem com tecla numérica).
+		ender.setItem(F + 3, ItemStack.EMPTY);
+		ensure(!menu.getSlot(3).mayPlace(bag), "o saco pode ser posto dentro do saco");
+		inv.setItem(0, bag.copy());
+		menu.quickMoveStack(fp, 36);
+		ensure(SacoEnder.isBag(inv.getItem(0)) && ender.getItem(F + 3).isEmpty(), "shift+clique pôs o saco dentro do saco");
+		menu.clicked(3, 0, ContainerInput.SWAP, fp);
+		ensure(SacoEnder.isBag(inv.getItem(0)) && ender.getItem(F + 3).isEmpty(), "tecla numérica pôs o saco dentro do saco");
+		menu.setCarried(inv.getItem(0).copy());
+		inv.setItem(0, ItemStack.EMPTY);
+		menu.clicked(3, 0, ContainerInput.PICKUP, fp);
+		ensure(SacoEnder.isBag(menu.getCarried()) && ender.getItem(F + 3).isEmpty(), "clique pôs o saco dentro do saco");
+		inv.setItem(0, menu.getCarried());
+		menu.setCarried(ItemStack.EMPTY);
+		// Saco tingido também não entra.
+		ItemStack dyedBag = craft(server, sl, CraftingInput.of(2, 1, List.of(bag.copy(), new ItemStack(BuiltInRegistries.ITEM.getValue(Identifier.withDefaultNamespace("purple_dye"))))));
+		ensure(!menu.getSlot(3).mayPlace(dyedBag), "saco tingido pode ser posto dentro do saco");
+		ensure(menu.getSlot(3).mayPlace(new ItemStack(Items.BUNDLE)), "trouxa comum foi barrada");
 		menu.removed(fp);
-		ok("tela ligada aos 9 últimos espaços do baú do fim");
+		ok("tela ligada aos 9 últimos espaços do baú do fim; o saco não entra nele mesmo");
 
 		// 4b. Clicar com um item em cima do saco (e o saco em cima de um item) não guarda nada dentro dele.
 		inv.clearContent();

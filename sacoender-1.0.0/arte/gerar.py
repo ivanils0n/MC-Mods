@@ -161,7 +161,10 @@ T1 = [F([5, 0, 5], [11, 1, 11], 'cloth'), F([4, 1, 4], [12, 2, 12], 'cloth'),
       F([6, 8.5, 6], [10, 10, 10], 'cloth'),
       F([5.5, 8.75, 5.5], [10.5, 9.75, 10.5], 'cord')] + ring(4.5, 10, 4.5, 11.5, 11.5, 11.5, 1, 'top') + [
       F([5.5, 10, 5.5], [10.5, 10.25, 10.5], 'inner'),
-      F([7.3, 7.0, 4.6], [8.0, 9.0, 5.1], 'cord'), F([8.2, 6.6, 4.6], [8.9, 9.0, 5.1], 'cord')]
+      # nó e as duas pontas do laço caindo na face sul: a que fica virada para o jogador na mão e no inventário
+      F([7.3, 8.5, 10.5], [8.7, 9.9, 11.2], 'cord'),
+      F([6.9, 7.4, 11.0], [7.5, 8.6, 11.5], 'cord'), F([6.6, 6.0, 12.0], [7.2, 7.6, 12.5], 'cord'),
+      F([8.5, 7.4, 11.0], [9.1, 8.6, 11.5], 'cord'), F([8.9, 6.4, 12.0], [9.5, 7.6, 12.5], 'cord')]
 
 ELEMENTS = T1
 
@@ -178,7 +181,7 @@ def model_json():
         'textures': {t: f'sacoender:item/saco_{t}' for t in sorted(TEX)} | {'particle': 'sacoender:item/saco_cloth'},
         'elements': els,
         'display': {
-            'gui': {'rotation': [30, 225, 0], 'translation': [0, 1.25, 0], 'scale': [0.8, 0.8, 0.8]},
+            'gui': {'rotation': [30, 45, 0], 'translation': [0, 1.25, 0], 'scale': [0.8, 0.8, 0.8]},
             'ground': {'translation': [0, 2, 0], 'scale': [0.5, 0.5, 0.5]},
             'fixed': {'translation': [0, 1, 0], 'scale': [0.75, 0.75, 0.75]},
             'head': {'translation': [0, 13, 0], 'scale': [0.8, 0.8, 0.8]},
@@ -259,13 +262,13 @@ if __name__ == '__main__':
     ender_row().save(RES + '/sacoender/textures/gui/ender_row.png', optimize=True)
     dump(RES + '/sacoender/font/gui.json', FONT, ascii=True)
     os.makedirs(ROOT + '/src/pack', exist_ok=True)
-    icon = render(ELEMENTS, TEX, 64, scale=0.7)
+    icon = render(ELEMENTS, TEX, 64, ry=45, scale=0.7)
     bg = Image.new('RGBA', (64, 64), (24, 16, 36, 255)); bg.alpha_composite(icon)
     bg.save(ROOT + '/src/pack/pack.png', optimize=True)
     if len(sys.argv) > 1:
-        big = render(ELEMENTS, TEX, 420, scale=0.52)
-        back = render(ELEMENTS, TEX, 420, rx=30, ry=45, scale=0.52)
-        slot = render(ELEMENTS, TEX, 32, scale=0.72).resize((96, 96), Image.NEAREST)
+        big = render(ELEMENTS, TEX, 420, ry=45, scale=0.52)
+        back = render(ELEMENTS, TEX, 420, rx=30, ry=225, scale=0.52)
+        slot = render(ELEMENTS, TEX, 32, ry=45, scale=0.72).resize((96, 96), Image.NEAREST)
         sheet = Image.new('RGBA', (900, 560), (28, 28, 33, 255))
         sheet.alpha_composite(big, (10, 20)); sheet.alpha_composite(back, (450, 20))
         from PIL import ImageDraw, ImageFont

@@ -27,7 +27,15 @@ final class BagMenu extends AbstractContainerMenu {
 		super(MenuType.GENERIC_9x1, id);
 		this.owner = owner;
 		PlayerEnderChestContainer ender = owner.getEnderChestInventory();
-		for (int i = 0; i < SLOTS; i++) addSlot(new Slot(ender, FIRST + i, 8 + i * 18, 18));
+		for (int i = 0; i < SLOTS; i++) {
+			// O próprio saco não entra nos espaços do saco (clique, shift+clique, arrastar e teclas numéricas usam mayPlace).
+			addSlot(new Slot(ender, FIRST + i, 8 + i * 18, 18) {
+				@Override
+				public boolean mayPlace(ItemStack stack) {
+					return !SacoEnder.isBag(stack);
+				}
+			});
+		}
 		for (int row = 0; row < 3; row++) {
 			for (int col = 0; col < 9; col++) addSlot(new Slot(inv, col + row * 9 + 9, 8 + col * 18, 49 + row * 18));
 		}
