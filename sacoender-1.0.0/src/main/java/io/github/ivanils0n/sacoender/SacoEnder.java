@@ -44,7 +44,7 @@ import org.slf4j.LoggerFactory;
 
 /**
  * Saco do Ender: uma trouxa do jogo marcada (custom_data "sacoender") e sem espaço próprio (sem bundle_contents, então
- * o jogo não deixa pôr itens nela nem a esvazia) que, com o botão direito, abre os 9 primeiros espaços do baú do fim de
+ * o jogo não deixa pôr itens nela nem a esvazia) que, com o botão direito, abre os 9 últimos espaços do baú do fim de
  * quem o usa. O mod não guarda nada: a tela mexe direto no baú do fim do jogador, que o próprio jogo salva. Sem o mod,
  * o saco vira uma trouxa chamada "Saco do Ender" que não guarda nada, e os itens continuam no baú do fim.
  */
@@ -59,7 +59,7 @@ public final class SacoEnder implements ModInitializer {
 	static final String PACK_SHA1 = readPackHash();
 	private static final UUID PACK_ID = UUID.nameUUIDFromBytes("sacoender:pack".getBytes(StandardCharsets.UTF_8));
 	private static final Set<UUID> PACK_OK = ConcurrentHashMap.newKeySet();
-	/** Caractere da fonte sacoender:gui com os 9 espaços do saco (arte/gerar.py); \uF000/\uF001/\uF002 voltam o cursor. */
+	/** Caractere da fonte sacoender:gui com os 9 espaços do saco (a última fileira) (arte/gerar.py); \uF000/\uF001/\uF002 voltam o cursor. */
 	static final String ENDER_ROW = "\uF000\uE000\uF001\uF002";
 
 	@Override

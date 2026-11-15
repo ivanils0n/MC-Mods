@@ -12,7 +12,7 @@
    "type": "bitmap",
    "file": "sacoender:gui/ender_row.png",
    "ascent": 13,
-   "height": 36,
+   "height": 72,
    "chars": [
     "\ue000"
    ]

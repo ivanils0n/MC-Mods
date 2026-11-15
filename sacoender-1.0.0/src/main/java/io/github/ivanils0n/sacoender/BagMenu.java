@@ -12,12 +12,14 @@ import net.minecraft.world.inventory.Slot;
 import net.minecraft.world.item.ItemStack;
 
 /**
- * Tela do saco: o baú de 1 fileira do jogo (funciona sem mod no cliente). Os 9 espaços são os espaços 0 a 8 do
- * próprio baú do fim do jogador (os mesmos objetos do jogo, sem cópia), então o que entra ou sai aqui aparece no
- * baú do fim na hora e é salvo pelo jogo junto com o jogador. Os espaços 9 a 26 do baú do fim nunca são tocados.
+ * Tela do saco: o baú de 1 fileira do jogo (funciona sem mod no cliente). Os 9 espaços são os espaços 18 a 26 (a última
+ * fileira) do próprio baú do fim do jogador (os mesmos objetos do jogo, sem cópia), então o que entra ou sai aqui
+ * aparece no baú do fim na hora e é salvo pelo jogo junto com o jogador. Os espaços 0 a 17 nunca são tocados.
  */
 final class BagMenu extends AbstractContainerMenu {
 	static final int SLOTS = 9;
+	/** Primeiro espaço do baú do fim que é do saco (a última fileira: 18 a 26). */
+	static final int FIRST = 18;
 
 	private final ServerPlayer owner;
 
@@ -25,7 +27,7 @@ final class BagMenu extends AbstractContainerMenu {
 		super(MenuType.GENERIC_9x1, id);
 		this.owner = owner;
 		PlayerEnderChestContainer ender = owner.getEnderChestInventory();
-		for (int i = 0; i < SLOTS; i++) addSlot(new Slot(ender, i, 8 + i * 18, 18));
+		for (int i = 0; i < SLOTS; i++) addSlot(new Slot(ender, FIRST + i, 8 + i * 18, 18));
 		for (int row = 0; row < 3; row++) {
 			for (int col = 0; col < 9; col++) addSlot(new Slot(inv, col + row * 9 + 9, 8 + col * 18, 49 + row * 18));
 		}

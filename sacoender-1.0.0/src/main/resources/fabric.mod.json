@@ -3,7 +3,7 @@
 	"id": "sacoender",
 	"version": "${version}",
 	"name": "Saco do Ender",
-	"description": "Um saquinho que abre os 9 primeiros espaços do seu baú do fim, de qualquer lugar. Os itens ficam sempre no próprio baú do fim. Só no servidor: os jogadores não precisam instalar nada.",
+	"description": "Um saquinho que abre os 9 últimos espaços do seu baú do fim, de qualquer lugar. Os itens ficam sempre no próprio baú do fim. Só no servidor: os jogadores não precisam instalar nada.",
 	"authors": ["ivanils0n"],
 	"contact": {
 		"sources": "https://github.com/ivanils0n/MC-Mods"

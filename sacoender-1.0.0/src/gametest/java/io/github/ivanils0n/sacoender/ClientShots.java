@@ -39,9 +39,9 @@ public class ClientShots implements FabricClientGameTest {
 			sp.getServer().runOnServer(s -> {
 				ServerPlayer p = player(s);
 				p.getInventory().setItem(0, SacoEnder.bagItem());
-				p.getEnderChestInventory().setItem(0, new ItemStack(Items.DIAMOND, 12));
-				p.getEnderChestInventory().setItem(4, new ItemStack(Items.ENDER_PEARL, 16));
-				p.getEnderChestInventory().setItem(9, new ItemStack(Items.GOLD_INGOT, 5)); // fora do saco
+				p.getEnderChestInventory().setItem(18, new ItemStack(Items.DIAMOND, 12));
+				p.getEnderChestInventory().setItem(22, new ItemStack(Items.ENDER_PEARL, 16));
+				p.getEnderChestInventory().setItem(0, new ItemStack(Items.GOLD_INGOT, 5)); // fora do saco
 				ItemEntity drop = new ItemEntity(p.level(), X + 0.8, Y, Z + 2.2, SacoEnder.bagItem());
 				drop.setNeverPickUp();
 				drop.setDeltaMovement(0, 0, 0);
@@ -66,7 +66,7 @@ public class ClientShots implements FabricClientGameTest {
 			if (!screen || !menu.equals("BagMenu")) throw new AssertionError("a tela do saco não abriu (tela " + screen + ", menu " + menu + ")");
 
 			// Item posto no baú do fim com a tela aberta aparece no saco.
-			sp.getServer().runOnServer(s -> player(s).getEnderChestInventory().setItem(8, new ItemStack(Items.EMERALD, 7)));
+			sp.getServer().runOnServer(s -> player(s).getEnderChestInventory().setItem(26, new ItemStack(Items.EMERALD, 7)));
 			context.waitTicks(5);
 			context.takeScreenshot("4_tela_atualizada");
 			context.runOnClient(c -> c.player.closeContainer());
@@ -78,7 +78,7 @@ public class ClientShots implements FabricClientGameTest {
 			context.setScreen(() -> null);
 			context.waitTicks(5);
 
-			// Baú do Ender de verdade: os 9 primeiros espaços (os do saco) aparecem desenhados.
+			// Baú do Ender de verdade: os 9 últimos espaços (os do saco) aparecem desenhados.
 			cmd(sp, "kill @e[type=item]");
 			cmd(sp, "item replace entity @p weapon.mainhand with minecraft:air");
 			cmd(sp, String.format(Locale.ROOT, "setblock %d %d %d minecraft:ender_chest", (int) Math.floor(X), (int) Y, (int) Math.floor(Z) + 1));

@@ -97,44 +97,47 @@ final class SelfTest {
 		fp.setItemInHand(InteractionHand.OFF_HAND, ItemStack.EMPTY);
 		ok("botão direito");
 
-		// 4. A tela mexe direto nos espaços 0-8 do baú do fim e nunca nos 9-26.
+		// 4. A tela mexe direto nos espaços 18-26 (a última fileira) do baú do fim e nunca nos 0-17.
+		int F = BagMenu.FIRST;
+		ensure(F == 18, "primeiro espaço do saco: " + F);
 		PlayerEnderChestContainer ender = fp.getEnderChestInventory();
 		Inventory inv = fp.getInventory();
 		ender.clearContent();
 		inv.clearContent();
-		ender.setItem(0, new ItemStack(Items.DIAMOND, 5));
-		ender.setItem(9, new ItemStack(Items.GOLD_INGOT, 3));
-		ender.setItem(26, new ItemStack(Items.ELYTRA));
-		List<ItemStack> hidden = snapshot(ender, 9, 27);
+		ender.setItem(F, new ItemStack(Items.DIAMOND, 5));
+		ender.setItem(0, new ItemStack(Items.GOLD_INGOT, 3));
+		ender.setItem(17, new ItemStack(Items.ELYTRA));
+		List<ItemStack> hidden = snapshot(ender, 0, 18);
 		BagMenu menu = new BagMenu(1, inv, fp);
 		ensure(menu.slots.size() == 9 + 36, "espaços da tela: " + menu.slots.size());
-		ensure(menu.getSlot(0).getItem() == ender.getItem(0) && menu.getSlot(0).getItem().getCount() == 5, "a tela não mostra o baú do fim");
+		ensure(menu.getSlot(0).getItem() == ender.getItem(F) && menu.getSlot(0).getItem().getCount() == 5, "a tela não mostra a última fileira do baú do fim");
 		ensure(menu.stillValid(fp), "a tela fechou sozinha");
 
 		menu.getSlot(4).set(new ItemStack(Items.TORCH, 16));
-		ensure(ender.getItem(4).is(Items.TORCH) && ender.getItem(4).getCount() == 16, "item posto no saco não foi para o baú do fim");
+		ensure(ender.getItem(F + 4).is(Items.TORCH) && ender.getItem(F + 4).getCount() == 16, "item posto no saco não foi para o baú do fim");
 		menu.getSlot(0).remove(2);
-		ensure(ender.getItem(0).getCount() == 3, "item tirado do saco não saiu do baú do fim");
-		ender.setItem(1, new ItemStack(Items.EMERALD, 7));
+		ensure(ender.getItem(F).getCount() == 3, "item tirado do saco não saiu do baú do fim");
+		ender.setItem(F + 1, new ItemStack(Items.EMERALD, 7));
 		ensure(menu.getSlot(1).getItem().is(Items.EMERALD), "item posto no baú do fim não aparece no saco");
+		ensure(ender.getItem(26) == menu.getSlot(8).getItem(), "último espaço do saco não é o último do baú do fim");
 
 		// Shift+clique do inventário (hotbar 0 = espaço 36 da tela) vai para o 1º espaço livre do saco.
 		inv.setItem(0, new ItemStack(Items.COBBLESTONE, 64));
 		menu.quickMoveStack(fp, 36);
-		ensure(ender.getItem(2).is(Items.COBBLESTONE) && ender.getItem(2).getCount() == 64 && inv.getItem(0).isEmpty(), "shift+clique para o saco: " + ender.getItem(2));
-		// Saco cheio: o resto fica no inventário e o baú do fim (9-26) não muda.
-		for (int i = 0; i < 9; i++) if (ender.getItem(i).isEmpty()) ender.setItem(i, new ItemStack(Items.DIRT, 64));
+		ensure(ender.getItem(F + 2).is(Items.COBBLESTONE) && ender.getItem(F + 2).getCount() == 64 && inv.getItem(0).isEmpty(), "shift+clique para o saco: " + ender.getItem(F + 2));
+		// Saco cheio: o resto fica no inventário e o baú do fim (0-17) não muda.
+		for (int i = F; i < 27; i++) if (ender.getItem(i).isEmpty()) ender.setItem(i, new ItemStack(Items.DIRT, 64));
 		inv.setItem(0, new ItemStack(Items.STONE, 64));
 		menu.quickMoveStack(fp, 36);
 		ensure(inv.getItem(0).is(Items.STONE) && inv.getItem(0).getCount() == 64, "com o saco cheio o item saiu do inventário");
-		ensure(same(hidden, snapshot(ender, 9, 27)), "o saco mexeu nos espaços 9-26 do baú do fim");
+		ensure(same(hidden, snapshot(ender, 0, 18)), "o saco mexeu nos espaços 0-17 do baú do fim");
 		// Shift+clique do saco para o inventário.
 		menu.quickMoveStack(fp, 0);
-		ensure(ender.getItem(0).isEmpty(), "shift+clique para o inventário não tirou do baú do fim");
+		ensure(ender.getItem(F).isEmpty(), "shift+clique para o inventário não tirou do baú do fim");
 		ensure(count(inv, Items.DIAMOND) == 3, "diamantes no inventário: " + count(inv, Items.DIAMOND));
-		ensure(same(hidden, snapshot(ender, 9, 27)), "o saco mexeu nos espaços 9-26 do baú do fim");
+		ensure(same(hidden, snapshot(ender, 0, 18)), "o saco mexeu nos espaços 0-17 do baú do fim");
 		menu.removed(fp);
-		ok("tela ligada aos 9 primeiros espaços do baú do fim");
+		ok("tela ligada aos 9 últimos espaços do baú do fim");
 
 		// 4b. Clicar com um item em cima do saco (e o saco em cima de um item) não guarda nada dentro dele.
 		inv.clearContent();
