@@ -22,7 +22,7 @@ import java.util.concurrent.ConcurrentHashMap;
  */
 public final class StructureFinder {
 	/** Acima disso de regiões na tela para um conjunto, ele não é calculado (pede para aproximar). */
-	private static final int MAX_REGIONS = 12_000;
+	private static final int MAX_REGIONS = 6_000;
 	private static final SeedWorld.Found[] NONE = new SeedWorld.Found[0];
 
 	private final SeedWorld world;

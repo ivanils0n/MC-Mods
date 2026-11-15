@@ -120,6 +120,7 @@ public final class MapRenderer {
 				StructureFinder finder = seed.structures();
 				List<SeedWorld.Found> found = new ArrayList<>();
 				v.limited = finder.collect(v.worldX(v.x - 8), v.worldZ(v.y - 8), v.worldX(v.x + v.w + 8), v.worldZ(v.y + v.h + 8), v.filters, found);
+				if (v.minimap) v.limited = false;
 				v.busy = finder.busy();
 				drawStructures(g, v, found, hits);
 			} else {
@@ -229,13 +230,41 @@ public final class MapRenderer {
 		g.pose().popMatrix();
 	}
 
+	/** Ordem de desenho quando falta espaço: as mais raras primeiro. */
+	private static final List<StructureIcon> RARITY = List.of(StructureIcon.STRONGHOLD, StructureIcon.MANSION, StructureIcon.ANCIENT_CITY,
+			StructureIcon.END_CITY, StructureIcon.BASTION, StructureIcon.NETHER_FORTRESS, StructureIcon.OCEAN_MONUMENT,
+			StructureIcon.DESERT_PYRAMID, StructureIcon.JUNGLE_TEMPLE, StructureIcon.SWAMP_HUT, StructureIcon.IGLOO,
+			StructureIcon.PILLAGER_OUTPOST, StructureIcon.VILLAGE, StructureIcon.TRIAL_CHAMBERS, StructureIcon.SHIPWRECK,
+			StructureIcon.RUINED_PORTAL, StructureIcon.BURIED_TREASURE, StructureIcon.MINESHAFT);
+
+	private static int rarity(StructureIcon i) {
+		int r = RARITY.indexOf(i);
+		return r < 0 ? RARITY.size() : r;
+	}
+
+	/**
+	 * Desenha os ícones sem amontoar: cada ícone ocupa uma casa da tela do tamanho dele, e um ícone que cairia numa casa
+	 * já ocupada fica de fora (as estruturas mais raras ganham a vez). Se algum ficou de fora, o mapa pede para aproximar.
+	 */
 	private static void drawStructures(GuiGraphicsExtractor g, View v, List<SeedWorld.Found> found, List<Hit> hits) {
 		int size = iconSize(v);
+		found.sort(java.util.Comparator.comparingInt(f -> rarity(f.icon())));
 		int n = 0;
 		for (SeedWorld.Found f : found) {
-			if (f.icon() == null || ++n > 1500) break;
+			if (f.icon() == null) continue;
 			float sx = v.screenX(f.x() + 0.5), sy = v.screenY(f.z() + 0.5);
 			if (!v.inside(sx, sy, size)) continue;
+			// Casas do tamanho do ícone: basta olhar a própria e as 8 vizinhas para saber se encostaria em outro.
+			int cx = Mth.floor(sx / size), cy = Mth.floor(sy / size);
+			boolean free = true;
+			for (int dx = -1; dx <= 1 && free; dx++) {
+				for (int dy = -1; dy <= 1 && free; dy++) free = !near(sx, sy, cx + dx, cy + dy, size);
+			}
+			if (!free || ++n > 1200) {
+				v.limited = true;
+				continue;
+			}
+			centers.put(cell(cx, cy), new float[]{sx, sy});
 			drawIcon(g, f.icon().texture, sx, sy, size);
 			if (hits != null) {
 				int h = size / 2;
@@ -243,6 +272,19 @@ public final class MapRenderer {
 						List.of(f.icon().label(), structureName(f.structure()), coords(f.x(), f.z())), null));
 			}
 		}
+		centers.clear();
+	}
+
+	/** Centro do ícone já desenhado em cada casa (só durante drawStructures, na thread do jogo). */
+	private static final java.util.Map<Long, float[]> centers = new java.util.HashMap<>();
+
+	private static long cell(int x, int y) {
+		return (long) x << 32 | y & 0xFFFFFFFFL;
+	}
+
+	private static boolean near(float sx, float sy, int cx, int cy, int size) {
+		float[] c = centers.get(cell(cx, cy));
+		return c != null && Math.abs(c[0] - sx) < size && Math.abs(c[1] - sy) < size;
 	}
 
 	private static Component structureName(String id) {
