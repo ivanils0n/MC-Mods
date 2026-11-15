@@ -43,6 +43,8 @@ public final class SeedWorld {
 	private final int surfaceQuart;
 	private final int caveQuart;
 
+	private static final java.util.Set<String> WARNED = ConcurrentHashMap.newKeySet();
+
 	/** Índice de cada bioma (para os blocos de mapa guardarem só um número por pixel). */
 	private final ConcurrentHashMap<Holder<Biome>, Integer> biomeIndex = new ConcurrentHashMap<>();
 	private final List<Holder<Biome>> biomes = new CopyOnWriteArrayList<>();
@@ -151,6 +153,9 @@ public final class SeedWorld {
 		// demais para um mapa, e o teste no CI mostra que conferir só o bioma dá o mesmo resultado. As outras passam
 		// pela conferência completa do jogo (terreno e bioma).
 		if (!(structure instanceof JigsawStructure)) {
+			// Filtro rápido antes da conferência completa (que calcula a altura do terreno e é ~100x mais lenta): se
+			// nenhum bioma em volta do meio do chunk serve, a estrutura não nasce ali.
+			if (!biomeNear(structure, chunk)) return null;
 			try {
 				Structure.GenerationContext ctx = new Structure.GenerationContext(access, generator, biomeSource, randomState,
 						null, seed, chunk, height, structure.biomes()::contains);
@@ -158,13 +163,25 @@ public final class SeedWorld {
 				if (stub.isEmpty()) return null;
 				BlockPos p = stub.get().position();
 				return new Found(icon, id, p.getX(), p.getZ(), chunkX, chunkZ);
-			} catch (RuntimeException ignored) {
-				// Precisa de algo que não temos aqui (ex.: moldes no multiplayer): fica só a conferência do bioma.
+			} catch (RuntimeException e) {
+				// Precisa de algo que não temos aqui (ex.: moldes): fica só a conferência do bioma. Avisa uma vez por tipo.
+				if (WARNED.add(id)) io.github.ivanils0n.chunkmap.ChunkMap.LOG.info("ChunkMap: {} conferida só pelo bioma ({})", id, e.toString());
 			}
 		}
 		int x = chunk.getMiddleBlockX(), z = chunk.getMiddleBlockZ();
 		Holder<Biome> biome = biomeSource.getNoiseBiome(QuartPos.fromBlock(x), QuartPos.fromBlock(startY(id)), QuartPos.fromBlock(z), sampler);
 		return structure.biomes().contains(biome) ? new Found(icon, id, x, z, chunkX, chunkZ) : null;
+	}
+
+	/** Algum bioma da estrutura nos 3x3 "quarts" (12x12 blocos) em volta do meio do chunk, na superfície? */
+	private boolean biomeNear(Structure structure, ChunkPos chunk) {
+		int qx = QuartPos.fromBlock(chunk.getMiddleBlockX()), qz = QuartPos.fromBlock(chunk.getMiddleBlockZ());
+		for (int dx = -1; dx <= 1; dx++) {
+			for (int dz = -1; dz <= 1; dz++) {
+				if (structure.biomes().contains(biomeSource.getNoiseBiome(qx + dx, surfaceQuart, qz + dz, sampler))) return true;
+			}
+		}
+		return false;
 	}
 
 	/** Altura em que o jogo confere o bioma das estruturas subterrâneas de quebra-cabeça; as outras ficam no chão. */
