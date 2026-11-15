@@ -14,6 +14,8 @@ import net.minecraft.client.gui.components.PlayerFaceExtractor;
 import net.minecraft.client.multiplayer.ClientLevel;
 import net.minecraft.client.player.AbstractClientPlayer;
 import net.minecraft.client.renderer.RenderPipelines;
+import net.minecraft.client.renderer.entity.state.EntityRenderState;
+import net.minecraft.client.renderer.entity.state.LivingEntityRenderState;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.Identifier;
 import net.minecraft.resources.ResourceKey;
@@ -25,6 +27,9 @@ import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.levelgen.WorldgenRandom;
 import net.minecraft.world.level.storage.LevelData;
+
+import org.joml.Quaternionf;
+import org.joml.Vector3f;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -57,6 +62,8 @@ public final class MapRenderer {
 		public boolean biomes = true, terrain, grid, caves;
 		/** Mostrar o mapa das cavernas (no lugar dos biomas e do terreno). */
 		public boolean caveMap;
+		/** Modo detalhado (TAB apertado): cabeça de cada mob e do jogador no lugar dos pontos e da seta. */
+		public boolean detailed;
 		public Set<StructureIcon> filters = Set.of();
 		public float partialTick;
 		/** Saídas: a área ficou grande demais para alguns filtros / ainda calculando. */
@@ -357,7 +364,9 @@ public final class MapRenderer {
 		g.enableScissor(v.x, v.y, v.x + v.w, v.y + v.h);
 		try {
 			// Mobs: só os perto da altura do jogador (os das cavernas embaixo não poluem o mapa) e com zoom de perto.
-			if (Config.global.showMobs && v.scale >= 0.5f) {
+			if (v.detailed) {
+				drawMobHeads(g, v, mc, level, self);
+			} else if (Config.global.showMobs && v.scale >= 0.5f) {
 				int n = 0;
 				double py = self.getY();
 				for (Entity e : level.entitiesForRendering()) {
@@ -394,12 +403,66 @@ public final class MapRenderer {
 		if (!v.inside(sx, sy, 0)) return;
 		float yaw = self.getViewYRot(pt);
 		int s = v.minimap ? 9 : 12;
+		if (v.detailed && self instanceof AbstractClientPlayer me) {
+			// Modo detalhado: a sua cabeça no meio e a seta (menor) logo à frente dela, na direção em que você olha.
+			int hs = 10, hx = Mth.floor(sx) - hs / 2, hy = Mth.floor(sy) - hs / 2;
+			g.fill(hx - 1, hy - 1, hx + hs + 1, hy + hs + 1, 0xFF4CC8F0);
+			PlayerFaceExtractor.extractRenderState(g, me.getSkin(), hx, hy, hs);
+			double a = Math.toRadians(yaw);
+			sx += (float) (-Math.sin(a) * 9);
+			sy += (float) (Math.cos(a) * 9);
+			s = 7;
+		}
 		g.pose().pushMatrix();
 		g.pose().translate(sx, sy);
 		g.pose().rotate((float) Math.toRadians(yaw) + (float) Math.PI);
 		g.pose().scale(s / 16f, s / 16f);
 		g.blit(RenderPipelines.GUI_TEXTURED, ARROW, -8, -8, 0f, 0f, 16, 16, 16, 16);
 		g.pose().popMatrix();
+	}
+
+	/**
+	 * Cabeças dos mobs perto da altura do jogador (até 40, os mais perto por cima): o modelo do próprio jogo desenhado de
+	 * frente e recortado na cabeça, com borda vermelha (hostis) ou amarela (os outros).
+	 */
+	private static void drawMobHeads(GuiGraphicsExtractor g, View v, Minecraft mc, ClientLevel level, Player self) {
+		float pt = v.partialTick;
+		double py = self.getY();
+		List<LivingEntity> mobs = new ArrayList<>();
+		for (Entity e : level.entitiesForRendering()) {
+			if (e instanceof LivingEntity l && !(e instanceof Player) && !e.isInvisibleTo(self) && Math.abs(e.getY() - py) <= 12) mobs.add(l);
+		}
+		mobs.sort(java.util.Comparator.comparingDouble(e -> -e.distanceToSqr(self)));
+		if (mobs.size() > 40) mobs = mobs.subList(mobs.size() - 40, mobs.size());
+		int s = v.minimap ? 10 : 12;
+		for (LivingEntity e : mobs) {
+			float sx = v.screenX(Mth.lerp(pt, e.xo, e.getX())), sy = v.screenY(Mth.lerp(pt, e.zo, e.getZ()));
+			int x = Mth.floor(sx) - s / 2, y = Mth.floor(sy) - s / 2;
+			// A cabeça é desenhada fora do recorte do mapa: só as que cabem inteiras.
+			if (x < v.x + 1 || y < v.y + 1 || x + s > v.x + v.w - 1 || y + s > v.y + v.h - 1) continue;
+			mobHead(g, mc, e, x, y, s, e instanceof Enemy ? 0xFFE04040 : 0xFFF0E060);
+		}
+	}
+
+	private static void mobHead(GuiGraphicsExtractor g, Minecraft mc, LivingEntity e, int x, int y, int s, int border) {
+		g.fill(x - 1, y - 1, x + s + 1, y + s + 1, border);
+		g.fill(x, y, x + s, y + s, 0xFF20242C);
+		try {
+			EntityRenderState st = mc.getEntityRenderDispatcher().getRenderer(e).createRenderState(e, 1f);
+			st.shadowPieces.clear();
+			st.outlineColor = 0;
+			if (st instanceof LivingEntityRenderState l) {
+				l.bodyRot = 180f;
+				l.yRot = 0f;
+				l.xRot = 0f;
+			}
+			// Enquadra a cabeça: o ponto dos olhos no meio e uns 0,4-1,1 bloco de largura na caixa.
+			float view = Mth.clamp(e.getBbWidth(), 0.4f, 1f) * 0.9f + 0.15f;
+			Quaternionf rot = new Quaternionf().rotateZ((float) Math.PI);
+			g.entity(st, s / view, new Vector3f(0f, e.getEyeHeight(), 0f), rot, new Quaternionf(), x, y, x + s, y + s);
+		} catch (RuntimeException ex) {
+			g.fill(x + 2, y + 2, x + s - 2, y + s - 2, border);
+		}
 	}
 
 	/** Nome do bioma da seed num ponto (se já calculado) para a barra de informações. */

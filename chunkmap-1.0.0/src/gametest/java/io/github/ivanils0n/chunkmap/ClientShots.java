@@ -131,6 +131,19 @@ public class ClientShots implements FabricClientGameTest {
 			String where = context.computeOnClient(mc -> mc.player.blockPosition().toShortString() + " água=" + mc.player.isInWater());
 			log("modo caverna automático debaixo da terra=" + cave + " (" + where + ")");
 			context.takeScreenshot("14_modo_caverna_hud");
+			// TAB apertado: cabeças dos mobs e do jogador no minimapa.
+			context.getInput().holdKey(o -> o.keyPlayerList);
+			context.waitTicks(5);
+			context.takeScreenshot("14b_tab_cabecas");
+			context.getInput().releaseKey(o -> o.keyPlayerList);
+			// F3: o minimapa some.
+			context.getInput().pressKey(org.lwjgl.glfw.GLFW.GLFW_KEY_F3);
+			context.waitTicks(5);
+			boolean f3 = context.computeOnClient(mc -> mc.debugEntries.isOverlayVisible());
+			context.takeScreenshot("14c_f3_sem_minimapa");
+			context.getInput().pressKey(org.lwjgl.glfw.GLFW.GLFW_KEY_F3);
+			context.waitTicks(3);
+			log("F3 aberto=" + f3);
 			BlockPos under = context.computeOnClient(mc -> mc.player.blockPosition());
 			mapShot(context, Level.OVERWORLD, under.getX(), under.getZ(), 2f, "15_mapa_cavernas", 60);
 			context.setScreen(() -> null);

@@ -34,6 +34,7 @@ public final class MinimapHud {
 		LocalPlayer player = mc.player;
 		if (!Config.global.minimap || session == null || player == null || mc.level == null) return;
 		if (mc.gui.screen() instanceof MapScreen) return; // o mapa grande já está aberto
+		if (mc.debugEntries.isOverlayVisible()) return; // F3: as informações do jogo ficam no lugar do minimapa
 		float pt = delta.getGameTimeDeltaPartialTick(false);
 		int size = Config.global.minimapSize;
 		int x = MARGIN, y = MARGIN, outer = size + BORDER * 2;
@@ -68,6 +69,8 @@ public final class MinimapHud {
 			}
 		}
 		v.caveMap = session.caveActive;
+		// TAB (lista de jogadores) apertado: modo detalhado, com a cabeça de cada mob e a sua.
+		v.detailed = mc.options.keyPlayerList.isDown();
 		MapRenderer.draw(g, v, null);
 
 		// "N" (norte) em cima, no meio.
