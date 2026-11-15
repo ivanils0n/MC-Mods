@@ -235,7 +235,7 @@ public class ClientShots implements FabricClientGameTest {
 		fv.close();
 		// Diagnóstico: o /locate do jogo para alguns tipos, a partir de (0, 0).
 		for (StructureIcon icon : new StructureIcon[]{StructureIcon.SHIPWRECK, StructureIcon.VILLAGE, StructureIcon.PILLAGER_OUTPOST, StructureIcon.DESERT_PYRAMID}) {
-			String r = sp.getServer().computeOnServer(s -> {
+			String loc = sp.getServer().computeOnServer(s -> {
 				ServerLevel level = s.overworld();
 				var reg = level.registryAccess().lookupOrThrow(Registries.STRUCTURE);
 				List<Holder<Structure>> list = new ArrayList<>();
@@ -245,7 +245,7 @@ public class ClientShots implements FabricClientGameTest {
 				var found = level.getChunkSource().getGenerator().findNearestMapStructure(level, net.minecraft.core.HolderSet.direct(list), BlockPos.ZERO, 100, false);
 				return found == null ? "nada" : found.getFirst().toShortString();
 			});
-			log("locate " + icon.id + " -> " + r);
+			log("locate " + icon.id + " -> " + loc);
 		}
 		// Diagnóstico: quantos candidatos passam em cada etapa (navios).
 		int[] c = new int[3];

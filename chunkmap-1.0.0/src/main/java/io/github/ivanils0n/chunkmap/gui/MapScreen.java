@@ -509,11 +509,12 @@ public final class MapScreen extends Screen {
 
 	@Override
 	public boolean mouseClicked(MouseButtonEvent e, boolean doubleClick) {
-		if (super.mouseClicked(e, doubleClick)) return true;
 		double mx = e.x(), my = e.y();
+		// A lista de biomas fica por cima dos botões de zoom: ela recebe o clique primeiro.
+		if (overBiomePanel(mx, my)) return clickBiomePanel(mx, my);
+		if (super.mouseClicked(e, doubleClick)) return true;
 		WorldSession s = session();
 		if (s == null) return false;
-		if (overBiomePanel(mx, my)) return clickBiomePanel(mx, my);
 		StructureIcon[] icons = StructureIcon.values();
 		for (int i = 0; i < icons.length; i++) {
 			int ix = 10 + (i % iconsPerRow) * iconStep, iy = 18 + (i / iconsPerRow) * iconStep;
