@@ -1,0 +1,11 @@
+{
+	"schemaVersion": 1,
+	"id": "chunkmap-gametest",
+	"version": "1.0.0",
+	"name": "ChunkMap: prints e conferência (só CI)",
+	"environment": "client",
+	"entrypoints": {
+		"fabric-client-gametest": ["io.github.ivanils0n.chunkmap.ClientShots"]
+	},
+	"depends": {"chunkmap": "*"}
+}
