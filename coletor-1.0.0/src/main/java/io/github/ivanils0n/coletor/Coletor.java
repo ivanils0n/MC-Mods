@@ -83,6 +83,7 @@ public final class Coletor implements ModInitializer {
 	private static final List<Entity> LEFTOVERS = new ArrayList<>();
 
 	private static final Set<UUID> PACK_OK = ConcurrentHashMap.newKeySet();
+	private static int selftestIn;
 	static MinecraftServer server;
 	static ColetorStore store;
 
@@ -92,7 +93,10 @@ public final class Coletor implements ModInitializer {
 			server = s;
 			store = ColetorStore.load(s.getWorldPath(LevelResource.ROOT).resolve("coletor.json"));
 			LOG.info("{} coletores carregados", store.size());
-			if (Boolean.getBoolean("coletor.selftest")) SelfTest.run(s);
+			if (Boolean.getBoolean("coletor.selftest")) {
+				s.overworld().setChunkForced(0, 0, true); // o teste roda alguns ticks depois, com o chunk já carregado
+				selftestIn = 40;
+			}
 		});
 		ServerLifecycleEvents.SERVER_STOPPING.register(s -> {
 			if (store != null) store.flush();
@@ -107,6 +111,7 @@ public final class Coletor implements ModInitializer {
 			if (entity.entityTags().contains("coletor") && !entity.entityTags().contains(RUN_TAG)) LEFTOVERS.add(entity);
 		});
 		ServerTickEvents.END_SERVER_TICK.register(s -> {
+			if (selftestIn > 0 && --selftestIn == 0) SelfTest.run(s);
 			for (Entity e : LEFTOVERS) if (!e.isRemoved()) e.discard();
 			LEFTOVERS.clear();
 		});
@@ -284,7 +289,6 @@ public final class Coletor implements ModInitializer {
 		CommandSourceStack source = server.createCommandSourceStack().withLevel(sl).withPosition(Vec3.atCenterOf(pos))
 			.withSuppressedOutput().withCallback((success, result) -> ok[0] = success);
 		server.getCommands().performPrefixedCommand(source, cmd);
-		if (Boolean.getBoolean("coletor.selftest")) LOG.info("comando {} -> {}", cmd, ok[0]);
 		if (!ok[0]) LOG.warn("Comando do Coletor falhou: {}", cmd);
 		return ok[0];
 	}
