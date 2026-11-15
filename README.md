@@ -70,7 +70,7 @@ Vai na pasta `mods/` do servidor, junto com o Fabric API; os jogadores entram se
 - **Redstone**: com sinal (alavanca, botão...) ele pausa.
 - **Tela**: 27 espaços do barril e uma fileira com a situação (colhendo, esperando crescer, pausado, cheio), a área (3×3, 5×5, 7×7, 9×9 padrão, 11×11) e a farinha de osso liga/desliga.
 - **Quebrar**: volta o Coletor e tudo o que estava guardado.
-- **Visual (Ferro e Enxada)**: pedra com faixas de ferro e uma enxada, grade de ferro sobre a terra no topo; a tela ganha fundo de pedra e ferro com a fileira de controle sobre terra e botões próprios. Vem dentro do .jar (singleplayer) e, no servidor dedicado, o próprio mod envia o resource pack. Quem recusar vê um barril e a tela de baú comum (vidros e itens do jogo como botões). As texturas são geradas por `arte/gerar.py` e `arte/tela.py`.
+- **Visual (Ferro e Enxada)**: pedra com faixas de ferro e uma enxada, grade de ferro sobre a terra no topo; a tela ganha fundo de pedra e ferro com a fileira de controle sobre terra e botões próprios. Vem dentro do .jar (singleplayer) e, no servidor dedicado, o próprio mod envia o resource pack. Quem recusar vê um barril e a tela de baú comum (vidros, o escolhido brilhando, e itens do jogo como botões). As texturas são geradas por `arte/gerar.py` e `arte/tela.py`.
 - Os dados ficam em `<mundo>/coletor.json`, fora do save do Minecraft. Sem o mod, sobra um barril comum com a colheita dentro.
 
 ## Item Despawn Timer

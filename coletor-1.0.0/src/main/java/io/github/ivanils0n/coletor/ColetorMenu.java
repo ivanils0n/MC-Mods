@@ -72,7 +72,8 @@ final class ColetorMenu extends AbstractContainerMenu {
 		for (int r = 1; r <= Harvester.MAX_RADIUS; r++) {
 			boolean on = r == machine.radius;
 			int side = r * 2 + 1;
-			ItemStack b = icon(new ItemStack(on ? Items.LIME_STAINED_GLASS_PANE : Items.WHITE_STAINED_GLASS_PANE, side), "area_" + side + (on ? "_on" : ""));
+			ItemStack b = icon(new ItemStack(Items.GLASS_PANE, side), "area_" + side + (on ? "_on" : ""));
+			b.set(DataComponents.ENCHANTMENT_GLINT_OVERRIDE, on && !pack); // sem o pack, a escolhida brilha
 			b.set(DataComponents.CUSTOM_NAME, plain("Área: " + side + "×" + side, on ? ChatFormatting.GREEN : ChatFormatting.WHITE));
 			b.set(DataComponents.LORE, new ItemLore(List.of(
 				plain(on ? "Escolhida" : "Clique para escolher", on ? ChatFormatting.GREEN : ChatFormatting.YELLOW),
