@@ -31,7 +31,7 @@ jobs:
             echo "=== $c" >> $P; javap -p -cp "$jar" "$c" >> $P 2>&1
           done < .github/probe-classes.txt
           C=out/code.txt; : > $C
-          for c in net.minecraft.client.gui.screens.Screen; do
+          for c in net.minecraft.world.level.levelgen.structure.pools.JigsawPlacement net.minecraft.world.level.levelgen.structure.structures.JigsawStructure net.minecraft.world.level.levelgen.structure.templatesystem.StructureTemplateManager; do
             echo "=== $c" >> $C; javap -c -p -cp "$jar" "$c" >> $C 2>&1
           done
           F=out/fabric.txt; : > $F

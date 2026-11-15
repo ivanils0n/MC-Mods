@@ -1,7 +1,6 @@
-net.minecraft.network.chat.CommonComponents
-com.mojang.blaze3d.platform.InputConstants$Key
-net.minecraft.client.gui.components.Checkbox$OnValueChange
-net.minecraft.world.level.LevelReader
-net.minecraft.util.thread.BlockableEventLoop
-net.minecraft.world.level.storage.LevelData
-net.minecraft.client.gui.screens.worldselection.WorldCreationUiState
+net.minecraft.world.level.storage.LevelStorageSource
+net.minecraft.world.level.storage.LevelStorageSource$LevelStorageAccess
+net.minecraft.util.datafix.DataFixers
+net.minecraft.world.level.levelgen.structure.pools.JigsawPlacement
+net.minecraft.world.level.levelgen.structure.structures.JigsawStructure
+net.minecraft.world.level.levelgen.structure.templatesystem.loader.ResourceManagerTemplateSource
