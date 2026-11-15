@@ -27,6 +27,7 @@ import net.minecraft.world.level.chunk.ChunkAccess;
 import net.minecraft.world.level.chunk.status.ChunkStatus;
 import net.minecraft.world.level.levelgen.Heightmap;
 import net.minecraft.world.level.levelgen.WorldOptions;
+import net.minecraft.world.phys.Vec3;
 import net.minecraft.world.level.levelgen.structure.Structure;
 import net.minecraft.world.level.levelgen.structure.StructureSet;
 import net.minecraft.world.level.levelgen.structure.StructureStart;
@@ -115,6 +116,7 @@ public class ClientShots implements FabricClientGameTest {
 
 			// Modo caverna: uma sala e um túnel 30 blocos abaixo, com mobs parados; o minimapa mostra as cavernas.
 			context.setScreen(() -> null);
+			Vec3 top = context.computeOnClient(mc -> mc.player.position());
 			sp.getServer().runCommand("execute at @p run fill ~-12 ~-31 ~-12 ~12 ~-28 ~12 air");
 			sp.getServer().runCommand("execute at @p run fill ~-2 ~-31 ~-40 ~2 ~-29 ~-13 air");
 			sp.getServer().runCommand("execute at @p run fill ~13 ~-31 ~-1 ~40 ~-29 ~1 air");
@@ -131,7 +133,7 @@ public class ClientShots implements FabricClientGameTest {
 			mapShot(context, Level.OVERWORLD, under.getX(), under.getZ(), 2f, "15_mapa_cavernas", 60);
 			context.setScreen(() -> null);
 			sp.getServer().runCommand("kill @e[type=!player]");
-			sp.getServer().runCommand("execute at @p run tp @p ~ ~31 ~");
+			sp.getServer().runCommand(String.format(Locale.ROOT, "tp @p %.2f %.2f %.2f", top.x, top.y, top.z));
 			context.waitTicks(40);
 			boolean surface = context.computeOnClient(mc -> !ChunkMap.session().caveActive);
 			log("modo caverna desliga na superfície=" + surface);
