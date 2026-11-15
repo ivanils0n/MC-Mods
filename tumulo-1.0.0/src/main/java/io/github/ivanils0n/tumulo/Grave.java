@@ -23,7 +23,13 @@ final class Grave {
 	final float yaw;
 	long expires; // tempo do mundo (overworld) em que some
 	int mainhand = -1; // espaço da tela com o item que estava na mão (para o corpo segurar)
-	final SimpleContainer items = new SimpleContainer(SIZE);
+	final SimpleContainer items = new SimpleContainer(SIZE) {
+		@Override
+		public void setChanged() {
+			super.setChanged();
+			Tumulo.changed(id);
+		}
+	};
 
 	Grave(UUID id, UUID owner, String name, String dim, double x, double y, double z, float yaw, long expires) {
 		this.id = id;
@@ -35,7 +41,6 @@ final class Grave {
 		this.z = z;
 		this.yaw = yaw;
 		this.expires = expires;
-		items.addListener(c -> Tumulo.changed(this.id));
 	}
 
 	/** Espaço da tela para o espaço do inventário do jogador (0-40). */
