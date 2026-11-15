@@ -8,6 +8,7 @@ import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
+import net.minecraft.world.entity.EquipmentSlot;
 import net.minecraft.world.entity.ExperienceOrb;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.world.item.ItemStack;
@@ -80,7 +81,19 @@ final class Xp {
 	/** Passa todo o XP do pote para o jogador. */
 	static void giveTo(ServerPlayer sp, Machine m) {
 		if (m.xp <= 0) return;
-		sp.giveExperiencePoints(m.xp);
+		// Remendo, como ao pegar bolinhas de XP: itens com Remendo nas mãos ou vestidos consertam primeiro
+		// (cada ponto conserta 2 de durabilidade); só o que sobrar vira XP do jogador.
+		var mending = sp.level().registryAccess().lookupOrThrow(Registries.ENCHANTMENT).getOrThrow(Enchantments.MENDING);
+		int left = m.xp;
+		for (EquipmentSlot slot : EquipmentSlot.values()) {
+			if (left <= 0) break;
+			ItemStack s = sp.getItemBySlot(slot);
+			if (s.isEmpty() || !s.isDamaged() || EnchantmentHelper.getItemEnchantmentLevel(mending, s) <= 0) continue;
+			int fix = (int) Math.min(s.getDamageValue(), (long) left * 2);
+			s.setDamageValue(s.getDamageValue() - fix);
+			left -= (fix + 1) / 2;
+		}
+		if (left > 0) sp.giveExperiencePoints(left);
 		m.xp = 0;
 		Automato.store.markDirty();
 		sp.level().playSound(null, sp.blockPosition(), SoundEvents.PLAYER_LEVELUP, SoundSource.PLAYERS, 0.5f, 1.2f);
