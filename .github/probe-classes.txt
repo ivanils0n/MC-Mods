@@ -1,6 +1,5 @@
-net.minecraft.world.level.storage.LevelStorageSource
-net.minecraft.world.level.storage.LevelStorageSource$LevelStorageAccess
-net.minecraft.util.datafix.DataFixers
-net.minecraft.world.level.levelgen.structure.pools.JigsawPlacement
-net.minecraft.world.level.levelgen.structure.structures.JigsawStructure
-net.minecraft.world.level.levelgen.structure.templatesystem.loader.ResourceManagerTemplateSource
+net.minecraft.client.gui.components.DebugScreenOverlay
+net.minecraft.client.gui.components.debug.DebugScreenEntryList
+net.minecraft.client.gui.screens.inventory.InventoryScreen
+net.minecraft.client.renderer.entity.EntityRenderDispatcher
+net.minecraft.client.renderer.entity.state.EntityRenderState
