@@ -43,6 +43,8 @@ public class ClientShots implements FabricClientGameTest {
 				p.getInventory().setItem(36, new ItemStack(Items.GOLDEN_BOOTS));
 				p.getInventory().setItem(40, new ItemStack(Items.SHIELD));
 			});
+			// Parede a oeste: a cabeça iria para dentro dela, então o corpo deita para o norte.
+			cmd(sp, String.format(Locale.ROOT, "fill %d %d %d %d %d %d stone", (int) Math.floor(X) - 1, (int) Y, (int) Math.floor(Z) - 1, (int) Math.floor(X) - 1, (int) Y + 1, (int) Math.floor(Z) + 1));
 			context.waitTicks(5);
 			cmd(sp, "kill @p");
 			context.waitTicks(30);
@@ -58,15 +60,15 @@ public class ClientShots implements FabricClientGameTest {
 			cmd(sp, String.format(Locale.ROOT, "tp @p %.2f %.2f %.2f 90 25", X + 3, Y, Z));
 			context.waitTicks(40);
 			context.takeScreenshot("1_corpo_de_lado");
-			cmd(sp, String.format(Locale.ROOT, "tp @p %.2f %.2f %.2f 0 25", X, Y, Z - 3));
+			cmd(sp, String.format(Locale.ROOT, "tp @p %.2f %.2f %.2f 0 25", X, Y, Z - 4));
 			context.waitTicks(20);
 			context.takeScreenshot("2_corpo_de_frente");
-			cmd(sp, String.format(Locale.ROOT, "tp @p %.2f %.2f %.2f 0 90", X, Y + 3.5, Z));
+			cmd(sp, String.format(Locale.ROOT, "tp @p %.2f %.2f %.2f 0 90", X, Y + 5, Z - 0.9));
 			context.waitTicks(20);
 			context.takeScreenshot("3_corpo_de_cima");
 
 			// Botão direito de verdade no corpo: abre a tela do túmulo.
-			cmd(sp, String.format(Locale.ROOT, "tp @p %.2f %.2f %.2f 90 45", X + 1.8, Y, Z));
+			cmd(sp, String.format(Locale.ROOT, "tp @p %.2f %.2f %.2f 90 45", X + 1.5, Y, Z - 0.9));
 			context.waitTicks(10);
 			context.getInput().holdKey(o -> o.keyUse);
 			context.waitTicks(2);

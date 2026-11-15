@@ -184,7 +184,7 @@ public final class Tumulo implements ModInitializer {
 			at = last != null && last.dim().equals(dim(sl)) ? last.pos() : new Vec3(p.pos().x, Math.max(p.pos().y, sl.getMinY() + 1), p.pos().z);
 		}
 		long now = s.overworld().getGameTime();
-		Grave g = new Grave(UUID.randomUUID(), p.owner(), p.name(), dim(sl), at.x, at.y, at.z, p.yaw(), now + config.minutos * 1200L);
+		Grave g = new Grave(UUID.randomUUID(), p.owner(), p.name(), dim(sl), at.x, at.y, at.z, freeYaw(sl, at, p.yaw()), now + config.minutos * 1200L);
 		for (int i = 0; i < Grave.SIZE; i++) if (!p.items()[i].isEmpty()) g.items.setItem(i, p.items()[i]);
 		g.mainhand = p.mainhand();
 		// Itens que caíram junto com o jogador neste tick (ex.: a mochila equipada de outro mod) também vão para o túmulo.
@@ -216,6 +216,27 @@ public final class Tumulo implements ModInitializer {
 		return null;
 	}
 
+	/** Para onde vai a cabeça do corpo deitado (ele deita a partir dos pés, 1,8 bloco na direção do yaw + 90°). */
+	static Vec3 headDir(float yaw) {
+		double r = Math.toRadians(yaw + 90f);
+		return new Vec3(-Math.sin(r), 0, Math.cos(r));
+	}
+
+	/** Gira o corpo de 90 em 90 graus até a cabeça não entrar numa parede. */
+	static float freeYaw(ServerLevel sl, Vec3 at, float yaw) {
+		for (int k = 0; k < 4; k++) {
+			float y = yaw + 90f * k;
+			Vec3 d = headDir(y);
+			boolean free = true;
+			for (double t = 0.6; t <= 1.6 && free; t += 0.5) {
+				BlockPos b = BlockPos.containing(at.x + d.x * t, at.y + 0.2, at.z + d.z * t);
+				free = sl.getBlockState(b).getCollisionShape(sl, b).isEmpty();
+			}
+			if (free) return y;
+		}
+		return yaw;
+	}
+
 	// ---------- visual ----------
 
 	static void spawnVisuals(ServerLevel sl, Grave g) {
@@ -236,7 +257,8 @@ public final class Tumulo implements ModInitializer {
 	/** Área clicável em volta do corpo deitado (o corpo deitado é pequeno demais para clicar). */
 	private static void summonClick(ServerLevel sl, Grave g) {
 		String tags = "Tags:[\"" + TAG + "\",\"" + g.tag() + "\"]";
-		summon(sl, "interaction", g.x, g.y, g.z, tags + ",width:2.0f,height:0.6f,response:1b");
+		Vec3 d = headDir(g.yaw);
+		summon(sl, "interaction", g.x + d.x * 0.9, g.y, g.z + d.z * 0.9, tags + ",width:1.9f,height:0.6f,response:1b");
 		for (Entity e : find(sl, g)) if (e instanceof Interaction) register(g.id, e);
 	}
 
