@@ -66,6 +66,20 @@ public final class MapScreen extends Screen {
 		view.scale = lastScale;
 	}
 
+	/** Abre numa dimensão, centro e zoom escolhidos (usado pelo teste de prints). */
+	public MapScreen(ResourceKey<Level> dim, double cx, double cz, float scale) {
+		this();
+		this.dim = dim;
+		view.cx = cx;
+		view.cz = cz;
+		view.scale = Mth.clamp(scale, MIN_SCALE, MAX_SCALE);
+	}
+
+	/** Abre/fecha a lista de biomas (teste). */
+	public void showBiomePanel() {
+		if (!biomePanel) toggleBiomePanel();
+	}
+
 	private WorldSession session() {
 		return ChunkMap.session();
 	}

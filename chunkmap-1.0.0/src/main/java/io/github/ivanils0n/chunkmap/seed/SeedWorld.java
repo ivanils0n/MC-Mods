@@ -112,7 +112,7 @@ public final class SeedWorld {
 	}
 
 	/** Achado de uma estrutura: posição para mostrar e o id dela. */
-	public record Found(StructureIcon icon, String structure, int x, int z) {}
+	public record Found(StructureIcon icon, String structure, int x, int z, int chunkX, int chunkZ) {}
 
 	/**
 	 * A mesma escolha do jogo (ChunkGenerator.createStructures) para o chunk candidato de um conjunto de estruturas:
@@ -160,14 +160,14 @@ public final class SeedWorld {
 				Optional<Structure.GenerationStub> stub = structure.findValidGenerationPoint(ctx);
 				if (stub.isEmpty()) return null;
 				BlockPos p = stub.get().position();
-				return new Found(icon, id, p.getX(), p.getZ());
+				return new Found(icon, id, p.getX(), p.getZ(), chunkX, chunkZ);
 			} catch (RuntimeException ignored) {
 				// Precisa de algo que não temos aqui (ex.: moldes no multiplayer): fica só a conferência do bioma.
 			}
 		}
 		int x = chunk.getMiddleBlockX(), z = chunk.getMiddleBlockZ();
 		Holder<Biome> biome = biomeSource.getNoiseBiome(QuartPos.fromBlock(x), QuartPos.fromBlock(startY(id)), QuartPos.fromBlock(z), sampler);
-		return structure.biomes().contains(biome) ? new Found(icon, id, x, z) : null;
+		return structure.biomes().contains(biome) ? new Found(icon, id, x, z, chunkX, chunkZ) : null;
 	}
 
 	/** Altura em que o jogo confere o bioma das estruturas subterrâneas de quebra-cabeça; as outras ficam no chão. */

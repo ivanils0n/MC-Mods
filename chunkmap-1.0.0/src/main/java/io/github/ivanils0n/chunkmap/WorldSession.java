@@ -176,7 +176,8 @@ public final class WorldSession {
 		return VanillaWorldgen.get().thenApplyAsync(access -> vanilla(access, preset, dim, s), Workers.SLOW);
 	}
 
-	private static SeedWorld vanilla(RegistryAccess access, String preset, ResourceKey<Level> dim, long seed) {
+	/** A geração vanilla (sem servidor) de uma dimensão para a seed: o caminho do multiplayer. */
+	public static SeedWorld vanilla(RegistryAccess access, String preset, ResourceKey<Level> dim, long seed) {
 		ResourceKey<WorldPreset> key = switch (preset) {
 			case "large_biomes" -> WorldPresets.LARGE_BIOMES;
 			case "amplified" -> WorldPresets.AMPLIFIED;

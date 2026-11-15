@@ -92,7 +92,7 @@ public final class StructureFinder {
 			SeedWorld.Found[] f = new SeedWorld.Found[positions.size()];
 			for (int i = 0; i < f.length; i++) {
 				ChunkPos c = positions.get(i);
-				f[i] = new SeedWorld.Found(icon, id, c.getMiddleBlockX(), c.getMiddleBlockZ());
+				f[i] = new SeedWorld.Found(icon, id, c.getMiddleBlockX(), c.getMiddleBlockZ(), c.x(), c.z());
 			}
 			out.found = f;
 		} catch (RuntimeException e) {

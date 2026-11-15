@@ -1,0 +1,32 @@
+# Temporário (só no branch de desenvolvimento do ChunkMap): roda os testes/prints do cliente e publica tudo,
+# inclusive o log, no branch prints-chunkmap-dev. Não vai para a main.
+name: chunkmap-dev
+on:
+  push:
+    branches: [chunkmap]
+jobs:
+  prints:
+    runs-on: ubuntu-24.04
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v6
+      - uses: actions/setup-java@v5
+        with:
+          java-version: '25'
+          distribution: 'microsoft'
+      - run: chmod +x ./gradlew
+      - name: Testes e prints do cliente
+        run: |
+          sudo apt-get install -y -qq xvfb >/dev/null 2>&1 || true
+          timeout 1700 xvfb-run -a -s "-screen 0 1280x720x24" ./gradlew --configure-on-demand ":chunkmap-1.0.0:runClientGameTest" -Pminecraft_version=26.2 "-Pminecraft_dependency=~26.2" > gametest.log 2>&1 || true
+          grep -nE "CHUNKMAP TESTE|ERROR|Exception|error:|FAILED|chunkmap" gametest.log | head -300 > resumo.txt || true
+          tail -40 gametest.log
+      - name: Publicar
+        if: always()
+        run: |
+          d=$(mktemp -d)
+          find chunkmap-1.0.0 -path '*screenshots*' -name '*.png' -exec cp {} "$d"/ \;
+          cp gametest.log resumo.txt "$d"/ 2>/dev/null || true
+          cd "$d" && git init -q -b p && git add -A && git -c user.name=ci -c user.email=ci@localhost commit -qm "prints ${{ github.sha }}"
+          git push -qf "https://x-access-token:${{ github.token }}@github.com/${{ github.repository }}.git" p:prints-chunkmap-dev
