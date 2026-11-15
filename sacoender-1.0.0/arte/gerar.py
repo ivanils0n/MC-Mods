@@ -1,7 +1,7 @@
 """Saco do Ender: gera texturas, modelo 3D, definição do item e ícone do resource pack.
 
 Uso: python3 arte/gerar.py [preview.png]
-Modelo escolhido: saco preto (laterais com a mesma textura do topo), cordão lilás, sem placas e sem olho.
+Modelo: formato da trouxa do jogo (corpo largo de boca aberta, gola por cima e alça), nas cores escuras com cordão lilás.
 O item é um papel do jogo marcado com custom_model_data "sacoender"; assets/minecraft/items/paper.json troca o
 modelo só desse papel (qualquer outro papel continua igual ao do jogo).
 """
@@ -146,7 +146,25 @@ TEX = dict(
     cloth=cloth(['#120d1a', '#1c1528', '#271d38', '#33274a'], 31, folds=False),
     top=cloth(['#120d1a', '#1c1528', '#271d38', '#33274a'], 32, folds=False),
     cord=solid_noise(['#6a4296', '#8456b8', '#a06fd6'], 33),
+    inner=solid_noise(['#06040a', '#0b0812', '#100b19'], 35),
 )
+
+def hollow(x1, y1, z1, x2, y2, z2, t, tex, inner):
+    """Moldura oca (paredes de espessura t) com fundo escuro: a boca aberta da trouxa."""
+    return [F([x1, y1, z1], [x2, y2, z1 + t], tex), F([x1, y1, z2 - t], [x2, y2, z2], tex),
+            F([x1, y1, z1 + t], [x1 + t, y2, z2 - t], tex), F([x2 - t, y1, z1 + t], [x2, y2, z2 - t], tex),
+            F([x1 + t, y1, z1 + t], [x2 - t, y1 + 0.25, z2 - t], inner)]
+
+BUNDLE = [
+    F([3, 0, 5], [13, 1, 11], 'cloth'),                      # fundo
+    F([2, 1, 4], [14, 7, 12], 'cloth'),                      # corpo
+] + hollow(2, 7, 4, 14, 8.5, 12, 1, 'top', 'inner') + [   # boca do corpo
+    F([4.5, 7, 6], [11.5, 9.5, 10], 'top'),                  # pescoço franzido
+] + hollow(3.5, 9.5, 5, 12.5, 11.5, 11, 1, 'top', 'inner') + [  # gola
+    F([5, 8.5, 7.5], [6, 13, 8.5], 'cord'),                  # alça
+    F([10, 8.5, 7.5], [11, 13, 8.5], 'cord'),
+    F([5, 13, 7.5], [11, 14, 8.5], 'cord'),
+]
 
 def plate_set():
     """Placa de obsidiana com 4 rebites, igual nos quatro lados."""
@@ -160,7 +178,7 @@ def plate_set():
                     F([2.3, y, a], [2.6, y + .6, a + .6], 'cord'), F([13.4, y, a], [13.7, y + .6, a + .6], 'cord')]
     return out
 
-ELEMENTS = BODY
+ELEMENTS = BUNDLE
 
 def model_json():
     els = []
