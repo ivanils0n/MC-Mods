@@ -1,0 +1,173 @@
+=== net.minecraft.client.gui.components.DebugScreenOverlay
+Compiled from "DebugScreenOverlay.java"
+public class net.minecraft.client.gui.components.DebugScreenOverlay {
+  private static final int MARGIN_RIGHT;
+  private static final int MARGIN_LEFT;
+  private static final int MARGIN_TOP;
+  private final net.minecraft.client.Minecraft minecraft;
+  private final net.minecraft.client.gui.Font font;
+  private net.minecraft.world.level.ChunkPos lastPos;
+  private net.minecraft.world.level.chunk.LevelChunk clientChunk;
+  private java.util.concurrent.CompletableFuture<net.minecraft.world.level.chunk.LevelChunk> serverChunk;
+  private boolean renderProfilerChart;
+  private boolean renderFpsCharts;
+  private boolean renderNetworkCharts;
+  private boolean renderLightmapTexture;
+  private final net.minecraft.util.debugchart.LocalSampleLogger frameTimeLogger;
+  private final net.minecraft.util.debugchart.LocalSampleLogger tickTimeLogger;
+  private final net.minecraft.util.debugchart.LocalSampleLogger pingLogger;
+  private final net.minecraft.util.debugchart.LocalSampleLogger bandwidthLogger;
+  private final java.util.Map<net.minecraft.util.debugchart.RemoteDebugSampleType, net.minecraft.util.debugchart.LocalSampleLogger> remoteSupportingLoggers;
+  private final net.minecraft.client.gui.components.debugchart.FpsDebugChart fpsChart;
+  private final net.minecraft.client.gui.components.debugchart.TpsDebugChart tpsChart;
+  private final net.minecraft.client.gui.components.debugchart.PingDebugChart pingChart;
+  private final net.minecraft.client.gui.components.debugchart.BandwidthDebugChart bandwidthChart;
+  private final net.minecraft.client.gui.components.debugchart.ProfilerPieChart profilerPieChart;
+  public net.minecraft.client.gui.components.DebugScreenOverlay(net.minecraft.client.Minecraft);
+  public void clearChunkCache();
+  public void extractRenderState(net.minecraft.client.gui.GuiGraphicsExtractor);
+  private static java.lang.String formatChart(net.minecraft.client.KeyMapping, net.minecraft.client.KeyMapping, java.lang.String, boolean);
+  private static java.lang.String formatKeybind(net.minecraft.client.KeyMapping, net.minecraft.client.KeyMapping);
+  private void extractLines(net.minecraft.client.gui.GuiGraphicsExtractor, java.util.List<java.lang.String>, boolean);
+  private net.minecraft.server.level.ServerLevel getServerLevel();
+  private net.minecraft.world.level.Level getLevel();
+  private net.minecraft.world.level.chunk.LevelChunk getServerChunk();
+  private net.minecraft.world.level.chunk.LevelChunk getClientChunk();
+  public boolean showDebugScreen();
+  public boolean showProfilerChart();
+  public boolean showNetworkCharts();
+  public boolean showFpsCharts();
+  public boolean showLightmapTexture();
+  public void toggleNetworkCharts();
+  public void toggleFpsCharts();
+  public void toggleLightmapTexture();
+  public void toggleProfilerChart();
+  public void logFrameDuration(long);
+  public net.minecraft.util.debugchart.LocalSampleLogger getTickTimeLogger();
+  public net.minecraft.util.debugchart.LocalSampleLogger getPingLogger();
+  public net.minecraft.util.debugchart.LocalSampleLogger getBandwidthLogger();
+  public net.minecraft.client.gui.components.debugchart.ProfilerPieChart getProfilerPieChart();
+  public void logRemoteSample(long[], net.minecraft.util.debugchart.RemoteDebugSampleType);
+  public void reset();
+  private static net.minecraft.world.level.chunk.LevelChunk lambda$getServerChunk$0(net.minecraft.server.level.ChunkResult);
+  private java.util.Optional lambda$getLevel$0(net.minecraft.client.server.IntegratedServer);
+  private static java.lang.Float lambda$new$0(net.minecraft.client.Minecraft);
+}
+=== net.minecraft.client.gui.components.debug.DebugScreenEntryList
+Compiled from "DebugScreenEntryList.java"
+public class net.minecraft.client.gui.components.debug.DebugScreenEntryList {
+  private static final org.slf4j.Logger LOGGER;
+  private static final int DEFAULT_DEBUG_PROFILE_VERSION;
+  private final java.util.Map<net.minecraft.resources.Identifier, net.minecraft.client.gui.components.debug.DebugScreenEntryStatus> allStatuses;
+  private final java.util.List<net.minecraft.resources.Identifier> currentlyEnabled;
+  private boolean isOverlayVisible;
+  private net.minecraft.client.gui.components.debug.DebugScreenProfile profile;
+  private final java.io.File debugProfileFile;
+  private long currentlyEnabledVersion;
+  private final com.mojang.serialization.Codec<net.minecraft.client.gui.components.debug.DebugScreenEntryList$SerializedOptions> codec;
+  public net.minecraft.client.gui.components.debug.DebugScreenEntryList(java.io.File, com.mojang.datafixers.DataFixer);
+  public void load();
+  private void resetStatuses(java.util.Map<net.minecraft.resources.Identifier, net.minecraft.client.gui.components.debug.DebugScreenEntryStatus>);
+  private void resetToProfile(net.minecraft.client.gui.components.debug.DebugScreenProfile);
+  public void loadProfile(net.minecraft.client.gui.components.debug.DebugScreenProfile);
+  public net.minecraft.client.gui.components.debug.DebugScreenEntryStatus getStatus(net.minecraft.resources.Identifier);
+  public boolean isCurrentlyEnabled(net.minecraft.resources.Identifier);
+  public void setStatus(net.minecraft.resources.Identifier, net.minecraft.client.gui.components.debug.DebugScreenEntryStatus);
+  public boolean toggleStatus(net.minecraft.resources.Identifier);
+  public java.util.Collection<net.minecraft.resources.Identifier> getCurrentlyEnabled();
+  public void toggleDebugOverlay();
+  public void setOverlayVisible(boolean);
+  public boolean isOverlayVisible();
+  public void rebuildCurrentList();
+  public long getCurrentlyEnabledVersion();
+  public boolean isUsingProfile(net.minecraft.client.gui.components.debug.DebugScreenProfile);
+  public void save();
+  private void lambda$rebuildCurrentList$0(boolean, net.minecraft.resources.Identifier, net.minecraft.client.gui.components.debug.DebugScreenEntryStatus);
+  private static java.io.IOException lambda$load$0(java.lang.String);
+  static {};
+}
+=== net.minecraft.client.gui.screens.inventory.InventoryScreen
+Compiled from "InventoryScreen.java"
+public class net.minecraft.client.gui.screens.inventory.InventoryScreen extends net.minecraft.client.gui.screens.inventory.AbstractRecipeBookScreen<net.minecraft.world.inventory.InventoryMenu> {
+  private float xMouse;
+  private float yMouse;
+  private boolean buttonClicked;
+  private final net.minecraft.client.gui.screens.inventory.EffectsInInventory effects;
+  public net.minecraft.client.gui.screens.inventory.InventoryScreen(net.minecraft.world.entity.player.Player);
+  public void containerTick();
+  protected void init();
+  protected net.minecraft.client.gui.navigation.ScreenPosition getRecipeBookButtonPosition();
+  protected void onRecipeBookButtonClick();
+  protected void extractLabels(net.minecraft.client.gui.GuiGraphicsExtractor, int, int);
+  public void extractRenderState(net.minecraft.client.gui.GuiGraphicsExtractor, int, int, float);
+  public boolean showsActiveEffects();
+  protected boolean isBiggerResultSlot();
+  public void extractBackground(net.minecraft.client.gui.GuiGraphicsExtractor, int, int, float);
+  public static void extractEntityInInventoryFollowsMouse(net.minecraft.client.gui.GuiGraphicsExtractor, int, int, int, int, int, float, float, float, net.minecraft.world.entity.LivingEntity);
+  private static net.minecraft.client.renderer.entity.state.EntityRenderState extractRenderState(net.minecraft.world.entity.LivingEntity);
+  public boolean mouseReleased(net.minecraft.client.input.MouseButtonEvent);
+}
+=== net.minecraft.client.renderer.entity.EntityRenderDispatcher
+Compiled from "EntityRenderDispatcher.java"
+public class net.minecraft.client.renderer.entity.EntityRenderDispatcher implements net.minecraft.server.packs.resources.ResourceManagerReloadListener {
+  private java.util.Map<net.minecraft.world.entity.EntityType<?>, net.minecraft.client.renderer.entity.EntityRenderer<?, ?>> renderers;
+  private java.util.Map<net.minecraft.world.entity.player.PlayerModelType, net.minecraft.client.renderer.entity.player.AvatarRenderer<net.minecraft.client.player.AbstractClientPlayer>> playerRenderers;
+  private java.util.Map<net.minecraft.world.entity.player.PlayerModelType, net.minecraft.client.renderer.entity.player.AvatarRenderer<net.minecraft.client.entity.ClientMannequin>> mannequinRenderers;
+  public final net.minecraft.client.renderer.texture.TextureManager textureManager;
+  public net.minecraft.client.Camera camera;
+  public net.minecraft.world.entity.Entity crosshairPickEntity;
+  private final net.minecraft.client.renderer.block.BlockModelResolver blockModelResolver;
+  private final net.minecraft.client.renderer.item.ItemModelResolver itemModelResolver;
+  private final net.minecraft.client.renderer.MapRenderer mapRenderer;
+  private final net.minecraft.client.renderer.ItemInHandRenderer itemInHandRenderer;
+  private final net.minecraft.client.resources.model.sprite.AtlasManager atlasManager;
+  private final net.minecraft.client.gui.Font font;
+  public final net.minecraft.client.Options options;
+  private final java.util.function.Supplier<net.minecraft.client.model.geom.EntityModelSet> entityModels;
+  private final net.minecraft.client.resources.model.EquipmentAssetManager equipmentAssets;
+  private final net.minecraft.client.renderer.PlayerSkinRenderCache playerSkinRenderCache;
+  public <E extends net.minecraft.world.entity.Entity> int getPackedLightCoords(E, float);
+  public net.minecraft.client.renderer.entity.EntityRenderDispatcher(net.minecraft.client.Minecraft, net.minecraft.client.renderer.texture.TextureManager, net.minecraft.client.renderer.block.BlockModelResolver, net.minecraft.client.renderer.item.ItemModelResolver, net.minecraft.client.renderer.MapRenderer, net.minecraft.client.resources.model.sprite.AtlasManager, net.minecraft.client.gui.Font, net.minecraft.client.Options, java.util.function.Supplier<net.minecraft.client.model.geom.EntityModelSet>, net.minecraft.client.resources.model.EquipmentAssetManager, net.minecraft.client.renderer.PlayerSkinRenderCache);
+  public <T extends net.minecraft.world.entity.Entity> net.minecraft.client.renderer.entity.EntityRenderer<? super T, ?> getRenderer(T);
+  public net.minecraft.client.renderer.entity.player.AvatarRenderer<net.minecraft.client.player.AbstractClientPlayer> getPlayerRenderer(net.minecraft.client.player.AbstractClientPlayer);
+  private <T extends net.minecraft.world.entity.Avatar & net.minecraft.client.entity.ClientAvatarEntity> net.minecraft.client.renderer.entity.player.AvatarRenderer<T> getAvatarRenderer(java.util.Map<net.minecraft.world.entity.player.PlayerModelType, net.minecraft.client.renderer.entity.player.AvatarRenderer<T>>, T);
+  public <S extends net.minecraft.client.renderer.entity.state.EntityRenderState> net.minecraft.client.renderer.entity.EntityRenderer<?, ? super S> getRenderer(S);
+  public void prepare(net.minecraft.client.Camera, net.minecraft.world.entity.Entity);
+  public <E extends net.minecraft.world.entity.Entity> boolean shouldRender(E, net.minecraft.client.renderer.culling.Frustum, double, double, double);
+  public <E extends net.minecraft.world.entity.Entity> net.minecraft.client.renderer.entity.state.EntityRenderState extractEntity(E, float);
+  public <S extends net.minecraft.client.renderer.entity.state.EntityRenderState> void submit(S, net.minecraft.client.renderer.state.level.CameraRenderState, double, double, double, com.mojang.blaze3d.vertex.PoseStack, net.minecraft.client.renderer.SubmitNodeCollector);
+  private <S extends net.minecraft.client.renderer.entity.state.EntityRenderState> net.minecraft.CrashReportCategory fillRendererDetails(net.minecraft.client.renderer.entity.EntityRenderer<?, S>, net.minecraft.CrashReport);
+  public void resetCamera();
+  public double distanceToSqr(net.minecraft.world.entity.Entity);
+  public net.minecraft.client.renderer.ItemInHandRenderer getItemInHandRenderer();
+  public void onResourceManagerReload(net.minecraft.server.packs.resources.ResourceManager);
+}
+=== net.minecraft.client.renderer.entity.state.EntityRenderState
+Compiled from "EntityRenderState.java"
+public class net.minecraft.client.renderer.entity.state.EntityRenderState {
+  public static final int NO_OUTLINE;
+  public net.minecraft.world.entity.EntityType<?> entityType;
+  public double x;
+  public double y;
+  public double z;
+  public float ageInTicks;
+  public float boundingBoxWidth;
+  public float boundingBoxHeight;
+  public float eyeHeight;
+  public double distanceToCameraSq;
+  public boolean isInvisible;
+  public boolean isDiscrete;
+  public boolean displayFireAnimation;
+  public int lightCoords;
+  public int outlineColor;
+  public net.minecraft.world.phys.Vec3 passengerOffset;
+  public net.minecraft.network.chat.Component nameTag;
+  public net.minecraft.network.chat.Component scoreText;
+  public net.minecraft.world.phys.Vec3 nameTagAttachment;
+  public java.util.List<net.minecraft.client.renderer.entity.state.EntityRenderState$LeashState> leashStates;
+  public float shadowRadius;
+  public final java.util.List<net.minecraft.client.renderer.entity.state.EntityRenderState$ShadowPiece> shadowPieces;
+  public net.minecraft.client.renderer.entity.state.EntityRenderState();
+  public boolean appearsGlowing();
+  public void fillCrashReportCategory(net.minecraft.CrashReportCategory);
+}
