@@ -64,7 +64,7 @@
 	"chunkmap.options.title": "Opções do ChunkMap",
 	"chunkmap.options.minimap": "Minimapa",
 	"chunkmap.options.size": "Tamanho: %s",
-	"chunkmap.options.layer": "Minimapa: %s",
+	"chunkmap.options.layer": "Minimapa mostra: %s",
 	"chunkmap.options.layer.auto": "automático",
 	"chunkmap.options.layer.biomes": "biomas",
 	"chunkmap.options.layer.terrain": "terreno",

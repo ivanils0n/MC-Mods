@@ -176,9 +176,13 @@ public final class MapRenderer {
 			}
 		}
 		if (id == null) return;
+		// Bordas arredondadas para pixels de verdade da tela: pedaços vizinhos se encostam sem fresta.
+		double gs = Minecraft.getInstance().getWindow().getGuiScale();
+		float x0 = (float) (Math.round(sx * gs) / gs), x1 = (float) (Math.round((sx + px) * gs) / gs);
+		float y0 = (float) (Math.round(sy * gs) / gs), y1 = (float) (Math.round((sy + px) * gs) / gs);
 		g.pose().pushMatrix();
-		g.pose().translate(sx, sy);
-		g.pose().scale(px / size, px / size);
+		g.pose().translate(x0, y0);
+		g.pose().scale((x1 - x0) / size, (y1 - y0) / size);
 		g.blit(RenderPipelines.GUI_TEXTURED, id, 0, 0, u, vv, size, size, part, part, size, size);
 		g.pose().popMatrix();
 	}
@@ -200,7 +204,7 @@ public final class MapRenderer {
 	}
 
 	private static void drawSlime(GuiGraphicsExtractor g, View v, long seed) {
-		if (16 * v.scale < 2) return; // chunk menor que 2 pixels: não dá para ver
+		if (16 * v.scale < 4) return; // chunk menor que 4 pixels: vira ruído
 		int cx0 = Mth.floor(v.worldX(v.x) / 16), cx1 = Mth.floor(v.worldX(v.x + v.w) / 16);
 		int cz0 = Mth.floor(v.worldZ(v.y) / 16), cz1 = Mth.floor(v.worldZ(v.y + v.h) / 16);
 		for (int cx = cx0; cx <= cx1; cx++) {
@@ -302,16 +306,19 @@ public final class MapRenderer {
 		Font font = mc.font;
 		g.enableScissor(v.x, v.y, v.x + v.w, v.y + v.h);
 		try {
-			if (Config.global.showMobs) {
+			// Mobs: só os perto da altura do jogador (os das cavernas embaixo não poluem o mapa) e com zoom de perto.
+			if (Config.global.showMobs && v.scale >= 0.5f) {
 				int n = 0;
+				double py = self.getY();
 				for (Entity e : level.entitiesForRendering()) {
-					if (!(e instanceof LivingEntity) || e instanceof Player || e.isInvisibleTo(self) || ++n > 400) continue;
+					if (!(e instanceof LivingEntity) || e instanceof Player || e.isInvisibleTo(self) || Math.abs(e.getY() - py) > 12) continue;
 					float sx = v.screenX(Mth.lerp(pt, e.xo, e.getX())), sy = v.screenY(Mth.lerp(pt, e.zo, e.getZ()));
-					if (!v.inside(sx, sy, 2)) continue;
+					if (!v.inside(sx, sy, 2) || ++n > 300) continue;
 					int c = e instanceof Enemy ? 0xFFE04040 : 0xFFF0E060;
 					int ix = Mth.floor(sx), iy = Mth.floor(sy);
-					g.fill(ix - 2, iy - 2, ix + 2, iy + 2, 0xFF000000);
-					g.fill(ix - 1, iy - 1, ix + 1, iy + 1, c);
+					g.fill(ix - 1, iy - 1, ix + 2, iy + 2, 0xC0000000);
+					g.fill(ix, iy, ix + 1, iy + 1, c);
+					if (!v.minimap) g.fill(ix - 1, iy, ix + 2, iy + 1, c);
 				}
 			}
 			for (AbstractClientPlayer p : level.players()) {

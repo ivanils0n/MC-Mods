@@ -495,11 +495,14 @@ public final class MapScreen extends Screen {
 	}
 
 	private void banner(GuiGraphicsExtractor g, Component msg, int y) {
-		int w = font.width(msg);
-		int x = view.x + view.w / 2 - w / 2;
-		g.fill(x - 6, y - 4, x + w + 6, y + 12, 0xE0FFF4D0);
-		g.outline(x - 6, y - 4, w + 12, 16, 0xFFD0A040);
-		g.text(font, msg, x, y, 0xFF5A4010, false);
+		// Quebra em linhas se não couber na largura do mapa.
+		List<net.minecraft.util.FormattedCharSequence> lines = font.split(msg, Math.max(60, view.w - 40));
+		int w = 0;
+		for (var l : lines) w = Math.max(w, font.width(l));
+		int x = view.x + view.w / 2 - w / 2, h = lines.size() * 10 + 6;
+		g.fill(x - 6, y - 4, x + w + 6, y - 4 + h, 0xE0FFF4D0);
+		g.outline(x - 6, y - 4, w + 12, h, 0xFFD0A040);
+		for (int i = 0; i < lines.size(); i++) g.text(font, lines.get(i), x + (w - font.width(lines.get(i))) / 2, y + i * 10, 0xFF5A4010, false);
 	}
 
 	// ---------------------------------------------------------------- entrada

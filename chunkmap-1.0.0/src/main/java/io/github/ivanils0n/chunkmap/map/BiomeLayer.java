@@ -133,7 +133,7 @@ public final class BiomeLayer {
 
 	private void compute(Tile t) {
 		t.pending = true;
-		Workers.MAP.execute(() -> {
+		Workers.map(Workers.BIOMES, () -> {
 			try {
 				// Saiu da tela faz tempo: deixa para quando voltar a aparecer.
 				if (closed || frame - t.wanted > 240) return;

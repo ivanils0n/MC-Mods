@@ -10,10 +10,29 @@ import java.util.concurrent.atomic.AtomicInteger;
 /** Threads do mod: nada de cálculo pesado na thread do jogo. */
 public final class Workers {
 	/**
-	 * Cálculo de biomas e estruturas. A fila é uma pilha (o pedido mais novo sai primeiro): ao arrastar o mapa, o que
-	 * está na tela agora é calculado antes do que já saiu dela.
+	 * Cálculo de biomas e estruturas. Os biomas passam na frente das estruturas e, em cada tipo, o pedido mais novo sai
+	 * primeiro: ao arrastar o mapa, o que está na tela agora é calculado antes do que já saiu dela.
 	 */
 	public static final ThreadPoolExecutor MAP;
+	public static final int BIOMES = 0, STRUCTURES = 1;
+	private static final java.util.concurrent.atomic.AtomicLong SEQ = new java.util.concurrent.atomic.AtomicLong();
+
+	private record Job(int priority, long seq, Runnable task) implements Runnable, Comparable<Job> {
+		@Override
+		public void run() {
+			task.run();
+		}
+
+		@Override
+		public int compareTo(Job o) {
+			return priority != o.priority ? Integer.compare(priority, o.priority) : Long.compare(o.seq, seq);
+		}
+	}
+
+	/** Põe um cálculo do mapa na fila (BIOMES ou STRUCTURES). */
+	public static void map(int priority, Runnable task) {
+		MAP.execute(new Job(priority, SEQ.incrementAndGet(), task));
+	}
 	/** Tarefas longas e raras (carregar a geração vanilla, achar as fortalezas). */
 	public static final ExecutorService SLOW = new ThreadPoolExecutor(1, 1, 30, TimeUnit.SECONDS, new LinkedBlockingDeque<>(), factory("ChunkMap-lento"));
 	/** Leitura e gravação de arquivos, em ordem. */
@@ -21,12 +40,7 @@ public final class Workers {
 
 	static {
 		int n = Math.clamp(Runtime.getRuntime().availableProcessors() - 2, 1, 3);
-		MAP = new ThreadPoolExecutor(n, n, 30, TimeUnit.SECONDS, new LinkedBlockingDeque<>() {
-			@Override
-			public boolean offer(Runnable r) {
-				return offerFirst(r);
-			}
-		}, factory("ChunkMap-mapa"));
+		MAP = new ThreadPoolExecutor(n, n, 30, TimeUnit.SECONDS, new java.util.concurrent.PriorityBlockingQueue<>(), factory("ChunkMap-mapa"));
 		MAP.allowCoreThreadTimeOut(true);
 		((ThreadPoolExecutor) SLOW).allowCoreThreadTimeOut(true);
 		((ThreadPoolExecutor) IO).allowCoreThreadTimeOut(true);

@@ -157,7 +157,7 @@ public final class StructureFinder {
 
 	private void request(Spread s, int bx, int bz, long key) {
 		if (s.pending.put(key, frame) != null) return;
-		Workers.MAP.execute(() -> {
+		Workers.map(Workers.STRUCTURES, () -> {
 			try {
 				Long asked = s.pending.get(key);
 				// Saiu da tela faz tempo (arrastou o mapa para longe): deixa para quando voltar a aparecer.

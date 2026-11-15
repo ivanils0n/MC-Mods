@@ -169,7 +169,7 @@ public final class WorldSession {
 			if (data.autoSeed) return CompletableFuture.supplyAsync(() -> SeedWorld.fromServer(level), Workers.SLOW);
 			long s = seed.orElseThrow();
 			return CompletableFuture.supplyAsync(() -> SeedWorld.create(level.registryAccess(), level.getChunkSource().getGenerator(), s,
-					LevelHeightAccessor.create(level.getMinY(), level.getHeight()), server.getStructureManager()), Workers.SLOW);
+					LevelHeightAccessor.create(level.getMinY(), level.getHeight())), Workers.SLOW);
 		}
 		long s = seed.orElseThrow();
 		String preset = data.preset;
@@ -187,7 +187,7 @@ public final class WorldSession {
 		LevelStem stem = dims.dimensions().get(ResourceKey.create(Registries.LEVEL_STEM, dim.identifier()));
 		if (stem == null) return null;
 		DimensionType type = stem.type().value();
-		return SeedWorld.create(access, stem.generator(), seed, LevelHeightAccessor.create(type.minY(), type.height()), null);
+		return SeedWorld.create(access, stem.generator(), seed, LevelHeightAccessor.create(type.minY(), type.height()));
 	}
 
 	public Set<StructureIcon> filters() {

@@ -53,7 +53,7 @@ import java.util.Set;
  */
 public class ClientShots implements FabricClientGameTest {
 	private static final String SEED = "chunkmap";
-	private static final int RADIUS = 2048;
+	private static final int RADIUS = 4096;
 	private final List<String> report = new ArrayList<>();
 
 	private void log(String line) {
@@ -96,9 +96,19 @@ public class ClientShots implements FabricClientGameTest {
 				ChunkMap.session().data.showGrid = false;
 				ChunkMap.session().highlight.add("minecraft:plains");
 				ChunkMap.session().highlight.add("minecraft:forest");
+				ChunkMap.session().data.filters.remove("slime_chunk");
+			});
+			context.setScreen(() -> {
+				MapScreen m = new MapScreen(Level.OVERWORLD, p.getX(), p.getZ(), 1 / 8f);
+				m.showBiomePanel();
+				return m;
+			});
+			context.waitTicks(5);
+			context.runOnClient(mc -> {
 				if (mc.gui.screen() instanceof MapScreen m) m.showBiomePanel();
 			});
-			mapShot(context, Level.OVERWORLD, p.getX(), p.getZ(), 1 / 8f, "07_mapa_biomas_destacados", 200);
+			context.waitTicks(80);
+			context.takeScreenshot("07_mapa_biomas_destacados");
 			context.runOnClient(mc -> ChunkMap.session().highlight.clear());
 			mapShot(context, Level.NETHER, p.getX() / 8, p.getZ() / 8, 1 / 4f, "08_mapa_nether", 300);
 			mapShot(context, Level.END, 0, 0, 1 / 16f, "09_mapa_end", 300);

@@ -16,6 +16,7 @@ import java.util.function.Supplier;
 /** Opções do minimapa (valem em todos os mundos) e da seed deste mundo. */
 public final class OptionsScreen extends Screen {
 	private final Screen parent;
+	private int worldHeader;
 
 	public OptionsScreen(Screen parent) {
 		super(Component.translatable("chunkmap.options.title"));
@@ -41,7 +42,9 @@ public final class OptionsScreen extends Screen {
 		toggle(right, y, "mobs", () -> c.showMobs, v -> c.showMobs = v);
 		y += 24;
 		toggle(left, y, "in_world", () -> c.inWorldWaypoints, v -> c.inWorldWaypoints = v);
-		y += 34;
+		y += 24;
+		worldHeader = y + 4;
+		y += 16;
 
 		WorldSession s = ChunkMap.session();
 		if (s != null) {
@@ -84,7 +87,7 @@ public final class OptionsScreen extends Screen {
 	public void extractRenderState(GuiGraphicsExtractor g, int mx, int my, float pt) {
 		super.extractRenderState(g, mx, my, pt);
 		g.centeredText(font, title, width / 2, 16, 0xFFFFFFFF);
-		g.centeredText(font, Component.translatable("chunkmap.options.world"), width / 2, 40 + 24 * 5 - 6, 0xFFA0A0A0);
+		if (ChunkMap.session() != null) g.centeredText(font, Component.translatable("chunkmap.options.world"), width / 2, worldHeader, 0xFFA0A0A0);
 	}
 
 	@Override

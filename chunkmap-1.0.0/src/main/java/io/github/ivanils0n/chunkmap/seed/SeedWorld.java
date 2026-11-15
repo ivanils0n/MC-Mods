@@ -20,7 +20,6 @@ import net.minecraft.world.level.levelgen.WorldgenRandom;
 import net.minecraft.world.level.levelgen.structure.Structure;
 import net.minecraft.world.level.levelgen.structure.StructureSet;
 import net.minecraft.world.level.levelgen.structure.structures.JigsawStructure;
-import net.minecraft.world.level.levelgen.structure.templatesystem.StructureTemplateManager;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -41,8 +40,6 @@ public final class SeedWorld {
 	public final ChunkGeneratorStructureState state;
 	public final long seed;
 	public final LevelHeightAccessor height;
-	/** Só no singleplayer (moldes das estruturas do servidor): com ele as vilas e afins são conferidas por inteiro. */
-	private final StructureTemplateManager templates;
 	private final int surfaceQuart;
 	private final int caveQuart;
 
@@ -51,7 +48,7 @@ public final class SeedWorld {
 	private final List<Holder<Biome>> biomes = new CopyOnWriteArrayList<>();
 
 	private SeedWorld(RegistryAccess access, ChunkGenerator generator, RandomState randomState, ChunkGeneratorStructureState state,
-			long seed, LevelHeightAccessor height, StructureTemplateManager templates) {
+			long seed, LevelHeightAccessor height) {
 		this.access = access;
 		this.generator = generator;
 		this.biomeSource = generator.getBiomeSource();
@@ -60,7 +57,6 @@ public final class SeedWorld {
 		this.state = state;
 		this.seed = seed;
 		this.height = height;
-		this.templates = templates;
 		int top = height.getMinY() + height.getHeight() - 1;
 		// Bem acima do chão o "depth" do clima é negativo: dá o bioma da superfície (sem cavernas), o mesmo que o
 		// jogo usa no chão, sem precisar calcular a altura do terreno em cada ponto.
@@ -72,16 +68,15 @@ public final class SeedWorld {
 	public static SeedWorld fromServer(ServerLevel level) {
 		var source = level.getChunkSource();
 		return new SeedWorld(level.registryAccess(), source.getGenerator(), source.randomState(), source.getGeneratorState(),
-				level.getSeed(), LevelHeightAccessor.create(level.getMinY(), level.getHeight()), level.getServer().getStructureManager());
+				level.getSeed(), LevelHeightAccessor.create(level.getMinY(), level.getHeight()));
 	}
 
 	/** Outra seed com uma geração conhecida. Null se a dimensão não usa a geração por ruído (ex.: mundo plano). */
-	public static SeedWorld create(RegistryAccess access, ChunkGenerator generator, long seed, LevelHeightAccessor height,
-			StructureTemplateManager templates) {
+	public static SeedWorld create(RegistryAccess access, ChunkGenerator generator, long seed, LevelHeightAccessor height) {
 		if (!(generator instanceof NoiseBasedChunkGenerator noise)) return null;
 		RandomState rs = RandomState.create(noise.generatorSettings().value(), access.lookupOrThrow(Registries.NOISE), seed);
 		ChunkGeneratorStructureState st = generator.createState(access.lookupOrThrow(Registries.STRUCTURE_SET), rs, seed);
-		return new SeedWorld(access, generator, rs, st, seed, height, templates);
+		return new SeedWorld(access, generator, rs, st, seed, height);
 	}
 
 	public Holder<Biome> biomeAt(int blockX, int blockZ, boolean caves) {
@@ -152,11 +147,13 @@ public final class SeedWorld {
 		StructureIcon icon = StructureIcon.forStructure(id);
 		Structure structure = holder.value();
 		ChunkPos chunk = new ChunkPos(chunkX, chunkZ);
-		// Estruturas de quebra-cabeça (vilas, postos...) montam as peças para achar o lugar: só com os moldes do servidor.
-		if (templates != null || !(structure instanceof JigsawStructure)) {
+		// As de quebra-cabeça (vilas, postos, cidades...) precisariam montar todas as peças para achar o lugar exato: lento
+		// demais para um mapa, e o teste no CI mostra que conferir só o bioma dá o mesmo resultado. As outras passam
+		// pela conferência completa do jogo (terreno e bioma).
+		if (!(structure instanceof JigsawStructure)) {
 			try {
 				Structure.GenerationContext ctx = new Structure.GenerationContext(access, generator, biomeSource, randomState,
-						templates, seed, chunk, height, structure.biomes()::contains);
+						null, seed, chunk, height, structure.biomes()::contains);
 				Optional<Structure.GenerationStub> stub = structure.findValidGenerationPoint(ctx);
 				if (stub.isEmpty()) return null;
 				BlockPos p = stub.get().position();
