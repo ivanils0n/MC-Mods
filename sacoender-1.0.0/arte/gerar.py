@@ -216,10 +216,39 @@ def bundle_def(c):
         'fallback': vanilla_bundle(c),
     }}
 
-def dump(path, obj):
+# Tela do baú do Ender: os 9 primeiros espaços (os do saco) com a cor B2 (Pedra Lavanda) e o saco no canto do
+# título. É um caractere da fonte sacoender:gui (176x36, do canto da tela) que o mod põe antes do título do baú do
+# Ender: a textura do baú (generic_54) não é trocada, então o resto da tela segue o resource pack do jogador.
+def ender_row():
+    import random
+    im = Image.new('RGBA', (176, 36), (0, 0, 0, 0))
+    d = ImageDraw.Draw(im); rng = random.Random(4)
+    def c(h): h = h.lstrip('#'); return tuple(int(h[i:i + 2], 16) for i in (0, 2, 4)) + (255,)
+    for i in range(9):
+        x, y = 7 + i * 18, 17
+        for yy in range(y, y + 18):
+            for xx in range(x, x + 18):
+                im.putpixel((xx, yy), c(rng.choice(['#8b8496', '#8e8799', '#888193', '#918a9c'])))
+        d.line([x, y, x + 16, y], fill=c('#37323f')); d.line([x, y, x, y + 16], fill=c('#37323f'))
+        d.line([x + 1, y + 17, x + 17, y + 17], fill=c('#ffffff')); d.line([x + 17, y + 1, x + 17, y + 17], fill=c('#ffffff'))
+        for cx, cy in [(x, y), (x + 17, y), (x, y + 17), (x + 17, y + 17)]:
+            d.point((cx, cy), fill=c('#b88ee6'))
+        for pt in [(x + 1, y), (x, y + 1), (x + 16, y + 17), (x + 17, y + 16)]:
+            d.point(pt, fill=c('#a283cc'))
+    icon = render(ELEMENTS, TEX, 13, scale=0.85)
+    icon = icon.crop(icon.getbbox())
+    im.alpha_composite(icon, (168 - icon.width, 4 + (11 - icon.height) // 2 if icon.height < 11 else 4))
+    return im
+
+FONT = {'providers': [
+    {'type': 'space', 'advances': {'\uf000': -8, '\uf001': -177, '\uf002': 8}},
+    {'type': 'bitmap', 'file': 'sacoender:gui/ender_row.png', 'ascent': 13, 'height': 36, 'chars': ['\ue000']},
+]}
+
+def dump(path, obj, ascii=False):
     os.makedirs(os.path.dirname(path), exist_ok=True)
     with open(path, 'w', newline='\n') as f:
-        json.dump(obj, f, indent=1, ensure_ascii=False)
+        json.dump(obj, f, indent=1, ensure_ascii=ascii)
         f.write('\n')
 
 if __name__ == '__main__':
@@ -230,6 +259,9 @@ if __name__ == '__main__':
     dump(RES + '/sacoender/models/item/saco.json', model_json())
     for c in COLORS:
         dump(RES + f"/minecraft/items/{(c + '_') if c else ''}bundle.json", bundle_def(c))
+    os.makedirs(RES + '/sacoender/textures/gui', exist_ok=True)
+    ender_row().save(RES + '/sacoender/textures/gui/ender_row.png', optimize=True)
+    dump(RES + '/sacoender/font/gui.json', FONT, ascii=True)
     os.makedirs(ROOT + '/src/pack', exist_ok=True)
     icon = render(ELEMENTS, TEX, 64, scale=0.7)
     bg = Image.new('RGBA', (64, 64), (24, 16, 36, 255)); bg.alpha_composite(icon)

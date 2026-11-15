@@ -77,6 +77,22 @@ public class ClientShots implements FabricClientGameTest {
 			context.takeScreenshot("5_inventario");
 			context.setScreen(() -> null);
 			context.waitTicks(5);
+
+			// Baú do Ender de verdade: os 9 primeiros espaços (os do saco) aparecem desenhados.
+			cmd(sp, "kill @e[type=item]");
+			cmd(sp, "item replace entity @p weapon.mainhand with minecraft:air");
+			cmd(sp, String.format(Locale.ROOT, "setblock %d %d %d minecraft:ender_chest", (int) Math.floor(X), (int) Y, (int) Math.floor(Z) + 1));
+			cmd(sp, String.format(Locale.ROOT, "tp @p %.2f %.2f %.2f 0 45", X, Y, Z));
+			context.waitTicks(10);
+			context.getInput().holdKey(o -> o.keyUse);
+			context.waitTicks(2);
+			context.getInput().releaseKey(o -> o.keyUse);
+			context.waitTicks(15);
+			boolean chest = context.computeOnClient(c -> c.player.containerMenu instanceof ChestMenu);
+			context.takeScreenshot("6_bau_do_ender");
+			if (!chest) throw new AssertionError("o baú do Ender não abriu");
+			context.runOnClient(c -> c.player.closeContainer());
+			context.waitTicks(5);
 		}
 	}
 

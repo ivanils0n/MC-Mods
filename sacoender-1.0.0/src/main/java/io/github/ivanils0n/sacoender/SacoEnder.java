@@ -5,7 +5,11 @@ import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 import java.util.UUID;
+import java.util.concurrent.ConcurrentHashMap;
+import com.google.gson.JsonObject;
+import com.mojang.serialization.JsonOps;
 import net.fabricmc.api.ModInitializer;
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerLifecycleEvents;
 import net.fabricmc.fabric.api.event.player.UseItemCallback;
@@ -18,7 +22,9 @@ import net.minecraft.resources.Identifier;
 import net.minecraft.tags.TagKey;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.ComponentSerialization;
 import net.minecraft.network.protocol.common.ClientboundResourcePackPushPacket;
+import net.minecraft.network.protocol.common.ServerboundResourcePackPacket;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
@@ -52,6 +58,9 @@ public final class SacoEnder implements ModInitializer {
 	private static final String PACK_URL = "https://github.com/ivanils0n/MC-Mods/releases/download/sacoender-" + modVersion() + "/sacoender-pack-";
 	static final String PACK_SHA1 = readPackHash();
 	private static final UUID PACK_ID = UUID.nameUUIDFromBytes("sacoender:pack".getBytes(StandardCharsets.UTF_8));
+	private static final Set<UUID> PACK_OK = ConcurrentHashMap.newKeySet();
+	/** Caractere da fonte sacoender:gui com os 9 espaços do saco (arte/gerar.py); \uF000/\uF001/\uF002 voltam o cursor. */
+	static final String ENDER_ROW = "\uF000\uE000\uF001\uF002";
 
 	@Override
 	public void onInitialize() {
@@ -61,6 +70,8 @@ public final class SacoEnder implements ModInitializer {
 			sender.sendPacket(new ClientboundResourcePackPushPacket(PACK_ID, PACK_URL + PACK_SHA1 + ".zip", PACK_SHA1, false,
 				Optional.of(Component.literal("Texturas do Saco do Ender"))));
 		});
+		ServerPlayConnectionEvents.DISCONNECT.register((handler, s) -> PACK_OK.remove(handler.player.getUUID()));
+		ServerLifecycleEvents.SERVER_STOPPED.register(s -> PACK_OK.clear());
 		ServerLifecycleEvents.SERVER_STARTED.register(s -> {
 			if (Boolean.getBoolean("sacoender.selftest")) SelfTest.run(s);
 		});
@@ -99,6 +110,34 @@ public final class SacoEnder implements ModInitializer {
 	}
 
 	// ---------- resource pack ----------
+
+	/** Chamado pelo mixin quando o jogador responde ao pedido do resource pack. */
+	public static void packStatus(ServerPlayer p, UUID id, ServerboundResourcePackPacket.Action action) {
+		if (!PACK_ID.equals(id)) return;
+		if (action == ServerboundResourcePackPacket.Action.SUCCESSFULLY_LOADED) PACK_OK.add(p.getUUID());
+		else if (action != ServerboundResourcePackPacket.Action.ACCEPTED && action != ServerboundResourcePackPacket.Action.DOWNLOADED) PACK_OK.remove(p.getUUID());
+	}
+
+	/** Singleplayer: as texturas vêm do .jar do dono do mundo. Servidor: só de quem carregou o pack. */
+	public static boolean hasPack(ServerPlayer p) {
+		var server = p.level().getServer();
+		return server.isDedicatedServer() ? PACK_OK.contains(p.getUUID()) : server.isSingleplayerOwner(p.nameAndId());
+	}
+
+	/**
+	 * Título do baú do Ender com os 9 espaços do saco desenhados (só para quem tem o pack): antes do título vai um
+	 * caractere da fonte sacoender:gui do tamanho do topo da tela, em branco para não ser escurecido pela cor do título.
+	 * A textura do baú do jogo não muda, e sem o pack o título fica igual ao do jogo.
+	 */
+	public static Component enderTitle(Component title, Player player) {
+		if (!(player instanceof ServerPlayer sp) || !hasPack(sp)) return title;
+		JsonObject bg = new JsonObject();
+		bg.addProperty("text", ENDER_ROW);
+		bg.addProperty("font", "sacoender:gui");
+		bg.addProperty("color", "white");
+		return ComponentSerialization.CODEC.parse(JsonOps.INSTANCE, bg).result()
+			.<Component>map(c -> Component.empty().append(c).append(title)).orElse(title);
+	}
 
 	/** Versão do mod sem o sufixo "+mc..." (a do release no GitHub, ex.: 1.0.0). */
 	private static String modVersion() {

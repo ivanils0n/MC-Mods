@@ -1,0 +1,21 @@
+{
+ "providers": [
+  {
+   "type": "space",
+   "advances": {
+    "\uf000": -8,
+    "\uf001": -177,
+    "\uf002": 8
+   }
+  },
+  {
+   "type": "bitmap",
+   "file": "sacoender:gui/ender_row.png",
+   "ascent": 13,
+   "height": 36,
+   "chars": [
+    "\ue000"
+   ]
+  }
+ ]
+}

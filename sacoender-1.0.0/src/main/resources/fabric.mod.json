@@ -10,6 +10,7 @@
 	},
 	"license": "MIT",
 	"environment": "*",
+	"mixins": ["sacoender.mixins.json"],
 	"entrypoints": {
 		"main": ["io.github.ivanils0n.sacoender.SacoEnder"]
 	},

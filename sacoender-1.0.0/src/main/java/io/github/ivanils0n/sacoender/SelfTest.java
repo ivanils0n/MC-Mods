@@ -159,6 +159,10 @@ final class SelfTest {
 		ensure(SacoEnder.PACK_SHA1 != null, "hash do resource pack não está no .jar");
 		ensure(SacoEnder.class.getResource("/assets/minecraft/items/bundle.json") != null && SacoEnder.class.getResource("/assets/minecraft/items/purple_bundle.json") != null, "definições das trouxas");
 		ensure(SacoEnder.class.getResource("/assets/sacoender/models/item/saco.json") != null, "modelo do saco");
+		ensure(SacoEnder.class.getResource("/assets/sacoender/font/gui.json") != null && SacoEnder.class.getResource("/assets/sacoender/textures/gui/ender_row.png") != null, "desenho dos espaços do saco");
+		// Sem o pack (jogador que recusou), o título do baú do Ender continua o do jogo.
+		var title = net.minecraft.network.chat.Component.translatable("container.enderchest");
+		ensure(SacoEnder.enderTitle(title, fp) == title, "título mudou para quem não tem o pack");
 		ok("resource pack");
 	}
 
