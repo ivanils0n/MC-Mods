@@ -46,7 +46,8 @@ public final class MapScreen extends Screen {
 	private ResourceKey<Level> dim;
 	private int toolbarBottom, bottomTop, iconStep, iconRows, iconsPerRow;
 	private EditBox seedBox, xBox, zBox;
-	private Button dimButton, biomesButton;
+	private Button dimButton, biomesButton, optionsButton;
+	private static final net.minecraft.resources.Identifier GEAR = net.minecraft.resources.Identifier.fromNamespaceAndPath("chunkmap", "textures/gui/gear.png");
 	private boolean dragging;
 	private double mouseX, mouseY;
 	private boolean biomePanel;
@@ -110,7 +111,8 @@ public final class MapScreen extends Screen {
 				.bounds(bx, by, 74, 20).build());
 		addRenderableWidget(Button.builder(Component.translatable("chunkmap.map.waypoints"), b -> minecraft.gui.setScreen(new WaypointListScreen(this)))
 				.bounds(bx + 78, by, 74, 20).build());
-		addRenderableWidget(Button.builder(Component.literal("⚙"), b -> minecraft.gui.setScreen(new OptionsScreen(this)))
+		// Ícone de engrenagem desenhado por cima (o "⚙" da fonte do jogo parece um sol).
+		optionsButton = addRenderableWidget(Button.builder(Component.empty(), b -> minecraft.gui.setScreen(new OptionsScreen(this)))
 				.bounds(bx + 156, by, 20, 20).tooltip(net.minecraft.client.gui.components.Tooltip.create(Component.translatable("chunkmap.options.title"))).build());
 
 		// Barra de baixo: os controles em sequência; quando não cabe, quebra a linha (a barra cresce para cima).
@@ -450,6 +452,7 @@ public final class MapScreen extends Screen {
 		this.mouseX = mx;
 		this.mouseY = my;
 		super.extractRenderState(g, mx, my, pt);
+		if (optionsButton != null && optionsButton.visible) g.blit(RenderPipelines.GUI_TEXTURED, GEAR, optionsButton.getX() + 2, optionsButton.getY() + 2, 0f, 0f, 16, 16, 16, 16);
 		WorldSession s = session();
 		if (s == null) return;
 		// Avisos no meio/topo do mapa
