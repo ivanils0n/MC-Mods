@@ -146,7 +146,9 @@ final class SelfTest {
 		ensure(!im.getCarried().isEmpty() && SacoEnder.isBag(im.getCarried()) && !im.getCarried().has(DataComponents.BUNDLE_CONTENTS), "item foi posto dentro do saco: " + im.getCarried());
 		ensure(inv.getItem(0).is(Items.DIAMOND) && inv.getItem(0).getCount() == 4, "o clique não trocou o saco pelo diamante");
 		im.clicked(37, 1, ContainerInput.PICKUP, fp);
-		ensure(inv.getItem(1).is(Items.DIRT) && inv.getItem(1).getCount() == 10, "o saco puxou a terra para dentro: " + inv.getItem(1));
+		// Como item comum, só troca de lugar: a terra vem inteira para o cursor e o saco continua sem nada dentro.
+		ensure(im.getCarried().is(Items.DIRT) && im.getCarried().getCount() == 10, "o saco puxou a terra para dentro: " + im.getCarried());
+		ensure(SacoEnder.isBag(inv.getItem(1)) && !inv.getItem(1).has(DataComponents.BUNDLE_CONTENTS), "saco depois da troca: " + inv.getItem(1));
 		im.setCarried(ItemStack.EMPTY);
 		ok("o saco não guarda itens como trouxa");
 
