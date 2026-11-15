@@ -197,6 +197,19 @@ public class ClientShots implements FabricClientGameTest {
 			context.runOnClient(mc -> mc.player.respawn());
 			context.waitTicks(40);
 			context.setScreen(() -> null);
+			// A caveira da morte aparece no minimapa e no mundo; ao chegar perto dela, o ponto some.
+			sp.getServer().runCommand("gamemode creative @a");
+			Waypoint dw = context.computeOnClient(mc -> ChunkMap.session().data.waypoints.stream().filter(w -> w.death).findFirst().orElse(null));
+			if (dw != null) {
+				sp.getServer().runCommand(String.format(Locale.ROOT, "tp @p %d %d %d 0 0", dw.x, dw.y + 1, dw.z - 14));
+				context.waitTicks(20);
+				context.takeScreenshot("16_caveira_da_morte");
+				context.waitTicks(100);
+				sp.getServer().runCommand(String.format(Locale.ROOT, "tp @p %d %d %d", dw.x, dw.y, dw.z));
+				context.waitTicks(30);
+				boolean gone = context.computeOnClient(mc -> ChunkMap.session().data.waypoints.stream().noneMatch(w -> w.death));
+				log("ponto de morte some ao chegar perto=" + gone);
+			}
 		}
 
 		multiplayer(context, seed);

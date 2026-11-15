@@ -68,6 +68,7 @@ public final class WorldSession {
 	private final Set<Long> queued = new HashSet<>();
 	private long ticks;
 	private boolean wasDead;
+	private long deathTicks = Long.MIN_VALUE / 2;
 	private boolean dirty;
 
 	/** A seed de uma dimensão: a geração, os biomas e as estruturas. */
@@ -255,6 +256,13 @@ public final class WorldSession {
 		boolean dead = mc.player.isDeadOrDying();
 		if (dead && !wasDead) addDeathPoint(mc);
 		wasDead = dead;
+		if (dead) deathTicks = ticks;
+		// Chegou perto (4 blocos) do lugar da morte, vivo e um tempo depois de renascer: o ponto some.
+		else if (ticks - deathTicks > 100 && ticks % 10 == 0) {
+			String here = dimId(level.dimension());
+			BlockPos p = mc.player.blockPosition();
+			if (data.waypoints.removeIf(w -> w.death && w.dim.equals(here) && p.distSqr(new BlockPos(w.x, w.y, w.z)) <= 16)) markDirty();
+		}
 		if (ticks % 1200 == 0) save();
 	}
 
