@@ -675,7 +675,7 @@
   "firstperson_righthand": {
    "rotation": [
     0,
-    45,
+    -45,
     0
    ],
    "translation": [

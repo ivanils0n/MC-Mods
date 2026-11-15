@@ -187,7 +187,7 @@ def model_json():
             'head': {'translation': [0, 13, 0], 'scale': [0.8, 0.8, 0.8]},
             'thirdperson_righthand': {'rotation': [0, 45, 0], 'translation': [0, 2, 1], 'scale': [0.4, 0.4, 0.4]},
             'thirdperson_lefthand': {'rotation': [0, 45, 0], 'translation': [0, 2, 1], 'scale': [0.4, 0.4, 0.4]},
-            'firstperson_righthand': {'rotation': [0, 45, 0], 'translation': [1, 2, 0], 'scale': [0.35, 0.35, 0.35]},
+            'firstperson_righthand': {'rotation': [0, -45, 0], 'translation': [1, 2, 0], 'scale': [0.35, 0.35, 0.35]},
             'firstperson_lefthand': {'rotation': [0, 45, 0], 'translation': [1, 2, 0], 'scale': [0.35, 0.35, 0.35]},
         }}
 
