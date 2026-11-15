@@ -233,6 +233,36 @@ public class ClientShots implements FabricClientGameTest {
 		}
 		fs.close();
 		fv.close();
+		// Diagnóstico: o /locate do jogo para alguns tipos, a partir de (0, 0).
+		for (StructureIcon icon : new StructureIcon[]{StructureIcon.SHIPWRECK, StructureIcon.VILLAGE, StructureIcon.PILLAGER_OUTPOST, StructureIcon.DESERT_PYRAMID}) {
+			String r = sp.getServer().computeOnServer(s -> {
+				ServerLevel level = s.overworld();
+				var reg = level.registryAccess().lookupOrThrow(Registries.STRUCTURE);
+				List<Holder<Structure>> list = new ArrayList<>();
+				reg.listElements().forEach(h -> {
+					if (StructureIcon.forStructure(SeedWorld.id(h)) == icon) list.add(h);
+				});
+				var found = level.getChunkSource().getGenerator().findNearestMapStructure(level, net.minecraft.core.HolderSet.direct(list), BlockPos.ZERO, 100, false);
+				return found == null ? "nada" : found.getFirst().toShortString();
+			});
+			log("locate " + icon.id + " -> " + r);
+		}
+		// Diagnóstico: quantos candidatos passam em cada etapa (navios).
+		int[] c = new int[3];
+		for (Holder<StructureSet> set : server.state.possibleStructureSets()) {
+			if (!SeedWorld.id(set).contains("shipwreck")) continue;
+			var spread = (RandomSpreadStructurePlacement) set.value().placement();
+			int rb = spread.spacing() * 16;
+			for (int rx = Math.floorDiv(-RADIUS, rb); rx <= Math.floorDiv(RADIUS, rb); rx++) {
+				for (int rz = Math.floorDiv(-RADIUS, rb); rz <= Math.floorDiv(RADIUS, rb); rz++) {
+					ChunkPos cp = spread.getPotentialStructureChunk(server.state.getLevelSeed(), rx, rz);
+					c[0]++;
+					if (spread.isStructureChunk(server.state, cp.x(), cp.z())) c[1]++;
+					if (server.check(set, cp.x(), cp.z()) != null) c[2]++;
+				}
+			}
+		}
+		log("navios: candidatos " + c[0] + ", na grade " + c[1] + ", aceitos " + c[2] + "; conjuntos: " + server.state.possibleStructureSets().size());
 	}
 
 	private static Set<Long> chunks(List<SeedWorld.Found> list) {
