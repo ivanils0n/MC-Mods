@@ -227,10 +227,11 @@ public final class Tumulo implements ModInitializer {
 		return null;
 	}
 
-	/** Para onde vai a cabeça do corpo deitado (ele deita a partir dos pés, 1,8 bloco na direção do yaw + 90°). */
+	/** Para onde vai a cabeça do corpo deitado (ele deita a partir dos pés, 1,8 bloco). */
 	static Vec3 headDir(float yaw) {
-		double r = Math.toRadians(yaw + 90f);
-		return new Vec3(-Math.sin(r), 0, Math.cos(r));
+		// Conferido nos prints do cliente: yaw 0 = cabeça a oeste, 90 = sul, 180 = leste, 270 = norte.
+		double r = Math.toRadians(yaw);
+		return new Vec3(-Math.cos(r), 0, Math.sin(r));
 	}
 
 	/** Gira o corpo de 90 em 90 graus até a cabeça não entrar numa parede. */
