@@ -46,6 +46,15 @@ jobs:
           done < .diag/classes.txt
           [ -f .diag/grep.txt ] && while read -r p; do echo "=== $p" >> out/grep.txt; grep -E "$p" out/all-classes.txt | head -40 >> out/grep.txt; done < .diag/grep.txt
           gzip -f out/all-classes.txt
+      - name: Fontes
+        continue-on-error: true
+        run: |
+          [ -f .diag/sources.txt ] || exit 0
+          ./gradlew --configure-on-demand ":chunkmap-1.1.0:genSources" -Pminecraft_version=26.2 "-Pminecraft_dependency=~26.2" > out/gensources.log 2>&1 || true
+          src=$(find ~/.gradle .gradle */.gradle -name '*sources.jar' -path '*minecraft*' 2>/dev/null | head -1)
+          echo "$src" > out/sources-jar.txt
+          mkdir -p out/src
+          while read -r f; do [ -n "$f" ] && unzip -o -q "$src" "$f" -d out/src || echo "faltou $f" >> out/src/faltou.txt; done < .diag/sources.txt
       - name: Devolver
         if: always()
         run: |
