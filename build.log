@@ -1,0 +1,23 @@
+Configuration on demand is an incubating feature.
+
+> Configure project :spawninfo-1.0.0
+Fabric Loom: 1.19.4
+
+> Task :spawninfo-1.0.0:compileJava
+> Task :spawninfo-1.0.0:processResources
+> Task :spawninfo-1.0.0:classes
+> Task :spawninfo-1.0.0:processIncludeJars
+> Task :spawninfo-1.0.0:compileTestJava NO-SOURCE
+> Task :spawninfo-1.0.0:jar
+> Task :spawninfo-1.0.0:processTestResources NO-SOURCE
+> Task :spawninfo-1.0.0:assemble
+> Task :spawninfo-1.0.0:testClasses UP-TO-DATE
+> Task :spawninfo-1.0.0:test NO-SOURCE
+> Task :spawninfo-1.0.0:validateAccessWidener NO-SOURCE
+> Task :spawninfo-1.0.0:check UP-TO-DATE
+> Task :spawninfo-1.0.0:build
+
+BUILD SUCCESSFUL in 1s
+4 actionable tasks: 4 executed
+Consider enabling configuration cache to speed up this build: https://docs.gradle.org/9.8.2/userguide/configuration_cache_enabling.html
+exit=0
