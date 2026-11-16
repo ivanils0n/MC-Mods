@@ -80,6 +80,45 @@ public class ClientShots implements FabricClientGameTest {
 			if (!screen || !menu.equals("GraveMenu")) throw new AssertionError("a tela do túmulo não abriu (tela " + screen + ", menu " + menu + ")");
 			context.runOnClient(c -> c.player.closeContainer());
 			context.waitTicks(5);
+
+			// Corpos nas 4 direções: clicar em pé em cima da cabeça, do meio e dos pés (olhando para baixo) tem que abrir a tela.
+			float[] yaws = {0f, 90f, 180f, 270f};
+			for (int k = 0; k < 4; k++) {
+				float yaw = yaws[k];
+				double gx = X + 6 + k * 4, gz = Z + 6;
+				cmd(sp, String.format(Locale.ROOT, "fill %d %d %d %d %d %d air", (int) gx - 3, (int) Y, (int) gz - 3, (int) gx + 3, (int) Y + 3, (int) gz + 3));
+				cmd(sp, String.format(Locale.ROOT, "fill %d %d %d %d %d %d grass_block", (int) gx - 3, (int) Y - 1, (int) gz - 3, (int) gx + 3, (int) Y - 1, (int) gz + 3));
+				sp.getServer().runOnServer(s -> {
+					ItemStack[] its = new ItemStack[Grave.SIZE];
+					java.util.Arrays.fill(its, ItemStack.EMPTY);
+					its[Grave.HEAD] = new ItemStack(Items.GOLDEN_HELMET);
+					its[Grave.FEET] = new ItemStack(Items.DIAMOND_BOOTS);
+					its[0] = new ItemStack(Items.DIRT);
+					ServerPlayer p = player(s);
+					Tumulo.create(s, new Tumulo.Pending((net.minecraft.server.level.ServerLevel) p.level(), java.util.UUID.randomUUID(), "Teste" + (int) yaw, null, null, new net.minecraft.world.phys.Vec3(gx, Y, gz), yaw, its, -1));
+				});
+				net.minecraft.world.phys.Vec3 d = Tumulo.headDir(yaw);
+				cmd(sp, String.format(Locale.ROOT, "tp @p %.2f %.2f %.2f 0 90", gx + d.x * 0.9, Y + 4, gz + d.z * 0.9));
+				context.waitTicks(25);
+				context.takeScreenshot("5_yaw" + (int) yaw + "_de_cima");
+				String[] parts = {"pes", "meio", "cabeca"};
+				double[] at = {0.2, 0.9, 1.6};
+				for (int i = 0; i < 3; i++) {
+					cmd(sp, String.format(Locale.ROOT, "tp @p %.2f %.2f %.2f 0 90", gx + d.x * at[i], Y, gz + d.z * at[i]));
+					context.waitTicks(10);
+					context.getInput().holdKey(o -> o.keyUse);
+					context.waitTicks(2);
+					context.getInput().releaseKey(o -> o.keyUse);
+					context.waitTicks(10);
+					boolean open = context.computeOnClient(c -> c.player.containerMenu instanceof ChestMenu);
+					if (!open) {
+						context.takeScreenshot("6_falhou_yaw" + (int) yaw + "_" + parts[i]);
+						throw new AssertionError("clique na parte '" + parts[i] + "' do corpo (yaw " + yaw + ") não abriu a tela");
+					}
+					context.runOnClient(c -> c.player.closeContainer());
+					context.waitTicks(5);
+				}
+			}
 		}
 	}
 
