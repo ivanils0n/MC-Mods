@@ -178,6 +178,11 @@ public class ClientTest implements FabricClientGameTest {
 			});
 			context.waitTicks(5);
 			context.takeScreenshot("03_superficie_mobs_a_frente");
+			// Com efeitos de poção, o painel desce para não cobrir os ícones.
+			cmd(sp, "effect give @p speed 60", "effect give @p weakness 60");
+			context.waitTicks(5);
+			context.takeScreenshot("03b_painel_abaixo_dos_efeitos");
+			cmd(sp, "effect clear @p");
 
 			// Tecla J esconde e mostra.
 			context.getInput().pressKey(SpawnInfo.TOGGLE);

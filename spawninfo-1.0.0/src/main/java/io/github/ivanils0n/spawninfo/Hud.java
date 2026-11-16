@@ -45,10 +45,21 @@ public final class Hud {
 		SpawnCalc.Result r = SpawnInfo.result;
 		if (r == null) return;
 		List<Line> lines = lines(mc, r, SpawnInfo.look);
-		draw(g, mc.font, lines);
+		draw(g, mc.font, lines, effectRows(mc) * 26);
 	}
 
-	static void draw(GuiGraphicsExtractor g, Font font, List<Line> lines) {
+	/** Os ícones de efeitos (poções) também ficam no canto superior direito: uma fileira de bons e uma de ruins. */
+	private static int effectRows(Minecraft mc) {
+		boolean good = false, bad = false;
+		for (net.minecraft.world.effect.MobEffectInstance e : mc.player.getActiveEffects()) {
+			if (!e.showIcon()) continue;
+			if (e.getEffect().value().isBeneficial()) good = true;
+			else bad = true;
+		}
+		return (good ? 1 : 0) + (bad ? 1 : 0);
+	}
+
+	static void draw(GuiGraphicsExtractor g, Font font, List<Line> lines, int top) {
 		int w = 140;
 		for (Line l : lines) {
 			int lw = l.indent() + font.width(l.left()) + (l.right() == null ? 0 : 10 + font.width(l.right()));
@@ -60,7 +71,7 @@ public final class Hud {
 		int screenW = g.guiWidth();
 		g.pose().pushMatrix();
 		// Encosta no canto superior direito, já na escala escolhida.
-		g.pose().translate(screenW - MARGIN - w * s, MARGIN);
+		g.pose().translate(screenW - MARGIN - w * s, MARGIN + top);
 		g.pose().scale(s, s);
 		int alpha = Math.round(Config.get.opacity / 100f * 255) << 24;
 		g.fill(0, 0, w, h, alpha | 0x10161E);
