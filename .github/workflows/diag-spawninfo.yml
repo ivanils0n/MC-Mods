@@ -1,0 +1,55 @@
+name: diag-spawninfo
+# Temporário (só no branch spawninfo-wip): compila o SpawnInfo, roda os testes do cliente e devolve log, javap e prints
+# no branch diag-spawninfo, para conferir sem precisar de login no GitHub. Sai antes do merge na main.
+on:
+  push:
+    branches: [spawninfo-wip]
+
+jobs:
+  diag:
+    runs-on: ubuntu-24.04
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v6
+      - uses: actions/setup-java@v5
+        with:
+          java-version: '25'
+          distribution: 'microsoft'
+      - run: chmod +x ./gradlew
+      - name: Compilar e testar
+        continue-on-error: true
+        run: |
+          mkdir -p out
+          ./gradlew --configure-on-demand ":chunkmap-1.1.0:compileJava" -Pminecraft_version=26.2 "-Pminecraft_dependency=~26.2" > out/prep.log 2>&1 || true
+          if [ -d spawninfo-1.0.0 ]; then
+            ./gradlew --configure-on-demand ":spawninfo-1.0.0:build" -Pminecraft_version=26.2 "-Pminecraft_dependency=~26.2" > out/build.log 2>&1; echo "exit=$?" >> out/build.log
+            if grep -q "exit=0" out/build.log && [ -d spawninfo-1.0.0/src/gametest ]; then
+              sudo apt-get install -y -qq xvfb >/dev/null 2>&1 || true
+              timeout 1200 xvfb-run -a -s "-screen 0 1280x720x24" ./gradlew --configure-on-demand ":spawninfo-1.0.0:runClientGameTest" -Pminecraft_version=26.2 "-Pminecraft_dependency=~26.2" > out/gametest.log 2>&1; echo "exit=$?" >> out/gametest.log
+              find spawninfo-1.0.0 -path '*screenshots*' -name '*.png' -exec cp {} out/ \;
+              grep -E "SPAWNINFO|ERROR|Exception|at io.github" out/gametest.log | head -400 > out/gametest-resumo.log || true
+            fi
+          fi
+      - name: javap
+        continue-on-error: true
+        run: |
+          [ -f .diag/classes.txt ] || exit 0
+          jar=$(find ~/.gradle .gradle */.gradle -name '*.jar' -path '*minecraft*' 2>/dev/null | grep -iE 'merged|common|clientOnly|minecraft-client|minecraft-26' | head -20)
+          echo "$jar" > out/jars.txt
+          cp=$(echo "$jar" | tr '\n' ':')
+          for j in $jar; do unzip -l "$j" | awk '{print $4}' | grep -E '\.class$' >> out/all-classes.txt; done
+          while read -r c; do
+            [ -n "$c" ] || continue
+            echo "=== $c" >> out/javap.txt
+            javap -public -cp "$cp" "$c" >> out/javap.txt 2>&1 || true
+          done < .diag/classes.txt
+          [ -f .diag/grep.txt ] && while read -r p; do echo "=== $p" >> out/grep.txt; grep -E "$p" out/all-classes.txt | head -40 >> out/grep.txt; done < .diag/grep.txt
+          gzip -f out/all-classes.txt
+      - name: Devolver
+        if: always()
+        run: |
+          d=$(mktemp -d); cp -r out/. "$d"/ 2>/dev/null || true
+          cd "$d" && git init -q -b diag && git add -A
+          git -c user.name=ci -c user.email=ci@localhost commit -qm "diag ${{ github.sha }}" --allow-empty
+          git push -qf "https://x-access-token:${{ github.token }}@github.com/${{ github.repository }}.git" diag:diag-spawninfo
