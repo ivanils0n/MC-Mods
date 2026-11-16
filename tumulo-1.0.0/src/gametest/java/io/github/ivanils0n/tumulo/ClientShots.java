@@ -68,7 +68,9 @@ public class ClientShots implements FabricClientGameTest {
 			context.takeScreenshot("3_corpo_de_cima");
 
 			// Botão direito de verdade no corpo: abre a tela do túmulo.
-			cmd(sp, String.format(Locale.ROOT, "tp @p %.2f %.2f %.2f 90 50", X + 1.5, Y, Z - 0.9));
+			float gy = sp.getServer().computeOnServer(s -> Tumulo.store.all().iterator().next().yaw);
+			net.minecraft.world.phys.Vec3 hd = Tumulo.headDir(gy);
+			cmd(sp, String.format(Locale.ROOT, "tp @p %.2f %.2f %.2f 0 90", X + hd.x * 0.9, Y, Z + hd.z * 0.9));
 			context.waitTicks(10);
 			context.getInput().holdKey(o -> o.keyUse);
 			context.waitTicks(2);
