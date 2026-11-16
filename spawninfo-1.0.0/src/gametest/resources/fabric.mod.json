@@ -1,0 +1,11 @@
+{
+	"schemaVersion": 1,
+	"id": "spawninfo-gametest",
+	"version": "1.0.0",
+	"name": "Spawn Info: conferência e prints (só CI)",
+	"environment": "client",
+	"entrypoints": {
+		"fabric-client-gametest": ["io.github.ivanils0n.spawninfo.ClientTest"]
+	},
+	"depends": {"spawninfo": "*"}
+}
