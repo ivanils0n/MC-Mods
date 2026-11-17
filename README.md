@@ -5,7 +5,6 @@ Mods Fabric para Minecraft. Cada pasta `<mod>-<versão>/` é um mod independente
 | Mod | Pasta | Minecraft |
 |-----|-------|-----------|
 | Mob Health Bar | `mobhealthbar-1.2.1/` | 26.2 e 26.3+ (Fabric, só cliente) |
-| Item Despawn Timer | `itemtimer-1.0.0/` | 26.2 e 26.3+ (Fabric, só cliente) |
 | Altar de Teleporte | `tpaltar-1.0.0/` | 26.2 e 26.3+ (Fabric, servidor ou singleplayer, requer Fabric API) |
 | Baú Central | `smartchest-1.1.0/` | 26.2 (Fabric, servidor ou singleplayer, requer Fabric API) |
 | Golem de Cobre Inteligente | `coppergolem-1.0.0/` | 26.2 (Fabric, servidor ou singleplayer, requer Fabric API) |
@@ -15,7 +14,6 @@ Mods Fabric para Minecraft. Cada pasta `<mod>-<versão>/` é um mod independente
 | Túmulo | `tumulo-1.0.0/` | 26.2 (Fabric, servidor ou singleplayer, requer Fabric API) |
 | Mochilas | `mochilas-1.0.0/` | 26.2 (Fabric, servidor ou singleplayer, requer Fabric API; Polymer e SGUI já vêm dentro) |
 | ChunkMap | `chunkmap-1.1.0/` | 26.2 (Fabric, só cliente, requer Fabric API) |
-| Spawn Info | `spawninfo-1.0.0/` | 26.2 (Fabric, só cliente, requer Fabric API) |
 
 ## Releases
 
@@ -75,13 +73,6 @@ Vai na pasta `mods/` do servidor, junto com o Fabric API; os jogadores entram se
 - **Quebrar**: volta o Coletor e tudo o que estava guardado.
 - **Visual (Ferro e Enxada)**: pedra com faixas de ferro e uma enxada, grade de ferro sobre a terra no topo; a tela ganha fundo de pedra e ferro com a fileira de controle sobre terra e botões próprios. Vem dentro do .jar (singleplayer) e, no servidor dedicado, o próprio mod envia o resource pack. Quem recusar vê um barril e a tela de baú comum (vidros, o escolhido brilhando, e itens do jogo como botões). As texturas são geradas por `arte/gerar.py` e `arte/tela.py`.
 - Os dados ficam em `<mundo>/coletor.json`, fora do save do Minecraft. Sem o mod, sobra um barril comum com a colheita dentro.
-
-## Item Despawn Timer
-
-Mostra acima dos itens no chão quanto falta para sumirem (5 min). Itens dropados juntos no mesmo lugar (ex.: ao morrer) mostram um só cronômetro, com o tempo do primeiro a sumir. Amarelo no último minuto, vermelho nos últimos 10 s.
-
-- Singleplayer/LAN (host): tempo exato, mesmo para itens que você deixou para trás e voltou para buscar.
-- Servidor multiplayer: o servidor não informa a idade do item, então o cronômetro conta a partir de quando o item apareceu para você.
 
 ## Compilar
 
@@ -174,17 +165,3 @@ Minimapa e mapa em tela cheia com waypoints e jogadores, como o Xaero, e, a part
 - **Arquivos**: cada mundo/servidor tem sua pasta em `.minecraft/chunkmap/` (`sp_<pasta do mundo>` ou `mp_<endereço>`) com `mundo.json` (seed, filtros, waypoints) e o terreno. Nada é gravado no mundo nem no servidor.
 - **Desempenho**: biomas e estruturas são calculados em 1 a 3 threads em segundo plano (os biomas primeiro, o que está na tela antes do que saiu dela) e guardados; o desenho só usa o que já está pronto (no CI: tela cheia a 16 blocos por pixel pronta em ~1,6 s, a 64 em ~5 s). De longe os ícones não se amontoam (os mais raros ganham a vez) e aparece "Aproxime para ver todas as estruturas marcadas", como no Chunkbase. As câmaras do desafio (muito comuns) começam desligadas nos filtros.
 - **Limites**: estruturas e biomas de outros mods só aparecem no singleplayer (no multiplayer o mod conhece só a geração vanilla). No mapa, o bioma é o de cada bloco de 4x4 da geração; o jogo mistura um pouco as bordas, então perto de uma divisa o F3 pode mostrar o vizinho (97% iguais no teste). Outros jogadores só aparecem no mapa enquanto o servidor os envia (perto de você). A seed de um servidor só é conhecida se alguém digitar.
-
-## Spawn Info
-
-Painel no canto superior direito com a chance de cada mob nascer no bloco que você olha, o limite de mobs e quantos mobs há à sua frente. Só no cliente: vai na pasta `mods/` do jogo junto com o Fabric API e funciona em qualquer servidor.
-
-- **Teclas** (mudam em Opções > Controles > Teclas, categoria Spawn Info): **J** mostra/esconde o painel, **U** abre os ajustes. O painel some com o **F3** e desce quando há ícones de efeitos de poção.
-- **Bloco analisado**: o espaço livre na frente do bloco que você olha (até 128 blocos; olhando para o chão, é o bloco em cima dele). Sem bloco na mira, ou com "onde estou" nos ajustes, vale o bloco dos seus pés. Mostra bioma, luz de blocos e do céu, a sua distância e o motivo quando nada nasce ali (bloco sólido, sem espaço, chão que não serve, perto demais: o jogo só faz nascer mobs a mais de 24 blocos de qualquer jogador e longe do spawn do mundo).
-- **Chance de cada mob**: a mesma conta do jogo. A cada tentativa o jogo sorteia um mob da lista do bioma pelo peso e confere as regras dele no bloco (luz, chão, espaço, céu à vista, Y, lua...). O painel mostra, para cada mob, a chance de uma tentativa naquele bloco dar esse mob, do mais provável ao menos provável, e o total do grupo. Exemplo num slime chunk abaixo do Y 40: no escuro, aranha, esqueleto e creeper ~19% cada e slime ~1,9%; com a sala iluminada, só o slime continua (1,9%), porque nos slime chunks ele ignora a luz.
-- **Slime chunk**: Sim/Não pela seed (abaixo do Y 40). No singleplayer usa a seed do mundo sozinho. No multiplayer, digite a seed (comando `/seed`) nos ajustes: fica guardada para aquele servidor. Sem seed, o resto funciona e o slime aparece como "se for slime chunk".
-- **Limite de mobs**: hostis (70), pacíficos (10, o jogo só tenta animais a cada 20 s) e ambiente (morcegos, 15), com barra verde/amarela/vermelha. Contam os mobs sem nome em chunks a até 128 blocos de você (no singleplayer, a contagem exata do servidor; no multiplayer, os mobs que o seu jogo enxerga). O jogo faz nascer na velocidade normal até o limite e para de vez quando ele enche; com **Limite reduz** ligado, a chance mostrada cai conforme o limite enche (0% quando cheio) e aparece "Limite cheio" em vermelho.
-- **À frente**: quantos mobs hostis e pacíficos há num cone para onde você olha (alcance e ângulo nos ajustes, atravessa paredes), com os 3 tipos mais comuns.
-- **Ajustes** (tecla U): ligar/desligar cada parte, o que analisar, quantos mobs listar, alcance e ângulo da contagem à frente, tamanho e fundo do painel e a seed do mundo/servidor. Ficam em `config/spawninfo.json`.
-- **Listas dos biomas**: o servidor não manda ao cliente quais mobs nascem em cada bioma. No singleplayer o mod lê do próprio mundo (vale com data packs); no multiplayer, do data pack vanilla que vem dentro do Minecraft (carrega 1 a 3 s ao entrar no servidor). Mobs de estruturas (bruxas nas cabanas, guardiões nos monumentos, fortalezas do Nether) não entram na conta.
-- **Testes** (CI): o teste do cliente compara a chance do mod com as regras de verdade do servidor sorteadas 40 mil vezes no mesmo bloco (sala escura e iluminada num slime chunk, fora dele, grama de dia e de noite) e confere limite, contagem à frente, teclas e a seed no multiplayer. O ícone é gerado por `arte/gerar.py`.
