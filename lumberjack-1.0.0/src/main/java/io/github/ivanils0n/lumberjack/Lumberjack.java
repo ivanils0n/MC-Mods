@@ -50,7 +50,11 @@ public final class Lumberjack implements ModInitializer {
 	/** Enquanto derruba uma árvore: os blocos quebrados em cadeia não começam outra cadeia e os drops são juntados. */
 	private static boolean chaining;
 	private static final List<Entity> DROPS = new ArrayList<>();
+	/** Árvores para derrubar no fim do tick: o evento de quebra vem antes do jogo gastar o machado no tronco original. */
+	private static final List<Pending> PENDING = new ArrayList<>();
 	private static int saveTimer;
+
+	private record Pending(ServerPlayer sp, ServerLevel sl, BlockPos origin, Block kind, List<BlockPos> logs) {}
 
 	@Override
 	public void onInitialize() {
@@ -67,9 +71,11 @@ public final class Lumberjack implements ModInitializer {
 			placed = null;
 			chaining = false;
 			DROPS.clear();
+			PENDING.clear();
 		});
 		// Grava as marcações no máximo 1 vez por minuto (só se mudou).
 		ServerTickEvents.END_SERVER_TICK.register(s -> {
+			processPending();
 			if (++saveTimer < 20 * 60) return;
 			saveTimer = 0;
 			if (placed != null) placed.flush();
@@ -97,7 +103,16 @@ public final class Lumberjack implements ModInitializer {
 		if (config.agacharDesativa && sp.isShiftKeyDown()) return;
 		if (config.exigirMachado && !sp.getMainHandItem().is(ItemTags.AXES)) return;
 		List<BlockPos> logs = findTree(sl, pos, state.getBlock());
-		if (logs != null) chop(sp, sl, pos, state.getBlock(), logs);
+		if (logs != null) PENDING.add(new Pending(sp, sl, pos.immutable(), state.getBlock(), logs));
+	}
+
+	static void processPending() {
+		if (PENDING.isEmpty()) return;
+		List<Pending> list = new ArrayList<>(PENDING);
+		PENDING.clear();
+		for (Pending p : list) {
+			if (!p.sp().isRemoved() && p.sp().level() == p.sl()) chop(p.sp(), p.sl(), p.origin(), p.kind(), p.logs());
+		}
 	}
 
 	/**

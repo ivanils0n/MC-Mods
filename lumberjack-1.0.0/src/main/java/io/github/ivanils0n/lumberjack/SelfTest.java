@@ -59,6 +59,7 @@ final class SelfTest {
 		ItemStack axe = new ItemStack(Items.DIAMOND_AXE);
 		hold(fp, axe);
 		ensure(fp.gameMode.destroyBlock(t1.get(0)), "não quebrou o tronco");
+		Lumberjack.processPending();
 		for (BlockPos p : t1) ensure(sl.getBlockState(p).isAir(), "tronco ficou em " + p);
 		int logs = 0;
 		for (ItemEntity e : items(sl)) {
@@ -75,12 +76,12 @@ final class SelfTest {
 		List<BlockPos> t2 = tree(sl, 6, 2, 5);
 		hold(fp, new ItemStack(Items.IRON_AXE));
 		fp.setShiftKeyDown(true);
-		fp.gameMode.destroyBlock(t2.get(0));
+		cut(fp, t2.get(0));
 		fp.setShiftKeyDown(false);
 		ensure(sl.getBlockState(t2.get(0)).isAir() && sl.getBlockState(t2.get(1)).is(Blocks.OAK_LOG), "agachado derrubou a árvore");
 		// 3. Sem machado: só um.
 		hold(fp, new ItemStack(Items.STICK));
-		fp.gameMode.destroyBlock(t2.get(1));
+		cut(fp, t2.get(1));
 		ensure(sl.getBlockState(t2.get(1)).isAir() && sl.getBlockState(t2.get(2)).is(Blocks.OAK_LOG), "sem machado derrubou a árvore");
 		clearItems(sl);
 		ok("agachado e sem machado quebram só um");
@@ -93,7 +94,7 @@ final class SelfTest {
 			t4.add(p);
 		}
 		hold(fp, new ItemStack(Items.IRON_AXE));
-		fp.gameMode.destroyBlock(t4.get(0));
+		cut(fp, t4.get(0));
 		ensure(sl.getBlockState(t4.get(1)).is(Blocks.SPRUCE_LOG), "troncos sem folhas caíram");
 		clearItems(sl);
 		ok("sem folhas naturais não é árvore");
@@ -106,10 +107,10 @@ final class SelfTest {
 		for (BlockPos p : List.of(c0, c1, c2)) ensure(Lumberjack.placed.contains(sl, p), "tronco colocado não foi marcado: " + p);
 		leaves(sl, c2);
 		hold(fp, new ItemStack(Items.DIAMOND_AXE));
-		fp.gameMode.destroyBlock(c0);
+		cut(fp, c0);
 		ensure(sl.getBlockState(c0).isAir() && sl.getBlockState(c1).is(Blocks.OAK_LOG) && sl.getBlockState(c2).is(Blocks.OAK_LOG), "troncos colocados caíram em cadeia");
 		ensure(!Lumberjack.placed.contains(sl, c0), "marcação ficou depois de quebrar");
-		fp.gameMode.destroyBlock(c2);
+		cut(fp, c2);
 		ensure(sl.getBlockState(c1).is(Blocks.OAK_LOG), "troncos colocados caíram em cadeia (de cima)");
 		clearItems(sl);
 		ok("troncos colocados não caem em cadeia");
@@ -120,7 +121,7 @@ final class SelfTest {
 		BlockPos side = placeOn(fp, sl, t6.get(1), Direction.EAST);
 		ensure(Lumberjack.placed.contains(sl, side), "tronco do lado não marcado");
 		hold(fp, new ItemStack(Items.DIAMOND_AXE));
-		fp.gameMode.destroyBlock(t6.get(0));
+		cut(fp, t6.get(0));
 		for (BlockPos p : t6) ensure(sl.getBlockState(p).isAir(), "tronco natural ficou em " + p);
 		ensure(sl.getBlockState(side).is(Blocks.OAK_LOG) && Lumberjack.placed.contains(sl, side), "o tronco colocado caiu junto");
 		clearItems(sl);
@@ -131,7 +132,7 @@ final class SelfTest {
 		ItemStack worn = new ItemStack(Items.DIAMOND_AXE);
 		worn.setDamageValue(worn.getMaxDamage() - 3);
 		hold(fp, worn);
-		fp.gameMode.destroyBlock(t7.get(0));
+		cut(fp, t7.get(0));
 		ItemStack after = fp.getMainHandItem();
 		ensure(after.is(Items.DIAMOND_AXE) && after.getMaxDamage() - after.getDamageValue() == 1, "machado: " + after + " " + after.getDamageValue());
 		ensure(sl.getBlockState(t7.get(1)).isAir() && sl.getBlockState(t7.get(2)).is(Blocks.OAK_LOG), "não parou com 1 de durabilidade");
@@ -147,7 +148,7 @@ final class SelfTest {
 		}
 		sl.setBlock(t8.get(4).above(), Blocks.NETHER_WART_BLOCK.defaultBlockState(), Block.UPDATE_ALL);
 		hold(fp, new ItemStack(Items.IRON_AXE));
-		fp.gameMode.destroyBlock(t8.get(0));
+		cut(fp, t8.get(0));
 		for (BlockPos p : t8) ensure(sl.getBlockState(p).isAir(), "caule ficou em " + p);
 		clearItems(sl);
 		ok("fungo gigante do Nether");
@@ -196,6 +197,12 @@ final class SelfTest {
 		fp.getMainHandItem().useOn(new UseOnContext(fp, InteractionHand.MAIN_HAND, new BlockHitResult(hit, face, on, false)));
 		ensure(sl.getBlockState(target).is(net.minecraft.tags.BlockTags.LOGS), "não colocou o tronco em " + target);
 		return target;
+	}
+
+	/** Quebra como o jogador e roda o fim do tick (onde a árvore cai). */
+	private static void cut(FakePlayer fp, BlockPos pos) {
+		fp.gameMode.destroyBlock(pos);
+		Lumberjack.processPending();
 	}
 
 	private static void hold(FakePlayer fp, ItemStack stack) {
