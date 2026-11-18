@@ -93,10 +93,16 @@ public class ClientTest implements FabricClientGameTest {
 		context.getInput().releaseKey(o -> o.keyAttack);
 	}
 
-	/** Olha para o meio do bloco (ou, se for o chão, para o topo dele) e espera o cliente virar. */
+	/**
+	 * Olha, a partir dos olhos, para o meio do bloco (ou, se for o chão, para o topo dele) e espera o cliente virar.
+	 * (O "tp ... facing" mira a partir dos pés, por isso o ângulo é calculado aqui.)
+	 */
 	private static void look(ClientGameTestContext context, TestSingleplayerContext sp, int bx, int by, int bz) {
-		String y = by < Y ? by + ".99" : by + ".5";
-		cmd(sp, f("tp @p %d.5 %d %d.5 facing %d.5 %s %d.5", X, Y, Z, bx, y, bz));
+		double dx = bx - X, dz = bz - Z;
+		double dy = (by < Y ? by + 0.99 : by + 0.5) - (Y + 1.62);
+		float yaw = (float) Math.toDegrees(Math.atan2(-dx, dz));
+		float pitch = (float) -Math.toDegrees(Math.atan2(dy, Math.sqrt(dx * dx + dz * dz)));
+		cmd(sp, f("tp @p %d.5 %d %d.5 %.2f %.2f", X, Y, Z, yaw, pitch));
 		context.waitTicks(10);
 	}
 
