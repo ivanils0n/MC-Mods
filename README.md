@@ -13,6 +13,7 @@ Mods Fabric para Minecraft. Cada pasta `<mod>-<versão>/` é um mod independente
 | Coletor | `coletor-1.0.0/` | 26.2 (Fabric, servidor ou singleplayer, requer Fabric API) |
 | Túmulo | `tumulo-1.0.0/` | 26.2 (Fabric, servidor ou singleplayer, requer Fabric API) |
 | Mochilas | `mochilas-1.0.0/` | 26.2 (Fabric, servidor ou singleplayer, requer Fabric API; Polymer e SGUI já vêm dentro) |
+| Lenhador | `lumberjack-1.0.0/` | 26.2 (Fabric, servidor ou singleplayer, requer Fabric API) |
 | ChunkMap | `chunkmap-1.1.0/` | 26.2 (Fabric, só cliente, requer Fabric API) |
 
 ## Releases
@@ -165,3 +166,15 @@ Minimapa e mapa em tela cheia com waypoints e jogadores, como o Xaero, e, a part
 - **Arquivos**: cada mundo/servidor tem sua pasta em `.minecraft/chunkmap/` (`sp_<pasta do mundo>` ou `mp_<endereço>`) com `mundo.json` (seed, filtros, waypoints) e o terreno. Nada é gravado no mundo nem no servidor.
 - **Desempenho**: biomas e estruturas são calculados em 1 a 3 threads em segundo plano (os biomas primeiro, o que está na tela antes do que saiu dela) e guardados; o desenho só usa o que já está pronto (no CI: tela cheia a 16 blocos por pixel pronta em ~1,6 s, a 64 em ~5 s). De longe os ícones não se amontoam (os mais raros ganham a vez) e aparece "Aproxime para ver todas as estruturas marcadas", como no Chunkbase. As câmaras do desafio (muito comuns) começam desligadas nos filtros.
 - **Limites**: estruturas e biomas de outros mods só aparecem no singleplayer (no multiplayer o mod conhece só a geração vanilla). No mapa, o bioma é o de cada bloco de 4x4 da geração; o jogo mistura um pouco as bordas, então perto de uma divisa o F3 pode mostrar o vizinho (97% iguais no teste). Outros jogadores só aparecem no mapa enquanto o servidor os envia (perto de você). A seed de um servidor só é conhecida se alguém digitar.
+
+## Lenhador
+
+Quebrar um tronco de árvore derruba a árvore inteira. Vai na pasta `mods/` do servidor, junto com o Fabric API; os jogadores entram sem instalar nada. Em singleplayer, coloque o mesmo .jar na pasta `mods/` do jogo. Num servidor sem o mod, o cliente com o mod corta normalmente (a lógica é do servidor).
+
+- **Como funciona**: no modo sobrevivência, com um **machado** e **sem agachar**, quebrar um tronco derruba todos os troncos do mesmo tipo ligados a ele (também na diagonal: galhos de acácia, carvalho-escuro e selva 2×2, mangue, cerejeira, fungos gigantes do Nether), até 256 troncos e 10 blocos para os lados.
+- **Troncos colocados por jogadores** são anotados ao serem colocados e **nunca** caem em cadeia: quebrar um deles quebra só ele, e eles não servem de ponte entre a árvore e a sua casa. Uma árvore natural encostada numa construção cai sem levar os troncos colocados.
+- **Só é árvore com folhas naturais** (as que o jogo gerou; folhas colocadas não contam) ou verruga/luz-cogumelo do Nether encostadas nos troncos. Protege construções feitas antes de instalar o mod e casas de vila.
+- Cada tronco é quebrado como se fosse pelo próprio jogador: o machado gasta 1 por tronco (Inquebrável vale), estatísticas e fome contam, e mods de proteção de terreno podem bloquear. O corte para quando o machado fica com 1 de durabilidade. Os troncos caem todos no lugar do tronco quebrado (não ficam presos nas folhas).
+- **Agachado** (Shift) ou **sem machado**: quebra só um, como no jogo normal. No criativo não derruba em cadeia. Máquinas de outros mods (jogadores falsos, como o Autômato) cortam um por vez.
+- **Configuração**: `config/lumberjack.json` (exigir machado, agachar desativa, proteger o machado, exigir folhas, juntar drops, limite e raio).
+- Os troncos colocados ficam em `<mundo>/lumberjack.dat`, fora do save do Minecraft: removendo o mod, nada muda no mundo. Troncos colocados antes de instalar o mod não estão anotados (as folhas naturais protegem esses casos).

@@ -1,0 +1,11 @@
+{
+	"schemaVersion": 1,
+	"id": "lumberjack-gametest",
+	"version": "1.0.0",
+	"name": "Lenhador: teste no cliente (só CI)",
+	"environment": "client",
+	"entrypoints": {
+		"fabric-client-gametest": ["io.github.ivanils0n.lumberjack.ClientTest"]
+	},
+	"depends": {"lumberjack": "*"}
+}
