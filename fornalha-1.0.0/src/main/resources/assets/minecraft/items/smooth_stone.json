@@ -1,0 +1,48 @@
+{
+ "model": {
+  "type": "minecraft:select",
+  "property": "minecraft:custom_model_data",
+  "index": 0,
+  "cases": [
+   {
+    "when": "fornalha_casca",
+    "model": {
+     "type": "minecraft:model",
+     "model": "fornalha:block/casca"
+    }
+   },
+   {
+    "when": "fornalha_casca_1",
+    "model": {
+     "type": "minecraft:model",
+     "model": "fornalha:block/casca_1"
+    }
+   },
+   {
+    "when": "fornalha_casca_2",
+    "model": {
+     "type": "minecraft:model",
+     "model": "fornalha:block/casca_2"
+    }
+   },
+   {
+    "when": "fornalha_casca_3",
+    "model": {
+     "type": "minecraft:model",
+     "model": "fornalha:block/casca_3"
+    }
+   },
+   {
+    "when": "fornalha_casca_4",
+    "model": {
+     "type": "minecraft:model",
+     "model": "fornalha:block/casca_4"
+    }
+   }
+  ],
+  "fallback": {
+   "type": "minecraft:model",
+   "model": "minecraft:block/smooth_stone"
+  }
+ }
+}

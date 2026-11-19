@@ -1,0 +1,33 @@
+{
+	"type": "minecraft:crafting_shaped",
+	"category": "misc",
+	"pattern": [
+		"ICI",
+		"SBS",
+		"IFI"
+	],
+	"key": {
+		"I": "minecraft:iron_ingot",
+		"C": "minecraft:comparator",
+		"S": "minecraft:smooth_stone",
+		"B": "minecraft:blast_furnace",
+		"F": "minecraft:furnace"
+	},
+	"result": {
+		"id": "minecraft:blast_furnace",
+		"count": 1,
+		"components": {
+			"minecraft:custom_data": {
+				"fornalha_controlador": true
+			},
+			"minecraft:custom_model_data": {
+				"strings": ["fornalha_ctrl"]
+			},
+			"minecraft:custom_name": {
+				"text": "Controlador Industrial",
+				"color": "aqua",
+				"italic": false
+			}
+		}
+	}
+}

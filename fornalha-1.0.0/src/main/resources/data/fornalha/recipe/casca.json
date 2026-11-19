@@ -1,0 +1,30 @@
+{
+	"type": "minecraft:crafting_shaped",
+	"category": "building",
+	"pattern": [
+		"SSS",
+		"SIS",
+		"SSS"
+	],
+	"key": {
+		"S": "minecraft:smooth_stone",
+		"I": "minecraft:iron_ingot"
+	},
+	"result": {
+		"id": "minecraft:smooth_stone",
+		"count": 8,
+		"components": {
+			"minecraft:custom_data": {
+				"fornalha_casca": true
+			},
+			"minecraft:custom_model_data": {
+				"strings": ["fornalha_casca"]
+			},
+			"minecraft:custom_name": {
+				"text": "Casca Industrial",
+				"color": "aqua",
+				"italic": false
+			}
+		}
+	}
+}

@@ -15,6 +15,7 @@ Mods Fabric para Minecraft. Cada pasta `<mod>-<versão>/` é um mod independente
 | Mochilas | `mochilas-1.0.0/` | 26.2 (Fabric, servidor ou singleplayer, requer Fabric API; Polymer e SGUI já vêm dentro) |
 | Lenhador | `lumberjack-1.0.0/` | 26.2 (Fabric, servidor ou singleplayer, requer Fabric API) |
 | ChunkMap | `chunkmap-1.1.0/` | 26.2 (Fabric, só cliente, requer Fabric API) |
+| Fornalha Industrial | `fornalha-1.0.0/` | 26.2 (Fabric, servidor ou singleplayer, requer Fabric API) |
 
 ## Releases
 
@@ -74,6 +75,33 @@ Vai na pasta `mods/` do servidor, junto com o Fabric API; os jogadores entram se
 - **Quebrar**: volta o Coletor e tudo o que estava guardado.
 - **Visual (Ferro e Enxada)**: pedra com faixas de ferro e uma enxada, grade de ferro sobre a terra no topo; a tela ganha fundo de pedra e ferro com a fileira de controle sobre terra e botões próprios. Vem dentro do .jar (singleplayer) e, no servidor dedicado, o próprio mod envia o resource pack. Quem recusar vê um barril e a tela de baú comum (vidros, o escolhido brilhando, e itens do jogo como botões). As texturas são geradas por `arte/gerar.py` e `arte/tela.py`.
 - Os dados ficam em `<mundo>/coletor.json`, fora do save do Minecraft. Sem o mod, sobra um barril comum com a colheita dentro.
+
+## Fornalha Industrial
+
+Uma fornalha 3×3×3 de aço que funde vários itens de uma vez. Vai na pasta `mods/` do servidor, junto com o Fabric API; os jogadores entram sem instalar nada. Em singleplayer, coloque o mesmo .jar na pasta `mods/` do jogo.
+
+- **Receitas** (bancada):
+  - **Casca Industrial** (rende 8): 8 pedras lisas em volta de 1 lingote de ferro.
+  - **Controlador Industrial**: lingote de ferro, comparador, lingote de ferro em cima; pedra lisa, alto-forno, pedra lisa no meio; lingote de ferro, fornalha, lingote de ferro embaixo.
+- **Montar**: coloque o Controlador (a frente fica virada para você). Atrás dele vai um cubo 3×3×3: o Controlador no meio da face da frente, o **núcleo** no centro do cubo e **25 Cascas Industriais** em todo o resto. Clique no Controlador: ele confere a estrutura e monta (ou diz o que falta e onde). Cada casca só pode pertencer a uma fornalha.
+- **Núcleo** (bloco do centro) define o nível e a cor da textura (faixa e rebites):
+
+  | Núcleo | Itens por vez | Velocidade | Bônus no minério bruto |
+  |--------|---------------|------------|------------------------|
+  | Bloco de ferro | 4 | 1,5× | 25% de 1 lingote extra |
+  | Bloco de ouro | 8 | 2× | 33% |
+  | Bloco de diamante | 16 | 3× | 42% |
+  | Bloco de netherite | 32 | 4× | 50% |
+
+  Trocar o bloco do centro muda o nível na hora.
+- **Tela** (clique no Controlador ou em qualquer casca da fornalha montada): entrada 3×3 à esquerda, saída 3×3 à direita (só tirar), chama com a situação, barra de progresso, núcleo/nível, tanque de combustível com o espaço de combustível ao lado, XP guardado (clique para coletar), modo e liga/desliga.
+  - **Combustível**: qualquer combustível do jogo vai para o tanque (até 64 baldes de lava; o balde vazio vai para a saída). Cada item fundido gasta 100 ticks de queima (metade da fornalha comum).
+  - **Modo**: Tudo (receitas da fornalha, ciclo de 10 s ÷ velocidade), Minérios (só alto-forno) ou Comida (só defumador), esses dois com ciclo de 5 s ÷ velocidade. As receitas são as do jogo (datapacks valem).
+  - **Redstone**: sinal no Controlador pausa.
+- **Funis**: um baú ou funil em cima da casca do meio do topo abastece a fornalha (itens que ela funde vão para a entrada, combustível para o tanque) e a saída vai para um baú ou funil embaixo da casca do meio da base.
+- **Quebrar**: a casca volta com picareta (a fornalha desmonta). O Controlador volta com qualquer ferramenta, com os itens guardados e o XP; o combustível do tanque se perde.
+- **Visual (Aço Industrial)**: chapas de aço rebitadas com a faixa e os rebites na cor do núcleo; a frente do Controlador acende com brasa animada enquanto funde. A tela ganha fundo de aço, barra de progresso e tanque. Vem dentro do .jar (singleplayer) e, no servidor dedicado, o próprio mod envia o resource pack. Quem recusar vê pedra lisa, alto-forno e a tela de baú comum (vidros coloridos). As texturas são geradas por `arte/gerar.py`.
+- Por baixo são blocos do jogo: as cascas são pedras lisas e o Controlador é um barril com os itens dentro. Os dados ficam em `<mundo>/fornalha.json`, fora do save do Minecraft, e o visual nunca é salvo no mapa.
 
 ## Compilar
 
