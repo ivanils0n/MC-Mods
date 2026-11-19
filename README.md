@@ -100,7 +100,7 @@ Uma fornalha 3×3×3 de aço que funde vários itens de uma vez. Vai na pasta `m
   - **Redstone**: sinal no Controlador pausa.
 - **Funis**: um baú ou funil em cima da casca do meio do topo abastece a fornalha (itens que ela funde vão para a entrada, combustível para o tanque) e a saída vai para um baú ou funil embaixo da casca do meio da base.
 - **Quebrar**: a casca volta com picareta (a fornalha desmonta). O Controlador volta com qualquer ferramenta, com os itens guardados e o XP; o combustível do tanque se perde.
-- **Visual (Aço Industrial)**: chapas de aço rebitadas com a faixa e os rebites na cor do núcleo; a frente do Controlador acende com brasa animada enquanto funde. A tela ganha fundo de aço, barra de progresso e tanque. Vem dentro do .jar (singleplayer) e, no servidor dedicado, o próprio mod envia o resource pack. Quem recusar vê pedra lisa, alto-forno e a tela de baú comum (vidros coloridos). As texturas são geradas por `arte/gerar.py`.
+- **Visual (Aço Industrial)**: chapas de aço rebitadas com a faixa e os rebites na cor do núcleo; a frente do Controlador acende com brasa animada enquanto funde. A tela ganha fundo de aço, barra de progresso e tanque. Vem dentro do .jar (singleplayer) e, no servidor dedicado, o próprio mod envia o resource pack. Quem recusar vê pedra lisa, alto-forno e a tela de baú comum (pepitas e lingotes de ouro na barra, baldes no tanque). As texturas são geradas por `arte/gerar.py`.
 - Por baixo são blocos do jogo: as cascas são pedras lisas e o Controlador é um barril com os itens dentro. Os dados ficam em `<mundo>/fornalha.json`, fora do save do Minecraft, e o visual nunca é salvo no mapa.
 
 ## Compilar

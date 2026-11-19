@@ -120,12 +120,12 @@ final class FornalhaMenu extends AbstractContainerMenu {
 		String sig = forno.status + "|" + prog + "|" + tanque + "|" + (int) forno.xp + "|" + forno.modo + "|" + forno.ligado + "|" + forno.nivel;
 		if (sig.equals(visto)) return;
 		visto = sig;
-		for (int cell = 0; cell < CELLS; cell++) if (barril[cell] < 0) controls.setItem(cell, pack ? ItemStack.EMPTY : vidro(Items.BLACK_STAINED_GLASS_PANE));
+		for (int cell = 0; cell < CELLS; cell++) if (barril[cell] < 0) controls.setItem(cell, ItemStack.EMPTY);
 
 		controls.setItem(STATUS, status());
 		for (int i = 0; i < 3; i++) {
 			int k = Math.clamp(prog - i * 8, 0, 8);
-			ItemStack s = pack ? icon("prog_" + k) : vidro(k == 8 ? Items.LIME_STAINED_GLASS_PANE : k > 0 ? Items.YELLOW_STAINED_GLASS_PANE : Items.GRAY_STAINED_GLASS_PANE);
+			ItemStack s = pack ? icon("prog_" + k) : vidro(k == 8 ? Items.GOLD_INGOT : k > 0 ? Items.GOLD_NUGGET : Items.GLASS_PANE);
 			nome(s, "Progresso: " + (forno.tempo > 0 ? forno.progresso * 100 / forno.tempo : 0) + "%", ChatFormatting.GOLD,
 				"Ciclo de " + fmtSeg(forno.tempo) + ": funde até " + Fundicao.paralelo(forno.nivel) + " itens de uma vez.");
 			controls.setItem(PROG[i], s);
@@ -134,7 +134,7 @@ final class FornalhaMenu extends AbstractContainerMenu {
 		long pct = forno.tanque * 100 / Fundicao.TANQUE_MAX;
 		for (int i = 0; i < 3; i++) {
 			int k = Math.clamp(tanque - (2 - i) * 8, 0, 8);
-			ItemStack s = pack ? icon("tanque_" + k) : vidro(k > 0 ? Items.ORANGE_STAINED_GLASS_PANE : Items.GRAY_STAINED_GLASS_PANE);
+			ItemStack s = pack ? icon("tanque_" + k) : vidro(k > 0 ? Items.LAVA_BUCKET : Items.BUCKET);
 			nome(s, "Combustível: " + pct + "%", ChatFormatting.GOLD,
 				"Dá para fundir " + forno.tanque / Fundicao.CUSTO + " itens.",
 				"Ponha carvão, lava ou outro combustível no espaço ao lado.",
@@ -173,7 +173,7 @@ final class FornalhaMenu extends AbstractContainerMenu {
 			"ou do defumador, com o ciclo na metade do tempo.");
 		controls.setItem(MODO, modo);
 
-		ItemStack liga = pack ? icon(forno.ligado ? "ligado" : "desligado") : new ItemStack(forno.ligado ? Items.LIME_DYE : Items.RED_DYE);
+		ItemStack liga = pack ? icon(forno.ligado ? "ligado" : "desligado") : new ItemStack(forno.ligado ? Items.REDSTONE_TORCH : Items.LEVER);
 		nome(liga, forno.ligado ? "Ligada" : "Desligada", forno.ligado ? ChatFormatting.GREEN : ChatFormatting.RED,
 			"Clique para " + (forno.ligado ? "desligar" : "ligar"),
 			"Sinal de redstone no Controlador também pausa.");
