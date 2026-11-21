@@ -126,6 +126,9 @@ public class ClientShots implements FabricClientGameTest {
 			sp.getServer().runCommand("execute at @p run summon skeleton ~-6 ~ ~-3 {NoAI:1b,PersistenceRequired:1b}");
 			sp.getServer().runCommand("execute at @p run summon cow ~2 ~ ~-8 {NoAI:1b,PersistenceRequired:1b}");
 			sp.getServer().runCommand("execute at @p run setblock ~ ~2 ~ glowstone");
+			sp.getServer().runCommand("execute at @p run summon item ~3 ~ ~-3 {Item:{id:\"minecraft:diamond\",count:1},PickupDelay:32767}");
+			sp.getServer().runCommand("execute at @p run summon item ~-4 ~ ~5 {Item:{id:\"minecraft:apple\",count:1},PickupDelay:32767}");
+			sp.getServer().runCommand("execute at @p run summon item ~6 ~ ~1 {Item:{id:\"minecraft:iron_ingot\",count:1},PickupDelay:32767}");
 			context.waitTicks(80);
 			boolean cave = context.computeOnClient(mc -> ChunkMap.session().caveActive);
 			String where = context.computeOnClient(mc -> mc.player.blockPosition().toShortString() + " água=" + mc.player.isInWater());
@@ -146,6 +149,10 @@ public class ClientShots implements FabricClientGameTest {
 			log("F3 aberto=" + f3);
 			BlockPos under = context.computeOnClient(mc -> mc.player.blockPosition());
 			mapShot(context, Level.OVERWORLD, under.getX(), under.getZ(), 2f, "15_mapa_cavernas", 60);
+			context.getInput().holdKey(o -> o.keyPlayerList);
+			context.waitTicks(5);
+			context.takeScreenshot("15b_mapa_tab_cabecas_itens");
+			context.getInput().releaseKey(o -> o.keyPlayerList);
 			context.setScreen(() -> null);
 			sp.getServer().runCommand("kill @e[type=!player]");
 			sp.getServer().runCommand(String.format(Locale.ROOT, "tp @p %.2f %.2f %.2f", top.x, top.y, top.z));

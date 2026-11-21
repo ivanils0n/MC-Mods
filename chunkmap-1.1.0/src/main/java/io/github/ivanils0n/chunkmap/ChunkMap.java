@@ -78,6 +78,9 @@ public final class ChunkMap implements ClientModInitializer {
 				mc.gui.setScreen(new WaypointScreen(null, w, true));
 			}
 		}
+		while (Keys.WAYPOINT_LIST.consumeClick()) {
+			if (free) mc.gui.setScreen(new io.github.ivanils0n.chunkmap.gui.WaypointListScreen(null));
+		}
 		while (Keys.ZOOM_IN.consumeClick()) zoom(2f);
 		while (Keys.ZOOM_OUT.consumeClick()) zoom(0.5f);
 		while (Keys.CAVE.consumeClick()) {

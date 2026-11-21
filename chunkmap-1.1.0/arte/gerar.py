@@ -106,25 +106,50 @@ def outline(im, col="#1a1a1a"):
 # seta do jogador (aponta para cima; o mod gira conforme o yaw)
 arrow = Image.new("RGBA", (16, 16)); ImageDraw.Draw(arrow).polygon([(8,1),(14,14),(8,10),(2,14)], fill=hx("#ffffff"))
 arrow = outline(arrow)
-# Seta 32x32: metade esquerda branca, direita cinza-azulada (dá volume), contorno escuro de 2 px.
-a32 = Image.new("RGBA", (32, 32), (0, 0, 0, 0)); ad = ImageDraw.Draw(a32)
-ad.polygon([(16, 2), (28, 29), (16, 22), (4, 29)], fill=hx("#14181e"))
-ad.polygon([(16, 6), (25, 26), (16, 20)], fill=hx("#c9d6e6"))
-ad.polygon([(16, 6), (16, 20), (7, 26)], fill=hx("#ffffff"))
-a32.save(f"{OUT}/player_arrow.png")
+# Seta do jogador em pixel art 16x16 (ampliada 2x): branca com contorno escuro (escolha "1").
+ARROW16 = [".......OO.......", "......OWWO......", "......OWWO......", ".....OWWWWO.....", ".....OWWWWO.....",
+           "....OWWWWWWO....", "....OWWWWWWO....", "...OWWWWWWWWO...", "...OWWWWWWWWO...", "..OWWWWWWWWWWO..",
+           "..OWWWWOOWWWWO..", ".OWWWWO..OWWWWO.", ".OWWWO....OWWWO.", "OWWWO......OWWWO", "OOOO........OOOO",
+           "................"]
+a16 = Image.new("RGBA", (16, 16), (0, 0, 0, 0))
+for y, row in enumerate(ARROW16):
+    for x, ch in enumerate(row):
+        if ch == "O": a16.putpixel((x, y), (20, 22, 28, 255))
+        if ch == "W": a16.putpixel((x, y), (255, 255, 255, 255))
+a16.resize((32, 32), Image.NEAREST).save(f"{OUT}/player_arrow.png")
+# Setinha dos mobs 8x8 (escolha "2"): corpo branco/cinza tingido pela cor do mob + contorno e brilho por cima.
+MOB8 = ["...OO...", "..OHCO..", "..OCCO..", ".OHCCSO.", ".OCCCSO.", "OHCCCCSO", "OCCSSCSO", "OOO..OOO"]
+mb = Image.new("RGBA", (8, 8), (0, 0, 0, 0)); mt = Image.new("RGBA", (8, 8), (0, 0, 0, 0))
+for y, row in enumerate(MOB8):
+    for x, ch in enumerate(row):
+        if ch in "CH": mb.putpixel((x, y), (255, 255, 255, 255))
+        if ch == "S": mb.putpixel((x, y), (168, 168, 168, 255))
+        if ch == "O": mt.putpixel((x, y), (20, 22, 28, 255))
+        if ch == "H": mt.putpixel((x, y), (255, 255, 255, 110))
+mb.resize((16, 16), Image.NEAREST).save(f"{OUT}/mob_arrow.png")
+mt.resize((16, 16), Image.NEAREST).save(f"{OUT}/mob_arrow_top.png")
 # outros jogadores
 dot = Image.new("RGBA", (8, 8)); ImageDraw.Draw(dot).ellipse([1,1,6,6], fill=hx("#ffffff"))
 # waypoint (tingido em runtime)
 pin = Image.new("RGBA", (16, 16)); dp = ImageDraw.Draw(pin)
 dp.ellipse([3,1,12,10], fill=hx("#ffffff")); dp.polygon([(4,8),(11,8),(7.5,15)], fill=hx("#ffffff"))
 dp.ellipse([6,4,9,7], fill=hx("#9a9a9a")); pin = outline(pin)
-# Alfinete 32x32 (tingido pela cor do waypoint no jogo): cabeça redonda com brilho, ponta fina, contorno escuro.
-p32 = Image.new("RGBA", (32, 32), (0, 0, 0, 0)); pd = ImageDraw.Draw(p32)
-pd.ellipse([5, 1, 26, 22], fill=hx("#20242a")); pd.polygon([(8, 16), (23, 16), (15.5, 31)], fill=hx("#20242a"))
-pd.ellipse([7, 3, 24, 20], fill=hx("#ffffff")); pd.polygon([(10, 16), (21, 16), (15.5, 28)], fill=hx("#ffffff"))
-pd.ellipse([9, 13, 24, 21], fill=hx("#c8c8c8")); pd.ellipse([7, 3, 24, 18], fill=hx("#ffffff"))
-pd.ellipse([12, 8, 19, 15], fill=hx("#5a5f66")); pd.ellipse([10, 5, 14, 9], fill=hx("#ffffff"))
-p32.save(f"{OUT}/waypoint.png")
+# Alfinete em pixel art 16x16 (ampliado 2x). Duas texturas: o corpo (branco e cinza, tingido pela cor do waypoint no
+# jogo) e por cima, sem tingir, o contorno, o miolo branco e o brilho.
+PIN16 = [".....OOOOOO.....", "....OWWWWWWO....", "...OWHHWWWWSO...", "..OWHWWCCWWWSO..", "..OWHWCCCCWWSO..",
+         "..OWWWCCCCWWSO..", "..OWWWWCCWWWSO..", "..OWWWWWWWWWSO..", "...OWWWWWWWSO...", "...OWWWWWWWSO...",
+         "....OWWWWWSO....", "....OWWWWWSO....", ".....OWWWSO.....", "......OWSO......", "......OWSO......",
+         ".......OO......."]
+pin_body = Image.new("RGBA", (16, 16), (0, 0, 0, 0)); pin_top = Image.new("RGBA", (16, 16), (0, 0, 0, 0))
+for y, row in enumerate(PIN16):
+    for x, ch in enumerate(row):
+        if ch in "WHC": pin_body.putpixel((x, y), (255, 255, 255, 255))
+        if ch == "S": pin_body.putpixel((x, y), (174, 174, 174, 255))
+        if ch == "O": pin_top.putpixel((x, y), (20, 22, 28, 255))
+        if ch == "C": pin_top.putpixel((x, y), (250, 250, 250, 255))
+        if ch == "H": pin_top.putpixel((x, y), (255, 255, 255, 115))
+pin_body.resize((32, 32), Image.NEAREST).save(f"{OUT}/waypoint.png")
+pin_top.resize((32, 32), Image.NEAREST).save(f"{OUT}/waypoint_top.png")
 # Caveira 32x32 do ponto de morte (não é tingida): osso claro com relevo, olhos e nariz escuros, contorno.
 SKULL = ["....XXXXXXXX....","..XXXXXXXXXXXX..",".XXXXXXXXXXXXXX.",".XXXXXXXXXXXXXX.","XXXXXXXXXXXXXXXX",
          "XXX....XX....XXX","XXX....XX....XXX","XXX....XX....XXX","XXXXXXX..XXXXXXX",".XXXXXX..XXXXXX.",
@@ -361,7 +386,8 @@ sh = Image.new("RGBA", (len(final) * 36 + 8, 120), hx("#cfe0f2"))
 for i, im in enumerate(final): sh.alpha_composite(im, (8 + i * 36, 6))
 for i, f in enumerate(["player_arrow", "waypoint"]):
     sh.alpha_composite(Image.open(f"{OUT}/{f}.png"), (8 + i * 40, 46))
-tinted = Image.open(f"{OUT}/waypoint.png"); arr = np.array(tinted).astype(float); arr[..., :3] *= np.array([0.88, 0.28, 0.28]); sh.alpha_composite(Image.fromarray(arr.astype(np.uint8)), (88, 46))
+tinted = Image.open(f"{OUT}/waypoint.png"); arr = np.array(tinted).astype(float); arr[..., :3] *= np.array([0.88, 0.28, 0.28])
+tinted = Image.fromarray(arr.astype(np.uint8)); tinted.alpha_composite(Image.open(f"{OUT}/waypoint_top.png")); sh.alpha_composite(tinted, (88, 46))
 sh.alpha_composite(Image.open(f"{OUT}/compass_tab.png"), (128, 52))
 sh.alpha_composite(Image.open(f"{OUT}/skull.png"), (168, 46))
 up(sh, 3).convert("RGB").save(f"{PREV}/texturas_finais.png")

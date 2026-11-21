@@ -90,5 +90,8 @@
 	"chunkmap.options.cave": "Cave mode: %s",
 	"chunkmap.options.cave.off": "off",
 	"chunkmap.options.cave.auto": "automatic",
-	"chunkmap.options.cave.always": "always"
+	"chunkmap.options.cave.always": "always",
+	"key.chunkmap.waypoint_list": "Open waypoint list",
+	"chunkmap.options.passive": "Passive mobs",
+	"chunkmap.options.items": "Dropped items"
 }

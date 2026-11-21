@@ -45,6 +45,9 @@ public final class OptionsScreen extends Screen {
 		button(right, y, () -> Component.translatable("chunkmap.options.cave", Component.translatable("chunkmap.options.cave." + c.caveMode.name().toLowerCase(java.util.Locale.ROOT))),
 				() -> c.caveMode = Config.CaveMode.values()[(c.caveMode.ordinal() + 1) % Config.CaveMode.values().length]);
 		y += 24;
+		toggle(left, y, "passive", () -> c.showPassive, v -> c.showPassive = v);
+		toggle(right, y, "items", () -> c.showItems, v -> c.showItems = v);
+		y += 24;
 		worldHeader = y + 4;
 		y += 16;
 

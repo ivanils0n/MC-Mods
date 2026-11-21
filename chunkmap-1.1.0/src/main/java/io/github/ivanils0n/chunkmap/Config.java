@@ -35,6 +35,10 @@ public final class Config {
 		public boolean showBiome = true;
 		public boolean showTime = true;
 		public boolean showMobs = true;
+		/** Mostrar também os mobs não hostis (vacas, porcos...). */
+		public boolean showPassive = true;
+		/** Itens no chão no mapa (ícone do item). */
+		public boolean showItems = true;
 		public boolean inWorldWaypoints = true;
 		public CaveMode caveMode = CaveMode.AUTO;
 

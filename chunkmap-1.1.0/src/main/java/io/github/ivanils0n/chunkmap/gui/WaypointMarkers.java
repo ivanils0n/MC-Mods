@@ -51,7 +51,10 @@ public final class WaypointMarkers {
 			// Perto do centro da tela mostra nome e distância; longe dele só o alfinete (não polui a visão).
 			boolean focus = Math.abs(sx - sw / 2) < sw / 6 && Math.abs(sy - sh / 2) < sh / 5;
 			if (w.death) g.blit(RenderPipelines.GUI_TEXTURED, MapRenderer.SKULL, sx - 6, sy - 12, 0f, 0f, 12, 12, 16, 16, 16, 16);
-			else g.blit(RenderPipelines.GUI_TEXTURED, MapRenderer.PIN, sx - 6, sy - 12, 0f, 0f, 12, 12, 16, 16, 16, 16, w.color | 0xFF000000);
+			else {
+				g.blit(RenderPipelines.GUI_TEXTURED, MapRenderer.PIN, sx - 6, sy - 12, 0f, 0f, 12, 12, 16, 16, 16, 16, w.color | 0xFF000000);
+				g.blit(RenderPipelines.GUI_TEXTURED, MapRenderer.PIN_TOP, sx - 6, sy - 12, 0f, 0f, 12, 12, 16, 16, 16, 16);
+			}
 			String label = focus ? w.name + " (" + Math.round(dist) + " m)" : Math.round(dist) + " m";
 			int tw = font.width(label);
 			g.fill(sx - tw / 2 - 2, sy + 1, sx + tw / 2 + 2, sy + 11, 0x80000000);
