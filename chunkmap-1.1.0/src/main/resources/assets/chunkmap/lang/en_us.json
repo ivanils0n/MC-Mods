@@ -72,7 +72,7 @@
 	"chunkmap.options.coords": "Coordinates",
 	"chunkmap.options.biome": "Biome",
 	"chunkmap.options.time": "Time",
-	"chunkmap.options.mobs": "Mobs on map",
+	"chunkmap.options.mobs": "Hostile mobs",
 	"chunkmap.options.in_world": "In-world waypoints",
 	"chunkmap.options.world": "This world/server",
 	"chunkmap.options.preset": "World type: %s",

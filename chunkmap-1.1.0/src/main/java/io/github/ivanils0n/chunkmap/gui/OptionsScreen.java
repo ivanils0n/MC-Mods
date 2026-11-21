@@ -39,14 +39,14 @@ public final class OptionsScreen extends Screen {
 		toggle(right, y, "biome", () -> c.showBiome, v -> c.showBiome = v);
 		y += 24;
 		toggle(left, y, "time", () -> c.showTime, v -> c.showTime = v);
-		toggle(right, y, "mobs", () -> c.showMobs, v -> c.showMobs = v);
+		toggle(right, y, "items", () -> c.showItems, v -> c.showItems = v);
 		y += 24;
 		toggle(left, y, "in_world", () -> c.inWorldWaypoints, v -> c.inWorldWaypoints = v);
 		button(right, y, () -> Component.translatable("chunkmap.options.cave", Component.translatable("chunkmap.options.cave." + c.caveMode.name().toLowerCase(java.util.Locale.ROOT))),
 				() -> c.caveMode = Config.CaveMode.values()[(c.caveMode.ordinal() + 1) % Config.CaveMode.values().length]);
 		y += 24;
-		toggle(left, y, "passive", () -> c.showPassive, v -> c.showPassive = v);
-		toggle(right, y, "items", () -> c.showItems, v -> c.showItems = v);
+		toggle(left, y, "mobs", () -> c.showMobs, v -> c.showMobs = v);
+		toggle(right, y, "passive", () -> c.showPassive, v -> c.showPassive = v);
 		y += 24;
 		worldHeader = y + 4;
 		y += 16;

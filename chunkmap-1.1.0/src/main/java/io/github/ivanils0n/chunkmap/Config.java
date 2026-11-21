@@ -34,6 +34,7 @@ public final class Config {
 		public boolean showCoords = true;
 		public boolean showBiome = true;
 		public boolean showTime = true;
+		/** Mostrar os mobs hostis no mapa. */
 		public boolean showMobs = true;
 		/** Mostrar também os mobs não hostis (vacas, porcos...). */
 		public boolean showPassive = true;

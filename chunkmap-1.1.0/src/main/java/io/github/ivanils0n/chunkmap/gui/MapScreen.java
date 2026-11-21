@@ -415,7 +415,7 @@ public final class MapScreen extends Screen {
 		view.terrain = s.data.showTerrain;
 		view.biomes = true;
 		view.caveMap = caveMap;
-		view.detailed = tabHeld && io.github.ivanils0n.chunkmap.Config.global.showMobs;
+		view.detailed = tabHeld && (io.github.ivanils0n.chunkmap.Config.global.showMobs || io.github.ivanils0n.chunkmap.Config.global.showPassive);
 		view.caves = "caves".equals(s.data.biomeDepth);
 		view.filters = s.filters();
 		hits.clear();

@@ -378,7 +378,7 @@ public final class MapRenderer {
 			// Mobs: só os perto da altura do jogador (os das cavernas embaixo não poluem o mapa) e com zoom de perto.
 			if (v.detailed) {
 				drawMobHeads(g, v, mc, level, self);
-			} else if (Config.global.showMobs && v.scale >= 0.5f) {
+			} else if ((Config.global.showMobs || Config.global.showPassive) && v.scale >= 0.5f) {
 				drawMobArrows(g, v, level, self);
 			}
 			if (Config.global.showItems && v.scale >= 0.5f) drawItems(g, v, level, self);
@@ -423,6 +423,11 @@ public final class MapRenderer {
 		g.pose().popMatrix();
 	}
 
+	/** O mob passa pelas opções "Mobs hostis" e "Mobs passivos"? */
+	private static boolean shown(Entity e) {
+		return e instanceof Enemy ? Config.global.showMobs : Config.global.showPassive;
+	}
+
 	/** Cor do mob no mapa: vermelho hostil, amarelo neutro (lobo, abelha, golem...), verde passivo. */
 	private static int mobColor(Entity e) {
 		return e instanceof Enemy ? 0xFFE04040 : e instanceof NeutralMob ? 0xFFF0C43C : 0xFF54C45A;
@@ -436,7 +441,7 @@ public final class MapRenderer {
 		int n = 0;
 		for (Entity e : level.entitiesForRendering()) {
 			if (!(e instanceof LivingEntity) || e instanceof Player || e.isInvisibleTo(self) || Math.abs(e.getY() - py) > 12) continue;
-			if (!Config.global.showPassive && !(e instanceof Enemy)) continue;
+			if (!shown(e)) continue;
 			float sx = v.screenX(Mth.lerp(pt, e.xo, e.getX())), sy = v.screenY(Mth.lerp(pt, e.zo, e.getZ()));
 			if (!v.inside(sx, sy, 2) || ++n > 300) continue;
 			float yaw = Mth.rotLerp(pt, e.yRotO, e.getYRot());
@@ -454,7 +459,8 @@ public final class MapRenderer {
 	private static void drawItems(GuiGraphicsExtractor g, View v, ClientLevel level, Player self) {
 		float pt = v.partialTick;
 		double py = self.getY();
-		float size = v.detailed ? (v.minimap ? 10f : 14f) : (v.minimap ? 5f : 7f);
+		// 8 = o ícone do item na resolução dele (16 px de textura em 16 px de tela na escala 2); com TAB, o dobro.
+		float size = v.detailed ? 16f : 8f;
 		int n = 0;
 		for (Entity e : level.entitiesForRendering()) {
 			if (!(e instanceof ItemEntity item) || Math.abs(e.getY() - py) > 12) continue;
@@ -478,7 +484,7 @@ public final class MapRenderer {
 		List<LivingEntity> mobs = new ArrayList<>();
 		for (Entity e : level.entitiesForRendering()) {
 			if (e instanceof LivingEntity l && !(e instanceof Player) && !e.isInvisibleTo(self) && Math.abs(e.getY() - py) <= 12
-					&& (Config.global.showPassive || e instanceof Enemy)) mobs.add(l);
+					&& shown(e)) mobs.add(l);
 		}
 		mobs.sort(java.util.Comparator.comparingDouble(e -> -e.distanceToSqr(self)));
 		if (mobs.size() > 40) mobs = mobs.subList(mobs.size() - 40, mobs.size());
