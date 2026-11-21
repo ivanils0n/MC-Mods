@@ -51,6 +51,8 @@ public final class MapScreen extends Screen {
 	private boolean dragging;
 	private double mouseX, mouseY;
 	private boolean biomePanel;
+	/** TAB apertado com o mapa aberto: cabeças dos mobs e jogadores (se "Mobs no mapa" estiver ligado). */
+	private boolean tabHeld;
 	/** Mostra o mapa das cavernas (começa ligado se o modo caverna estiver valendo). */
 	private boolean caveMap;
 	private int biomeScroll;
@@ -413,6 +415,7 @@ public final class MapScreen extends Screen {
 		view.terrain = s.data.showTerrain;
 		view.biomes = true;
 		view.caveMap = caveMap;
+		view.detailed = tabHeld && io.github.ivanils0n.chunkmap.Config.global.showMobs;
 		view.caves = "caves".equals(s.data.biomeDepth);
 		view.filters = s.filters();
 		hits.clear();
@@ -587,6 +590,10 @@ public final class MapScreen extends Screen {
 	@Override
 	public boolean keyPressed(KeyEvent e) {
 		boolean typing = getFocused() instanceof EditBox box && box.isFocused();
+		if (!typing && minecraft.options.keyPlayerList.matches(e)) {
+			tabHeld = true; // (e não passa o foco para o próximo botão, como o TAB faria)
+			return true;
+		}
 		if (!typing) {
 			if (Keys.OPEN_MAP.matches(e)) {
 				onClose();
@@ -615,6 +622,12 @@ public final class MapScreen extends Screen {
 			return true;
 		}
 		return super.keyPressed(e);
+	}
+
+	@Override
+	public boolean keyReleased(KeyEvent e) {
+		if (minecraft.options.keyPlayerList.matches(e)) tabHeld = false;
+		return super.keyReleased(e);
 	}
 
 	@Override

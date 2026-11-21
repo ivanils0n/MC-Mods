@@ -106,12 +106,28 @@ def outline(im, col="#1a1a1a"):
 # seta do jogador (aponta para cima; o mod gira conforme o yaw)
 arrow = Image.new("RGBA", (16, 16)); ImageDraw.Draw(arrow).polygon([(8,1),(14,14),(8,10),(2,14)], fill=hx("#ffffff"))
 arrow = outline(arrow)
-# Seta 32x32: metade esquerda branca, direita cinza-azulada (dá volume), contorno escuro de 2 px.
-a32 = Image.new("RGBA", (32, 32), (0, 0, 0, 0)); ad = ImageDraw.Draw(a32)
-ad.polygon([(16, 2), (28, 29), (16, 22), (4, 29)], fill=hx("#14181e"))
-ad.polygon([(16, 6), (25, 26), (16, 20)], fill=hx("#c9d6e6"))
-ad.polygon([(16, 6), (16, 20), (7, 26)], fill=hx("#ffffff"))
-a32.save(f"{OUT}/player_arrow.png")
+# Seta do jogador em pixel art 16x16 (ampliada 2x): branca com contorno escuro (escolha "1").
+ARROW16 = [".......OO.......", "......OWWO......", "......OWWO......", ".....OWWWWO.....", ".....OWWWWO.....",
+           "....OWWWWWWO....", "....OWWWWWWO....", "...OWWWWWWWWO...", "...OWWWWWWWWO...", "..OWWWWWWWWWWO..",
+           "..OWWWWOOWWWWO..", ".OWWWWO..OWWWWO.", ".OWWWO....OWWWO.", "OWWWO......OWWWO", "OOOO........OOOO",
+           "................"]
+a16 = Image.new("RGBA", (16, 16), (0, 0, 0, 0))
+for y, row in enumerate(ARROW16):
+    for x, ch in enumerate(row):
+        if ch == "O": a16.putpixel((x, y), (20, 22, 28, 255))
+        if ch == "W": a16.putpixel((x, y), (255, 255, 255, 255))
+a16.resize((32, 32), Image.NEAREST).save(f"{OUT}/player_arrow.png")
+# Setinha dos mobs 8x8 (escolha "2"): corpo branco/cinza tingido pela cor do mob + contorno e brilho por cima.
+MOB8 = ["...OO...", "..OHCO..", "..OCCO..", ".OHCCSO.", ".OCCCSO.", "OHCCCCSO", "OCCSSCSO", "OOO..OOO"]
+mb = Image.new("RGBA", (8, 8), (0, 0, 0, 0)); mt = Image.new("RGBA", (8, 8), (0, 0, 0, 0))
+for y, row in enumerate(MOB8):
+    for x, ch in enumerate(row):
+        if ch in "CH": mb.putpixel((x, y), (255, 255, 255, 255))
+        if ch == "S": mb.putpixel((x, y), (168, 168, 168, 255))
+        if ch == "O": mt.putpixel((x, y), (20, 22, 28, 255))
+        if ch == "H": mt.putpixel((x, y), (255, 255, 255, 110))
+mb.resize((16, 16), Image.NEAREST).save(f"{OUT}/mob_arrow.png")
+mt.resize((16, 16), Image.NEAREST).save(f"{OUT}/mob_arrow_top.png")
 # outros jogadores
 dot = Image.new("RGBA", (8, 8)); ImageDraw.Draw(dot).ellipse([1,1,6,6], fill=hx("#ffffff"))
 # waypoint (tingido em runtime)

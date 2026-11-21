@@ -13,6 +13,7 @@ public final class Keys {
 	public static final KeyMapping WAYPOINT = key("waypoint", GLFW.GLFW_KEY_B);
 	public static final KeyMapping ZOOM_IN = key("zoom_in", GLFW.GLFW_KEY_EQUAL);
 	public static final KeyMapping ZOOM_OUT = key("zoom_out", GLFW.GLFW_KEY_MINUS);
+	public static final KeyMapping WAYPOINT_LIST = key("waypoint_list", GLFW.GLFW_KEY_U);
 	public static final KeyMapping CAVE = key("cave_mode", GLFW.GLFW_KEY_K);
 	public static final KeyMapping TOGGLE = key("toggle_minimap", GLFW.GLFW_KEY_UNKNOWN);
 

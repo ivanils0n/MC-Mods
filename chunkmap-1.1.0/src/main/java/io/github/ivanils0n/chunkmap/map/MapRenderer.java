@@ -22,6 +22,8 @@ import net.minecraft.resources.ResourceKey;
 import net.minecraft.util.Mth;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.entity.NeutralMob;
+import net.minecraft.world.entity.item.ItemEntity;
 import net.minecraft.world.entity.monster.Enemy;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.Level;
@@ -39,6 +41,8 @@ import java.util.Set;
 /** Desenha o mapa (minimapa e tela cheia usam o mesmo código). */
 public final class MapRenderer {
 	public static final Identifier ARROW = tex("player_arrow");
+	/** Setinha dos mobs (corpo tingido pela cor do tipo) e o contorno por cima. */
+	public static final Identifier MOB = tex("mob_arrow"), MOB_TOP = tex("mob_arrow_top");
 	public static final Identifier PIN = tex("waypoint");
 	/** Contorno, miolo e brilho do alfinete (desenhados por cima, sem a cor do waypoint). */
 	public static final Identifier PIN_TOP = tex("waypoint_top");
@@ -375,19 +379,9 @@ public final class MapRenderer {
 			if (v.detailed) {
 				drawMobHeads(g, v, mc, level, self);
 			} else if (Config.global.showMobs && v.scale >= 0.5f) {
-				int n = 0;
-				double py = self.getY();
-				for (Entity e : level.entitiesForRendering()) {
-					if (!(e instanceof LivingEntity) || e instanceof Player || e.isInvisibleTo(self) || Math.abs(e.getY() - py) > 12) continue;
-					float sx = v.screenX(Mth.lerp(pt, e.xo, e.getX())), sy = v.screenY(Mth.lerp(pt, e.zo, e.getZ()));
-					if (!v.inside(sx, sy, 2) || ++n > 300) continue;
-					int c = e instanceof Enemy ? 0xFFE04040 : 0xFFF0E060;
-					int ix = Mth.floor(sx), iy = Mth.floor(sy);
-					g.fill(ix - 1, iy - 1, ix + 2, iy + 2, 0xC0000000);
-					g.fill(ix, iy, ix + 1, iy + 1, c);
-					if (!v.minimap) g.fill(ix - 1, iy, ix + 2, iy + 1, c);
-				}
+				drawMobArrows(g, v, level, self);
 			}
+			if (Config.global.showItems && v.scale >= 0.5f) drawItems(g, v, level, self);
 			for (AbstractClientPlayer p : level.players()) {
 				if (p == self || p.isInvisibleTo(self)) continue;
 				float sx = v.screenX(Mth.lerp(pt, p.xo, p.getX())), sy = v.screenY(Mth.lerp(pt, p.zo, p.getZ()));
@@ -429,6 +423,51 @@ public final class MapRenderer {
 		g.pose().popMatrix();
 	}
 
+	/** Cor do mob no mapa: vermelho hostil, amarelo neutro (lobo, abelha, golem...), verde passivo. */
+	private static int mobColor(Entity e) {
+		return e instanceof Enemy ? 0xFFE04040 : e instanceof NeutralMob ? 0xFFF0C43C : 0xFF54C45A;
+	}
+
+	/** Setinhas pequenas (pixel art 8x8) na cor do tipo do mob, apontando para onde ele olha. */
+	private static void drawMobArrows(GuiGraphicsExtractor g, View v, ClientLevel level, Player self) {
+		float pt = v.partialTick;
+		double py = self.getY();
+		float size = v.minimap ? 4f : 6f;
+		int n = 0;
+		for (Entity e : level.entitiesForRendering()) {
+			if (!(e instanceof LivingEntity) || e instanceof Player || e.isInvisibleTo(self) || Math.abs(e.getY() - py) > 12) continue;
+			if (!Config.global.showPassive && !(e instanceof Enemy)) continue;
+			float sx = v.screenX(Mth.lerp(pt, e.xo, e.getX())), sy = v.screenY(Mth.lerp(pt, e.zo, e.getZ()));
+			if (!v.inside(sx, sy, 2) || ++n > 300) continue;
+			float yaw = Mth.rotLerp(pt, e.yRotO, e.getYRot());
+			g.pose().pushMatrix();
+			g.pose().translate(sx, sy);
+			g.pose().rotate((float) Math.toRadians(yaw) + (float) Math.PI);
+			g.pose().scale(size / 16f, size / 16f);
+			g.blit(RenderPipelines.GUI_TEXTURED, MOB, -8, -8, 0f, 0f, 16, 16, 16, 16, mobColor(e));
+			g.blit(RenderPipelines.GUI_TEXTURED, MOB_TOP, -8, -8, 0f, 0f, 16, 16, 16, 16);
+			g.pose().popMatrix();
+		}
+	}
+
+	/** Itens no chão: o ícone do próprio item, pequeno (maior com TAB apertado). */
+	private static void drawItems(GuiGraphicsExtractor g, View v, ClientLevel level, Player self) {
+		float pt = v.partialTick;
+		double py = self.getY();
+		float size = v.detailed ? (v.minimap ? 10f : 14f) : (v.minimap ? 5f : 7f);
+		int n = 0;
+		for (Entity e : level.entitiesForRendering()) {
+			if (!(e instanceof ItemEntity item) || Math.abs(e.getY() - py) > 12) continue;
+			float sx = v.screenX(Mth.lerp(pt, e.xo, e.getX())), sy = v.screenY(Mth.lerp(pt, e.zo, e.getZ()));
+			if (!v.inside(sx, sy, size) || ++n > 150) continue;
+			g.pose().pushMatrix();
+			g.pose().translate(sx - size / 2f, sy - size / 2f);
+			g.pose().scale(size / 16f, size / 16f);
+			g.item(item.getItem(), 0, 0);
+			g.pose().popMatrix();
+		}
+	}
+
 	/**
 	 * Cabeças dos mobs perto da altura do jogador (até 40, os mais perto por cima): o modelo do próprio jogo desenhado de
 	 * frente e recortado na cabeça, com borda vermelha (hostis) ou amarela (os outros).
@@ -438,7 +477,8 @@ public final class MapRenderer {
 		double py = self.getY();
 		List<LivingEntity> mobs = new ArrayList<>();
 		for (Entity e : level.entitiesForRendering()) {
-			if (e instanceof LivingEntity l && !(e instanceof Player) && !e.isInvisibleTo(self) && Math.abs(e.getY() - py) <= 12) mobs.add(l);
+			if (e instanceof LivingEntity l && !(e instanceof Player) && !e.isInvisibleTo(self) && Math.abs(e.getY() - py) <= 12
+					&& (Config.global.showPassive || e instanceof Enemy)) mobs.add(l);
 		}
 		mobs.sort(java.util.Comparator.comparingDouble(e -> -e.distanceToSqr(self)));
 		if (mobs.size() > 40) mobs = mobs.subList(mobs.size() - 40, mobs.size());

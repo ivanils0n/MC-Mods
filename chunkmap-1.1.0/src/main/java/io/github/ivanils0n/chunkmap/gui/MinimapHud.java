@@ -70,7 +70,7 @@ public final class MinimapHud {
 		}
 		v.caveMap = session.caveActive;
 		// TAB (lista de jogadores) apertado: modo detalhado, com a cabeça de cada mob e a sua.
-		v.detailed = mc.options.keyPlayerList.isDown();
+		v.detailed = mc.options.keyPlayerList.isDown() && Config.global.showMobs;
 		MapRenderer.draw(g, v, null);
 
 		// "N" (norte) em cima, no meio.

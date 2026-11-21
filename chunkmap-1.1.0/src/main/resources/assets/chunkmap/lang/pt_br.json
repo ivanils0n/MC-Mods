@@ -90,5 +90,8 @@
 	"chunkmap.options.cave": "Modo caverna: %s",
 	"chunkmap.options.cave.off": "desligado",
 	"chunkmap.options.cave.auto": "automático",
-	"chunkmap.options.cave.always": "sempre"
+	"chunkmap.options.cave.always": "sempre",
+	"key.chunkmap.waypoint_list": "Abrir a lista de waypoints",
+	"chunkmap.options.passive": "Mobs passivos",
+	"chunkmap.options.items": "Itens no chão"
 }
