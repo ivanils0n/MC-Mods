@@ -36,6 +36,8 @@ public final class OptionsScreen extends Screen {
 		y += 24;
 		toggle(left, y, "light", () -> c.light, v -> c.light = v);
 		toggle(right, y, "effects", () -> c.effects, v -> c.effects = v);
+		y += 24;
+		toggle(left, y, "tilt", () -> c.tilt, v -> c.tilt = v);
 		y += 32;
 		toggle(left, y, "inventory", () -> c.inventory, v -> c.inventory = v);
 		toggle(right, y, "chests", () -> c.chests, v -> c.chests = v);

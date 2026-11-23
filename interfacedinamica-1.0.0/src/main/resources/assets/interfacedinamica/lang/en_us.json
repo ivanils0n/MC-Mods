@@ -23,5 +23,6 @@
 	"interfacedinamica.options.chests": "In chests and barrels",
 	"interfacedinamica.options.crafting": "In crafting tables",
 	"interfacedinamica.options.furnaces": "In furnaces",
-	"interfacedinamica.options.others": "In other screens"
+	"interfacedinamica.options.others": "In other screens",
+	"interfacedinamica.options.tilt": "3D screen"
 }

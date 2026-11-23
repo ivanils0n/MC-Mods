@@ -61,8 +61,9 @@ public final class Poses {
 			// olhada de lado de vez em quando, como quem está pensando
 			yaw += 10f * Mth.sin(s.ageInTicks * 0.045f);
 		} else {
-			yaw = 38f * Anim.side();
-			pitch = th == Theme.INVENTORY ? 40f : 20f;
+			// olha para a tela flutuando à frente, do lado dela
+			yaw = 34f * Anim.side() + 4f * Mth.sin(s.ageInTicks * 0.06f);
+			pitch = 6f;
 		}
 		s.yRot = Mth.lerp(t, s.yRot, yaw);
 		s.xRot = Mth.lerp(t, s.xRot, pitch);
@@ -72,9 +73,9 @@ public final class Poses {
 		float time = s.ageInTicks;
 		float rx, ry, lx, ly, rz = 0, lz = 0;
 		switch (Anim.theme()) {
-			case INVENTORY -> { // olhando as próprias mãos, mexendo nos itens
-				rx = -0.95f + 0.08f * Mth.sin(time * 0.35f); ry = -0.35f;
-				lx = -0.95f + 0.08f * Mth.cos(time * 0.35f); ly = 0.35f;
+			case INVENTORY -> { // mão levantada mexendo na tela, a outra relaxada
+				rx = -1.55f + 0.12f * Mth.sin(time * 0.3f); ry = -0.45f + 0.15f * Mth.sin(time * 0.17f);
+				lx = -0.35f + 0.05f * Mth.sin(time * 0.1f); ly = 0.1f;
 			}
 			case CRAFTING -> { // mãos apoiadas na mesa, uma mexendo nas peças
 				rx = -1.05f + 0.22f * Math.max(0, Mth.sin(time * 0.55f)); ry = -0.2f + 0.12f * Mth.sin(time * 0.27f);
@@ -110,10 +111,11 @@ public final class Poses {
 				lx = -1.0f + 0.15f * Mth.cos(time * 0.4f); ly = 0.15f;
 			}
 		}
-		if (!Anim.hasBlock()) {
-			// sem bloco, o braço do lado da tela "mexe" nela
-			if (Anim.side() > 0) lx -= 0.15f;
-			else rx -= 0.15f;
+		if (!Anim.hasBlock() && Anim.side() < 0) {
+			// tela à esquerda: espelha os braços
+			float tx = rx, ty = ry, tz = rz;
+			rx = lx; ry = -ly; rz = -lz;
+			lx = tx; ly = -ty; lz = -tz;
 		}
 		pose(m.rightArm, rx, ry, rz, t);
 		pose(m.leftArm, lx, ly, lz, t);

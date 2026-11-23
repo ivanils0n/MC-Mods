@@ -23,5 +23,6 @@
 	"interfacedinamica.options.chests": "Em baús e barris",
 	"interfacedinamica.options.crafting": "Em mesas de trabalho",
 	"interfacedinamica.options.furnaces": "Em fornalhas",
-	"interfacedinamica.options.others": "Nas outras telas"
+	"interfacedinamica.options.others": "Nas outras telas",
+	"interfacedinamica.options.tilt": "Tela em 3D"
 }

@@ -45,6 +45,9 @@ public final class Anim {
 	static Vec3 camPos = Vec3.ZERO;
 	static float camYaw, camPitch;
 	public static int clientTicks;
+	/** Conta os quadros (para a tela 3D calcular os ângulos uma vez por quadro). */
+	public static int frameId;
+	public static float framePartial;
 
 	private static final float SIDE_SHIFT = 1.0f;
 
@@ -160,7 +163,7 @@ public final class Anim {
 		ContainerScreenAccess a = (ContainerScreenAccess) s;
 		int w = s.width, iw = a.interfacedinamica$imageWidth();
 		if (w < iw * 1.55f) return; // tela pequena demais: fica no meio
-		float cx = side > 0 ? w * 0.70f : w * 0.30f;
+		float cx = side > 0 ? w * 0.66f : w * 0.34f;
 		int left = Mth.clamp(Math.round(cx - iw / 2f), 2, w - iw - 2);
 		int dx = left - a.interfacedinamica$leftPos();
 		if (dx == 0) return;
@@ -204,12 +207,15 @@ public final class Anim {
 		return x * x * (3 - 2 * x);
 	}
 
-	/** Sem bloco: gira em volta do personagem de trás (t=0) até a frente (t=1). */
+	/**
+	 * Sem bloco: câmera por cima do ombro, atrás e ao lado do personagem (do lado da tela), que fica do outro lado
+	 * da imagem olhando para a tela flutuando.
+	 */
 	static Vec3 frontCamera(Vec3 eye, float yaw, float t, int s) {
-		Vec3 fwd = dir(yaw + 180f * t);
+		Vec3 fwd = dir(yaw);
 		double br = Math.toRadians(yaw);
 		Vec3 left = new Vec3(Math.cos(br), 0, Math.sin(br));
-		return eye.subtract(fwd.scale(distance * t)).add(left.scale(SIDE_SHIFT * t * s)).add(0, 0.15 * t, 0);
+		return eye.subtract(fwd.scale(distance * 0.8 * t)).subtract(left.scale(SIDE_SHIFT * 1.15 * t * s)).add(0, 0.2 * t, 0);
 	}
 
 	static Vec3 clip(Entity e, Vec3 from, Vec3 to) {
@@ -236,6 +242,8 @@ public final class Anim {
 	public static double[] camera(Entity e, float partial) {
 		float t = eased(partial);
 		frameT = t;
+		frameId++;
+		framePartial = partial;
 		if (t <= 0.0001f || !(e instanceof LocalPlayer)) {
 			frameT = 0;
 			return null;
@@ -257,8 +265,8 @@ public final class Anim {
 			pitch = Mth.lerp(t, basePitch, fp);
 		} else {
 			pos = clip(e, eye, frontCamera(eye, baseYaw, t, side));
-			yaw = baseYaw + 180f * t;
-			pitch = Mth.lerp(t, basePitch, 10f);
+			yaw = baseYaw + (14f * side + (float) (1.0 * Math.sin(time * 0.03))) * t;
+			pitch = Mth.lerp(t, basePitch, 9f);
 		}
 		camPos = pos;
 		camYaw = yaw;
@@ -290,7 +298,7 @@ public final class Anim {
 		} else {
 			double br = Math.toRadians(baseYaw);
 			Vec3 left = new Vec3(Math.cos(br), 0, Math.sin(br));
-			hand = mc.player.getEyePosition(1f).add(0, -0.75, 0).add(left.scale(0.38 * side)).add(dir(baseYaw).scale(0.35));
+			hand = mc.player.getEyePosition(1f).add(0, -0.55, 0).subtract(left.scale(0.38 * side)).add(dir(baseYaw).scale(0.45));
 		}
 		return project(mc, hand, guiW, guiH);
 	}

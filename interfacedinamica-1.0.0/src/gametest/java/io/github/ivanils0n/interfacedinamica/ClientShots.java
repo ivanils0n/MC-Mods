@@ -78,10 +78,24 @@ public class ClientShots implements FabricClientGameTest {
 			// suporte de poções
 			scene(context, sp, b, "brewing_stand", null, new int[]{30}, "6_pocoes");
 			// inventário (sem bloco: câmera de frente)
+			cmd(sp, f("setblock %d %d %d air", b.getX(), b.getY(), b.getZ()));
+			cmd(sp, f("tp @p %d.5 %d %d.5 -30 5", X, Y, Z));
+			context.waitTicks(20);
 			context.runOnClient(c -> c.gui.setScreen(new InventoryScreen(c.player)));
+			context.waitTicks(6);
+			context.takeScreenshot("7_inventario_a");
 			context.waitTicks(30);
-			context.takeScreenshot("7_inventario");
+			context.takeScreenshot("7_inventario_b");
 			context.runOnClient(c -> c.gui.setScreen(null));
+			context.waitTicks(30);
+			// inventário do criativo (como a imagem de referência)
+			cmd(sp, "gamemode creative @p");
+			context.waitTicks(10);
+			context.runOnClient(c -> c.gui.setScreen(new InventoryScreen(c.player)));
+			context.waitTicks(36);
+			context.takeScreenshot("7c_inventario_criativo");
+			context.runOnClient(c -> c.gui.setScreen(null));
+			cmd(sp, "gamemode survival @p");
 			context.waitTicks(30);
 			// noite, na mesa
 			cmd(sp, "time set 18000");

@@ -26,6 +26,8 @@ public final class Config {
 	public boolean poses = true;
 	public boolean flight = true;
 	public boolean light = true;
+	/** Tela em 3D (perspectiva, girada). */
+	public boolean tilt = true;
 	public boolean effects = true;
 	public boolean inventory = true;
 	public boolean chests = true;
