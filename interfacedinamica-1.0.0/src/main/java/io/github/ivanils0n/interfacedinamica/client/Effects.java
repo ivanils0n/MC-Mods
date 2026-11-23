@@ -10,6 +10,7 @@ import net.minecraft.util.Mth;
 import net.minecraft.util.RandomSource;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
+import net.minecraft.world.level.LightLayer;
 
 import java.util.ArrayList;
 import java.util.Iterator;
@@ -143,8 +144,9 @@ public final class Effects {
 	public static int tint(Minecraft mc) {
 		if (!Config.INSTANCE.light || mc.level == null || mc.player == null) return 0;
 		BlockPos pos = BlockPos.containing(mc.player.getEyePosition(1f));
-		int light = mc.level.getMaxLocalRawBrightness(pos);
-		float dark = (1f - light / 15f) * 0.45f;
+		int sky = mc.level.getBrightness(LightLayer.SKY, pos) - mc.level.getSkyDarken();
+		int light = Math.max(0, Math.max(sky, mc.level.getBrightness(LightLayer.BLOCK, pos)));
+		float dark = (1f - light / 15f) * 0.55f;
 		int r = 0, gr = 0, b = 0;
 		float a = dark;
 		if (mc.level.dimension() == Level.NETHER) {
