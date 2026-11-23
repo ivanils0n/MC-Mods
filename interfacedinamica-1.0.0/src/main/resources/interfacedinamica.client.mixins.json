@@ -1,0 +1,7 @@
+{
+	"required": true,
+	"package": "io.github.ivanils0n.interfacedinamica.client.mixin",
+	"compatibilityLevel": "JAVA_25",
+	"client": ["CameraMixin", "ScreenMixin", "ContainerScreenMixin", "ContainerScreenAccess", "PlayerModelMixin"],
+	"injectors": {"defaultRequire": 1}
+}

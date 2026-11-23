@@ -1,0 +1,27 @@
+{
+	"schemaVersion": 1,
+	"id": "interfacedinamica",
+	"version": "${version}",
+	"name": "Interface Dinâmica",
+	"description": "Ao abrir baú, fornalha, mesa e outras telas, a câmera gira para a 3ª pessoa de frente e a tela fica ao lado do personagem, que faz uma pose. No servidor, os outros jogadores veem a tela flutuando ao lado de quem abriu, com os itens (sem precisar instalar nada).",
+	"authors": ["ivanils0n"],
+	"contact": {
+		"sources": "https://github.com/ivanils0n/MC-Mods"
+	},
+	"license": "MIT",
+	"environment": "*",
+	"entrypoints": {
+		"main": ["io.github.ivanils0n.interfacedinamica.InterfaceDinamica"],
+		"client": ["io.github.ivanils0n.interfacedinamica.client.ClientMod"]
+	},
+	"mixins": [
+		"interfacedinamica.mixins.json",
+		{"config": "interfacedinamica.client.mixins.json", "environment": "client"}
+	],
+	"depends": {
+		"fabricloader": ">=0.19.0",
+		"fabric-api": "*",
+		"minecraft": "${minecraft_dependency}",
+		"java": ">=25"
+	}
+}

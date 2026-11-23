@@ -1,0 +1,11 @@
+{
+	"schemaVersion": 1,
+	"id": "interfacedinamica-gametest",
+	"version": "1.0.0",
+	"name": "Interface Dinâmica: prints do cliente (só CI)",
+	"environment": "client",
+	"entrypoints": {
+		"fabric-client-gametest": ["io.github.ivanils0n.interfacedinamica.ClientShots"]
+	},
+	"depends": {"interfacedinamica": "*"}
+}
