@@ -1,0 +1,282 @@
+=== net.minecraft.client.gui.render.GuiRenderer
+Compiled from "GuiRenderer.java"
+public class net.minecraft.client.gui.render.GuiRenderer implements java.lang.AutoCloseable {
+  private static final org.slf4j.Logger LOGGER;
+  private static final float MAX_GUI_Z;
+  public static final float MIN_GUI_Z;
+  private static final float GUI_Z_NEAR;
+  public static final int GUI_3D_Z_FAR;
+  public static final int GUI_3D_Z_NEAR;
+  public static final int DEFAULT_ITEM_SIZE;
+  public static final org.joml.Vector4fc CLEAR_COLOR;
+  private static final java.util.Comparator<net.minecraft.client.gui.navigation.ScreenRectangle> SCISSOR_COMPARATOR;
+  private static final java.util.Comparator<net.minecraft.client.gui.render.TextureSetup> TEXTURE_COMPARATOR;
+  private static final java.util.Comparator<net.minecraft.client.renderer.state.gui.GuiElementRenderState> ELEMENT_SORT_COMPARATOR;
+  private final java.util.Map<java.lang.Object, net.minecraft.client.gui.render.pip.OversizedItemRenderer> oversizedItemRenderers;
+  private final net.minecraft.client.renderer.state.gui.GuiRenderState renderState;
+  private final java.util.List<net.minecraft.client.gui.render.GuiRenderer$Draw> draws;
+  private final net.minecraft.client.renderer.StagedVertexBuffer vertexBuffer;
+  private int firstDrawIndexAfterBlur;
+  private final net.minecraft.client.renderer.Projection guiProjection;
+  private final net.minecraft.client.renderer.ProjectionMatrixBuffer guiProjectionMatrixBuffer;
+  private final net.minecraft.client.renderer.feature.FeatureRenderDispatcher featureRenderDispatcher;
+  private final java.util.Map<java.lang.Class<? extends net.minecraft.client.renderer.state.gui.pip.PictureInPictureRenderState>, net.minecraft.client.gui.render.pip.PictureInPictureRenderer<?>> pictureInPictureRenderers;
+  private net.minecraft.client.gui.render.GuiItemAtlas itemAtlas;
+  private int cachedGuiScale;
+  private final net.minecraft.client.renderer.CubeMap cubeMap;
+  private net.minecraft.client.gui.navigation.ScreenRectangle previousScissorArea;
+  private com.mojang.blaze3d.pipeline.RenderPipeline previousPipeline;
+  private net.minecraft.client.gui.render.TextureSetup previousTextureSetup;
+  private net.minecraft.client.renderer.StagedVertexBuffer$Draw previousDraw;
+  public net.minecraft.client.gui.render.GuiRenderer(net.minecraft.client.renderer.state.gui.GuiRenderState, net.minecraft.client.renderer.feature.FeatureRenderDispatcher, java.util.List<net.minecraft.client.gui.render.pip.PictureInPictureRenderer<?>>);
+  public void endFrame();
+  public void render();
+  private void clearUnusedOversizedItemRenderers();
+  private void prepare();
+  private void addElementsToMeshes(net.minecraft.client.renderer.state.gui.GuiRenderState$TraverseRange);
+  private void draw();
+  private void executeDrawRange(java.util.function.Supplier<java.lang.String>, com.mojang.blaze3d.pipeline.RenderTarget, com.mojang.blaze3d.buffers.GpuBufferSlice, int, int);
+  private void addElementToMesh(net.minecraft.client.renderer.state.gui.GuiElementRenderState);
+  private void prepareText();
+  private void prepareItemElements();
+  private void preparePictureInPicture();
+  private <T extends net.minecraft.client.renderer.state.gui.pip.PictureInPictureRenderState> void preparePictureInPictureState(T, int);
+  private void submitBlitFromItemAtlas(net.minecraft.client.renderer.state.gui.GuiItemRenderState, net.minecraft.client.gui.render.GuiItemAtlas$SlotView);
+  private net.minecraft.client.gui.render.GuiItemAtlas prepareItemAtlas(java.util.Set<java.lang.Object>, int);
+  private int getGuiScaleInvalidatingItemAtlasIfChanged();
+  private void invalidateItemAtlas();
+  private void executeDraw(net.minecraft.client.gui.render.GuiRenderer$Draw, com.mojang.blaze3d.systems.RenderPass);
+  private boolean scissorChanged(net.minecraft.client.gui.navigation.ScreenRectangle, net.minecraft.client.gui.navigation.ScreenRectangle);
+  private void enableScissor(net.minecraft.client.gui.navigation.ScreenRectangle, com.mojang.blaze3d.systems.RenderPass);
+  public void registerPanoramaTextures(net.minecraft.client.renderer.texture.TextureManager);
+  public void close();
+  private void lambda$preparePictureInPicture$0(int, net.minecraft.client.renderer.state.gui.pip.PictureInPictureRenderState);
+  private void lambda$prepareItemElements$1(int, net.minecraft.client.renderer.state.gui.GuiItemRenderState);
+  private static net.minecraft.client.gui.render.pip.OversizedItemRenderer lambda$prepareItemElements$2(java.lang.Object);
+  private void lambda$prepareItemElements$0(org.apache.commons.lang3.mutable.MutableBoolean, net.minecraft.client.gui.render.GuiItemAtlas, net.minecraft.client.renderer.state.gui.GuiItemRenderState);
+  private void lambda$prepareText$0(net.minecraft.client.renderer.state.gui.GuiTextRenderState);
+  private static java.lang.String lambda$draw$1();
+  private static java.lang.String lambda$draw$0();
+  private static java.lang.String lambda$new$0();
+  static {};
+}
+=== net.minecraft.client.MouseHandler
+Compiled from "MouseHandler.java"
+public class net.minecraft.client.MouseHandler {
+  private static final org.slf4j.Logger LOGGER;
+  public static final long DOUBLE_CLICK_THRESHOLD_MS;
+  private final net.minecraft.client.Minecraft minecraft;
+  private boolean isLeftPressed;
+  private boolean isMiddlePressed;
+  private boolean isRightPressed;
+  private double xpos;
+  private double ypos;
+  private net.minecraft.client.MouseHandler$LastClick lastClick;
+  protected int lastClickButton;
+  private int fakeRightMouse;
+  private net.minecraft.client.input.MouseButtonInfo activeButton;
+  private boolean ignoreFirstMove;
+  private double mousePressedTime;
+  private final net.minecraft.util.SmoothDouble smoothTurnX;
+  private final net.minecraft.util.SmoothDouble smoothTurnY;
+  private double accumulatedDX;
+  private double accumulatedDY;
+  private final net.minecraft.client.ScrollWheelHandler scrollWheelHandler;
+  private double lastHandleMovementTime;
+  private boolean mouseGrabbed;
+  public net.minecraft.client.MouseHandler(net.minecraft.client.Minecraft);
+  private void onButton(long, net.minecraft.client.input.MouseButtonInfo, int);
+  private net.minecraft.client.input.MouseButtonInfo simulateRightClick(net.minecraft.client.input.MouseButtonInfo, boolean);
+  public void fillMousePositionDetails(net.minecraft.CrashReportCategory, com.mojang.blaze3d.platform.Window);
+  private void onScroll(long, double, double);
+  private void onDrop(long, java.util.List<java.nio.file.Path>, int);
+  public void setup(com.mojang.blaze3d.platform.Window);
+  private void onMove(long, double, double);
+  public void handleAccumulatedMovement();
+  public static double getScaledXPos(com.mojang.blaze3d.platform.Window, double);
+  public double getScaledXPos(com.mojang.blaze3d.platform.Window);
+  public static double getScaledYPos(com.mojang.blaze3d.platform.Window, double);
+  public double getScaledYPos(com.mojang.blaze3d.platform.Window);
+  private void turnPlayer(double);
+  public boolean isLeftPressed();
+  public boolean isMiddlePressed();
+  public boolean isRightPressed();
+  public double xpos();
+  public double ypos();
+  public void setIgnoreFirstMove();
+  public boolean isMouseGrabbed();
+  public void grabMouse();
+  public void releaseMouse();
+  public void cursorEntered();
+  public void drawDebugMouseInfo(net.minecraft.client.gui.Font, net.minecraft.client.gui.GuiGraphicsExtractor);
+  private void lambda$setup$6(long, int, long);
+  private void lambda$setup$7(long, java.util.List, int);
+  private void lambda$setup$4(long, double, double);
+  private void lambda$setup$5(long, double, double);
+  private void lambda$setup$2(long, int, int, int);
+  private void lambda$setup$3(long, net.minecraft.client.input.MouseButtonInfo, int);
+  private void lambda$setup$0(long, double, double);
+  private void lambda$setup$1(long, double, double);
+  private static java.lang.String lambda$fillMousePositionDetails$1(com.mojang.blaze3d.platform.Window) throws java.lang.Exception;
+  private java.lang.String lambda$fillMousePositionDetails$0(com.mojang.blaze3d.platform.Window) throws java.lang.Exception;
+  static {};
+}
+=== net.minecraft.client.renderer.CachedOrthoProjectionMatrixBuffer
+Error: class not found: net.minecraft.client.renderer.CachedOrthoProjectionMatrixBuffer
+=== net.minecraft.client.renderer.ProjectionMatrixBuffer
+Compiled from "ProjectionMatrixBuffer.java"
+public class net.minecraft.client.renderer.ProjectionMatrixBuffer implements java.lang.AutoCloseable {
+  private final com.mojang.blaze3d.buffers.GpuBuffer buffer;
+  private final com.mojang.blaze3d.buffers.GpuBufferSlice bufferSlice;
+  private net.minecraft.client.renderer.Projection lastUploadedProjection;
+  private long projectionMatrixVersion;
+  private final org.joml.Matrix4f tempMatrix;
+  static final boolean $assertionsDisabled;
+  public net.minecraft.client.renderer.ProjectionMatrixBuffer(java.lang.String);
+  public com.mojang.blaze3d.buffers.GpuBufferSlice getBuffer(net.minecraft.client.renderer.Projection);
+  public com.mojang.blaze3d.buffers.GpuBufferSlice getBuffer(org.joml.Matrix4f);
+  private com.mojang.blaze3d.buffers.GpuBufferSlice writeBuffer(org.joml.Matrix4f);
+  public void close();
+  private static java.lang.String lambda$new$0(java.lang.String);
+  static {};
+}
+=== net.minecraft.client.renderer.Projection
+Compiled from "Projection.java"
+public class net.minecraft.client.renderer.Projection {
+  private com.mojang.blaze3d.ProjectionType projectionType;
+  private float zNear;
+  private float zFar;
+  private float perspectiveFov;
+  private float width;
+  private float height;
+  private boolean orthoInvertY;
+  private boolean isMatrixDirty;
+  private final org.joml.Matrix4f matrix;
+  private long matrixVersion;
+  public net.minecraft.client.renderer.Projection();
+  public void setupPerspective(float, float, float, float, float);
+  public void setupOrtho(float, float, float, float, boolean);
+  public void setSize(float, float);
+  public org.joml.Matrix4f getMatrix(org.joml.Matrix4f);
+  public long getMatrixVersion();
+  public float zNear();
+  public float zFar();
+  public float width();
+  public float height();
+  public float fov();
+  public boolean invertY();
+}
+=== com.mojang.blaze3d.platform.Window
+Compiled from "Window.java"
+public final class com.mojang.blaze3d.platform.Window implements java.lang.AutoCloseable {
+  private static final org.slf4j.Logger LOGGER;
+  public static final int BASE_WIDTH;
+  public static final int BASE_HEIGHT;
+  private final org.lwjgl.glfw.GLFWErrorCallback defaultErrorCallback;
+  private final com.mojang.blaze3d.platform.WindowEventHandler eventHandler;
+  private final com.mojang.blaze3d.platform.MonitorManager monitorManager;
+  private final long handle;
+  private int windowedX;
+  private int windowedY;
+  private int windowedWidth;
+  private int windowedHeight;
+  private java.util.Optional<com.mojang.blaze3d.platform.VideoMode> preferredFullscreenVideoMode;
+  private boolean fullscreen;
+  private boolean actuallyFullscreen;
+  private int x;
+  private int y;
+  private int width;
+  private int height;
+  private int framebufferWidth;
+  private int framebufferHeight;
+  private int guiScaledWidth;
+  private int guiScaledHeight;
+  private int guiScale;
+  private java.lang.String errorSection;
+  private boolean dirty;
+  private boolean vsync;
+  private boolean iconified;
+  private boolean focused;
+  private boolean minimized;
+  private boolean allowCursorChanges;
+  private com.mojang.blaze3d.platform.cursor.CursorType currentCursor;
+  private final boolean exclusiveFullscreen;
+  private final com.mojang.blaze3d.systems.GpuBackend backend;
+  public com.mojang.blaze3d.platform.Window(com.mojang.blaze3d.platform.WindowEventHandler, com.mojang.blaze3d.platform.DisplayData, java.lang.String, boolean, java.lang.String, com.mojang.blaze3d.platform.MonitorManager, com.mojang.blaze3d.systems.GpuBackend) throws com.mojang.blaze3d.systems.BackendCreationException;
+  public static long createGlfwWindow(int, int, java.lang.String, long, com.mojang.blaze3d.systems.GpuBackend) throws com.mojang.blaze3d.systems.BackendCreationException;
+  private long createWindow(com.mojang.blaze3d.systems.GpuBackend, int, int, java.lang.String, long) throws com.mojang.blaze3d.systems.BackendCreationException;
+  public static java.lang.String getPlatform();
+  public int getRefreshRate();
+  public boolean shouldClose();
+  public static void checkGlfwError(java.util.function.BiConsumer<java.lang.Integer, java.lang.String>);
+  public void setIcon(net.minecraft.server.packs.PackResources, com.mojang.blaze3d.platform.IconSet) throws java.io.IOException;
+  public void setErrorSection(java.lang.String);
+  private void setBootErrorCallback();
+  private static void bootCrash(int, long);
+  public void defaultErrorCallback(int, long);
+  public void setDefaultErrorCallback();
+  public void close();
+  private void onMove(long, int, int);
+  private boolean isSoftScreen();
+  private void onFramebufferResize(long, int, int);
+  private void refreshFramebufferSize();
+  private void onResize(long, int, int);
+  private void onFocus(long, boolean);
+  private void onEnter(long, boolean);
+  private void onIconify(long, boolean);
+  public void updateFullscreenIfChanged();
+  public java.util.Optional<com.mojang.blaze3d.platform.VideoMode> getPreferredFullscreenVideoMode();
+  public void setPreferredFullscreenVideoMode(java.util.Optional<com.mojang.blaze3d.platform.VideoMode>);
+  public void changeFullscreenVideoMode();
+  private void setMode();
+  public void toggleFullScreen();
+  public void setWindowed(int, int);
+  public int calculateScale(int, boolean);
+  public void setGuiScale(int);
+  public void setTitle(java.lang.String);
+  public long handle();
+  public boolean isFullscreen();
+  public boolean isIconified();
+  public boolean isFocused();
+  public int getWidth();
+  public int getHeight();
+  public void setWidth(int);
+  public void setHeight(int);
+  public int getScreenWidth();
+  public int getScreenHeight();
+  public int getGuiScaledWidth();
+  public int getGuiScaledHeight();
+  public int getX();
+  public int getY();
+  public int getGuiScale();
+  public com.mojang.blaze3d.platform.Monitor findBestMonitor();
+  public void updateRawMouseInput(boolean);
+  public void setWindowCloseCallback(java.lang.Runnable);
+  public boolean isMinimized();
+  public void setAllowCursorChanges(boolean);
+  public void selectCursor(com.mojang.blaze3d.platform.cursor.CursorType);
+  public float getAppropriateLineWidth();
+  public com.mojang.blaze3d.systems.GpuBackend backend();
+  private static int allowedWindowMinSize(int);
+  private static void lambda$setWindowCloseCallback$0(java.lang.Runnable, long);
+  static {};
+}
+=== net.minecraft.client.input.MouseButtonEvent
+Compiled from "MouseButtonEvent.java"
+public final class net.minecraft.client.input.MouseButtonEvent extends java.lang.Record implements net.minecraft.client.input.InputWithModifiers {
+  private final double x;
+  private final double y;
+  private final net.minecraft.client.input.MouseButtonInfo buttonInfo;
+  public net.minecraft.client.input.MouseButtonEvent(double, double, net.minecraft.client.input.MouseButtonInfo);
+  public int input();
+  public int button();
+  public int modifiers();
+  public final java.lang.String toString();
+  public final int hashCode();
+  public final boolean equals(java.lang.Object);
+  public double x();
+  public double y();
+  public net.minecraft.client.input.MouseButtonInfo buttonInfo();
+}
+=== net.minecraft.client.gui.render.state.GuiRenderState
+Error: class not found: net.minecraft.client.gui.render.state.GuiRenderState

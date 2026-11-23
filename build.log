@@ -1,0 +1,36 @@
+Fetching distribution.
+Downloading https://services.gradle.org/distributions/gradle-9.8.2-bin.zip
+..............10%..............20%...............30%..............40%...............50%..............60%...............70%..............80%...............90%..............100%
+
+Welcome to Gradle 9.8.2!
+
+Here are the highlights of this release:
+ - Java 27 support
+ - Maven mirror settings reuse
+ - Linked problem locations in build output
+
+For more details see https://docs.gradle.org/9.8.2/release-notes.html
+
+Starting a Gradle Daemon (subsequent builds will be faster)
+Configuration on demand is an incubating feature.
+
+> Configure project :interfacedinamica-1.0.0
+Fabric Loom: 1.19.4
+
+> Task :interfacedinamica-1.0.0:compileJava
+> Task :interfacedinamica-1.0.0:processResources
+> Task :interfacedinamica-1.0.0:classes
+> Task :interfacedinamica-1.0.0:processIncludeJars
+> Task :interfacedinamica-1.0.0:jar
+> Task :interfacedinamica-1.0.0:compileTestJava NO-SOURCE
+> Task :interfacedinamica-1.0.0:assemble
+> Task :interfacedinamica-1.0.0:processTestResources NO-SOURCE
+> Task :interfacedinamica-1.0.0:testClasses UP-TO-DATE
+> Task :interfacedinamica-1.0.0:test NO-SOURCE
+> Task :interfacedinamica-1.0.0:validateAccessWidener NO-SOURCE
+> Task :interfacedinamica-1.0.0:check UP-TO-DATE
+> Task :interfacedinamica-1.0.0:build
+
+BUILD SUCCESSFUL in 32s
+4 actionable tasks: 4 executed
+Consider enabling configuration cache to speed up this build: https://docs.gradle.org/9.8.2/userguide/configuration_cache_enabling.html
