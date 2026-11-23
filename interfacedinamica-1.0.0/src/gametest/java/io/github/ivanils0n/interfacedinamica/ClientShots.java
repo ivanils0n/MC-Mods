@@ -2,6 +2,7 @@ package io.github.ivanils0n.interfacedinamica;
 
 import io.github.ivanils0n.interfacedinamica.client.ClientMod;
 import io.github.ivanils0n.interfacedinamica.client.Effects;
+import io.github.ivanils0n.interfacedinamica.client.Tilt;
 import io.github.ivanils0n.interfacedinamica.client.mixin.ContainerScreenAccess;
 import net.fabricmc.fabric.api.client.gametest.v1.FabricClientGameTest;
 import net.fabricmc.fabric.api.client.gametest.v1.context.ClientGameTestContext;
@@ -22,6 +23,7 @@ import java.util.Locale;
  */
 public class ClientShots implements FabricClientGameTest {
 	private static int X, Y, Z;
+	private static final double[] CURSOR = {5, 5};
 
 	@Override
 	public void runTest(ClientGameTestContext context) {
@@ -71,6 +73,22 @@ public class ClientShots implements FabricClientGameTest {
 			});
 			context.waitTicks(4);
 			context.takeScreenshot("4b_bau_item_voando");
+			// mouse em cima do diamante (espaço 0) na tela 3D: tem que destacar o espaço e mostrar o nome
+			context.waitTicks(12);
+			context.runOnClient(c -> {
+				if (Tilt.active() && c.gui.screen() instanceof AbstractContainerScreen<?> cs) {
+					ContainerScreenAccess a = (ContainerScreenAccess) cs;
+					Slot s = cs.getMenu().slots.get(0);
+					var w = c.getWindow();
+					double[] p = Tilt.project(a.interfacedinamica$leftPos() + s.x + 8, a.interfacedinamica$topPos() + s.y + 8, w.getGuiScaledWidth(), w.getGuiScaledHeight());
+					CURSOR[0] = p[0] * w.getScreenWidth() / w.getGuiScaledWidth();
+					CURSOR[1] = p[1] * w.getScreenHeight() / w.getGuiScaledHeight();
+				}
+			});
+			context.getInput().setCursorPos(CURSOR[0], CURSOR[1]);
+			context.waitTicks(3);
+			context.takeScreenshot("4c_bau_mouse_no_diamante");
+			context.getInput().setCursorPos(5, 5);
 			close(context, sp);
 			context.waitTicks(30);
 			// mesa de encantamento
@@ -116,6 +134,7 @@ public class ClientShots implements FabricClientGameTest {
 		cmd(sp, f("setblock %d %d %d air", pos.getX(), pos.getY(), pos.getZ()));
 		cmd(sp, f("setblock %d %d %d %s%s", pos.getX(), pos.getY(), pos.getZ(), block, nbt == null ? "" : nbt));
 		cmd(sp, f("tp @p %d.5 %d %d.5 0 30", X, Y, Z));
+		context.getInput().setCursorPos(5, 5);
 		context.waitTicks(40);
 		sp.getServer().runOnServer(s -> {
 			ServerPlayer p = player(s);

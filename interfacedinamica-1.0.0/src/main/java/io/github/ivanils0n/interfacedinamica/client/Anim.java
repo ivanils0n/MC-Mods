@@ -81,6 +81,7 @@ public final class Anim {
 	public static void onScreenInit(Minecraft mc, Screen s) {
 		if (!(s instanceof AbstractContainerScreen<?>) || mc.player == null || mc.level == null) return;
 		Config c = Config.INSTANCE;
+		if (mc.gui.screen() != s) return; // já foi trocada por outra (ex.: inventório -> criativo)
 		if (s != screen) {
 			Theme t = Theme.of(s);
 			if (!t.enabled(c)) return;
@@ -215,7 +216,9 @@ public final class Anim {
 		Vec3 fwd = dir(yaw);
 		double br = Math.toRadians(yaw);
 		Vec3 left = new Vec3(Math.cos(br), 0, Math.sin(br));
-		return eye.subtract(fwd.scale(distance * 0.8 * t)).subtract(left.scale(SIDE_SHIFT * 1.15 * t * s)).add(0, 0.2 * t, 0);
+		// primeiro vai para o lado (para não atravessar a cabeça), depois para trás
+		float side = smooth(Math.min(1f, t * 2.2f)), back = smooth(Math.max(0f, (t - 0.15f) / 0.85f));
+		return eye.subtract(fwd.scale(distance * 0.8 * back)).subtract(left.scale(SIDE_SHIFT * 1.15 * side * s)).add(0, 0.2 * side, 0);
 	}
 
 	static Vec3 clip(Entity e, Vec3 from, Vec3 to) {

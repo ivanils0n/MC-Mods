@@ -71,6 +71,14 @@ public final class Tilt {
 		return new Matrix4f().perspective(FOV, w / h, d * 0.05f, d * 8f).mul(view(w, h));
 	}
 
+	/** Ponto da GUI no painel -> pixel da tela (o contrário de unproject). */
+	public static double[] project(double gx, double gy, float w, float h) {
+		Vector3f p = view(w, h).transformPosition(new Vector3f((float) gx, (float) gy, 0));
+		double t2 = Math.tan(FOV / 2), a = w / (double) h;
+		double nx = p.x / -p.z / (a * t2), ny = p.y / -p.z / t2;
+		return new double[]{(nx + 1) / 2 * w, (1 - ny) / 2 * h};
+	}
+
 	/** Ponto da tela (pixels da GUI) -> ponto da GUI no painel girado (onde o mouse está "de verdade"). */
 	public static double[] unproject(double sx, double sy, float w, float h) {
 		Matrix4f v = view(w, h);
