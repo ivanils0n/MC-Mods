@@ -6,6 +6,7 @@ import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen;
 import net.minecraft.core.BlockPos;
+import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.util.Mth;
 import net.minecraft.util.RandomSource;
 import net.minecraft.world.item.ItemStack;
@@ -47,9 +48,10 @@ public final class Effects {
 			s.age++;
 			s.x += s.vx;
 			s.y += s.vy;
-			s.vy += Anim.theme() == Theme.FURNACE ? -0.05f : 0.0f;
+			s.vy += Anim.theme() == Theme.FURNACE ? -0.05f : Anim.theme() == Theme.ANVIL ? 0.25f : 0.0f;
 			if (s.age > s.life) it.remove();
 		}
+		anvilHit(mc);
 		Screen screen = mc.gui.screen();
 		if (!Config.INSTANCE.effects || !Anim.isFor(screen) || !(screen instanceof AbstractContainerScreen<?> cs)) return;
 		ContainerScreenAccess a = (ContainerScreenAccess) cs;
@@ -80,6 +82,24 @@ public final class Effects {
 			}
 		}
 		if (SPARKS.size() > 220) SPARKS.subList(0, SPARKS.size() - 220).clear();
+	}
+
+	/** Na batida do martelo: faíscas em cima da bigorna (no mundo) e na tela. */
+	private static void anvilHit(Minecraft mc) {
+		if (!Config.INSTANCE.effects || Anim.theme() != Theme.ANVIL || !Anim.hasBlock() || Anim.frameT < 0.9f || mc.level == null) return;
+		if (mc.player.tickCount % Poses.HAMMER_PERIOD != 10) return;
+		var top = Anim.blockCenter().add(0, 0.5, 0);
+		for (int i = 0; i < 10; i++) {
+			mc.level.addParticle(ParticleTypes.CRIT, top.x, top.y + 0.05, top.z,
+					(RANDOM.nextFloat() - 0.5f) * 0.5f, 0.15f + RANDOM.nextFloat() * 0.25f, (RANDOM.nextFloat() - 0.5f) * 0.5f);
+		}
+		mc.level.addParticle(ParticleTypes.SMOKE, top.x, top.y + 0.1, top.z, 0, 0.03, 0);
+		if (mc.gui.screen() instanceof AbstractContainerScreen<?> cs && Anim.isFor(cs)) {
+			ContainerScreenAccess a = (ContainerScreenAccess) cs;
+			int l = a.interfacedinamica$leftPos(), t = a.interfacedinamica$topPos(), w = a.interfacedinamica$imageWidth();
+			for (int i = 0; i < 14; i++) spark(l + RANDOM.nextFloat() * w, t + 4, (RANDOM.nextFloat() - 0.5f) * 2.4f,
+					-0.8f - RANDOM.nextFloat() * 1.6f, 8 + RANDOM.nextInt(8), pick(0xFFFFFFFF, 0xFFFFE07A, 0xFFFFA530));
+		}
 	}
 
 	private static int pick(int... c) {

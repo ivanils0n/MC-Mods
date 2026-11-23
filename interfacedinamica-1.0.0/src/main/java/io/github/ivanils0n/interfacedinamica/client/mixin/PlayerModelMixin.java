@@ -19,12 +19,12 @@ public abstract class PlayerModelMixin {
 	}
 
 	@Inject(method = "setupAnim(Lnet/minecraft/client/renderer/entity/state/AvatarRenderState;)V", at = @At("HEAD"))
-	private void interfacedinamica$head(AvatarRenderState s, CallbackInfo ci) {
-		if (interfacedinamica$mine(s)) Poses.head(s, Anim.frameT);
+	private void interfacedinamica$before(AvatarRenderState s, CallbackInfo ci) {
+		if (interfacedinamica$mine(s)) Poses.before(s, Anim.poseT());
 	}
 
 	@Inject(method = "setupAnim(Lnet/minecraft/client/renderer/entity/state/AvatarRenderState;)V", at = @At("TAIL"))
 	private void interfacedinamica$arms(AvatarRenderState s, CallbackInfo ci) {
-		if (interfacedinamica$mine(s)) Poses.arms((PlayerModel) (Object) this, s, Anim.frameT);
+		if (interfacedinamica$mine(s)) Poses.arms((PlayerModel) (Object) this, s, Anim.poseT());
 	}
 }

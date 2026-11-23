@@ -9,12 +9,15 @@ import net.minecraft.client.KeyMapping;
 import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen;
 import net.minecraft.resources.Identifier;
 import org.lwjgl.glfw.GLFW;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Parte do cliente: câmera em 3ª pessoa animada, tela ao lado do personagem, poses, item voando, luz e efeitos.
- * Funciona em qualquer servidor (não precisa do mod no servidor).
+ * Mod só do cliente: funciona em qualquer servidor.
  */
 public class ClientMod implements ClientModInitializer {
+	public static final Logger LOG = LoggerFactory.getLogger("Interface Dinâmica");
 	private static final KeyMapping.Category CATEGORY = KeyMapping.Category.register(Identifier.fromNamespaceAndPath("interfacedinamica", "interfacedinamica"));
 	public static KeyMapping OPTIONS;
 

@@ -2,7 +2,6 @@ package io.github.ivanils0n.interfacedinamica.client;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
-import io.github.ivanils0n.interfacedinamica.InterfaceDinamica;
 import net.fabricmc.loader.api.FabricLoader;
 
 import java.io.Reader;
@@ -36,9 +35,9 @@ public final class Config {
 
 	public int durationTicks() {
 		return switch (speed) {
-			case 0 -> 16;
-			case 2 -> 6;
-			default -> 10;
+			case 0 -> 26;
+			case 2 -> 11;
+			default -> 18;
 		};
 	}
 
@@ -59,7 +58,7 @@ public final class Config {
 				}
 			}
 		} catch (Exception e) {
-			InterfaceDinamica.LOG.warn("Não deu para ler {}: {}", FILE, e.toString());
+			ClientMod.LOG.warn("Não deu para ler {}: {}", FILE, e.toString());
 		}
 		INSTANCE.speed = Math.clamp(INSTANCE.speed, 0, 2);
 		INSTANCE.side = Math.clamp(INSTANCE.side, 0, 2);
@@ -73,7 +72,7 @@ public final class Config {
 				GSON.toJson(INSTANCE, w);
 			}
 		} catch (Exception e) {
-			InterfaceDinamica.LOG.warn("Não deu para salvar {}: {}", FILE, e.toString());
+			ClientMod.LOG.warn("Não deu para salvar {}: {}", FILE, e.toString());
 		}
 	}
 }

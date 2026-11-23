@@ -28,7 +28,7 @@ jobs:
         if: always()
         run: |
           jar=$(find ~/.gradle . -name 'minecraft-merged*26.2*.jar' | grep -v sources | head -1)
-          for c in net.minecraft.client.gui.Hud net.minecraft.client.gui.Gui net.minecraft.client.gui.components.toasts.ToastManager; do echo "=== $c"; javap -p -cp "$jar" "$c"; done > api.txt 2>&1 || true
+          for c in net.minecraft.client.renderer.entity.state.ArmedEntityRenderState net.minecraft.client.renderer.item.ItemModelResolver net.minecraft.client.renderer.item.ItemStackRenderState net.minecraft.client.renderer.entity.player.AvatarRenderer net.minecraft.client.gui.components.toasts.ToastManager; do echo "=== $c"; javap -p -cp "$jar" "$c"; done > api.txt 2>&1 || true
       - name: Publicar
         if: always()
         run: |

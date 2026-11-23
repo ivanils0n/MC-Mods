@@ -7,28 +7,41 @@ import net.minecraft.client.gui.components.AbstractWidget;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen;
 import net.minecraft.client.player.LocalPlayer;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
 import net.minecraft.util.Mth;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.level.ClipContext;
+import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.HitResult;
 import net.minecraft.world.phys.Vec3;
 
 /**
- * Estado da animação: quando uma tela abre, "progress" vai de 0 a 1 (em ticks, conforme a velocidade escolhida) e a
- * câmera sai da 1ª pessoa, dá a volta no personagem e para de frente para ele, com a tela ao lado. Ao fechar, volta.
+ * Animação de cinema ao abrir uma tela. "progress" vai de 0 a 1 (em ticks) e, com o bloco usado (mesa, fornalha,
+ * bigorna, baú...), o personagem anda até ficar encostado nele e a câmera sai da 1ª pessoa para um plano de lado,
+ * enquadrando o personagem e o bloco, com a tela do outro lado. Sem bloco (inventário), a câmera gira para a frente.
+ * Tudo é só visual, no cliente: o jogador de verdade não sai do lugar.
  */
 public final class Anim {
 	private static Screen screen;
 	private static Theme theme = Theme.OTHER;
-	/** +1: tela à direita (câmera deslocada para a esquerda do personagem); -1: tela à esquerda. */
+	/** +1: tela à direita; -1: tela à esquerda. */
 	private static int side = 1;
 	private static boolean target;
 	private static float progress, prevProgress;
 	private static float baseYaw, basePitch;
 	private static float distance = 3.2f;
-	/** Progresso suavizado do quadro atual (calculado pela câmera, usado pelas poses e pela tela). */
+
+	// Cena com bloco
+	private static boolean hasBlock;
+	/** Onde o personagem fica (pés), para onde olha e o centro do bloco. */
+	private static Vec3 stand = Vec3.ZERO, blockCenter = Vec3.ZERO;
+	private static float standYaw;
+	/** Lado da câmera em relação à linha personagem-bloco (+1/-1). */
+	private static int camSide = 1;
+
+	/** Progresso suavizado do quadro atual. */
 	public static float frameT;
-	/** Câmera do quadro atual, para projetar a mão do personagem na tela (item voando). */
 	static Vec3 camPos = Vec3.ZERO;
 	static float camYaw, camPitch;
 	public static int clientTicks;
@@ -49,11 +62,19 @@ public final class Anim {
 		return side;
 	}
 
+	public static boolean hasBlock() {
+		return hasBlock;
+	}
+
+	public static Vec3 blockCenter() {
+		return blockCenter;
+	}
+
 	public static boolean isFor(Screen s) {
 		return s != null && s == screen && target;
 	}
 
-	/** Tela iniciada (ou redimensionada): liga a animação e põe a tela ao lado do personagem. */
+	/** Tela iniciada (ou redimensionada): liga a animação e põe a tela ao lado. */
 	public static void onScreenInit(Minecraft mc, Screen s) {
 		if (!(s instanceof AbstractContainerScreen<?>) || mc.player == null || mc.level == null) return;
 		Config c = Config.INSTANCE;
@@ -67,11 +88,52 @@ public final class Anim {
 			if (!wasActive) {
 				baseYaw = mc.player.getYRot();
 				basePitch = mc.player.getXRot();
+				setupScene(mc);
 			}
 			distance = c.cameraDistance();
 			side = chooseSide(mc.player, c);
 		}
 		placeScreen((AbstractContainerScreen<?>) s);
+	}
+
+	/** Bloco que o jogador usou (o que ele está olhando) e onde o personagem vai se encostar. */
+	private static void setupScene(Minecraft mc) {
+		hasBlock = false;
+		if (theme == Theme.INVENTORY || !(mc.hitResult instanceof BlockHitResult hit) || hit.getType() != HitResult.Type.BLOCK) return;
+		LocalPlayer p = mc.player;
+		BlockPos pos = hit.getBlockPos();
+		if (pos.getCenter().distanceTo(p.getEyePosition(1f)) > 6) return;
+		Direction face = hit.getDirection();
+		if (face.getAxis() == Direction.Axis.Y) {
+			// clicou em cima ou embaixo: fica do lado mais perto do jogador
+			double dx = p.getX() - pos.getCenter().x, dz = p.getZ() - pos.getCenter().z;
+			face = Math.abs(dx) > Math.abs(dz) ? (dx > 0 ? Direction.EAST : Direction.WEST) : (dz > 0 ? Direction.SOUTH : Direction.NORTH);
+		}
+		blockCenter = pos.getCenter();
+		double gap = theme == Theme.ANVIL ? 0.95 : 0.82;
+		double sx = blockCenter.x + face.getStepX() * gap, sz = blockCenter.z + face.getStepZ() * gap;
+		stand = new Vec3(sx, p.getY(), sz);
+		// olha para o bloco
+		standYaw = (float) Math.toDegrees(Math.atan2(-(blockCenter.x - sx), blockCenter.z - sz));
+		hasBlock = true;
+		camSide = 1;
+		Vec3 focus = focus();
+		double right = clip(p, focus, sceneCamera(1)).distanceTo(focus), left = clip(p, focus, sceneCamera(-1)).distanceTo(focus);
+		camSide = right + 0.2 >= left ? 1 : -1;
+	}
+
+	private static Vec3 focus() {
+		return stand.add(blockCenter).scale(0.5).with(Direction.Axis.Y, stand.y + 1.0);
+	}
+
+	private static Vec3 dir(float yaw) {
+		double r = Math.toRadians(yaw);
+		return new Vec3(-Math.sin(r), 0, Math.cos(r));
+	}
+
+	/** Câmera final da cena: de lado (75° da direção do personagem), um pouco acima, olhando para o foco. */
+	private static Vec3 sceneCamera(int s) {
+		return focus().add(dir(standYaw + s * 78f).scale(distance)).add(0, 0.75, 0);
 	}
 
 	public static void onScreenRemoved(Screen s) {
@@ -84,15 +146,14 @@ public final class Anim {
 	private static int chooseSide(LocalPlayer p, Config c) {
 		if (c.side == 1) return 1;
 		if (c.side == 2) return -1;
+		if (hasBlock) return 1;
 		double right = freeDistance(p, 1), left = freeDistance(p, -1);
 		return right + 0.3 >= left ? 1 : -1;
 	}
 
-	/** Quanto a câmera consegue chegar perto do ponto final de cada lado antes de bater num bloco. */
 	private static double freeDistance(LocalPlayer p, int s) {
 		Vec3 eye = p.getEyePosition(1f);
-		Vec3 want = cameraTarget(eye, baseYaw, 1f, s);
-		return clip(p, eye, want).distanceTo(eye);
+		return clip(p, eye, frontCamera(eye, baseYaw, 1f, s)).distanceTo(eye);
 	}
 
 	private static void placeScreen(AbstractContainerScreen<?> s) {
@@ -119,6 +180,7 @@ public final class Anim {
 		if (target && mc.gui.screen() != screen) target = false;
 		float step = 1f / Config.INSTANCE.durationTicks();
 		progress = Mth.clamp(progress + (target ? step : -step), 0f, 1f);
+		if (progress == 0 && prevProgress == 0) hasBlock = false;
 		Effects.tick(mc);
 	}
 
@@ -128,11 +190,23 @@ public final class Anim {
 		return p * p * (3 - 2 * p);
 	}
 
-	/** Ponto final da câmera para um progresso t: gira em volta do personagem de trás (t=0) até a frente (t=1). */
-	static Vec3 cameraTarget(Vec3 eye, float yaw, float t, int s) {
-		float camYaw = yaw + 180f * t;
-		double r = Math.toRadians(camYaw);
-		Vec3 fwd = new Vec3(-Math.sin(r), 0, Math.cos(r));
+	/** Parte do movimento: o personagem anda até o bloco nos primeiros 70%. */
+	public static float walkT() {
+		return smooth(Mth.clamp(frameT / 0.7f, 0, 1));
+	}
+
+	/** A pose entra a partir de 40%. */
+	public static float poseT() {
+		return smooth(Mth.clamp((frameT - 0.4f) / 0.6f, 0, 1));
+	}
+
+	private static float smooth(float x) {
+		return x * x * (3 - 2 * x);
+	}
+
+	/** Sem bloco: gira em volta do personagem de trás (t=0) até a frente (t=1). */
+	static Vec3 frontCamera(Vec3 eye, float yaw, float t, int s) {
+		Vec3 fwd = dir(yaw + 180f * t);
 		double br = Math.toRadians(yaw);
 		Vec3 left = new Vec3(Math.cos(br), 0, Math.sin(br));
 		return eye.subtract(fwd.scale(distance * t)).add(left.scale(SIDE_SHIFT * t * s)).add(0, 0.15 * t, 0);
@@ -141,15 +215,24 @@ public final class Anim {
 	static Vec3 clip(Entity e, Vec3 from, Vec3 to) {
 		HitResult hit = e.level().clip(new ClipContext(from, to, ClipContext.Block.VISUAL, ClipContext.Fluid.NONE, e));
 		if (hit.getType() == HitResult.Type.MISS) return to;
-		Vec3 dir = to.subtract(from);
-		double len = dir.length();
+		Vec3 d = to.subtract(from);
+		double len = d.length();
 		if (len < 1e-4) return from;
-		return hit.getLocation().subtract(dir.scale(0.25 / len));
+		return hit.getLocation().subtract(d.scale(0.25 / len));
 	}
 
-	/**
-	 * Chamado pela câmera em cada quadro. Devolve {x, y, z, yaw, pitch} ou null para a câmera normal.
-	 */
+	/** Onde o modelo do personagem é desenhado (pés) neste quadro. */
+	public static Vec3 modelPos(Vec3 real) {
+		if (!hasBlock) return real;
+		return real.lerp(stand, walkT());
+	}
+
+	public static float modelYaw(float realBodyYaw) {
+		if (!hasBlock) return realBodyYaw;
+		return Mth.rotLerp(walkT(), realBodyYaw, standYaw);
+	}
+
+	/** Chamado pela câmera em cada quadro. Devolve {x, y, z, yaw, pitch} ou null para a câmera normal. */
 	public static double[] camera(Entity e, float partial) {
 		float t = eased(partial);
 		frameT = t;
@@ -158,10 +241,25 @@ public final class Anim {
 			return null;
 		}
 		Vec3 eye = e.getEyePosition(partial);
-		Vec3 want = cameraTarget(eye, baseYaw, t, side);
-		Vec3 pos = clip(e, eye, want);
-		float yaw = baseYaw + 180f * t;
-		float pitch = Mth.lerp(t, basePitch, 10f);
+		Vec3 pos;
+		float yaw, pitch;
+		float time = clientTicks + partial;
+		if (hasBlock) {
+			Vec3 focus = focus();
+			Vec3 want = clip(e, focus, sceneCamera(camSide));
+			// pequeno balanço de câmera na mão (só quando parada)
+			want = want.add(0, 0.04 * Math.sin(time * 0.05) * t, 0);
+			Vec3 look = focus.subtract(want);
+			float fy = (float) Math.toDegrees(Math.atan2(-look.x, look.z)) + 17f * side + (float) (1.2 * Math.sin(time * 0.03)) * t;
+			float fp = (float) Math.toDegrees(Math.atan2(-look.y, Math.hypot(look.x, look.z)));
+			pos = eye.lerp(want, t);
+			yaw = Mth.rotLerp(t, baseYaw, fy);
+			pitch = Mth.lerp(t, basePitch, fp);
+		} else {
+			pos = clip(e, eye, frontCamera(eye, baseYaw, t, side));
+			yaw = baseYaw + 180f * t;
+			pitch = Mth.lerp(t, basePitch, 10f);
+		}
 		camPos = pos;
 		camYaw = yaw;
 		camPitch = pitch;
@@ -183,13 +281,17 @@ public final class Anim {
 		return new float[]{(float) (guiW / 2.0 * (1 + nx)), (float) (guiH / 2.0 * (1 - ny))};
 	}
 
-	/** Mão do personagem que fica do lado da tela, em pixels da GUI. */
+	/** Mão do personagem, em pixels da GUI (destino do item voando). */
 	static float[] handOnScreen(Minecraft mc, int guiW, int guiH) {
 		if (mc.player == null) return null;
-		double br = Math.toRadians(baseYaw);
-		Vec3 left = new Vec3(Math.cos(br), 0, Math.sin(br));
-		Vec3 fwd = new Vec3(-Math.sin(br), 0, Math.cos(br));
-		Vec3 hand = mc.player.getEyePosition(1f).add(0, -0.75, 0).add(left.scale(0.38 * side)).add(fwd.scale(0.35));
+		Vec3 hand;
+		if (hasBlock) {
+			hand = stand.add(dir(standYaw).scale(0.45)).add(0, 1.0, 0);
+		} else {
+			double br = Math.toRadians(baseYaw);
+			Vec3 left = new Vec3(Math.cos(br), 0, Math.sin(br));
+			hand = mc.player.getEyePosition(1f).add(0, -0.75, 0).add(left.scale(0.38 * side)).add(dir(baseYaw).scale(0.35));
+		}
 		return project(mc, hand, guiW, guiH);
 	}
 }

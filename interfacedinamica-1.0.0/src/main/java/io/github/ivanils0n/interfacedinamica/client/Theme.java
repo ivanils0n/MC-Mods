@@ -3,6 +3,10 @@ package io.github.ivanils0n.interfacedinamica.client;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.gui.screens.inventory.AbstractFurnaceScreen;
+import net.minecraft.client.gui.screens.inventory.AnvilScreen;
+import net.minecraft.client.gui.screens.inventory.BrewingStandScreen;
+import net.minecraft.client.gui.screens.inventory.GrindstoneScreen;
+import net.minecraft.client.gui.screens.inventory.SmithingScreen;
 import net.minecraft.client.gui.screens.inventory.ContainerScreen;
 import net.minecraft.client.gui.screens.inventory.CrafterScreen;
 import net.minecraft.client.gui.screens.inventory.CraftingScreen;
@@ -16,7 +20,7 @@ import net.minecraft.world.phys.BlockHitResult;
 
 /** Tipo de tela: escolhe a pose, os efeitos e qual ajuste liga/desliga o mod nela. */
 public enum Theme {
-	INVENTORY, CHEST, ENDER, CRAFTING, FURNACE, ENCHANT, OTHER;
+	INVENTORY, CHEST, ENDER, CRAFTING, FURNACE, ANVIL, ENCHANT, BREWING, OTHER;
 
 	public static Theme of(Screen screen) {
 		String cls = screen.getClass().getSimpleName();
@@ -24,6 +28,8 @@ public enum Theme {
 		if (screen instanceof AbstractFurnaceScreen<?>) return FURNACE;
 		if (screen instanceof CraftingScreen || screen instanceof CrafterScreen) return CRAFTING;
 		if (screen instanceof EnchantmentScreen) return ENCHANT;
+		if (screen instanceof AnvilScreen || screen instanceof SmithingScreen || screen instanceof GrindstoneScreen) return ANVIL;
+		if (screen instanceof BrewingStandScreen) return BREWING;
 		if (screen instanceof ContainerScreen && lookingAtEnderChest()) return ENDER;
 		if (screen instanceof ContainerScreen || screen instanceof ShulkerBoxScreen || screen instanceof HopperScreen
 				|| screen instanceof DispenserScreen) return CHEST;
