@@ -24,11 +24,16 @@ jobs:
           timeout 1700 xvfb-run -a -s "-screen 0 1280x720x24" ./gradlew --configure-on-demand ":interfacedinamica-1.0.0:runClientGameTest" -Pminecraft_version=26.2 "-Pminecraft_dependency=~26.2" > gametest.log 2>&1 || true
           grep -nE "RESUMO|ERROR|Exception|error:|FAILED|Mixin|interfacedinamica" gametest.log | head -300 > resumo.txt || true
           tail -40 gametest.log
+      - name: API extra
+        if: always()
+        run: |
+          jar=$(find ~/.gradle . -name 'minecraft-merged*26.2*.jar' | grep -v sources | head -1)
+          for c in net.minecraft.client.gui.Hud net.minecraft.client.gui.Gui net.minecraft.client.gui.components.toasts.ToastManager; do echo "=== $c"; javap -p -cp "$jar" "$c"; done > api.txt 2>&1 || true
       - name: Publicar
         if: always()
         run: |
           d=$(mktemp -d)
           find interfacedinamica-1.0.0 -path '*screenshots*' -name '*.png' -exec cp {} "$d"/ \;
-          cp build.log gametest.log resumo.txt "$d"/ 2>/dev/null || true
+          cp build.log gametest.log resumo.txt api.txt "$d"/ 2>/dev/null || true
           cd "$d" && git init -q -b p && git add -A && git -c user.name=ci -c user.email=ci@localhost commit -qm "prints ${{ github.sha }}"
           git push -qf "https://x-access-token:${{ github.token }}@github.com/${{ github.repository }}.git" p:prints-interfacedinamica-dev

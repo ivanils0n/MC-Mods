@@ -33,7 +33,7 @@ import java.util.List;
  */
 public final class MenuPanel extends ElementHolder {
 	/** Largura do painel em blocos para uma tela padrão (176 px). */
-	private static final float WIDTH_BLOCKS = 1.1f;
+	private static final float WIDTH_BLOCKS = 1.4f;
 	/** Blocos por pixel da tela. */
 	private static final float U = WIDTH_BLOCKS / 176f;
 	private static final float VIEW_RANGE = 0.5f;
@@ -45,8 +45,19 @@ public final class MenuPanel extends ElementHolder {
 	private final List<SlotView> slots = new ArrayList<>();
 	private final List<DisplayElement> all = new ArrayList<>();
 	private float lastYaw = Float.NaN;
+	private Vec3 offset = Vec3.ZERO;
 
-	private record SlotView(Slot slot, ItemDisplayElement item, TextDisplayElement count, ItemStack[] last) {}
+	/** Item e número de um espaço: só são criados quando o espaço tem algo (menos entidades). */
+	private static final class SlotView {
+		final Slot slot;
+		ItemDisplayElement item;
+		TextDisplayElement count;
+		ItemStack last = ItemStack.EMPTY;
+
+		SlotView(Slot slot) {
+			this.slot = slot;
+		}
+	}
 
 	/**
 	 * @param anchor quem está com a tela aberta (o painel acompanha)
@@ -76,25 +87,9 @@ public final class MenuPanel extends ElementHolder {
 		rect(block("white_concrete"), 0, 0, w, h, 0.002f);
 		for (Slot s : menu.slots) {
 			if (!s.isActive()) continue;
-			rect(block("gray_concrete"), s.x - 1, s.y - 1, 18, 18, 0.004f);
-			rect(block("light_gray_concrete"), s.x, s.y, 16, 16, 0.005f);
-			ItemDisplayElement item = new ItemDisplayElement();
-			item.setItemDisplayContext(ItemDisplayContext.GUI);
-			setup(item, new Vector3f(x(s.x + 8), y(s.y + 8), 0.012f), new Vector3f(16 * U, 16 * U, 0.001f));
-			slots.add(new SlotView(s, item, null, new ItemStack[]{ItemStack.EMPTY}));
+			rect(block("light_gray_concrete"), s.x - 1, s.y - 1, 18, 18, 0.004f);
+			slots.add(new SlotView(s));
 		}
-		// O número de cada pilha (texto pequeno no canto de baixo do espaço).
-		List<SlotView> withCount = new ArrayList<>();
-		for (SlotView v : slots) {
-			TextDisplayElement t = new TextDisplayElement(Component.empty());
-			t.setBackground(0);
-			t.setShadow(true);
-			float sc = U * 40f;
-			setup(t, new Vector3f(x(v.slot().x + 13), y(v.slot().y + 17), 0.02f), new Vector3f(sc, sc, sc));
-			withCount.add(new SlotView(v.slot(), v.item(), t, v.last()));
-		}
-		slots.clear();
-		slots.addAll(withCount);
 
 		if (!title.getString().isEmpty()) {
 			TextDisplayElement t = new TextDisplayElement(title.copy().withColor(0x404040));
@@ -103,8 +98,8 @@ public final class MenuPanel extends ElementHolder {
 			float sc = U * 40f;
 			setup(t, new Vector3f(x(w / 2f), y(14), 0.02f), new Vector3f(sc, sc, sc));
 		}
-		updateItems();
 		updateOffset(true);
+		updateItems();
 	}
 
 	private static BlockState block(String id) {
@@ -148,12 +143,26 @@ public final class MenuPanel extends ElementHolder {
 
 	private void updateItems() {
 		for (SlotView v : slots) {
-			ItemStack now = v.slot().getItem();
-			if (ItemStack.matches(now, v.last()[0])) continue;
-			v.last()[0] = now.copy();
-			v.item().setItem(now.copy());
+			ItemStack now = v.slot.getItem();
+			if (ItemStack.matches(now, v.last)) continue;
+			v.last = now.copy();
+			if (v.item == null && !now.isEmpty()) {
+				v.item = new ItemDisplayElement();
+				v.item.setItemDisplayContext(ItemDisplayContext.GUI);
+				setup(v.item, new Vector3f(x(v.slot.x + 8), y(v.slot.y + 8), 0.012f), new Vector3f(16 * U, 16 * U, 0.001f));
+				v.item.setOffset(offset);
+			}
+			if (v.item != null) v.item.setItem(now.copy());
 			int n = now.getCount();
-			v.count().setText(n > 1 ? Component.literal(String.valueOf(n)) : Component.empty());
+			if (v.count == null && n > 1) {
+				v.count = new TextDisplayElement(Component.empty());
+				v.count.setBackground(0);
+				v.count.setShadow(true);
+				float sc = U * 40f;
+				setup(v.count, new Vector3f(x(v.slot.x + 13), y(v.slot.y + 17), 0.02f), new Vector3f(sc, sc, sc));
+				v.count.setOffset(offset);
+			}
+			if (v.count != null) v.count.setText(n > 1 ? Component.literal(String.valueOf(n)) : Component.empty());
 		}
 	}
 
@@ -165,8 +174,8 @@ public final class MenuPanel extends ElementHolder {
 		double r = Math.toRadians(yaw);
 		Vec3 left = new Vec3(Math.cos(r), 0, Math.sin(r));
 		Vec3 fwd = new Vec3(-Math.sin(r), 0, Math.cos(r));
-		Vec3 off = left.scale(0.95).add(fwd.scale(0.35)).add(0, anchor.getBbHeight() * 0.7, 0);
-		for (DisplayElement e : all) e.setOffset(off);
+		offset = left.scale(1.15).add(fwd.scale(0.35)).add(0, anchor.getBbHeight() * 0.7, 0);
+		for (DisplayElement e : all) e.setOffset(offset);
 	}
 
 	public int elementCount() {
