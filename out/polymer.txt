@@ -1,0 +1,613 @@
+JAR /home/runner/.gradle/caches/modules-2/files-2.1/eu.pb4/polymer-bundled/0.17.5+26.2/115afd5dc50584d1ac294fe71b5aeb4e9138e434/polymer-bundled-0.17.5+26.2.jar
+JAR /home/runner/.gradle/caches/modules-2/files-2.1/eu.pb4/polymer-virtual-entity/0.17.5+26.2/178a6a263ba4d0e2d7a397187c56b67860f5131e/polymer-virtual-entity-0.17.5+26.2.jar
+=== eu.pb4.polymer.virtualentity.api.BlockWithElementHolder
+Compiled from "BlockWithElementHolder.java"
+public interface eu.pb4.polymer.virtualentity.api.BlockWithElementHolder {
+  public default eu.pb4.polymer.virtualentity.api.ElementHolder createElementHolder(net.minecraft.server.level.ServerLevel, net.minecraft.core.BlockPos, net.minecraft.world.level.block.state.BlockState);
+  public default net.minecraft.world.phys.Vec3 getElementHolderOffset(net.minecraft.server.level.ServerLevel, net.minecraft.core.BlockPos, net.minecraft.world.level.block.state.BlockState);
+  public default boolean tickElementHolder(net.minecraft.server.level.ServerLevel, net.minecraft.core.BlockPos, net.minecraft.world.level.block.state.BlockState);
+  public default eu.pb4.polymer.virtualentity.api.ElementHolder createMovingElementHolder(net.minecraft.server.level.ServerLevel, net.minecraft.core.BlockPos, net.minecraft.world.level.block.state.BlockState, eu.pb4.polymer.virtualentity.api.ElementHolder);
+  public default eu.pb4.polymer.virtualentity.api.ElementHolder createStaticElementHolder(net.minecraft.server.level.ServerLevel, net.minecraft.core.BlockPos, net.minecraft.world.level.block.state.BlockState, eu.pb4.polymer.virtualentity.api.ElementHolder);
+  public static eu.pb4.polymer.virtualentity.api.BlockWithElementHolder get(net.minecraft.world.level.block.state.BlockState);
+  public static boolean registerOverlay(net.minecraft.world.level.block.Block, eu.pb4.polymer.virtualentity.api.BlockWithElementHolder);
+}
+=== eu.pb4.polymer.virtualentity.api.ElementHolder
+Compiled from "ElementHolder.java"
+public class eu.pb4.polymer.virtualentity.api.ElementHolder {
+  protected net.minecraft.world.phys.Vec3 currentPos;
+  public eu.pb4.polymer.virtualentity.api.ElementHolder();
+  public boolean isPartOf(int);
+  public it.unimi.dsi.fastutil.ints.IntList getEntityIds();
+  public <T extends eu.pb4.polymer.virtualentity.api.elements.VirtualElement> T addElement(T);
+  public boolean addElementWithoutUpdates(eu.pb4.polymer.virtualentity.api.elements.VirtualElement);
+  public void removeElement(eu.pb4.polymer.virtualentity.api.elements.VirtualElement);
+  public boolean removeElementWithoutUpdates(eu.pb4.polymer.virtualentity.api.elements.VirtualElement);
+  public java.util.List<eu.pb4.polymer.virtualentity.api.elements.VirtualElement> getElements();
+  public boolean startWatching(net.minecraft.server.network.ServerGamePacketListenerImpl);
+  protected void startWatchingExtraPackets(net.minecraft.server.network.ServerGamePacketListenerImpl, java.util.function.Consumer<net.minecraft.network.protocol.Packet<net.minecraft.network.protocol.game.ClientGamePacketListener>>);
+  public final boolean startWatching(net.minecraft.server.level.ServerPlayer);
+  public boolean stopWatching(net.minecraft.server.network.ServerGamePacketListenerImpl);
+  public final boolean stopWatching(net.minecraft.server.level.ServerPlayer);
+  public void tick();
+  protected void onTick();
+  protected void updatePosition();
+  protected void updateInitialPosition();
+  protected void invalidateCaches();
+  public net.minecraft.world.level.ChunkPos getChunkPos();
+  protected void notifyElementsOfPositionUpdate(net.minecraft.world.phys.Vec3, net.minecraft.world.phys.Vec3);
+  public void sendPacket(net.minecraft.network.protocol.Packet<? extends net.minecraft.network.protocol.game.ClientGamePacketListener>);
+  public void sendPacket(net.minecraft.network.protocol.Packet<? extends net.minecraft.network.protocol.game.ClientGamePacketListener>, java.util.function.Predicate<net.minecraft.server.level.ServerPlayer>);
+  public eu.pb4.polymer.virtualentity.api.attachment.HolderAttachment getAttachment();
+  public void setAttachment(eu.pb4.polymer.virtualentity.api.attachment.HolderAttachment);
+  protected void onAttachmentSet(eu.pb4.polymer.virtualentity.api.attachment.HolderAttachment, eu.pb4.polymer.virtualentity.api.attachment.HolderAttachment);
+  protected void onAttachmentRemoved(eu.pb4.polymer.virtualentity.api.attachment.HolderAttachment);
+  public net.minecraft.world.phys.Vec3 getPos();
+  public eu.pb4.polymer.virtualentity.api.elements.VirtualElement$InteractionHandler getInteraction(int, net.minecraft.server.level.ServerPlayer);
+  public void destroy();
+  public java.util.Collection<net.minecraft.server.network.ServerGamePacketListenerImpl> getWatchingPlayers();
+  public boolean equals(java.lang.Object);
+  public int hashCode();
+  public void notifyUpdate(eu.pb4.polymer.virtualentity.api.attachment.HolderAttachment$UpdateType);
+  public it.unimi.dsi.fastutil.ints.IntList getAttachedPassengerEntityIds();
+  public <T extends eu.pb4.polymer.virtualentity.api.elements.VirtualElement> T addPassengerElement(T);
+  public void addPassengerId(int);
+  public void removePassengerId(int);
+}
+=== eu.pb4.polymer.virtualentity.api.LocalInterpolationHandler$InterpolationData
+Compiled from "LocalInterpolationHandler.java"
+class eu.pb4.polymer.virtualentity.api.LocalInterpolationHandler$InterpolationData {
+  protected int steps;
+  public void decrease();
+  public void addDelta(net.minecraft.world.phys.Vec3);
+  public void addRotation(float, float);
+}
+=== eu.pb4.polymer.virtualentity.api.LocalInterpolationHandler
+Compiled from "LocalInterpolationHandler.java"
+public class eu.pb4.polymer.virtualentity.api.LocalInterpolationHandler {
+  public static final int DEFAULT_INTERPOLATION_STEPS;
+  public eu.pb4.polymer.virtualentity.api.LocalInterpolationHandler(net.minecraft.world.entity.Entity);
+  public eu.pb4.polymer.virtualentity.api.LocalInterpolationHandler(net.minecraft.world.entity.Entity, int);
+  public eu.pb4.polymer.virtualentity.api.LocalInterpolationHandler(net.minecraft.world.entity.Entity, java.util.function.Consumer<eu.pb4.polymer.virtualentity.api.LocalInterpolationHandler>);
+  public eu.pb4.polymer.virtualentity.api.LocalInterpolationHandler(net.minecraft.world.entity.Entity, int, java.util.function.Consumer<eu.pb4.polymer.virtualentity.api.LocalInterpolationHandler>);
+  public net.minecraft.world.phys.Vec3 position();
+  public float yRot();
+  public float xRot();
+  public void interpolateTo(net.minecraft.world.phys.Vec3, float, float);
+  public boolean hasActiveInterpolation();
+  public void setInterpolationLength(int);
+  public void interpolate();
+  public void cancel();
+}
+=== eu.pb4.polymer.virtualentity.api.VirtualEntityUtils
+Compiled from "VirtualEntityUtils.java"
+public final class eu.pb4.polymer.virtualentity.api.VirtualEntityUtils {
+  public static int requestEntityId();
+  public static void addVirtualPassenger(net.minecraft.world.entity.Entity, int);
+  public static void addVirtualPassenger(net.minecraft.world.entity.Entity, int...);
+  public static void removeVirtualPassenger(net.minecraft.world.entity.Entity, int);
+  public static void removeVirtualPassenger(net.minecraft.world.entity.Entity, int...);
+  public static net.minecraft.network.protocol.game.ClientboundSetEntityLinkPacket createClientboundSetEntityLinkPacket(int, int);
+  public static net.minecraft.network.protocol.game.ClientboundSetCameraPacket createClientboundSetCameraPacket(int);
+  public static net.minecraft.network.protocol.game.ClientboundSoundEntityPacket createClientboundSoundEntityPacket(int, net.minecraft.core.Holder<net.minecraft.sounds.SoundEvent>, net.minecraft.sounds.SoundSource, float, float, long);
+  public static net.minecraft.network.protocol.Packet<net.minecraft.network.protocol.game.ClientGamePacketListener> createMovePacket(int, net.minecraft.world.phys.Vec3, net.minecraft.world.phys.Vec3, boolean, float, float);
+  public static net.minecraft.network.protocol.game.ClientboundSetPassengersPacket createClientboundSetPassengersPacket(int, it.unimi.dsi.fastutil.ints.IntList);
+  public static net.minecraft.network.protocol.game.ClientboundSetPassengersPacket createClientboundSetPassengersPacket(int, int[]);
+  public static boolean isPlayerTracking(net.minecraft.server.level.ServerPlayer, net.minecraft.world.level.chunk.LevelChunk);
+  public static void wrapCallWithContext(net.minecraft.server.level.ServerLevel, java.lang.Runnable);
+}
+=== eu.pb4.polymer.virtualentity.api.attachment.BlockAwareAttachment
+Compiled from "BlockAwareAttachment.java"
+public interface eu.pb4.polymer.virtualentity.api.attachment.BlockAwareAttachment extends eu.pb4.polymer.virtualentity.api.attachment.HolderAttachment {
+  public static final eu.pb4.polymer.virtualentity.api.attachment.HolderAttachment$UpdateType BLOCK_STATE_UPDATE;
+  public abstract net.minecraft.core.BlockPos getBlockPos();
+  public abstract net.minecraft.world.level.block.state.BlockState getBlockState();
+  public abstract boolean isPartOfTheWorld();
+  public static eu.pb4.polymer.virtualentity.api.attachment.BlockAwareAttachment get(net.minecraft.world.level.Level, net.minecraft.core.BlockPos);
+  public static eu.pb4.polymer.virtualentity.api.attachment.BlockAwareAttachment get(net.minecraft.world.level.chunk.LevelChunk, net.minecraft.core.BlockPos);
+  public static eu.pb4.polymer.virtualentity.api.attachment.BlockAwareAttachment get(eu.pb4.polymer.virtualentity.api.ElementHolder);
+  static {};
+}
+=== eu.pb4.polymer.virtualentity.api.attachment.BlockBoundAttachment
+Compiled from "BlockBoundAttachment.java"
+public final class eu.pb4.polymer.virtualentity.api.attachment.BlockBoundAttachment extends eu.pb4.polymer.virtualentity.api.attachment.ChunkAttachment implements eu.pb4.polymer.virtualentity.api.attachment.BlockAwareAttachment {
+  public static final eu.pb4.polymer.virtualentity.api.attachment.HolderAttachment$UpdateType BLOCK_STATE_UPDATE;
+  public eu.pb4.polymer.virtualentity.api.attachment.BlockBoundAttachment(eu.pb4.polymer.virtualentity.api.ElementHolder, net.minecraft.world.level.chunk.LevelChunk, net.minecraft.world.level.block.state.BlockState, net.minecraft.core.BlockPos, net.minecraft.world.phys.Vec3, boolean);
+  public static eu.pb4.polymer.virtualentity.api.attachment.BlockBoundAttachment of(eu.pb4.polymer.virtualentity.api.ElementHolder, net.minecraft.server.level.ServerLevel, net.minecraft.core.BlockPos, net.minecraft.world.level.block.state.BlockState);
+  public static eu.pb4.polymer.virtualentity.api.attachment.BlockBoundAttachment of(eu.pb4.polymer.virtualentity.api.ElementHolder, net.minecraft.server.level.ServerLevel, net.minecraft.world.level.chunk.LevelChunk, net.minecraft.core.BlockPos, net.minecraft.world.level.block.state.BlockState);
+  public static eu.pb4.polymer.virtualentity.api.attachment.BlockBoundAttachment fromMoving(eu.pb4.polymer.virtualentity.api.ElementHolder, net.minecraft.server.level.ServerLevel, net.minecraft.core.BlockPos, net.minecraft.world.level.block.state.BlockState);
+  protected void attach();
+  public net.minecraft.core.BlockPos getBlockPos();
+  public void setBlockState(net.minecraft.world.level.block.state.BlockState);
+  public net.minecraft.world.level.block.state.BlockState getBlockState();
+  public boolean isPartOfTheWorld();
+  public static eu.pb4.polymer.virtualentity.api.attachment.BlockBoundAttachment get(net.minecraft.world.level.Level, net.minecraft.core.BlockPos);
+  public static eu.pb4.polymer.virtualentity.api.attachment.BlockBoundAttachment get(net.minecraft.world.level.chunk.LevelChunk, net.minecraft.core.BlockPos);
+  public static eu.pb4.polymer.virtualentity.api.attachment.BlockBoundAttachment get(eu.pb4.polymer.virtualentity.api.ElementHolder);
+  static {};
+}
+=== eu.pb4.polymer.virtualentity.api.attachment.ChunkAttachment
+Compiled from "ChunkAttachment.java"
+public class eu.pb4.polymer.virtualentity.api.attachment.ChunkAttachment implements eu.pb4.polymer.virtualentity.api.attachment.HolderAttachment {
+  protected net.minecraft.world.phys.Vec3 pos;
+  public eu.pb4.polymer.virtualentity.api.attachment.ChunkAttachment(eu.pb4.polymer.virtualentity.api.ElementHolder, net.minecraft.world.level.chunk.LevelChunk, net.minecraft.world.phys.Vec3, boolean);
+  protected void attach();
+  public static eu.pb4.polymer.virtualentity.api.attachment.HolderAttachment of(eu.pb4.polymer.virtualentity.api.ElementHolder, net.minecraft.server.level.ServerLevel, net.minecraft.core.BlockPos);
+  public static eu.pb4.polymer.virtualentity.api.attachment.HolderAttachment ofTicking(eu.pb4.polymer.virtualentity.api.ElementHolder, net.minecraft.server.level.ServerLevel, net.minecraft.core.BlockPos);
+  public static eu.pb4.polymer.virtualentity.api.attachment.HolderAttachment of(eu.pb4.polymer.virtualentity.api.ElementHolder, net.minecraft.server.level.ServerLevel, net.minecraft.world.phys.Vec3);
+  public static eu.pb4.polymer.virtualentity.api.attachment.HolderAttachment ofTicking(eu.pb4.polymer.virtualentity.api.ElementHolder, net.minecraft.server.level.ServerLevel, net.minecraft.world.phys.Vec3);
+  public eu.pb4.polymer.virtualentity.api.ElementHolder holder();
+  public void destroy();
+  public void tick();
+  public boolean shouldTick();
+  public void updateCurrentlyTracking(java.util.Collection<net.minecraft.server.network.ServerGamePacketListenerImpl>);
+  public void updateTracking(net.minecraft.server.network.ServerGamePacketListenerImpl);
+  public net.minecraft.world.phys.Vec3 getPos();
+  public net.minecraft.server.level.ServerLevel getWorld();
+  public net.minecraft.world.level.chunk.LevelChunk getChunk();
+  public boolean isRemoved();
+}
+=== eu.pb4.polymer.virtualentity.api.attachment.EntityAttachment
+Compiled from "EntityAttachment.java"
+public class eu.pb4.polymer.virtualentity.api.attachment.EntityAttachment implements eu.pb4.polymer.virtualentity.api.attachment.HolderAttachment {
+  protected final net.minecraft.world.entity.Entity entity;
+  public eu.pb4.polymer.virtualentity.api.attachment.EntityAttachment(eu.pb4.polymer.virtualentity.api.ElementHolder, net.minecraft.world.entity.Entity, boolean);
+  protected void attach();
+  public static eu.pb4.polymer.virtualentity.api.attachment.EntityAttachment of(eu.pb4.polymer.virtualentity.api.ElementHolder, net.minecraft.world.entity.Entity);
+  public static eu.pb4.polymer.virtualentity.api.attachment.EntityAttachment ofTicking(eu.pb4.polymer.virtualentity.api.ElementHolder, net.minecraft.world.entity.Entity);
+  public eu.pb4.polymer.virtualentity.api.ElementHolder holder();
+  public void destroy();
+  public void tick();
+  public void updateCurrentlyTracking(java.util.Collection<net.minecraft.server.network.ServerGamePacketListenerImpl>);
+  public boolean canUpdatePosition();
+  public void updateTracking(net.minecraft.server.network.ServerGamePacketListenerImpl);
+  public net.minecraft.world.phys.Vec3 getPos();
+  public net.minecraft.server.level.ServerLevel getWorld();
+  public boolean shouldTick();
+  public boolean isRemoved();
+}
+=== eu.pb4.polymer.virtualentity.api.attachment.HolderAttachment$UpdateType
+Compiled from "HolderAttachment.java"
+public interface eu.pb4.polymer.virtualentity.api.attachment.HolderAttachment$UpdateType {
+  public static final eu.pb4.polymer.virtualentity.api.attachment.HolderAttachment$UpdateType POSITION;
+  public static eu.pb4.polymer.virtualentity.api.attachment.HolderAttachment$UpdateType of();
+  public static eu.pb4.polymer.virtualentity.api.attachment.HolderAttachment$UpdateType of(java.lang.String);
+  static {};
+}
+=== eu.pb4.polymer.virtualentity.api.attachment.HolderAttachment
+Compiled from "HolderAttachment.java"
+public interface eu.pb4.polymer.virtualentity.api.attachment.HolderAttachment {
+  public abstract eu.pb4.polymer.virtualentity.api.ElementHolder holder();
+  public abstract void destroy();
+  public abstract net.minecraft.world.phys.Vec3 getPos();
+  public abstract net.minecraft.server.level.ServerLevel getWorld();
+  public abstract void updateCurrentlyTracking(java.util.Collection<net.minecraft.server.network.ServerGamePacketListenerImpl>);
+  public abstract void updateTracking(net.minecraft.server.network.ServerGamePacketListenerImpl);
+  public default boolean isRemoved();
+  public default void startWatching(net.minecraft.server.level.ServerPlayer);
+  public default void startWatching(net.minecraft.server.network.ServerGamePacketListenerImpl);
+  public default void startWatchingExtraPackets(net.minecraft.server.network.ServerGamePacketListenerImpl, java.util.function.Consumer<net.minecraft.network.protocol.Packet<net.minecraft.network.protocol.game.ClientGamePacketListener>>);
+  public default void stopWatching(net.minecraft.server.level.ServerPlayer);
+  public default void stopWatching(net.minecraft.server.network.ServerGamePacketListenerImpl);
+  public default void tick();
+  public default boolean shouldTick();
+  public default boolean canUpdatePosition();
+}
+=== eu.pb4.polymer.virtualentity.api.attachment.IdentifiedUniqueEntityAttachment
+Compiled from "IdentifiedUniqueEntityAttachment.java"
+public class eu.pb4.polymer.virtualentity.api.attachment.IdentifiedUniqueEntityAttachment extends eu.pb4.polymer.virtualentity.api.attachment.EntityAttachment implements eu.pb4.polymer.virtualentity.api.attachment.UniqueIdentifiableAttachment {
+  public eu.pb4.polymer.virtualentity.api.attachment.IdentifiedUniqueEntityAttachment(net.minecraft.resources.Identifier, eu.pb4.polymer.virtualentity.api.ElementHolder, net.minecraft.world.entity.Entity, boolean);
+  public static eu.pb4.polymer.virtualentity.api.attachment.IdentifiedUniqueEntityAttachment of(net.minecraft.resources.Identifier, eu.pb4.polymer.virtualentity.api.ElementHolder, net.minecraft.world.entity.Entity);
+  public static eu.pb4.polymer.virtualentity.api.attachment.IdentifiedUniqueEntityAttachment ofTicking(net.minecraft.resources.Identifier, eu.pb4.polymer.virtualentity.api.ElementHolder, net.minecraft.world.entity.Entity);
+  static eu.pb4.polymer.virtualentity.api.attachment.UniqueIdentifiableAttachment get(net.minecraft.world.entity.Entity, net.minecraft.resources.Identifier);
+  public net.minecraft.resources.Identifier getAttachmentId();
+}
+=== eu.pb4.polymer.virtualentity.api.attachment.ManualAttachment
+Compiled from "ManualAttachment.java"
+public final class eu.pb4.polymer.virtualentity.api.attachment.ManualAttachment implements eu.pb4.polymer.virtualentity.api.attachment.HolderAttachment {
+  public eu.pb4.polymer.virtualentity.api.attachment.ManualAttachment(eu.pb4.polymer.virtualentity.api.ElementHolder, net.minecraft.server.level.ServerLevel, java.util.function.Supplier<net.minecraft.world.phys.Vec3>);
+  public void destroy();
+  public net.minecraft.world.phys.Vec3 getPos();
+  public net.minecraft.server.level.ServerLevel getWorld();
+  public void updateCurrentlyTracking(java.util.Collection<net.minecraft.server.network.ServerGamePacketListenerImpl>);
+  public void updateTracking(net.minecraft.server.network.ServerGamePacketListenerImpl);
+  public eu.pb4.polymer.virtualentity.api.ElementHolder holder();
+  public net.minecraft.server.level.ServerLevel world();
+  public java.util.function.Supplier<net.minecraft.world.phys.Vec3> posSupplier();
+  public boolean equals(java.lang.Object);
+  public int hashCode();
+  public java.lang.String toString();
+}
+=== eu.pb4.polymer.virtualentity.api.attachment.UniqueIdentifiableAttachment
+Compiled from "UniqueIdentifiableAttachment.java"
+public interface eu.pb4.polymer.virtualentity.api.attachment.UniqueIdentifiableAttachment extends eu.pb4.polymer.virtualentity.api.attachment.HolderAttachment {
+  public abstract net.minecraft.resources.Identifier getAttachmentId();
+  public static eu.pb4.polymer.virtualentity.api.attachment.UniqueIdentifiableAttachment get(net.minecraft.world.entity.Entity, net.minecraft.resources.Identifier);
+}
+=== eu.pb4.polymer.virtualentity.api.data.DisplayEntityData$Block
+Compiled from "DisplayEntityData.java"
+public final class eu.pb4.polymer.virtualentity.api.data.DisplayEntityData$Block {
+  public static final net.minecraft.network.syncher.EntityDataAccessor<net.minecraft.world.level.block.state.BlockState> BLOCK_STATE;
+  static {};
+}
+=== eu.pb4.polymer.virtualentity.api.data.DisplayEntityData$Item
+Compiled from "DisplayEntityData.java"
+public final class eu.pb4.polymer.virtualentity.api.data.DisplayEntityData$Item {
+  public static final net.minecraft.network.syncher.EntityDataAccessor<net.minecraft.world.item.ItemStack> ITEM;
+  public static final net.minecraft.network.syncher.EntityDataAccessor<java.lang.Byte> ITEM_DISPLAY;
+  static {};
+}
+=== eu.pb4.polymer.virtualentity.api.data.DisplayEntityData$Text
+Compiled from "DisplayEntityData.java"
+public final class eu.pb4.polymer.virtualentity.api.data.DisplayEntityData$Text {
+  public static final byte SHADOW_FLAG;
+  public static final byte SEE_THROUGH_FLAG;
+  public static final byte DEFAULT_BACKGROUND_FLAG;
+  public static final byte LEFT_ALIGNMENT_FLAG;
+  public static final byte RIGHT_ALIGNMENT_FLAG;
+  public static final net.minecraft.network.syncher.EntityDataAccessor<net.minecraft.network.chat.Component> TEXT;
+  public static final net.minecraft.network.syncher.EntityDataAccessor<java.lang.Integer> LINE_WIDTH;
+  public static final net.minecraft.network.syncher.EntityDataAccessor<java.lang.Integer> BACKGROUND;
+  public static final net.minecraft.network.syncher.EntityDataAccessor<java.lang.Byte> TEXT_OPACITY;
+  public static final net.minecraft.network.syncher.EntityDataAccessor<java.lang.Byte> TEXT_DISPLAY_FLAGS;
+  static {};
+}
+=== eu.pb4.polymer.virtualentity.api.data.DisplayEntityData
+Compiled from "DisplayEntityData.java"
+public final class eu.pb4.polymer.virtualentity.api.data.DisplayEntityData {
+  public static final net.minecraft.network.syncher.EntityDataAccessor<org.joml.Vector3fc> TRANSLATION;
+  public static final net.minecraft.network.syncher.EntityDataAccessor<org.joml.Vector3fc> SCALE;
+  public static final net.minecraft.network.syncher.EntityDataAccessor<org.joml.Quaternionfc> LEFT_ROTATION;
+  public static final net.minecraft.network.syncher.EntityDataAccessor<org.joml.Quaternionfc> RIGHT_ROTATION;
+  public static final net.minecraft.network.syncher.EntityDataAccessor<java.lang.Integer> INTERPOLATION_DURATION;
+  public static final net.minecraft.network.syncher.EntityDataAccessor<java.lang.Integer> TELEPORTATION_DURATION;
+  public static final net.minecraft.network.syncher.EntityDataAccessor<java.lang.Integer> START_INTERPOLATION;
+  public static final net.minecraft.network.syncher.EntityDataAccessor<java.lang.Integer> BRIGHTNESS;
+  public static final net.minecraft.network.syncher.EntityDataAccessor<java.lang.Float> VIEW_RANGE;
+  public static final net.minecraft.network.syncher.EntityDataAccessor<java.lang.Float> SHADOW_RADIUS;
+  public static final net.minecraft.network.syncher.EntityDataAccessor<java.lang.Float> SHADOW_STRENGTH;
+  public static final net.minecraft.network.syncher.EntityDataAccessor<java.lang.Float> WIDTH;
+  public static final net.minecraft.network.syncher.EntityDataAccessor<java.lang.Float> HEIGHT;
+  public static final net.minecraft.network.syncher.EntityDataAccessor<java.lang.Integer> GLOW_COLOR_OVERRIDE;
+  public static final net.minecraft.network.syncher.EntityDataAccessor<java.lang.Byte> BILLBOARD;
+  static {};
+}
+=== eu.pb4.polymer.virtualentity.api.data.EntityData
+Compiled from "EntityData.java"
+public class eu.pb4.polymer.virtualentity.api.data.EntityData {
+  public static final net.minecraft.network.syncher.EntityDataAccessor<java.lang.Byte> FLAGS;
+  public static final net.minecraft.network.syncher.EntityDataAccessor<java.lang.Integer> FROZEN_TICKS;
+  public static final net.minecraft.network.syncher.EntityDataAccessor<java.lang.Boolean> NO_GRAVITY;
+  public static final net.minecraft.network.syncher.EntityDataAccessor<net.minecraft.world.entity.Pose> POSE;
+  public static final net.minecraft.network.syncher.EntityDataAccessor<java.lang.Integer> AIR;
+  public static final net.minecraft.network.syncher.EntityDataAccessor<java.util.Optional<net.minecraft.network.chat.Component>> CUSTOM_NAME;
+  public static final net.minecraft.network.syncher.EntityDataAccessor<java.lang.Boolean> NAME_VISIBLE;
+  public static final net.minecraft.network.syncher.EntityDataAccessor<java.lang.Boolean> SILENT;
+  public static final int ON_FIRE_FLAG_INDEX;
+  public static final int SNEAKING_FLAG_INDEX;
+  public static final int SPRINTING_FLAG_INDEX;
+  public static final int SWIMMING_FLAG_INDEX;
+  public static final int INVISIBLE_FLAG_INDEX;
+  public static final int GLOWING_FLAG_INDEX;
+  public static final int GLIDING_FLAG_INDEX;
+  public eu.pb4.polymer.virtualentity.api.data.EntityData();
+  static {};
+}
+=== eu.pb4.polymer.virtualentity.api.data.InteractionEntityData
+Compiled from "InteractionEntityData.java"
+public class eu.pb4.polymer.virtualentity.api.data.InteractionEntityData {
+  public static final net.minecraft.network.syncher.EntityDataAccessor<java.lang.Float> WIDTH;
+  public static final net.minecraft.network.syncher.EntityDataAccessor<java.lang.Float> HEIGHT;
+  public static final net.minecraft.network.syncher.EntityDataAccessor<java.lang.Boolean> RESPONSE;
+  public eu.pb4.polymer.virtualentity.api.data.InteractionEntityData();
+  static {};
+}
+=== eu.pb4.polymer.virtualentity.api.data.SimpleSynchedEntityData$Entry
+Compiled from "SimpleSynchedEntityData.java"
+public class eu.pb4.polymer.virtualentity.api.data.SimpleSynchedEntityData$Entry<T> {
+  final net.minecraft.network.syncher.EntityDataAccessor<T> data;
+  T value;
+  public eu.pb4.polymer.virtualentity.api.data.SimpleSynchedEntityData$Entry(net.minecraft.network.syncher.EntityDataAccessor<T>, T);
+  public net.minecraft.network.syncher.EntityDataAccessor<T> getData();
+  public void set(T);
+  public T get();
+  public boolean isDirty();
+  public void setDirty(boolean);
+  public boolean isUnchanged();
+  public net.minecraft.network.syncher.SynchedEntityData$DataValue<T> toSerialized();
+}
+=== eu.pb4.polymer.virtualentity.api.data.SimpleSynchedEntityData
+Compiled from "SimpleSynchedEntityData.java"
+public class eu.pb4.polymer.virtualentity.api.data.SimpleSynchedEntityData implements eu.pb4.polymer.virtualentity.api.data.SynchedEntityDataLike {
+  public eu.pb4.polymer.virtualentity.api.data.SimpleSynchedEntityData(net.minecraft.world.entity.EntityType<?>);
+  public <T> T get(net.minecraft.network.syncher.EntityDataAccessor<T>);
+  public <T> eu.pb4.polymer.virtualentity.api.data.SimpleSynchedEntityData$Entry<T> getEntry(net.minecraft.network.syncher.EntityDataAccessor<T>);
+  public boolean isDirty(net.minecraft.network.syncher.EntityDataAccessor<?>);
+  public <T> void set(net.minecraft.network.syncher.EntityDataAccessor<T>, T, boolean);
+  public <T> void setDirty(net.minecraft.network.syncher.EntityDataAccessor<T>, boolean);
+  public boolean isDirty();
+  public java.util.List<net.minecraft.network.syncher.SynchedEntityData$DataValue<?>> getDirtyEntries();
+  public java.util.List<net.minecraft.network.syncher.SynchedEntityData$DataValue<?>> getChangedEntries();
+}
+=== eu.pb4.polymer.virtualentity.api.data.SynchedEntityDataLike
+Compiled from "SynchedEntityDataLike.java"
+public interface eu.pb4.polymer.virtualentity.api.data.SynchedEntityDataLike {
+  public abstract <T> T get(net.minecraft.network.syncher.EntityDataAccessor<T>);
+  public default <T> void set(net.minecraft.network.syncher.EntityDataAccessor<T>, T);
+  public abstract <T> void set(net.minecraft.network.syncher.EntityDataAccessor<T>, T, boolean);
+  public abstract <T> void setDirty(net.minecraft.network.syncher.EntityDataAccessor<T>, boolean);
+  public abstract boolean isDirty();
+  public abstract boolean isDirty(net.minecraft.network.syncher.EntityDataAccessor<?>);
+  public abstract java.util.List<net.minecraft.network.syncher.SynchedEntityData$DataValue<?>> getDirtyEntries();
+  public abstract java.util.List<net.minecraft.network.syncher.SynchedEntityData$DataValue<?>> getChangedEntries();
+  public static eu.pb4.polymer.virtualentity.api.data.SynchedEntityDataLike wrap(net.minecraft.network.syncher.SynchedEntityData);
+}
+=== eu.pb4.polymer.virtualentity.api.data.WrappingSynchedEntityData
+Compiled from "WrappingSynchedEntityData.java"
+public class eu.pb4.polymer.virtualentity.api.data.WrappingSynchedEntityData implements eu.pb4.polymer.virtualentity.api.data.SynchedEntityDataLike {
+  public eu.pb4.polymer.virtualentity.api.data.WrappingSynchedEntityData(eu.pb4.polymer.virtualentity.api.data.SynchedEntityDataLike);
+  public <T> T get(net.minecraft.network.syncher.EntityDataAccessor<T>);
+  public <T> void set(net.minecraft.network.syncher.EntityDataAccessor<T>, T, boolean);
+  public <T> void setDirty(net.minecraft.network.syncher.EntityDataAccessor<T>, boolean);
+  public boolean isDirty();
+  public boolean isDirty(net.minecraft.network.syncher.EntityDataAccessor<?>);
+  public java.util.List<net.minecraft.network.syncher.SynchedEntityData$DataValue<?>> getDirtyEntries();
+  public java.util.List<net.minecraft.network.syncher.SynchedEntityData$DataValue<?>> getChangedEntries();
+}
+=== eu.pb4.polymer.virtualentity.api.elements.AbstractElement
+Compiled from "AbstractElement.java"
+public abstract class eu.pb4.polymer.virtualentity.api.elements.AbstractElement implements eu.pb4.polymer.virtualentity.api.elements.VirtualElement {
+  protected net.minecraft.world.phys.Vec3 lastSyncedPos;
+  protected java.util.function.Predicate<net.minecraft.server.level.ServerPlayer> elementVisiblityPredicate;
+  public eu.pb4.polymer.virtualentity.api.elements.AbstractElement();
+  public net.minecraft.world.phys.Vec3 getOffset();
+  public void setOffset(net.minecraft.world.phys.Vec3);
+  public net.minecraft.world.phys.Vec3 getOverridePos();
+  public void setOverridePos(net.minecraft.world.phys.Vec3);
+  public net.minecraft.world.phys.Vec3 getLastSyncedPos();
+  public void updateLastSyncedPos();
+  public eu.pb4.polymer.virtualentity.api.ElementHolder getHolder();
+  public void setHolder(eu.pb4.polymer.virtualentity.api.ElementHolder);
+  public eu.pb4.polymer.virtualentity.api.elements.VirtualElement$InteractionHandler getInteractionHandler(net.minecraft.server.level.ServerPlayer);
+  public void setInteractionHandler(eu.pb4.polymer.virtualentity.api.elements.VirtualElement$InteractionHandler);
+  public final void setVisibilityPredicate(java.util.function.Predicate<net.minecraft.server.level.ServerPlayer>);
+  public final java.util.function.Predicate<net.minecraft.server.level.ServerPlayer> getVisibilityPredicate();
+  public void sendPacket(net.minecraft.network.protocol.Packet<? extends net.minecraft.network.protocol.game.ClientGamePacketListener>);
+  public void sendPacket(net.minecraft.network.protocol.Packet<? extends net.minecraft.network.protocol.game.ClientGamePacketListener>, java.util.function.Predicate<net.minecraft.server.level.ServerPlayer>);
+  static {};
+}
+=== eu.pb4.polymer.virtualentity.api.elements.BlockDisplayElement
+Compiled from "BlockDisplayElement.java"
+public class eu.pb4.polymer.virtualentity.api.elements.BlockDisplayElement extends eu.pb4.polymer.virtualentity.api.elements.DisplayElement {
+  public eu.pb4.polymer.virtualentity.api.elements.BlockDisplayElement(net.minecraft.world.level.block.state.BlockState);
+  public eu.pb4.polymer.virtualentity.api.elements.BlockDisplayElement();
+  public void setBlockState(net.minecraft.world.level.block.state.BlockState);
+  public net.minecraft.world.level.block.state.BlockState getBlockState();
+  protected final net.minecraft.world.entity.EntityType<? extends net.minecraft.world.entity.Display> getEntityType();
+}
+=== eu.pb4.polymer.virtualentity.api.elements.DisplayElement
+Compiled from "DisplayElement.java"
+public abstract class eu.pb4.polymer.virtualentity.api.elements.DisplayElement extends eu.pb4.polymer.virtualentity.api.elements.GenericEntityElement {
+  public eu.pb4.polymer.virtualentity.api.elements.DisplayElement();
+  protected abstract net.minecraft.world.entity.EntityType<? extends net.minecraft.world.entity.Display> getEntityType();
+  public void setTransformation(com.mojang.math.Transformation);
+  public void setTransformation(org.joml.Matrix4fc);
+  public void setTransformation(org.joml.Matrix4x3fc);
+  public boolean isTransformationDirty();
+  public void setTranslation(org.joml.Vector3fc);
+  public org.joml.Vector3fc getTranslation();
+  public void setScale(org.joml.Vector3fc);
+  public org.joml.Vector3fc getScale();
+  public void setLeftRotation(org.joml.Quaternionfc);
+  public org.joml.Quaternionfc getLeftRotation();
+  public void setRightRotation(org.joml.Quaternionfc);
+  public org.joml.Quaternionfc getRightRotation();
+  public int getInterpolationDuration();
+  public void setInterpolationDuration(int);
+  public int getTeleportDuration();
+  public void setTeleportDuration(int);
+  public int getStartInterpolation();
+  public void startInterpolation();
+  public void setStartInterpolation(int);
+  public void startInterpolationIfDirty();
+  public net.minecraft.world.entity.Display$BillboardConstraints getBillboardMode();
+  public void setBillboardMode(net.minecraft.world.entity.Display$BillboardConstraints);
+  public net.minecraft.util.Brightness getBrightness();
+  public void setBrightness(net.minecraft.util.Brightness);
+  public float getViewRange();
+  public void setViewRange(float);
+  public float getShadowRadius();
+  public void setShadowRadius(float);
+  public float getShadowStrength();
+  public void setShadowStrength(float);
+  public float getDisplayWidth();
+  public float getDisplayHeight();
+  public void setDisplayWidth(float);
+  public void setDisplayHeight(float);
+  public void setDisplaySize(float, float);
+  public void setDisplaySize(net.minecraft.world.entity.EntityDimensions);
+  public int getGlowColorOverride();
+  public void setGlowColorOverride(int);
+}
+=== eu.pb4.polymer.virtualentity.api.elements.EntityElement
+Compiled from "EntityElement.java"
+public class eu.pb4.polymer.virtualentity.api.elements.EntityElement<T extends net.minecraft.world.entity.Entity> extends eu.pb4.polymer.virtualentity.api.elements.AbstractElement {
+  public eu.pb4.polymer.virtualentity.api.elements.EntityElement(T, net.minecraft.server.level.ServerLevel);
+  public eu.pb4.polymer.virtualentity.api.elements.EntityElement(T, net.minecraft.server.level.ServerLevel, eu.pb4.polymer.virtualentity.api.elements.VirtualElement$InteractionHandler);
+  public eu.pb4.polymer.virtualentity.api.elements.EntityElement(net.minecraft.world.entity.EntityType<T>, net.minecraft.server.level.ServerLevel);
+  public eu.pb4.polymer.virtualentity.api.elements.EntityElement(net.minecraft.world.entity.EntityType<T>, net.minecraft.server.level.ServerLevel, eu.pb4.polymer.virtualentity.api.elements.VirtualElement$InteractionHandler);
+  public T entity();
+  public it.unimi.dsi.fastutil.ints.IntList getEntityIds();
+  public void setHolder(eu.pb4.polymer.virtualentity.api.ElementHolder);
+  public void setOffset(net.minecraft.world.phys.Vec3);
+  public void setOverridePos(net.minecraft.world.phys.Vec3);
+  public void startWatching(net.minecraft.server.level.ServerPlayer, java.util.function.Consumer<net.minecraft.network.protocol.Packet<net.minecraft.network.protocol.game.ClientGamePacketListener>>);
+  public void stopWatching(net.minecraft.server.level.ServerPlayer, java.util.function.Consumer<net.minecraft.network.protocol.Packet<net.minecraft.network.protocol.game.ClientGamePacketListener>>);
+  public void notifyMove(net.minecraft.world.phys.Vec3, net.minecraft.world.phys.Vec3, net.minecraft.world.phys.Vec3);
+  public void setInitialPosition(net.minecraft.world.phys.Vec3);
+  public net.minecraft.world.phys.Vec3 getLastSyncedPos();
+  public void tick();
+}
+=== eu.pb4.polymer.virtualentity.api.elements.GenericEntityElement
+Compiled from "GenericEntityElement.java"
+public abstract class eu.pb4.polymer.virtualentity.api.elements.GenericEntityElement extends eu.pb4.polymer.virtualentity.api.elements.AbstractElement {
+  protected final eu.pb4.polymer.virtualentity.api.data.SynchedEntityDataLike syncedData;
+  public eu.pb4.polymer.virtualentity.api.elements.GenericEntityElement();
+  protected eu.pb4.polymer.virtualentity.api.data.SynchedEntityDataLike createSynchedEntityData();
+  public boolean isDirty();
+  public boolean isRotationDirty();
+  public void ignorePositionUpdates();
+  public void instantPositionUpdates();
+  public void setInstantPositionUpdates(boolean);
+  public void setSendPositionUpdates(boolean);
+  public boolean isSendingPositionUpdates();
+  public void setAlwaysSyncAbsolutePosition(boolean);
+  public boolean isAlwaysSyncingAbsolutePosition();
+  public void setPitch(float);
+  public void setYaw(float);
+  public float getYaw();
+  public float getPitch();
+  public it.unimi.dsi.fastutil.ints.IntList getEntityIds();
+  public final java.util.UUID getUuid();
+  public final int getEntityId();
+  protected abstract net.minecraft.world.entity.EntityType<? extends net.minecraft.world.entity.Entity> getEntityType();
+  public void startWatching(net.minecraft.server.level.ServerPlayer, java.util.function.Consumer<net.minecraft.network.protocol.Packet<net.minecraft.network.protocol.game.ClientGamePacketListener>>);
+  protected net.minecraft.network.protocol.Packet<net.minecraft.network.protocol.game.ClientGamePacketListener> createSpawnPacket(net.minecraft.server.level.ServerPlayer);
+  protected void sendChangedTrackerEntries(net.minecraft.server.level.ServerPlayer, java.util.function.Consumer<net.minecraft.network.protocol.Packet<net.minecraft.network.protocol.game.ClientGamePacketListener>>);
+  public void notifyMove(net.minecraft.world.phys.Vec3, net.minecraft.world.phys.Vec3, net.minecraft.world.phys.Vec3);
+  public void stopWatching(net.minecraft.server.level.ServerPlayer, java.util.function.Consumer<net.minecraft.network.protocol.Packet<net.minecraft.network.protocol.game.ClientGamePacketListener>>);
+  public void tick();
+  protected void sendPositionUpdates();
+  protected void sendTrackerUpdates();
+  protected void sendRotationUpdates();
+  public eu.pb4.polymer.virtualentity.api.data.SynchedEntityDataLike getSyncedData();
+  public net.minecraft.world.entity.Pose getPose();
+  public void setPose(net.minecraft.world.entity.Pose);
+  public void setOnFire(boolean);
+  protected boolean getFlag(int);
+  protected void setFlag(int, boolean);
+  public boolean isSneaking();
+  public void setSneaking(boolean);
+  public boolean isSprinting();
+  public void setSprinting(boolean);
+  public boolean isGlowing();
+  public final void setGlowing(boolean);
+  public boolean isInvisible();
+  public void setInvisible(boolean);
+  public int getAir();
+  public void setAir(int);
+  public int getFrozenTicks();
+  public void setFrozenTicks(int);
+  public net.minecraft.network.chat.Component getCustomName();
+  public void setCustomName(net.minecraft.network.chat.Component);
+  public boolean isCustomNameVisible();
+  public void setCustomNameVisible(boolean);
+  public boolean isSilent();
+  public void setSilent(boolean);
+  public boolean hasNoGravity();
+  public void setNoGravity(boolean);
+  public void setRotation(float, float);
+}
+=== eu.pb4.polymer.virtualentity.api.elements.InteractionElement
+Compiled from "InteractionElement.java"
+public class eu.pb4.polymer.virtualentity.api.elements.InteractionElement extends eu.pb4.polymer.virtualentity.api.elements.GenericEntityElement {
+  public eu.pb4.polymer.virtualentity.api.elements.InteractionElement();
+  public eu.pb4.polymer.virtualentity.api.elements.InteractionElement(eu.pb4.polymer.virtualentity.api.elements.VirtualElement$InteractionHandler);
+  public static eu.pb4.polymer.virtualentity.api.elements.InteractionElement redirect(net.minecraft.world.entity.Entity);
+  protected final net.minecraft.world.entity.EntityType<? extends net.minecraft.world.entity.Entity> getEntityType();
+  public float getWidth();
+  public void setWidth(float);
+  public float getHeight();
+  public void setHeight(float);
+  public void setResponse(boolean);
+  public void setSize(float, float);
+  public void setSize(net.minecraft.world.entity.EntityDimensions);
+  public boolean shouldRespond();
+}
+=== eu.pb4.polymer.virtualentity.api.elements.ItemDisplayElement
+Compiled from "ItemDisplayElement.java"
+public class eu.pb4.polymer.virtualentity.api.elements.ItemDisplayElement extends eu.pb4.polymer.virtualentity.api.elements.DisplayElement {
+  public eu.pb4.polymer.virtualentity.api.elements.ItemDisplayElement(net.minecraft.world.item.ItemStack);
+  public eu.pb4.polymer.virtualentity.api.elements.ItemDisplayElement();
+  public eu.pb4.polymer.virtualentity.api.elements.ItemDisplayElement(net.minecraft.world.item.Item);
+  public void setItem(net.minecraft.world.item.ItemStack);
+  public net.minecraft.world.item.ItemStack getItem();
+  public void setItemDisplayContext(net.minecraft.world.item.ItemDisplayContext);
+  public net.minecraft.world.item.ItemDisplayContext getItemDisplayContext();
+  protected final net.minecraft.world.entity.EntityType<? extends net.minecraft.world.entity.Display> getEntityType();
+}
+=== eu.pb4.polymer.virtualentity.api.elements.MarkerElement
+Compiled from "MarkerElement.java"
+public class eu.pb4.polymer.virtualentity.api.elements.MarkerElement extends eu.pb4.polymer.virtualentity.api.elements.GenericEntityElement {
+  public eu.pb4.polymer.virtualentity.api.elements.MarkerElement();
+  protected net.minecraft.world.entity.EntityType<? extends net.minecraft.world.entity.Entity> getEntityType();
+}
+=== eu.pb4.polymer.virtualentity.api.elements.MobAnchorElement
+Compiled from "MobAnchorElement.java"
+public class eu.pb4.polymer.virtualentity.api.elements.MobAnchorElement extends eu.pb4.polymer.virtualentity.api.elements.GenericEntityElement {
+  public eu.pb4.polymer.virtualentity.api.elements.MobAnchorElement();
+  protected net.minecraft.world.entity.EntityType<? extends net.minecraft.world.entity.Entity> getEntityType();
+}
+=== eu.pb4.polymer.virtualentity.api.elements.SimpleEntityElement
+Compiled from "SimpleEntityElement.java"
+public class eu.pb4.polymer.virtualentity.api.elements.SimpleEntityElement extends eu.pb4.polymer.virtualentity.api.elements.GenericEntityElement {
+  public eu.pb4.polymer.virtualentity.api.elements.SimpleEntityElement(net.minecraft.world.entity.EntityType<?>);
+  protected eu.pb4.polymer.virtualentity.api.data.SynchedEntityDataLike createSynchedEntityData();
+  protected net.minecraft.world.entity.EntityType<? extends net.minecraft.world.entity.Entity> getEntityType();
+  static {};
+}
+=== eu.pb4.polymer.virtualentity.api.elements.TextDisplayElement
+Compiled from "TextDisplayElement.java"
+public class eu.pb4.polymer.virtualentity.api.elements.TextDisplayElement extends eu.pb4.polymer.virtualentity.api.elements.DisplayElement {
+  public eu.pb4.polymer.virtualentity.api.elements.TextDisplayElement(net.minecraft.network.chat.Component);
+  public eu.pb4.polymer.virtualentity.api.elements.TextDisplayElement();
+  public net.minecraft.network.chat.Component getText();
+  public void setText(net.minecraft.network.chat.Component);
+  public int getLineWidth();
+  public void setLineWidth(int);
+  public byte getTextOpacity();
+  public void setTextOpacity(byte);
+  public int getBackground();
+  public void setBackground(int);
+  public byte getDisplayFlags();
+  public void setDisplayFlags(byte);
+  public boolean getDisplayFlag(byte);
+  public void setDisplayFlag(byte, boolean);
+  public void setTextAlignment(net.minecraft.world.entity.Display$TextDisplay$Align);
+  public net.minecraft.world.entity.Display$TextDisplay$Align getTextAlignment();
+  public void setShadow(boolean);
+  public boolean getShadow();
+  public void setSeeThrough(boolean);
+  public boolean getSeeThrough();
+  public void setDefaultBackground(boolean);
+  public boolean getDefaultBackground();
+  protected final net.minecraft.world.entity.EntityType<? extends net.minecraft.world.entity.Display> getEntityType();
+}
+=== eu.pb4.polymer.virtualentity.api.elements.VirtualElement$InteractionHandler
+Compiled from "VirtualElement.java"
+public interface eu.pb4.polymer.virtualentity.api.elements.VirtualElement$InteractionHandler {
+  public static final eu.pb4.polymer.virtualentity.api.elements.VirtualElement$InteractionHandler EMPTY;
+  public static eu.pb4.polymer.virtualentity.api.elements.VirtualElement$InteractionHandler redirect(net.minecraft.world.entity.Entity);
+  public default void interact(net.minecraft.server.level.ServerPlayer, net.minecraft.world.InteractionHand, net.minecraft.world.phys.Vec3, boolean);
+  public default void attack(net.minecraft.server.level.ServerPlayer);
+  public default void pickItem(net.minecraft.server.level.ServerPlayer, boolean);
+  static {};
+}
+=== eu.pb4.polymer.virtualentity.api.elements.VirtualElement
+Compiled from "VirtualElement.java"
+public interface eu.pb4.polymer.virtualentity.api.elements.VirtualElement {
+  public abstract it.unimi.dsi.fastutil.ints.IntList getEntityIds();
+  public abstract void setHolder(eu.pb4.polymer.virtualentity.api.ElementHolder);
+  public abstract eu.pb4.polymer.virtualentity.api.ElementHolder getHolder();
+  public abstract net.minecraft.world.phys.Vec3 getOffset();
+  public abstract void setOffset(net.minecraft.world.phys.Vec3);
+  public default net.minecraft.world.phys.Vec3 getOverridePos();
+  public default void setOverridePos(net.minecraft.world.phys.Vec3);
+  public default net.minecraft.world.phys.Vec3 getCurrentPos();
+  public default net.minecraft.world.phys.Vec3 getLastSyncedPos();
+  public abstract void startWatching(net.minecraft.server.level.ServerPlayer, java.util.function.Consumer<net.minecraft.network.protocol.Packet<net.minecraft.network.protocol.game.ClientGamePacketListener>>);
+  public abstract void stopWatching(net.minecraft.server.level.ServerPlayer, java.util.function.Consumer<net.minecraft.network.protocol.Packet<net.minecraft.network.protocol.game.ClientGamePacketListener>>);
+  public abstract void notifyMove(net.minecraft.world.phys.Vec3, net.minecraft.world.phys.Vec3, net.minecraft.world.phys.Vec3);
+  public abstract void tick();
+  public abstract eu.pb4.polymer.virtualentity.api.elements.VirtualElement$InteractionHandler getInteractionHandler(net.minecraft.server.level.ServerPlayer);
+  public default void setInitialPosition(net.minecraft.world.phys.Vec3);
+}
