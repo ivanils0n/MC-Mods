@@ -20,7 +20,10 @@ public abstract class PlayerModelMixin {
 
 	@Inject(method = "setupAnim(Lnet/minecraft/client/renderer/entity/state/AvatarRenderState;)V", at = @At("HEAD"))
 	private void interfacedinamica$before(AvatarRenderState s, CallbackInfo ci) {
-		if (interfacedinamica$mine(s)) Poses.before(s, Anim.poseT());
+		if (interfacedinamica$mine(s)) {
+			Poses.before(s, Anim.poseT());
+			Poses.handItems(s, Anim.poseT());
+		}
 	}
 
 	@Inject(method = "setupAnim(Lnet/minecraft/client/renderer/entity/state/AvatarRenderState;)V", at = @At("TAIL"))

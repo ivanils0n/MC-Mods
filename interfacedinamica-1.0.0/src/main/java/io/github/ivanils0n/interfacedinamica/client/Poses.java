@@ -1,6 +1,11 @@
 package io.github.ivanils0n.interfacedinamica.client;
 
+import net.minecraft.client.Minecraft;
 import net.minecraft.client.model.geom.ModelPart;
+import net.minecraft.client.renderer.item.ItemModelResolver;
+import net.minecraft.world.item.ItemDisplayContext;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.Items;
 import net.minecraft.client.model.player.PlayerModel;
 import net.minecraft.client.renderer.entity.state.AvatarRenderState;
 import net.minecraft.util.Mth;
@@ -14,7 +19,22 @@ public final class Poses {
 	public static final int HAMMER_PERIOD = 14;
 	public static final float HAMMER_HIT = 10f / HAMMER_PERIOD;
 
+	/** Para trocar o item da mão (martelo na bigorna); vem do desenhista de entidades. */
+	public static ItemModelResolver resolver;
+	private static final ItemStack HAMMER = new ItemStack(Items.MACE);
+
 	private Poses() {}
+
+	/** Na bigorna o personagem segura um martelo (a maça do jogo) na mão direita, só no desenho. */
+	public static void handItems(AvatarRenderState s, float t) {
+		if (Anim.theme() != Theme.ANVIL || !Anim.hasBlock() || t < 0.5f || resolver == null) return;
+		Minecraft mc = Minecraft.getInstance();
+		if (mc.player == null) return;
+		s.rightHandItemStack = HAMMER;
+		resolver.updateForLiving(s.rightHandItemState, HAMMER, ItemDisplayContext.THIRD_PERSON_RIGHT_HAND, mc.player);
+		s.leftHandItemStack = ItemStack.EMPTY;
+		s.leftHandItemState.clear();
+	}
 
 	/** Antes do modelo calcular: encostar (corpo inclinado) e cabeça olhando para o que está fazendo. */
 	public static void before(AvatarRenderState s, float t) {

@@ -102,14 +102,14 @@ public final class Anim {
 		if (theme == Theme.INVENTORY || !(mc.hitResult instanceof BlockHitResult hit) || hit.getType() != HitResult.Type.BLOCK) return;
 		LocalPlayer p = mc.player;
 		BlockPos pos = hit.getBlockPos();
-		if (pos.getCenter().distanceTo(p.getEyePosition(1f)) > 6) return;
+		if (Vec3.atCenterOf(pos).distanceTo(p.getEyePosition(1f)) > 6) return;
 		Direction face = hit.getDirection();
 		if (face.getAxis() == Direction.Axis.Y) {
 			// clicou em cima ou embaixo: fica do lado mais perto do jogador
-			double dx = p.getX() - pos.getCenter().x, dz = p.getZ() - pos.getCenter().z;
+			double dx = p.getX() - Vec3.atCenterOf(pos).x, dz = p.getZ() - Vec3.atCenterOf(pos).z;
 			face = Math.abs(dx) > Math.abs(dz) ? (dx > 0 ? Direction.EAST : Direction.WEST) : (dz > 0 ? Direction.SOUTH : Direction.NORTH);
 		}
-		blockCenter = pos.getCenter();
+		blockCenter = Vec3.atCenterOf(pos);
 		double gap = theme == Theme.ANVIL ? 0.95 : 0.82;
 		double sx = blockCenter.x + face.getStepX() * gap, sz = blockCenter.z + face.getStepZ() * gap;
 		stand = new Vec3(sx, p.getY(), sz);
