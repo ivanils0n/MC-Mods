@@ -16,7 +16,8 @@ import net.minecraft.world.inventory.AbstractContainerMenu;
 import net.minecraft.world.inventory.Slot;
 import net.minecraft.world.item.ItemDisplayContext;
 import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.level.block.Blocks;
+import net.minecraft.core.registries.BuiltInRegistries;
+import net.minecraft.resources.Identifier;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.Vec3;
 import org.joml.Vector3f;
@@ -71,12 +72,12 @@ public final class MenuPanel extends ElementHolder {
 		this.h = Math.max(60, maxY + 16 + 8);
 
 		// Moldura escura, fundo cinza claro e um quadradinho mais escuro por espaço (como a tela do jogo).
-		rect(Blocks.BLACK_CONCRETE.defaultBlockState(), -2, -2, w + 4, h + 4, 0f);
-		rect(Blocks.WHITE_CONCRETE.defaultBlockState(), 0, 0, w, h, 0.002f);
+		rect(block("black_concrete"), -2, -2, w + 4, h + 4, 0f);
+		rect(block("white_concrete"), 0, 0, w, h, 0.002f);
 		for (Slot s : menu.slots) {
 			if (!s.isActive()) continue;
-			rect(Blocks.GRAY_CONCRETE.defaultBlockState(), s.x - 1, s.y - 1, 18, 18, 0.004f);
-			rect(Blocks.LIGHT_GRAY_CONCRETE.defaultBlockState(), s.x, s.y, 16, 16, 0.005f);
+			rect(block("gray_concrete"), s.x - 1, s.y - 1, 18, 18, 0.004f);
+			rect(block("light_gray_concrete"), s.x, s.y, 16, 16, 0.005f);
 			ItemDisplayElement item = new ItemDisplayElement();
 			item.setItemDisplayContext(ItemDisplayContext.GUI);
 			setup(item, new Vector3f(x(s.x + 8), y(s.y + 8), 0.012f), new Vector3f(16 * U, 16 * U, 0.001f));
@@ -104,6 +105,10 @@ public final class MenuPanel extends ElementHolder {
 		}
 		updateItems();
 		updateOffset(true);
+	}
+
+	private static BlockState block(String id) {
+		return BuiltInRegistries.BLOCK.getValue(Identifier.withDefaultNamespace(id)).defaultBlockState();
 	}
 
 	private float x(float gx) {
