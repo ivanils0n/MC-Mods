@@ -1,0 +1,53 @@
+name: probe-interface
+on:
+  push:
+    branches: [probe-interface]
+jobs:
+  probe:
+    runs-on: ubuntu-24.04
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v6
+      - uses: actions/setup-java@v5
+        with:
+          java-version: '25'
+          distribution: 'microsoft'
+      - run: chmod +x ./gradlew
+      - run: ./gradlew --configure-on-demand ":mochilas-1.0.0:compileGametestJava" "-Pminecraft_version=26.2" "-Pminecraft_dependency=~26.2"
+      - name: Dump API
+        run: |
+          set +e
+          mkdir -p out
+          jar=$(find ~/.gradle -name 'minecraft-merged-deobf-26.2.jar' | head -1)
+          P=out/mc.txt; : > $P
+          while read -r c; do
+            [ -z "$c" ] && continue
+            echo "=== $c" >> $P; javap -p -cp "$jar" "$c" >> $P 2>&1
+          done < .github/probe-classes.txt
+          C=out/code.txt; : > $C
+          for c in net.minecraft.client.Camera net.minecraft.client.gui.screens.Screen net.minecraft.client.gui.screens.inventory.AbstractContainerScreen net.minecraft.client.renderer.entity.LivingEntityRenderer; do
+            echo "=== $c" >> $C; javap -c -p -cp "$jar" "$c" >> $C 2>&1
+          done
+          V=out/polymer.txt; : > $V
+          for pj in $(find ~/.gradle -name 'polymer-virtual-entity*.jar' -o -name 'polymer-bundled*.jar' | grep -v sources | sort -u); do
+            echo "JAR $pj" >> $V
+            for c in $(unzip -l "$pj" | awk '{print $4}' | grep -E 'eu/pb4/polymer/virtualentity/api/.*\.class$' | grep -v '\$[0-9]'); do
+              cn=$(echo "$c" | sed 's/\.class$//; s#/#.#g'); echo "=== $cn" >> $V; javap -cp "$pj" "$cn" >> $V 2>&1
+            done
+          done
+          F=out/fabric.txt; : > $F
+          for gj in $(find ~/.gradle -name 'fabric-networking-api-v1*.jar' -o -name 'fabric-key-mapping-api*.jar' -o -name 'fabric-key-binding-api*.jar' -o -name 'fabric-lifecycle-events-v1*.jar' -o -name 'fabric-screen-api-v1*.jar' | grep -v sources | sort -u); do
+            echo "JAR $gj" >> $F
+            for c in $(unzip -l "$gj" | awk '{print $4}' | grep -E 'net/fabricmc/fabric/api/.*\.class$' | grep -v '\$[0-9]'); do
+              cn=$(echo "$c" | sed 's/\.class$//; s#/#.#g'); echo "=== $cn" >> $F; javap -cp "$gj" "$cn" >> $F 2>&1
+            done
+          done
+          wc -c out/*
+      - name: Publicar dump
+        run: |
+          git config user.name ci; git config user.email ci@example.com
+          git checkout -B probe-interface-out
+          git add -f out
+          git commit -qm "dump da API (interface dinamica)"
+          git push -qf origin probe-interface-out
