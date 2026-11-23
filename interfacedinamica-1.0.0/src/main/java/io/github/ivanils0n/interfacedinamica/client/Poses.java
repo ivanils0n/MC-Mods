@@ -25,15 +25,22 @@ public final class Poses {
 
 	private Poses() {}
 
-	/** Na bigorna o personagem segura um martelo (a maça do jogo) na mão direita, só no desenho. */
+	/**
+	 * Mãos livres para trabalhar (o item da mão some só no desenho); na bigorna o personagem segura um martelo
+	 * (a maça do jogo) na mão direita.
+	 */
 	public static void handItems(AvatarRenderState s, float t) {
-		if (Anim.theme() != Theme.ANVIL || !Anim.hasBlock() || t < 0.5f || resolver == null) return;
-		Minecraft mc = Minecraft.getInstance();
-		if (mc.player == null) return;
-		s.rightHandItemStack = HAMMER;
-		resolver.updateForLiving(s.rightHandItemState, HAMMER, ItemDisplayContext.THIRD_PERSON_RIGHT_HAND, mc.player);
+		if (t < 0.5f) return;
 		s.leftHandItemStack = ItemStack.EMPTY;
 		s.leftHandItemState.clear();
+		Minecraft mc = Minecraft.getInstance();
+		if (Anim.theme() == Theme.ANVIL && Anim.hasBlock() && resolver != null && mc.player != null) {
+			s.rightHandItemStack = HAMMER;
+			resolver.updateForLiving(s.rightHandItemState, HAMMER, ItemDisplayContext.THIRD_PERSON_RIGHT_HAND, mc.player);
+		} else {
+			s.rightHandItemStack = ItemStack.EMPTY;
+			s.rightHandItemState.clear();
+		}
 	}
 
 	/** Antes do modelo calcular: encostar (corpo inclinado) e cabeça olhando para o que está fazendo. */
